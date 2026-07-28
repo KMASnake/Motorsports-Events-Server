@@ -1,0 +1,93 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: motorsports-events-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: ./server
+    container_name: motorsports-events-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_VERSION: ${APP_VERSION:-2.4.0}
+      APP_BUILD: ${APP_BUILD:-20260728-080615}
+      APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${API_BIND_PORT:-8088}:8000"
+    networks:
+      - backend
+      - proxy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  scheduler:
+    build:
+      context: ./server
+    container_name: motorsports-events-scheduler
+    restart: unless-stopped
+    command: ["python", "-m", "app.scheduler"]
+    env_file:
+      - .env
+    environment:
+      APP_VERSION: ${APP_VERSION:-2.4.0}
+      APP_BUILD: ${APP_BUILD:-20260728-080615}
+      APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: motorsports-events-caddy
+    restart: unless-stopped
+    profiles: ["vps"]
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_DOMAIN: ${API_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/caddy:/data
+      - ./data/caddy-config:/config
+    networks:
+      - proxy
+
+networks:
+  backend:
+  proxy:

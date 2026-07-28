@@ -1,0 +1,14 @@
+.env
+data/
+backups/
+logs/
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.sha256

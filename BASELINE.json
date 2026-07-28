@@ -1,0 +1,15 @@
+{
+  "project": "motorsports-events-server",
+  "milestone": "1-foundation-server",
+  "functional_baseline": "2.4.0",
+  "client_repositories": [
+    "motorsports-events-mybb",
+    "motorsports-events-android"
+  ],
+  "hashes": {
+    "VERSION": "2ad7b0c3f0ede58c3165b7a8a5479e890a758d39bfe8683eaef50ce6afad7232",
+    "server/Dockerfile": "9e53fa2fa2f9c7967db20aef8597a1d20f42fe1ef78d6a8e260cc94ca0dd65ea",
+    "server/app/main.py": "27081688555e11c97e34a292da7c8d104a7dec3a53565adc840e6be0630b5428",
+    "docker-compose.yml": "e116edea5b66b6c6bbba2f5991c6d6686ee33a519cfe059e52ea8bb17e57c73f"
+  }
+}
