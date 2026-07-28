@@ -25,6 +25,12 @@ class ArchitectureBoundaryTests(unittest.TestCase):
         ):
             self.assertTrue((APP / module).is_file(), module)
 
+    def test_events_query_does_not_distinct_json_rows(self):
+        source = (APP / "main.py").read_text(encoding="utf-8")
+
+        self.assertNotIn(".distinct().all()", source)
+        self.assertIn("matching_sessions.c.first_start", source)
+
 
 if __name__ == "__main__":
     unittest.main()
