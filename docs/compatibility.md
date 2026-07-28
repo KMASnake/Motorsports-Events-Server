@@ -12,3 +12,28 @@ API serveur prise en charge : >= 1.0 et < 2.0
 
 Le serveur ne doit pas introduire de rupture dans `/api/v1` sans créer une
 nouvelle version majeure de l’API.
+
+## Règles de l'API v1
+
+Sont compatibles dans `/api/v1` :
+
+- l'ajout d'une route ;
+- l'ajout d'un paramètre facultatif ;
+- l'ajout d'un champ de réponse ;
+- l'ajout d'une valeur documentée à une énumération ouverte.
+
+Nécessitent `/api/v2` :
+
+- le retrait ou le renommage d'un champ ;
+- le changement de type d'un champ ;
+- la modification de la signification d'un champ existant ;
+- le changement d'une valeur par défaut qui retire des données.
+
+Les clients doivent ignorer les champs JSON inconnus et traiter
+`deleted=true` comme une suppression logique.
+
+## Versions
+
+- serveur 2.4.x : API v1 historique avec synchronisation par `since` ;
+- serveur 2.5.x : API v1, curseur différentiel recommandé et schémas OpenAPI
+  explicites.

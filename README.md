@@ -5,9 +5,10 @@ Serveur central indépendant de la plateforme Motorsports Events.
 Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 évolueront dans des dépôts séparés et communiqueront avec le serveur par l’API.
 
-## Base fonctionnelle
+## Version courante
 
-La base importée correspond au serveur **2.4.0 validé sur VPS** :
+La version **2.5.2 — Jalon 3** conserve la base 2.4.0 validée sur VPS et
+stabilise le contrat destiné aux clients :
 
 - FastAPI ;
 - PostgreSQL ;
@@ -16,7 +17,9 @@ La base importée correspond au serveur **2.4.0 validé sur VPS** :
 - TheSportsDB ;
 - Caddy ;
 - installation Docker ;
-- sauvegarde, mise à niveau et rollback.
+- sauvegarde, mise à niveau et rollback ;
+- API v1 documentée ;
+- synchronisation différentielle par curseur.
 
 ## Structure
 
@@ -60,3 +63,10 @@ Les clients sont développés séparément :
 - `motorsports-events-android`
 
 Le contrat entre les projets est l’API REST versionnée du serveur.
+
+Voir :
+
+- `docs/api-v1.md` ;
+- `docs/clients/mybb.md` ;
+- `docs/clients/android.md` ;
+- `docs/compatibility.md`.

@@ -25,8 +25,8 @@ services:
     env_file:
       - .env
     environment:
-      APP_VERSION: ${APP_VERSION:-2.4.0}
-      APP_BUILD: ${APP_BUILD:-20260728-080615}
+      APP_VERSION: ${APP_VERSION:-2.5.2}
+      APP_BUILD: ${APP_BUILD:-20260728-210128}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
     depends_on:
       db:
@@ -57,8 +57,8 @@ services:
     env_file:
       - .env
     environment:
-      APP_VERSION: ${APP_VERSION:-2.4.0}
-      APP_BUILD: ${APP_BUILD:-20260728-080615}
+      APP_VERSION: ${APP_VERSION:-2.5.2}
+      APP_BUILD: ${APP_BUILD:-20260728-210128}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
     depends_on:
       db:

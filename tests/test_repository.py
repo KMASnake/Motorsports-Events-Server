@@ -19,3 +19,12 @@ def test_required_server_files_exist():
 
 def test_version_is_defined():
     assert (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+
+
+def test_events_query_does_not_apply_distinct_to_json_rows():
+    source = (
+        ROOT / "server" / "app" / "main.py"
+    ).read_text(encoding="utf-8")
+
+    assert ".distinct().all()" not in source
+    assert "matching_sessions.c.first_start" in source

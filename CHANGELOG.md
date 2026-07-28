@@ -1,5 +1,34 @@
 # Changelog
 
+## 2.5.2 — Cohérence pendant les synchronisations
+
+- Ajout de l'identifiant de synchronisation dans le curseur opaque.
+- Réponse `503` lorsque le scheduler modifie les données.
+- Réponse `409` lorsqu'une synchronisation invalide une pagination.
+- Prévention des pages vides silencieuses pendant une synchronisation.
+- Documentation de la stratégie de reprise MyBB et Android.
+
+## 2.5.1 — Correctif de pagination du jalon 3
+
+- Comparaison des curseurs par microsecondes Unix plutôt que par dates SQL.
+- Compatibilité avec les bases historiques utilisant un timestamp sans fuseau.
+- Correction d'une page vide après une réponse `has_more=true`.
+- Suppression du `DISTINCT` incompatible avec le champ PostgreSQL `json`.
+- Sélection des épreuves par une sous-requête groupée sur les séances.
+- Ajout d'un test de non-régression sur la normalisation des fuseaux.
+
+## 2.5.0 — Jalon 3, contrats clients
+
+- Déclaration explicite des schémas publics OpenAPI v1.
+- Stabilisation des champs JSON des sports, épreuves et séances.
+- Pagination différentielle déterministe par horodatage et identifiant.
+- Ajout d'un curseur opaque conservant un instantané cohérent.
+- Conservation du paramètre historique `since` et de `next_cursor`.
+- Ajout de `limit`, `has_more`, `cursor` et `snapshot_at`.
+- Documentation du contrat API et des intégrations MyBB et Android.
+- Formalisation de la politique de compatibilité de `/api/v1`.
+- Ajout de tests de non-régression des réponses et des curseurs.
+
 ## Jalon 2 — Séparation interne progressive
 
 - Extraction du domaine métier sans dépendance aux frameworks.
@@ -97,6 +126,3 @@
 - Détection automatique de l’environnement conservée.
 - Tous les chemins d’exploitation sont relatifs à la racine du projet.
 - Données et sauvegardes centralisées.
-
-
-
