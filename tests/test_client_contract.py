@@ -1,8 +1,14 @@
+import sys
 import unittest
 from datetime import datetime, timezone
+from pathlib import Path
 from types import SimpleNamespace
 
-from server.app.api.client_contract import (
+
+SERVER_ROOT = Path(__file__).resolve().parent.parent / "server"
+sys.path.insert(0, str(SERVER_ROOT))
+
+from app.api.client_contract import (  # noqa: E402
     InvalidCursor,
     change_payload,
     decode_cursor,
