@@ -37,10 +37,10 @@ La version 2.5.2 est validée sur le VPS :
 
 ## État Git
 
-- branche stable distante avant publication du Jalon 3 : `main` ;
-- dernier commit stable antérieur : `c401257` (serveur 2.4.0, Jalon 2) ;
-- publication 2.5.2 : préparée dans une pull request dédiée ;
-- tag attendu après intégration : `v2.5.2`.
+- branche stable : `main` ;
+- publication 2.5.2 : pull request GitHub `#1` ;
+- branche de publication : `agent/publish-2.5.2-handoff` ;
+- référence officielle de release : tag annoté `v2.5.2`.
 
 ## Problèmes connus
 

@@ -5,10 +5,10 @@ précédente est terminée ou explicitement différée.
 
 ## 1. Publier officiellement la 2.5.2
 
-- [ ] faire relire et intégrer la pull request du Jalon 3 ;
-- [ ] vérifier la branche `main` après intégration ;
-- [ ] créer et pousser le tag annoté `v2.5.2` ;
-- [ ] reporter le commit et le tag définitifs dans `PROJECT_STATUS.md`.
+- [x] faire relire et intégrer la pull request du Jalon 3 ;
+- [x] vérifier la branche `main` après intégration ;
+- [x] créer et pousser le tag annoté `v2.5.2` ;
+- [x] reporter la pull request et le tag dans `PROJECT_STATUS.md`.
 
 Critère d'acceptation : `main` contient exactement la version validée sur VPS,
 le tag `v2.5.2` pointe sur cette version et la validation GitHub réussit.
