@@ -563,7 +563,32 @@ après réussite des validations applicative et PostgreSQL.
 - deuxième exécution GitHub : vérification lancée depuis la racine alors que
   le nom portable doit être résolu depuis `dist/` ;
 - correctif : la vérification CI s’exécute désormais dans `dist/` ;
-- validation GitHub et VPS : en attente.
+- validation GitHub : suites applicative et PostgreSQL réussies, puis artefact
+  construit et vérifié ;
+- artefact GitHub :
+  `motorsports-events-server-2.7.0-alpha.14.zip` ;
+- SHA-256 de l’artefact GitHub :
+  `df9aefe59ccaca748b4541b06b8295f8b6ba90c290a282ff36b0678fb1ac24cd` ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- empreinte SHA-256 de l’artefact téléchargé : valide ;
+- contrôle préalable à la mise à niveau : réussi ;
+- version locale et API : `2.7.0-alpha.14`, build `20260729-171443` ;
+- arrêt et recréation de la pile complète : réussis sans réseau occupé ni
+  avertissement de conteneur orphelin ;
+- API et PostgreSQL : sains ;
+- scheduler, Caddy, Prometheus et Grafana : actifs ;
+- schéma : `0002_admin_audit_log` ;
+- données conservées : 13 sports, 243 événements, 1 186 séances et
+  3 overrides ;
+- Grafana reste lié à `127.0.0.1:3000` et Prometheus sans port hôte ;
+- timer de sauvegarde : actif ;
+- quota mensuel OCBlackTop épuisé : synchronisation en échec rapide avec
+  réponse HTTP 429 correctement journalisée ;
+- deux avertissements Grafana non bloquants signalent l’absence des
+  répertoires de provisioning `plugins/` et `alerting/`.
 
 ## Validation de la 2.6.0
 
@@ -615,7 +640,12 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - la 2.6.0 les signale et conserve les corrections comme overrides après
   synchronisation ;
 - l’éditeur `.env` ne redémarre volontairement pas Docker : l’administrateur
-  doit exécuter `sudo ./restart.sh` après enregistrement.
+  doit exécuter `sudo ./restart.sh` après enregistrement ;
+- OCBlackTop refuse actuellement les synchronisations avec une réponse
+  `HTTP 429 Monthly limit exceeded` jusqu’au renouvellement du quota ;
+- Grafana journalise au démarrage l’absence des répertoires facultatifs
+  `/etc/grafana/provisioning/plugins` et
+  `/etc/grafana/provisioning/alerting`.
 
 ## Exploitation
 
