@@ -109,7 +109,7 @@ procédure de rollback avant implémentation.
 - [x] préserver les chemins, méthodes HTTP et réponses ;
 - [x] ajouter un test de frontière d’architecture ;
 - [x] construire et réextraire l’archive `2.7.0-alpha.4` ;
-- [ ] vérifier sur le VPS la connexion, le tableau de bord, les paramètres,
+- [x] vérifier sur le VPS la connexion, le tableau de bord, les paramètres,
   les incohérences horaires et une synchronisation ;
 - [ ] intégrer la pull request après validation VPS.
 

@@ -174,7 +174,17 @@ changement visuel n’est inclus.
 - SHA-256 :
   `f38957e20b1d7ab759caa3600b656df760b272b93d022174dce5b8ea6c476d58` ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- tableau de bord `/admin` : accessible ;
+- paramètres `/admin/settings` : accessibles ;
+- incohérences horaires `/admin/temporal-issues` : accessibles ;
+- OCBlackTop : connexion réussie, 529 ms ;
+- TheSportsDB : connexion réussie, 199 ms ;
+- synchronisation : 0 créée, 243 mises à jour, 0 erreur ;
+- journaux API, scheduler et migration : aucune erreur détectée.
 
 ## Validation de la 2.6.0
 
