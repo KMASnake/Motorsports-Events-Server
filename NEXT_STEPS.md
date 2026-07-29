@@ -284,8 +284,8 @@ supplémentaire n’est exposé.
 - [x] ajouter une checklist de qualification reproductible ;
 - [x] exécuter les suites applicative et PostgreSQL ;
 - [x] construire et retester l’archive `2.7.0-rc.1` ;
-- [ ] valider l’artefact GitHub sur le VPS ;
-- [ ] vérifier les données, services, sondes et sauvegardes ;
+- [x] valider l’artefact GitHub sur le VPS ;
+- [x] vérifier les données, services, sondes et sauvegardes ;
 - [ ] intégrer la pull request après validation VPS ;
 - [ ] promouvoir la candidate validée en `2.7.0`.
 

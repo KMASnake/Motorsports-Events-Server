@@ -648,7 +648,26 @@ checklist de qualification utilisée avant promotion en `2.7.0`.
 - archive : `motorsports-events-server-2.7.0-rc.1.zip` ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- artefact GitHub vérifié, SHA-256 :
+  `a0e012499adfdd88a7e1a7b2c8d4e8be6549f5a9dce966fd3eef670f79ccb55f` ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-rc.1`, build `20260729-193421` ;
+- API et PostgreSQL : sains ;
+- scheduler et Caddy : actifs ;
+- schéma : `0002_admin_audit_log` ;
+- données conservées : 13 sports, 243 événements, 1 186 séances et
+  3 overrides ;
+- sondes `/live`, `/ready` et `/metrics` : opérationnelles ;
+- Prometheus et Grafana : actifs ;
+- Grafana lié uniquement à `127.0.0.1:3000` ;
+- Prometheus sans port hôte ;
+- timer de sauvegarde : actif et prochaine exécution planifiée ;
+- aucune erreur applicative nouvelle détectée ;
+- seules erreurs observées : réponses `HTTP 429 Monthly limit exceeded`
+  d’OCBlackTop, problème externe connu.
 
 ## Validation de la 2.6.0
 
