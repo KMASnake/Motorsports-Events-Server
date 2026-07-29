@@ -590,6 +590,44 @@ après réussite des validations applicative et PostgreSQL.
 - deux avertissements Grafana non bloquants signalent l’absence des
   répertoires de provisioning `plugins/` et `alerting/`.
 
+## Candidate provisioning Grafana
+
+- version : `2.7.0-alpha.15` ;
+- sous-jalon : `4.15-grafana-provisioning` ;
+- branche : `agent/grafana-provisioning-cleanup` ;
+- schéma et contrat API v1 : inchangés.
+
+La candidate ajoute les répertoires facultatifs `alerting/` et `plugins/` au
+montage de provisioning existant. Les répertoires contiennent un marqueur afin
+d’être conservés par Git et dans l’archive ZIP. Les ports de supervision et les
+provisionings existants restent inchangés.
+
+### Validation locale
+
+- validation du dépôt : réussie avant modification ;
+- quatre répertoires de provisioning couverts par un test de non-régression ;
+- liaison Grafana à `127.0.0.1:3000` conservée ;
+- Prometheus reste sans port hôte ;
+- suite complète : 72 tests et 5 sous-tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.15.zip` ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.15`, build `20260729-192233` ;
+- API et PostgreSQL : sains ;
+- scheduler et Caddy : actifs ;
+- schéma : `0002_admin_audit_log` ;
+- 13 sports accessibles ;
+- Prometheus et Grafana : actifs ;
+- Grafana lié uniquement à `127.0.0.1:3000` ;
+- Prometheus sans port hôte ;
+- répertoires `/etc/grafana/provisioning/plugins` et
+  `/etc/grafana/provisioning/alerting` présents ;
+- aucun message d’erreur de provisioning Grafana détecté.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
@@ -642,10 +680,7 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - l’éditeur `.env` ne redémarre volontairement pas Docker : l’administrateur
   doit exécuter `sudo ./restart.sh` après enregistrement ;
 - OCBlackTop refuse actuellement les synchronisations avec une réponse
-  `HTTP 429 Monthly limit exceeded` jusqu’au renouvellement du quota ;
-- Grafana journalise au démarrage l’absence des répertoires facultatifs
-  `/etc/grafana/provisioning/plugins` et
-  `/etc/grafana/provisioning/alerting`.
+  `HTTP 429 Monthly limit exceeded` jusqu’au renouvellement du quota.
 
 ## Exploitation
 

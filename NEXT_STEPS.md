@@ -259,7 +259,7 @@ nécessaire.
 - [x] échouer lorsque les fichiers attendus sont absents ;
 - [x] valider le job sur la pull request alpha.14 ;
 - [x] installer l’artefact GitHub sur le VPS ;
-- [ ] intégrer la pull request après validation VPS.
+- [x] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : GitHub ne publie l’artefact qu’après réussite des deux
 suites, le ZIP téléchargé correspond à son SHA-256 et cette archive s’installe
@@ -267,10 +267,12 @@ sur le VPS sans différence avec une archive locale.
 
 ## 20. Nettoyer le provisioning Grafana
 
-- [ ] créer les répertoires de provisioning facultatifs `plugins/` et
+- [x] créer les répertoires de provisioning facultatifs `plugins/` et
   `alerting/` dans l’image ou le montage Grafana ;
-- [ ] vérifier que Grafana démarre sans erreur de provisioning ;
-- [ ] conserver la liaison privée à `127.0.0.1:3000`.
+- [x] vérifier que Grafana démarre sans erreur de provisioning ;
+- [x] conserver la liaison privée à `127.0.0.1:3000`.
+- [x] installer et valider l’alpha.15 sur le VPS ;
+- [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : le démarrage de Grafana ne produit plus d’erreur liée
 aux répertoires de provisioning absents et aucun port de supervision
