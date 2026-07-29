@@ -300,9 +300,9 @@ et les données de production sont conservées.
 - [x] construire et retester l’archive stable ;
 - [x] installer l’artefact GitHub stable sur le VPS ;
 - [x] vérifier version, données, services, sondes et sauvegardes ;
-- [ ] intégrer la pull request dans `main` ;
-- [ ] créer et pousser le tag annoté `v2.7.0` ;
-- [ ] publier la release GitHub avec le ZIP et son SHA-256.
+- [x] intégrer la pull request dans `main` ;
+- [x] créer et pousser le tag annoté `v2.7.0` ;
+- [x] publier la release GitHub avec le ZIP et son SHA-256.
 
 Critère d’acceptation : l’artefact stable est identique fonctionnellement à la
 RC qualifiée, s’installe sans perte sur le VPS et le tag `v2.7.0` désigne
