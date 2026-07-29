@@ -58,7 +58,7 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 - [x] Ajouter des logs structurés JSON.
 - [x] Mettre en place la rotation des logs.
 - [x] Automatiser et tester les sauvegardes/restaurations.
-- [ ] Vérifier automatiquement les prérequis avant les mises à niveau.
+- [x] Vérifier automatiquement les prérequis avant les mises à niveau.
 
 ### Priorité 6 — Observabilité
 - [ ] Ajouter les endpoints /ready, /live et /metrics.

@@ -353,6 +353,29 @@ maximal de 15 minutes.
 - taille observée : 147 468 octets ;
 - permissions et propriétaire : `0600`, `root:root`.
 
+## Candidate contrôle préalable aux mises à niveau
+
+- version : `2.7.0-alpha.9` ;
+- sous-jalon : `4.9-upgrade-preflight` ;
+- build : `20260729-152713` ;
+- branche : `feature/upgrade-preflight` ;
+- révision de schéma : `0002_admin_audit_log` inchangée ;
+- contrats API public et administration : inchangés.
+
+Le contrôle valide l’archive, sa structure, les outils, Docker Compose, le
+fichier `.env` et l’espace disque avant toute écriture ou interruption.
+
+### Validation VPS
+
+- préflight manuel : réussi ;
+- version locale et API : `2.7.0-alpha.9`, build `20260729-152713` ;
+- API et PostgreSQL : sains ;
+- schéma : `0002_admin_audit_log` ;
+- Caddy et scheduler : actifs ;
+- timer de sauvegarde : conservé, actif et planifié ;
+- amorçage : l’upgrade alpha.8 vers alpha.9 utilise encore l’ancien script ;
+  le préflight automatique protège les mises à niveau lancées depuis alpha.9.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

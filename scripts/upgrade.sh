@@ -21,6 +21,8 @@ if [[ ! -f "${ARCHIVE}" ]]; then
   exit 1
 fi
 
+"${PROJECT_ROOT}/scripts/preflight-upgrade.sh" "${ARCHIVE}"
+
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 PARENT_DIR="$(dirname "${PROJECT_ROOT}")"
 PROJECT_NAME="$(basename "${PROJECT_ROOT}")"
