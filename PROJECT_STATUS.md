@@ -771,6 +771,16 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - OCBlackTop refuse actuellement les synchronisations avec une réponse
   `HTTP 429 Monthly limit exceeded` jusqu’au renouvellement du quota.
 
+## Configuration administrative
+
+- le fichier `.env` brut n’est exposé par aucune route HTTP ;
+- les paramètres autorisés restent modifiables depuis `/admin/settings` ;
+- les secrets ne sont pas préremplis et une valeur vide les conserve ;
+- les paramètres PostgreSQL restent protégés ;
+- `/api/v1/admin/client-config` est conservée sous authentification
+  administrateur et ne renvoie qu’une configuration client construite,
+  incluant volontairement la clé API publique mais aucun secret serveur.
+
 ## Exploitation
 
 Les commandes Docker nécessitent actuellement `sudo` sur le VPS :
