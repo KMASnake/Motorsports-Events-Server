@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.0-alpha.6 — Logs structurés JSON
+
+- Format JSON commun pour l’API, le scheduler et les bibliothèques.
+- Journal HTTP avec identifiant de requête, statut et durée.
+- Événements structurés de début, fin et erreur de synchronisation.
+- Désactivation du journal d’accès texte d’Uvicorn.
+- Masquage récursif des champs sensibles.
+- Masquage des clés connues lorsqu’elles apparaissent dans un message.
+
 ## 2.7.0-alpha.5 — Journal d’administration
 
 - Ajout de la migration `0002_admin_audit_log`.

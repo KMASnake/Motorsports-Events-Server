@@ -228,6 +228,31 @@ métadonnées non sensibles.
 - page `/admin/audit` accessible ;
 - journaux API, scheduler et migration : aucune erreur détectée.
 
+## Candidate logs structurés JSON
+
+- version : `2.7.0-alpha.6` ;
+- sous-jalon : `4.6-structured-json-logs` ;
+- build : `20260729-142027` ;
+- branche : `feature/structured-json-logs` ;
+- révision de schéma : `0002_admin_audit_log` inchangée ;
+- contrats API public et administration : inchangés.
+
+La candidate structure les logs API, scheduler, HTTP et synchronisation en
+JSON. Les requêtes possèdent un identifiant de corrélation. Les champs
+sensibles et valeurs secrètes configurées sont masqués.
+
+### Validation locale
+
+- suite applicative : 51 tests, 3 tests PostgreSQL ignorés hors Docker et
+  5 sous-tests réussis ;
+- suite PostgreSQL isolée : 3 tests réussis ;
+- format JSON, contexte et redaction : testés ;
+- archive : `motorsports-events-server-2.7.0-alpha.6.zip` ;
+- SHA-256 :
+  `c54a61e25d21621e33145530b2c4f8fd75c22ff0ccd41e549bbe3c11d7d64667` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

@@ -131,3 +131,19 @@ d’administration validées en 2.6.0 fonctionnent encore.
 
 Critère d’acceptation : les actions prévues sont persistées, consultables par
 un administrateur et ne contiennent aucune valeur sensible.
+
+## 11. Valider les logs structurés JSON
+
+- [x] ajouter un formateur JSON commun ;
+- [x] corréler les requêtes HTTP par identifiant ;
+- [x] structurer les événements de synchronisation ;
+- [x] désactiver les accès Uvicorn en texte ;
+- [x] masquer les champs et valeurs sensibles ;
+- [x] construire, réextraire et retester l’archive alpha.6 ;
+- [ ] installer `2.7.0-alpha.6` sur le VPS ;
+- [ ] vérifier que les lignes API et scheduler sont du JSON valide ;
+- [ ] vérifier les événements HTTP et de synchronisation ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : les logs applicatifs sont des objets JSON valides,
+corrélables, sans secret et exploitables par un collecteur externe.

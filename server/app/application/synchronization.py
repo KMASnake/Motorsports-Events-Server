@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import logging
 
 from sqlalchemy.orm import Session as OrmSession
 
@@ -10,6 +11,8 @@ from ..overrides import apply_override
 from ..providers.ocblacktop import OcBlackTopProvider
 from ..providers.thesportsdb import TheSportsDbProvider
 
+logger = logging.getLogger("motorsports.sync")
+
 
 async def synchronize(db: OrmSession) -> SyncRun:
     settings = get_settings()
@@ -17,6 +20,14 @@ async def synchronize(db: OrmSession) -> SyncRun:
     db.add(run)
     db.commit()
     db.refresh(run)
+    logger.info(
+        "Synchronization started",
+        extra={
+            "event": "sync.started",
+            "sync_run_id": run.id,
+            "season": settings.sync_season,
+        },
+    )
 
     created = updated = errors = 0
     details: list[str] = []
@@ -27,6 +38,14 @@ async def synchronize(db: OrmSession) -> SyncRun:
         except Exception as exc:
             errors += 1
             details.append(f"{provider.name}: {exc}")
+            logger.exception(
+                "Provider synchronization failed",
+                extra={
+                    "event": "sync.provider_failed",
+                    "sync_run_id": run.id,
+                    "provider": provider.name,
+                },
+            )
             continue
 
         for source_event in provider_events:
@@ -141,4 +160,15 @@ async def synchronize(db: OrmSession) -> SyncRun:
     db.add(run)
     db.commit()
     db.refresh(run)
+    logger.info(
+        "Synchronization completed",
+        extra={
+            "event": "sync.completed",
+            "sync_run_id": run.id,
+            "status": run.status,
+            "created": created,
+            "updated": updated,
+            "errors": errors,
+        },
+    )
     return run
