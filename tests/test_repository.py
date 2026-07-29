@@ -14,6 +14,14 @@ def test_required_server_files_exist():
     assert (ROOT / "docker-compose.yml").is_file()
     assert (ROOT / "install.sh").is_file()
     assert (ROOT / "server" / "Dockerfile").is_file()
+    assert (ROOT / "server" / "alembic.ini").is_file()
+    assert (
+        ROOT
+        / "server"
+        / "alembic"
+        / "versions"
+        / "0001_initial_schema.py"
+    ).is_file()
     assert (ROOT / "server" / "app" / "main.py").is_file()
 
 

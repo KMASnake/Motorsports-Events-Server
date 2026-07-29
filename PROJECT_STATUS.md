@@ -19,6 +19,52 @@ La version ajoute :
 - la protection des paramètres PostgreSQL et des secrets laissés vides ;
 - l’application explicite de la nouvelle configuration après redémarrage.
 
+## Candidate du Jalon 4
+
+- version : `2.7.0-alpha.1` ;
+- sous-jalon : `4.1-alembic-schema` ;
+- build : `20260729-101537` ;
+- branche : `feature/alembic-schema` ;
+- révision de schéma : `0001_initial_schema` ;
+- contrat API v1 : inchangé.
+
+La candidate remplace les créations de tables et migrations SQL au démarrage
+par un service Alembic dédié. L’API et le scheduler ne démarrent qu’après une
+migration réussie et vérifient eux-mêmes la révision attendue.
+
+### Validation locale de la candidate
+
+- validation reproductible : 30 tests, dont 27 réussis et 3 ignorés lorsque
+  les dépendances applicatives ne sont pas installées ;
+- suite complète avec dépendances : 34 tests réussis ;
+- base SQLite vierge migrée : réussie ;
+- adoption SQLite d’un schéma 2.6.0 avec conservation des données : réussie ;
+- schéma SQLite incomplet refusé : réussi ;
+- correspondance entre migration et modèles : réussie ;
+- image Docker construite : réussie ;
+- PostgreSQL 16 vierge migré : réussi ;
+- adoption PostgreSQL 16 avec conservation d’une donnée IndyCar : réussie ;
+- archive candidate : `motorsports-events-server-2.7.0-alpha.1.zip` ;
+- SHA-256 :
+  `fc907f58f58297af030904e5a42e8f4570f604092bdffad8421ddc3ea1f376f8` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS de la candidate
+
+- version locale et API : `2.7.0-alpha.1`, build `20260729-101537` ;
+- service de migration : `Exited (0)` ;
+- révision du schéma : `0001_initial_schema` ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- données conservées : 18 épreuves et 110 séances IndyCar ;
+- corrections conservées : 10 Warmup et aucune incohérence temporelle ;
+- synchronisation : 0 créée, 243 mises à jour, 0 erreur ;
+- révision inchangée après synchronisation ;
+- sauvegarde PostgreSQL : valide ;
+- dossier de rollback : présent ;
+- journaux API, scheduler et migration : aucune erreur détectée.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
@@ -54,7 +100,8 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - branche de publication : `agent/publish-2.5.2-handoff` ;
 - référence officielle de release : tag annoté `v2.5.2` ;
 - publication 2.6.0 : intégrée dans `main` ;
-- tag officiel `v2.6.0` : en attente.
+- tag officiel `v2.6.0` publié sur
+  `eaa63e2533d71aa4dcaaff46aa745b2e92505e9e` ;
 
 ## Problèmes connus
 

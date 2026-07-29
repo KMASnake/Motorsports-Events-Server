@@ -26,12 +26,12 @@ services:
       - .env
     environment:
       ADMIN_ENV_FILE: /run/motorsports-events/config.env
-      APP_VERSION: ${APP_VERSION:-2.6.0}
-      APP_BUILD: ${APP_BUILD:-20260728-214529}
+      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.1}
+      APP_BUILD: ${APP_BUILD:-20260729-101537}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     ports:
       - "${API_BIND_PORT:-8088}:8000"
     volumes:
@@ -60,9 +60,23 @@ services:
     env_file:
       - .env
     environment:
-      APP_VERSION: ${APP_VERSION:-2.6.0}
-      APP_BUILD: ${APP_BUILD:-20260728-214529}
+      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.1}
+      APP_BUILD: ${APP_BUILD:-20260729-101537}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - backend
+
+  migrate:
+    build:
+      context: ./server
+    container_name: motorsports-events-migrate
+    restart: "no"
+    command: ["python", "-m", "app.schema_migrations", "upgrade"]
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy

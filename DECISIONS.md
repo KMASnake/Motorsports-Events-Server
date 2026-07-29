@@ -40,6 +40,14 @@ paramètres PostgreSQL protégés, puis demande un redémarrage contrôlé.
 
 Voir `docs/decisions/0005-admin-data-quality-and-config.md`.
 
+## ADR 0006 — Migrations de schéma avec Alembic
+
+Alembic devient l’unique mécanisme de migration. Un service Docker dédié
+applique les migrations avant le démarrage de l’API et du scheduler. Une base
+2.6.0 existante est contrôlée puis adoptée sans recréer ses tables.
+
+Voir `docs/decisions/0006-alembic-schema-migrations.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

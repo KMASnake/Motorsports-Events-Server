@@ -37,3 +37,6 @@ Les clients doivent ignorer les champs JSON inconnus et traiter
 - serveur 2.4.x : API v1 historique avec synchronisation par `since` ;
 - serveur 2.5.x : API v1, curseur différentiel recommandé et schémas OpenAPI
   explicites.
+- serveur 2.6.x : API v1, administration de la qualité temporelle et de la
+  configuration ;
+- serveur 2.7.0-alpha.1 : API v1 inchangée, migrations de schéma Alembic.
