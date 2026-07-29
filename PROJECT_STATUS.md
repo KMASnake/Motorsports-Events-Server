@@ -338,7 +338,20 @@ maximal de 15 minutes.
 - archive : `motorsports-events-server-2.7.0-alpha.8.zip` ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.8`, build `20260729-151518` ;
+- révision du schéma : `0002_admin_audit_log` ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- timer systemd : chargé, activé et en attente ;
+- prochaine exécution observée : 30 juillet 2026 à 03:22:59 UTC ;
+- sauvegarde réelle : créée et restaurée dans une base temporaire ;
+- archive gzip : valide ;
+- taille observée : 147 468 octets ;
+- permissions et propriétaire : `0600`, `root:root`.
 
 ## Validation de la 2.6.0
 

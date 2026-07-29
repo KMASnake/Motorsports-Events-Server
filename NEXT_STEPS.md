@@ -176,9 +176,9 @@ Critère d’acceptation : chaque conteneur utilise `json-file`, `max-size=10m`,
 - [x] fournir un timer systemd quotidien et persistant ;
 - [x] tester le flux avec un environnement déterministe ;
 - [x] construire, réextraire et retester l’archive alpha.8 ;
-- [ ] installer `2.7.0-alpha.8` sur le VPS ;
-- [ ] installer et contrôler le timer ;
-- [ ] créer puis vérifier une sauvegarde réelle ;
+- [x] installer `2.7.0-alpha.8` sur le VPS ;
+- [x] installer et contrôler le timer ;
+- [x] créer puis vérifier une sauvegarde réelle ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : une sauvegarde quotidienne est créée en mode `0600`,
