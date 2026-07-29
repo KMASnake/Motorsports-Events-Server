@@ -298,8 +298,8 @@ et les données de production sont conservées.
 - [x] aligner les versions racine, serveur et Compose sur `2.7.0` ;
 - [x] exécuter les suites applicative et PostgreSQL ;
 - [x] construire et retester l’archive stable ;
-- [ ] installer l’artefact GitHub stable sur le VPS ;
-- [ ] vérifier version, données, services, sondes et sauvegardes ;
+- [x] installer l’artefact GitHub stable sur le VPS ;
+- [x] vérifier version, données, services, sondes et sauvegardes ;
 - [ ] intégrer la pull request dans `main` ;
 - [ ] créer et pousser le tag annoté `v2.7.0` ;
 - [ ] publier la release GitHub avec le ZIP et son SHA-256.

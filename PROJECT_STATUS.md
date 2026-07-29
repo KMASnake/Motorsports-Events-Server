@@ -5,9 +5,9 @@ Dernière mise à jour : 29 juillet 2026.
 ## Version retenue
 
 - projet : `motorsports-events-server` ;
-- version fonctionnelle : `2.6.0` ;
-- jalon : `4-admin-data-quality` ;
-- build : `20260728-214529` ;
+- version fonctionnelle : `2.7.0` ;
+- jalon : `4.17-stable-release` ;
+- build : `20260729-194637` ;
 - API publique : `/api/v1` ;
 - dépôt GitHub : `KMASnake/Motorsports-Events-Server` (privé).
 
@@ -689,7 +689,26 @@ métadonnées et la documentation de publication sont mises à jour.
 - archive : `motorsports-events-server-2.7.0.zip` ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- artefact GitHub vérifié, SHA-256 :
+  `0b4e02064fdfa32380a96a8e662bcff8e56d00b10d8c2039a8898d42385728b8` ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0`, build `20260729-194637` ;
+- API et PostgreSQL : sains ;
+- scheduler et Caddy : actifs ;
+- schéma : `0002_admin_audit_log` ;
+- données conservées : 13 sports, 243 événements, 1 186 séances et
+  3 overrides ;
+- sondes `/live`, `/ready` et `/metrics` : opérationnelles ;
+- Prometheus et Grafana : actifs ;
+- Grafana lié uniquement à `127.0.0.1:3000` ;
+- Prometheus sans port hôte ;
+- timer de sauvegarde : actif et prochaine exécution planifiée ;
+- aucune erreur applicative nouvelle détectée ;
+- seules erreurs observées : réponses `HTTP 429 Monthly limit exceeded`
+  d’OCBlackTop, problème externe connu.
 
 ## Validation de la 2.6.0
 
