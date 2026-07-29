@@ -393,7 +393,18 @@ aucun secret ni identifiant métier et bornent les labels aux routes déclarées
 - suite PostgreSQL : 4 tests réussis ;
 - archive réextraite et retestée ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.10`, build `20260729-154303` ;
+- API et PostgreSQL : sains ;
+- schéma : `0002_admin_audit_log` ;
+- timer de sauvegarde : conservé et actif ;
+- `/live` : HTTP 200, `{"status":"ok"}` ;
+- `/ready` : HTTP 200, `{"status":"ready"}` ;
+- `/metrics` : exposition Prometheus valide avec compteurs HTTP bornés ;
+- type : `text/plain; version=0.0.4; charset=utf-8`.
 
 ## Validation de la 2.6.0
 
