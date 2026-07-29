@@ -36,3 +36,30 @@ jobs:
 
       - name: Run isolated PostgreSQL integration tests
         run: ./scripts/test-postgres.sh
+
+  release-artifact:
+    needs: [validate, postgres-integration]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build release archive
+        run: ./scripts/build-release.sh
+
+      - name: Verify release checksum
+        run: sha256sum -c dist/*.zip.sha256
+
+      - name: Upload release archive and checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: motorsports-events-server-${{ github.sha }}
+          path: |
+            dist/*.zip
+            dist/*.zip.sha256
+          if-no-files-found: error
+          retention-days: 14

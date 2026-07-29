@@ -123,6 +123,13 @@ et refuse les états ambigus.
 
 Voir `docs/decisions/0016-atomic-upgrade-files.md`.
 
+## ADR 0017 — Artefacts de release après validation
+
+GitHub Actions ne construit et ne publie une archive que lorsque les suites
+applicative et PostgreSQL sont toutes deux réussies.
+
+Voir `docs/decisions/0017-tested-release-artifacts.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

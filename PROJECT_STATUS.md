@@ -539,6 +539,26 @@ orphelins.
 - SHA-256 de la sonde :
   `e40cf0edb32a412fed8d2d8acad76c7ac6e5a26e2db56d7ce8425615775fdfed`.
 
+## Candidate artefacts de release GitHub
+
+- version : `2.7.0-alpha.14` ;
+- sous-jalon : `4.14-release-artifacts` ;
+- branche : `feature/release-artifacts` ;
+- schéma et contrat API v1 : inchangés.
+
+La candidate construit le ZIP et son SHA-256 dans GitHub Actions uniquement
+après réussite des validations applicative et PostgreSQL.
+
+### Validation locale
+
+- contrôle du chaînage des jobs et des fichiers publiés : réussi ;
+- suite applicative complète : 66 tests, 4 ignorés et 5 sous-tests réussis ;
+- suite PostgreSQL isolée : 4 tests réussis ;
+- archive locale : `motorsports-events-server-2.7.0-alpha.14.zip` ;
+- archive réextraite et retestée : réussie ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- validation GitHub et VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

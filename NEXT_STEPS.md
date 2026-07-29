@@ -243,9 +243,24 @@ exposé.
 - [x] construire et retester l’archive alpha.13 ;
 - [x] installer et provoquer un rollback contrôlé sur le VPS ;
 - [x] vérifier version, données, sauvegarde et supervision après rollback ;
-- [ ] intégrer la pull request après validation VPS.
+- [x] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : une candidate volontairement invalide déclenche le
 rollback automatique, l’ancienne version et les données réapparaissent, la
 supervision retrouve son état initial et aucune restauration PostgreSQL n’est
 nécessaire.
+
+## 19. Valider les artefacts de release GitHub
+
+- [x] faire dépendre la construction des suites applicative et PostgreSQL ;
+- [x] utiliser `scripts/build-release.sh` comme unique constructeur ;
+- [x] vérifier automatiquement le SHA-256 ;
+- [x] publier le ZIP et son empreinte dans le même artefact ;
+- [x] échouer lorsque les fichiers attendus sont absents ;
+- [ ] valider le job sur la pull request alpha.14 ;
+- [ ] installer l’artefact GitHub sur le VPS ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : GitHub ne publie l’artefact qu’après réussite des deux
+suites, le ZIP téléchargé correspond à son SHA-256 et cette archive s’installe
+sur le VPS sans différence avec une archive locale.
