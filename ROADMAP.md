@@ -57,7 +57,7 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 ### Priorité 5 — Exploitation
 - [x] Ajouter des logs structurés JSON.
 - [x] Mettre en place la rotation des logs.
-- [ ] Automatiser et tester les sauvegardes/restaurations.
+- [x] Automatiser et tester les sauvegardes/restaurations.
 - [ ] Vérifier automatiquement les prérequis avant les mises à niveau.
 
 ### Priorité 6 — Observabilité

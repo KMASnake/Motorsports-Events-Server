@@ -95,7 +95,7 @@ par l’environnement de test.
 - [x] ajouter des tests d'intégration PostgreSQL ;
 - [x] modulariser l'administration ;
 - [x] ajouter des logs structurés ;
-- [ ] automatiser et tester les sauvegardes ;
+- [x] automatiser et tester les sauvegardes ;
 - [ ] définir l'observabilité et les alertes ;
 - [ ] renforcer les tests de mise à niveau et de rollback.
 
@@ -162,7 +162,25 @@ corrélables, sans secret et exploitables par un collecteur externe.
 - [x] construire, réextraire et retester l’archive alpha.7 ;
 - [x] installer `2.7.0-alpha.7` sur le VPS ;
 - [x] vérifier les options réelles des cinq conteneurs ;
-- [ ] intégrer la pull request après validation VPS.
+- [x] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : chaque conteneur utilise `json-file`, `max-size=10m`,
 `max-file=5` et `compress=true`, sans changement du contrat API ni du schéma.
+
+## 13. Valider les sauvegardes automatisées
+
+- [x] rendre la création atomique et les fichiers privés ;
+- [x] vérifier chaque archive par restauration PostgreSQL temporaire ;
+- [x] sécuriser le redémarrage après une restauration échouée ;
+- [x] rendre la rétention configurable ;
+- [x] fournir un timer systemd quotidien et persistant ;
+- [x] tester le flux avec un environnement déterministe ;
+- [x] construire, réextraire et retester l’archive alpha.8 ;
+- [ ] installer `2.7.0-alpha.8` sur le VPS ;
+- [ ] installer et contrôler le timer ;
+- [ ] créer puis vérifier une sauvegarde réelle ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : une sauvegarde quotidienne est créée en mode `0600`,
+restaurée avec succès dans une base temporaire, soumise à rétention et
+rattrapée après une indisponibilité du VPS.

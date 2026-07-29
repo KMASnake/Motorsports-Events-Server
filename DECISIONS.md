@@ -87,6 +87,13 @@ de fichiers bornés, ainsi que la compression des fichiers tournés.
 
 Voir `docs/decisions/0011-docker-log-rotation.md`.
 
+## ADR 0012 — Sauvegardes automatisées et vérifiées
+
+Les sauvegardes quotidiennes sont atomiques et ne sont acceptées qu’après une
+restauration réussie dans une base PostgreSQL temporaire.
+
+Voir `docs/decisions/0012-verified-automated-backups.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

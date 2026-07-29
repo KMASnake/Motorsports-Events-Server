@@ -5,9 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${PROJECT_ROOT}"
 
-ENV_FILE="${PROJECT_ROOT}/.env"
+ENV_FILE="${MOTORSPORTS_ENV_FILE:-${PROJECT_ROOT}/.env}"
 COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.yml"
-BACKUP_DIR="${PROJECT_ROOT}/backups"
+BACKUP_DIR="${MOTORSPORTS_BACKUP_DIR:-${PROJECT_ROOT}/backups}"
 DATA_DIR="${PROJECT_ROOT}/data"
 
 detect_environment() {
