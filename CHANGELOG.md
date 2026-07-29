@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.7.0-alpha.12 — Alertes de supervision
+
+- Règles Prometheus pour l’indisponibilité de l’API, les erreurs HTTP 5xx et
+  les redémarrages répétés.
+- Délai de confirmation pour éviter les alertes transitoires.
+- Compteur des alertes actives ajouté au tableau Grafana.
+- État de collecte Prometheus utilisé pour afficher la disponibilité réelle.
+- Couleur de l’uptime corrigée pour ne plus signaler un démarrage récent comme
+  une panne.
+- Cohérence de la version et du build Compose vérifiée automatiquement avant
+  livraison.
+- Données persistantes replacées dans la version précédente avant la
+  suppression d’une candidate en échec.
+
 ## 2.7.0-alpha.11 — Supervision privée
 
 - Prometheus collecte `/metrics` toutes les 30 secondes et conserve 30 jours.

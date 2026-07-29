@@ -22,3 +22,13 @@ def test_preflight_checks_archive_docker_disk_and_required_files():
         "VERSION install.sh docker-compose.yml scripts/upgrade.sh",
     ):
         assert expected in source
+
+
+def test_rollback_moves_persistent_data_back_before_deleting_candidate():
+    source = (ROOT / "scripts" / "upgrade.sh").read_text(encoding="utf-8")
+    rollback = source[source.index("restore_previous()"):]
+    move_back = 'mv "${PROJECT_ROOT}/data" "${ROLLBACK_DIR}/data"'
+    delete_candidate = 'rm -rf "${PROJECT_ROOT}"'
+
+    assert move_back in rollback
+    assert rollback.index(move_back) < rollback.index(delete_candidate)

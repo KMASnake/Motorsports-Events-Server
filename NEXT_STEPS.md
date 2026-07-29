@@ -211,5 +211,24 @@ rattrapée après une indisponibilité du VPS.
 - [x] provisionner la source et le tableau de bord API ;
 - [x] tester la confidentialité de la configuration ;
 - [x] construire et retester l’archive alpha.11 ;
-- [ ] installer et valider l’alpha.11 sur le VPS ;
+- [x] installer et valider l’alpha.11 sur le VPS ;
 - [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : Prometheus collecte l’API, Grafana reste lié à
+localhost, le tableau provisionné affiche la disponibilité, l’uptime, les
+requêtes et un taux d’erreurs nul.
+
+## 17. Valider les alertes locales
+
+- [x] définir les seuils et délais dans un ADR ;
+- [x] ajouter les règles Prometheus ;
+- [x] afficher les alertes actives dans Grafana ;
+- [x] corriger la couleur trompeuse de l’uptime ;
+- [x] construire et retester l’archive alpha.12 ;
+- [x] installer et valider l’alpha.12 sur le VPS ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : les règles sont chargées sans erreur, aucune alerte
+n’est active en fonctionnement nominal, une indisponibilité contrôlée fait
+passer l’alerte attendue à l’état actif et aucun port supplémentaire n’est
+exposé.

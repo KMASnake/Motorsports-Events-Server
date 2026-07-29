@@ -82,6 +82,14 @@ mv "${NEW_ROOT}" "${PROJECT_ROOT}"
 restore_previous() {
   echo "Échec de la nouvelle version, rollback en cours…"
   cd "${PARENT_DIR}"
+
+  # Persistent bind-mounted data was moved from the rollback directory into
+  # the candidate. Move it back before deleting the failed candidate.
+  if [[ -d "${PROJECT_ROOT}/data" ]]; then
+    rm -rf "${ROLLBACK_DIR}/data"
+    mv "${PROJECT_ROOT}/data" "${ROLLBACK_DIR}/data"
+  fi
+
   rm -rf "${PROJECT_ROOT}"
   mv "${ROLLBACK_DIR}" "${PROJECT_ROOT}"
   cd "${PROJECT_ROOT}"

@@ -10,7 +10,17 @@ def test_monitoring_is_private_and_scrapes_api():
     assert "9090:9090" not in compose
     assert 'targets: ["api:8000"]' in prometheus
     assert "metrics_path: /metrics" in prometheus
+    assert "rule_files:" in prometheus
+    assert "/etc/prometheus/alert-rules.yml" in prometheus
+    assert "./monitoring/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro" in compose
     assert "GF_USERS_ALLOW_SIGN_UP" in compose
+    rules = (ROOT / "monitoring/alert-rules.yml").read_text()
+    assert "MotorsportsApiUnavailable" in rules
+    assert 'up{job="motorsports-events-api"} == 0' in rules
+    assert "MotorsportsApiHigh5xxRate" in rules
+    assert "MotorsportsApiRepeatedRestarts" in rules
+    assert "ADMIN_API_KEY" not in rules
+    assert "PUBLIC_API_KEY" not in rules
     dashboard = json.loads(
         (ROOT / "monitoring/grafana/dashboards/api-overview.json").read_text()
     )
@@ -18,3 +28,4 @@ def test_monitoring_is_private_and_scrapes_api():
     expressions = json.dumps(dashboard)
     assert "motorsports_api_up" in expressions
     assert "motorsports_http_requests_total" in expressions
+    assert "ALERTS" in expressions
