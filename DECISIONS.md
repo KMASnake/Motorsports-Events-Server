@@ -138,6 +138,14 @@ protégée ne renvoie qu’un document construit sans secret serveur.
 
 Voir `docs/decisions/0018-controlled-admin-configuration.md`.
 
+## ADR 0019 — Cadrage de la refonte administrative 3.0
+
+La version 3.0 refond l'expérience d'administration par étapes, tout en
+préservant les routes et le contrat `/api/v1`, les protections existantes et
+la séparation entre configuration administrable et secrets serveur.
+
+Voir `docs/decisions/0019-admin-ui-redesign.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

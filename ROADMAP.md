@@ -69,9 +69,62 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 - [x] Générer automatiquement les archives et SHA256.
 - [x] Exécuter les tests avant toute release.
 
-## Après le jalon 4
+## Maintenance 2.7.x
 
-La version 3.0.0 sera consacrée à la refonte complète de l'interface d'administration : UX, UI, tableaux de bord, thème clair/sombre, ergonomie et identité visuelle.
+La branche stable 2.7.x reste limitée aux correctifs de sécurité, de
+fiabilité et d'exploitation. Elle ne reçoit aucune refonte visuelle ni
+évolution incompatible de `/api/v1`.
+
+- [ ] Contrôler la première sauvegarde quotidienne postérieure à la release.
+- [ ] Revalider OCBlackTop après le renouvellement de son quota mensuel.
+- [ ] Corriger uniquement les régressions confirmées en production.
+- [ ] Publier toute correction par une release 2.7.x testée sur le VPS.
+
+## Jalon 5 — Refonte de l'administration (3.0.0)
+
+Objectif : rendre l'administration plus claire, cohérente, accessible et
+utilisable sur mobile, sans exposer le fichier `.env`, sans affaiblir
+l'authentification et sans modifier le contrat `/api/v1`.
+
+### Phase 1 — Inventaire et conception
+
+- [ ] Inventorier les pages, routes, formulaires, actions et états d'erreur.
+- [ ] Décrire les parcours administrateur : exploitation, configuration,
+  correction temporelle et audit.
+- [ ] Définir l'identité visuelle, la navigation et les composants communs.
+- [ ] Produire les maquettes desktop et mobile des écrans prioritaires.
+- [ ] Choisir et intégrer l'outillage de tests navigateur et d'accessibilité.
+
+### Phase 2 — Fondations de l'interface
+
+- [ ] Créer un gabarit et une navigation partagés.
+- [ ] Définir les styles, composants, états de chargement et messages communs.
+- [ ] Ajouter les thèmes clair et sombre avec respect du choix système.
+- [ ] Garantir navigation clavier, focus visible, contrastes et libellés.
+- [ ] Préserver les URLs administratives et les protections existantes.
+
+### Phase 3 — Refonte des écrans
+
+- [ ] Refaire le tableau de bord et la synthèse de santé.
+- [ ] Refaire les paramètres et le contrôle des providers.
+- [ ] Refaire le traitement des incohérences temporelles.
+- [ ] Refaire le journal d'administration.
+- [ ] Intégrer sauvegardes, état des services et supervision dans les parcours
+  d'exploitation, sans rendre Grafana ou Prometheus publics.
+
+### Phase 4 — Qualification de la 3.0.0
+
+- [ ] Tester les parcours critiques dans un navigateur réel.
+- [ ] Tester les vues desktop, tablette et mobile.
+- [ ] Vérifier accessibilité, authentification, cookies, CSRF et absence de
+  secrets dans les réponses, pages, journaux et captures.
+- [ ] Exécuter la non-régression complète du contrat `/api/v1`.
+- [ ] Qualifier une release candidate sur le VPS avant la release stable.
+
+Critère d'acceptation : tous les parcours administratifs sont cohérents,
+responsifs et accessibles ; les actions sensibles restent authentifiées et
+auditées ; aucun secret serveur ni contenu brut de `.env` n'est exposé ; le
+contrat `/api/v1` reste compatible.
 
 ### Méthode de développement
 - Développer par branches fonctionnelles (`feature/...`).

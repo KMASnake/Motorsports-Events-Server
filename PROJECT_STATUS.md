@@ -771,6 +771,18 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - OCBlackTop refuse actuellement les synchronisations avec une réponse
   `HTTP 429 Monthly limit exceeded` jusqu’au renouvellement du quota.
 
+## Prochaine étape
+
+- la version stable reste `2.7.0` ; la branche 2.7.x est réservée aux
+  correctifs confirmés de sécurité, fiabilité et exploitation ;
+- le jalon 5 cible la version `3.0.0` et la refonte de l'administration ;
+- la feuille de route détaillée est consignée dans `ROADMAP.md` ;
+- l'inventaire des écrans, routes et parcours est la première tâche
+  d'implémentation ;
+- l'ADR 0019 impose la compatibilité `/api/v1`, l'absence d'exposition du
+  `.env` brut, la conservation de l'authentification et une qualification
+  navigateur, responsive et accessibilité.
+
 ## Configuration administrative
 
 - le fichier `.env` brut n’est exposé par aucune route HTTP ;
