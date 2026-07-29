@@ -1,0 +1,9 @@
+apiVersion: 1
+providers:
+  - name: Motorsports Events
+    folder: Motorsports Events
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: /var/lib/grafana/dashboards

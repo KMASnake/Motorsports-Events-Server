@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0-alpha.11 — Supervision privée
+
+- Prometheus collecte `/metrics` toutes les 30 secondes et conserve 30 jours.
+- Grafana écoute uniquement sur `127.0.0.1:3000`.
+- Mot de passe administrateur obligatoire et inscriptions désactivées.
+- Source Prometheus et tableau de bord API provisionnés automatiquement.
+- Scripts de démarrage et d’état dédiés.
+
 ## 2.7.0-alpha.10 — Endpoints d’observabilité
 
 - `/live` contrôle la disponibilité du processus API.

@@ -202,3 +202,14 @@ rattrapée après une indisponibilité du VPS.
 - [x] construire et retester l’archive alpha.10 ;
 - [x] installer et valider l’alpha.10 sur le VPS ;
 - [ ] intégrer la pull request après validation VPS.
+
+## 16. Valider la supervision privée
+
+- [x] ajouter Prometheus sans port public ;
+- [x] lier Grafana uniquement à `127.0.0.1:3000` ;
+- [x] imposer un mot de passe et désactiver les inscriptions ;
+- [x] provisionner la source et le tableau de bord API ;
+- [x] tester la confidentialité de la configuration ;
+- [x] construire et retester l’archive alpha.11 ;
+- [ ] installer et valider l’alpha.11 sur le VPS ;
+- [ ] intégrer la pull request après validation VPS.

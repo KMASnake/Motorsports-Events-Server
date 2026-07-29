@@ -1,0 +1,45 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "API disponible",
+      "targets": [{"expr": "motorsports_api_up", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Uptime (secondes)",
+      "targets": [{"expr": "motorsports_api_uptime_seconds", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "Requêtes par seconde",
+      "targets": [{
+        "expr": "sum by (route, status) (rate(motorsports_http_requests_total[5m]))",
+        "legendFormat": "{{route}} — {{status}}",
+        "refId": "A"
+      }],
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "Taux d'erreurs HTTP",
+      "targets": [{
+        "expr": "sum(rate(motorsports_http_requests_total{status=~\"4..|5..\"}[5m]))",
+        "refId": "A"
+      }],
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 9}
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["motorsports-events"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "Motorsports Events — API",
+  "uid": "motorsports-events-api",
+  "version": 1
+}
