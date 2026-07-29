@@ -9,6 +9,7 @@
 - Synchronisation répétée et conservation d’un override vérifiées.
 - Nettoyage automatique des conteneurs et données temporaires.
 - Exécution dédiée ajoutée à GitHub Actions.
+- Vérification du schéma exécutée depuis l’API déjà connectée à PostgreSQL.
 
 ## 2.7.0-alpha.2 — Qualité des providers
 

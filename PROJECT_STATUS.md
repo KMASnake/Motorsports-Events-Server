@@ -131,6 +131,13 @@ bases créés pour les tests sont supprimés automatiquement.
   `motorsports-events-server-2.7.0-alpha.3.zip.sha256` ;
 - validation VPS : en attente.
 
+La première validation VPS a révélé que `verify-installation.sh` lançait son
+contrôle de schéma dans un conteneur temporaire avec `--no-deps`. Ce conteneur
+ne résolvait pas l’alias Docker `db`, alors que l’API déployée restait
+opérationnelle. Le contrôle utilise désormais le conteneur API déjà sain et
+connecté au réseau de production. Une nouvelle archive alpha.3 doit être
+installée avant validation.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
