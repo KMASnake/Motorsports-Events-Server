@@ -190,6 +190,6 @@ rattrapée après une indisponibilité du VPS.
 - [x] contrôler archive, outils, Docker, Compose, `.env` et espace disque ;
 - [x] exécuter le contrôle avant toute écriture ou interruption ;
 - [x] tester l’ordre d’exécution et les contrôles obligatoires ;
-- [ ] construire et retester l’archive alpha.9 ;
-- [ ] installer et valider l’alpha.9 sur le VPS ;
+- [x] construire et retester l’archive alpha.9 ;
+- [x] installer et valider l’alpha.9 sur le VPS ;
 - [ ] intégrer la pull request après validation VPS.
