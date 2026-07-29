@@ -160,8 +160,8 @@ corrélables, sans secret et exploitables par un collecteur externe.
 - [x] compresser les fichiers tournés ;
 - [x] ajouter un test de non-régression de la configuration ;
 - [x] construire, réextraire et retester l’archive alpha.7 ;
-- [ ] installer `2.7.0-alpha.7` sur le VPS ;
-- [ ] vérifier les options réelles des cinq conteneurs ;
+- [x] installer `2.7.0-alpha.7` sur le VPS ;
+- [x] vérifier les options réelles des cinq conteneurs ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : chaque conteneur utilise `json-file`, `max-size=10m`,

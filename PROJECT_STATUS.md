@@ -301,7 +301,17 @@ ce qui applique la politique sans modifier la configuration globale du démon.
 - archive : `motorsports-events-server-2.7.0-alpha.7.zip` ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.7`, build `20260729-145707` ;
+- révision du schéma : `0002_admin_audit_log` ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- sports et données accessibles ;
+- services `db`, `api`, `scheduler`, `migrate` et `caddy` : pilote
+  `json-file`, `max-size=10m`, `max-file=5`, `compress=true`.
 
 ## Validation de la 2.6.0
 
