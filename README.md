@@ -7,7 +7,7 @@ Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 
 ## Version courante
 
-La candidate **2.7.0-alpha.3 — Intégration PostgreSQL** conserve le contrat
+La candidate **2.7.0-alpha.4 — Administration modulaire** conserve le contrat
 API v1 et poursuit le Jalon 4 :
 
 - FastAPI ;
@@ -21,19 +21,21 @@ API v1 et poursuit le Jalon 4 :
 - API v1 documentée ;
 - synchronisation différentielle par curseur ;
 - signalement et correction des incohérences horaires ;
-- édition sécurisée du fichier `.env` depuis l'administration.
+- édition sécurisée du fichier `.env` depuis l'administration ;
 - migrations de schéma versionnées avec Alembic ;
-- contrôle automatique de la révision avant démarrage.
+- contrôle automatique de la révision avant démarrage ;
 - tests unitaires sans réseau pour OCBlackTop et TheSportsDB ;
-- couverture des providers mesurée et contrôlée dans la CI.
+- couverture des providers mesurée et contrôlée dans la CI ;
 - environnement PostgreSQL 16 temporaire et isolé ;
-- migrations et synchronisation testées avec un jeu de données reproductible.
+- migrations et synchronisation testées avec un jeu de données reproductible ;
+- routes d’administration isolées du point d’entrée de l’API publique.
 
 ## Structure
 
 ```text
 motorsports-events-server/
 ├── server/               Application FastAPI
+│   └── app/admin/        Routeurs d’administration
 ├── scripts/              Installation, exploitation et validation
 ├── docs/                 Documentation et décisions d’architecture
 ├── tests/                Tests du serveur

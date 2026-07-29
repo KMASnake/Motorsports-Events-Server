@@ -93,7 +93,7 @@ par l’environnement de test.
 - [x] introduire Alembic ;
 - [x] ajouter des tests unitaires providers ;
 - [x] ajouter des tests d'intégration PostgreSQL ;
-- [ ] modulariser l'administration ;
+- [x] modulariser l'administration ;
 - [ ] ajouter des logs structurés ;
 - [ ] automatiser et tester les sauvegardes ;
 - [ ] définir l'observabilité et les alertes ;
@@ -101,3 +101,18 @@ par l’environnement de test.
 
 Critère d'acceptation : chaque sous-jalon possède une décision, des tests et une
 procédure de rollback avant implémentation.
+
+## 9. Valider l’administration modulaire
+
+- [x] isoler les routes administratives de `app.main` ;
+- [x] conserver une façade unique d’inclusion des routeurs ;
+- [x] préserver les chemins, méthodes HTTP et réponses ;
+- [x] ajouter un test de frontière d’architecture ;
+- [x] construire et réextraire l’archive `2.7.0-alpha.4` ;
+- [ ] vérifier sur le VPS la connexion, le tableau de bord, les paramètres,
+  les incohérences horaires et une synchronisation ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : les contrats publics et administratifs restent
+identiques, aucune refonte visuelle n’est introduite et toutes les actions
+d’administration validées en 2.6.0 fonctionnent encore.

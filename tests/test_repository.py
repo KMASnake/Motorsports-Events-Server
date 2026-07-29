@@ -50,3 +50,33 @@ def test_installation_check_uses_running_api_network():
 
     assert "docker compose exec -T api" in source
     assert "docker compose run --rm --no-deps migrate" not in source
+
+
+def test_admin_routes_are_isolated_from_main():
+    main_source = (
+        ROOT / "server" / "app" / "main.py"
+    ).read_text(encoding="utf-8")
+    admin_source = (
+        ROOT / "server" / "app" / "admin" / "core.py"
+    ).read_text(encoding="utf-8")
+    router_source = (
+        ROOT / "server" / "app" / "admin" / "__init__.py"
+    ).read_text(encoding="utf-8")
+
+    assert '@app.get("/admin' not in main_source
+    assert '@app.post("/admin' not in main_source
+    assert '"/api/v1/admin/' not in main_source
+    assert "router.include_router(core_router)" in router_source
+    assert "router.include_router(extension_router)" in router_source
+
+    expected_routes = {
+        "/admin/login",
+        "/admin",
+        "/admin/sync",
+        "/admin/overrides/{override_id}/delete",
+        "/api/v1/admin/sync",
+        "/api/v1/admin/overrides",
+        "/api/v1/admin/overrides/{override_id}",
+    }
+    for route in expected_routes:
+        assert route in admin_source

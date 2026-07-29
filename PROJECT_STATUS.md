@@ -150,6 +150,32 @@ installée et validée.
 - journaux API, scheduler et migration : aucune erreur détectée ;
 - correctif de vérification du schéma : validé depuis le conteneur API.
 
+## Candidate administration modulaire
+
+- version : `2.7.0-alpha.4` ;
+- sous-jalon : `4.4-admin-modularization` ;
+- build : `20260729-115446` ;
+- branche : `feature/admin-modularization` ;
+- contrat API v1, URLs d’administration et schéma SQL : inchangés.
+
+La candidate retire de `app.main` l’authentification, le tableau de bord, les
+overrides et le déclenchement administratif des synchronisations. Le paquet
+`app.admin` agrège ces routes avec la façade d’administration existante. Aucun
+changement visuel n’est inclus.
+
+### Validation locale
+
+- syntaxe Python : réussie ;
+- suite applicative : 45 tests, 3 tests PostgreSQL ignorés hors Docker et
+  5 sous-tests réussis ;
+- suite PostgreSQL isolée : 3 tests réussis ;
+- contrôle statique des routes d’administration : ajouté ;
+- archive : `motorsports-events-server-2.7.0-alpha.4.zip` ;
+- SHA-256 :
+  `f38957e20b1d7ab759caa3600b656df760b272b93d022174dce5b8ea6c476d58` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

@@ -51,7 +51,7 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 - [x] Ajouter des jeux de données de test.
 
 ### Priorité 4 — Administration
-- [ ] Modulariser l’administration sans refonte visuelle.
+- [x] Modulariser l’administration sans refonte visuelle.
 - [ ] Ajouter un journal d’administration.
 
 ### Priorité 5 — Exploitation

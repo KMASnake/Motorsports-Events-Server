@@ -56,6 +56,14 @@ sur stockage temporaire et des bases créées par test. Aucun test ne se connect
 
 Voir `docs/decisions/0007-isolated-postgres-tests.md`.
 
+## ADR 0008 — Routes d’administration modulaires
+
+Les routes publiques restent dans `app.main`. L’authentification, le tableau
+de bord et les API d’administration sont regroupés derrière le routeur
+`app.admin`, sans changement des URLs ni du rendu existant.
+
+Voir `docs/decisions/0008-modular-admin-router.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité
