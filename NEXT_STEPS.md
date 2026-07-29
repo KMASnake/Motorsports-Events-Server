@@ -307,3 +307,34 @@ et les données de production sont conservées.
 Critère d’acceptation : l’artefact stable est identique fonctionnellement à la
 RC qualifiée, s’installe sans perte sur le VPS et le tag `v2.7.0` désigne
 exactement le commit publié dans `main`.
+
+## 23. Assurer le suivi post-release 2.7.0
+
+- [ ] contrôler la première sauvegarde quotidienne créée après la release ;
+- [ ] vérifier sa restauration dans l'environnement temporaire prévu ;
+- [ ] revalider une synchronisation OCBlackTop après renouvellement du quota ;
+- [ ] consigner toute régression confirmée avant d'ouvrir une maintenance
+  2.7.x.
+
+Le contrôle OCBlackTop est différé jusqu'au renouvellement du quota externe.
+Ce suivi de production reste continu et ne bloque pas le travail documentaire
+du jalon 5.
+
+Critère d'acceptation : la sauvegarde post-release est vérifiée, OCBlackTop
+reprend sans anomalie après renouvellement et toute correction 2.7.x reste
+strictement compatible avec `/api/v1`.
+
+## 24. Cadrer le jalon 5 — Administration 3.0.0
+
+- [x] détailler les phases et critères dans `ROADMAP.md` ;
+- [x] consigner les contraintes dans l'ADR 0019 ;
+- [ ] inventorier les pages, routes, actions, formulaires et états actuels ;
+- [ ] documenter les parcours et besoins de l'administrateur ;
+- [ ] choisir l'outillage de tests navigateur et d'accessibilité ;
+- [ ] produire les premières maquettes desktop et mobile ;
+- [ ] découper l'implémentation en pull requests indépendantes.
+
+Critère d'acceptation : l'inventaire relie chaque écran à ses routes et
+actions, les maquettes couvrent les parcours prioritaires, les contrôles de
+sécurité et d'accessibilité sont testables et aucune implémentation ne change
+le contrat `/api/v1`.
