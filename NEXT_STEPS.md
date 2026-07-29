@@ -51,16 +51,32 @@ publics restent inchangés.
 Critère d’acceptation : la base VPS conserve toutes ses données, possède la
 révision attendue et les services restent sains après mise à niveau.
 
-## 5. Qualifier l’origine de l’anomalie horaire
+## 5. Valider le sous-jalon qualité providers
+
+- [x] tester OCBlackTop sans réseau externe ;
+- [x] tester TheSportsDB sans réseau externe ;
+- [x] couvrir pagination, normalisation, statuts et erreurs ;
+- [x] mesurer la couverture des providers ;
+- [x] imposer un seuil minimal de 85 % dans la CI ;
+- [ ] installer `2.7.0-alpha.2` sur le VPS ;
+- [ ] tester les deux providers depuis l’administration ;
+- [ ] exécuter une synchronisation complète sans erreur ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : la CI maintient au moins 85 % de couverture providers,
+les tests administratifs réussissent et la synchronisation VPS reste sans
+erreur.
+
+## 6. Qualifier l’origine de l’anomalie horaire
 
 - [x] identifier le provider, les épreuves et les données brutes ;
 - [x] déterminer si l’erreur vient du provider ou de la normalisation ;
 - [ ] documenter la cause dans une issue.
 
-## 6. Poursuivre le Jalon 4 — Stabilisation opérationnelle
+## 7. Poursuivre le Jalon 4 — Stabilisation opérationnelle
 
 - [x] introduire Alembic ;
-- [ ] ajouter des tests unitaires providers ;
+- [x] ajouter des tests unitaires providers ;
 - [ ] ajouter des tests d'intégration PostgreSQL ;
 - [ ] modulariser l'administration ;
 - [ ] ajouter des logs structurés ;

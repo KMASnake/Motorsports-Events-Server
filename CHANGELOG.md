@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.0-alpha.2 — Qualité des providers
+
+- Ajout de tests HTTP déterministes avec `httpx.MockTransport`.
+- Couverture de la pagination et de la normalisation OCBlackTop.
+- Couverture des réponses WRC, erreurs HTTP/JSON et limitations 429.
+- Couverture de la normalisation et des statuts TheSportsDB.
+- Mesure de la couverture des providers dans GitHub Actions.
+- Seuil minimal de couverture fixé à 85 %.
+
 ## 2.7.0-alpha.1 — Infrastructure Alembic
 
 - Ajout d’une migration initiale décrivant l’intégralité du schéma.

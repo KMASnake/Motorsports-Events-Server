@@ -29,7 +29,7 @@ def version_payload() -> dict:
     return {
         "version": os.getenv(
             "APP_VERSION",
-            read_text_file("VERSION", "2.7.0-alpha.1"),
+            read_text_file("VERSION", "2.7.0-alpha.2"),
         ),
         "build": os.getenv("APP_BUILD", read_text_file("BUILD", "unknown")),
         "git_commit": os.getenv(

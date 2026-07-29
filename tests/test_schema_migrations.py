@@ -73,6 +73,7 @@ class SchemaMigrationTests(unittest.TestCase):
                 }.issubset(tables)
             )
             command.check(self.alembic_config(url))
+            engine.dispose()
 
     def test_existing_2_6_schema_is_adopted_without_data_loss(self):
         with TemporaryDirectory() as directory:
@@ -102,6 +103,7 @@ class SchemaMigrationTests(unittest.TestCase):
                 ).scalar_one()
             self.assertEqual(1, count)
             self.assertEqual(revision, stored)
+            engine.dispose()
 
     def test_incomplete_existing_schema_is_refused(self):
         with TemporaryDirectory() as directory:
@@ -117,6 +119,7 @@ class SchemaMigrationTests(unittest.TestCase):
                 "Schéma existant incomplet",
             ):
                 upgrade_database(url)
+            engine.dispose()
 
 
 if __name__ == "__main__":

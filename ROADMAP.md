@@ -41,9 +41,9 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 - [x] Vérifier automatiquement la version de schéma.
 
 ### Priorité 2 — Qualité
-- [ ] Ajouter des tests unitaires des providers.
-- [ ] Utiliser des mocks des API externes.
-- [ ] Mesurer la couverture de code.
+- [x] Ajouter des tests unitaires des providers.
+- [x] Utiliser des mocks des API externes.
+- [x] Mesurer la couverture de code.
 
 ### Priorité 3 — Base de données
 - [ ] Ajouter des tests d’intégration PostgreSQL via Docker.

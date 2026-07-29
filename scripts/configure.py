@@ -74,7 +74,7 @@ def main() -> None:
             return
 
     print()
-    print("Motorsports Events Server 2.7.0-alpha.1")
+    print("Motorsports Events Server 2.7.0-alpha.2")
     print("=" * 32)
     print()
 
