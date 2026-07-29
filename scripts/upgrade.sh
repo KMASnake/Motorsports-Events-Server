@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+source "${SCRIPT_DIR}/upgrade-files.sh"
 cd "${PROJECT_ROOT}"
 
 if [[ $# -ne 1 ]]; then
@@ -30,6 +31,18 @@ ROLLBACK_DIR="${PARENT_DIR}/${PROJECT_NAME}-rollback-${TIMESTAMP}"
 STAGING_DIR="${PARENT_DIR}/${PROJECT_NAME}-staging-${TIMESTAMP}"
 ENV_BACKUP="${PARENT_DIR}/.${PROJECT_NAME}.env-${TIMESTAMP}"
 DB_BACKUP="${PROJECT_ROOT}/backups/pre-upgrade-${TIMESTAMP}.sql.gz"
+MONITORING_FILE="${PROJECT_ROOT}/docker-compose.monitoring.yml"
+MONITORING_WAS_RUNNING=false
+
+if [[ -f "${MONITORING_FILE}" ]] \
+  && docker compose \
+    -f "${PROJECT_ROOT}/docker-compose.yml" \
+    -f "${MONITORING_FILE}" \
+    ps --services --status running \
+    | grep -qx prometheus
+then
+  MONITORING_WAS_RUNNING=true
+fi
 
 cleanup() {
   rm -rf "${STAGING_DIR}" 2>/dev/null || true
@@ -73,25 +86,23 @@ if [[ -z "${NEW_ROOT}" || ! -f "${NEW_ROOT}/install.sh" ]]; then
 fi
 
 echo "Arrêt de la version actuelle…"
-docker compose --profile vps down || docker compose down
+if [[ "${MONITORING_WAS_RUNNING}" == "true" ]]; then
+  docker compose \
+    --profile vps \
+    -f "${PROJECT_ROOT}/docker-compose.yml" \
+    -f "${MONITORING_FILE}" \
+    down
+else
+  docker compose --profile vps down || docker compose down
+fi
 
 echo "Création du point de rollback…"
-mv "${PROJECT_ROOT}" "${ROLLBACK_DIR}"
-mv "${NEW_ROOT}" "${PROJECT_ROOT}"
+activate_candidate_files "${PROJECT_ROOT}" "${NEW_ROOT}" "${ROLLBACK_DIR}"
 
 restore_previous() {
   echo "Échec de la nouvelle version, rollback en cours…"
   cd "${PARENT_DIR}"
-
-  # Persistent bind-mounted data was moved from the rollback directory into
-  # the candidate. Move it back before deleting the failed candidate.
-  if [[ -d "${PROJECT_ROOT}/data" ]]; then
-    rm -rf "${ROLLBACK_DIR}/data"
-    mv "${PROJECT_ROOT}/data" "${ROLLBACK_DIR}/data"
-  fi
-
-  rm -rf "${PROJECT_ROOT}"
-  mv "${ROLLBACK_DIR}" "${PROJECT_ROOT}"
+  restore_candidate_files "${PROJECT_ROOT}" "${ROLLBACK_DIR}"
   cd "${PROJECT_ROOT}"
 
   if [[ -f "${ENV_BACKUP}" ]]; then
@@ -100,6 +111,9 @@ restore_previous() {
 
   docker compose --profile vps build --no-cache --pull
   docker compose --profile vps up -d
+  if [[ "${MONITORING_WAS_RUNNING}" == "true" ]]; then
+    "${PROJECT_ROOT}/scripts/monitoring-start.sh"
+  fi
   echo "Rollback terminé."
   exit 1
 }
@@ -111,12 +125,6 @@ if [[ -f "${ENV_BACKUP}" ]]; then
 fi
 
 mkdir -p "${PROJECT_ROOT}/data" "${PROJECT_ROOT}/backups" "${PROJECT_ROOT}/logs"
-
-# Preserve persistent data from the previous installation.
-if [[ -d "${ROLLBACK_DIR}/data" ]]; then
-  rm -rf "${PROJECT_ROOT}/data"
-  mv "${ROLLBACK_DIR}/data" "${PROJECT_ROOT}/data"
-fi
 
 if [[ -d "${ROLLBACK_DIR}/backups" ]]; then
   cp -a "${ROLLBACK_DIR}/backups/." "${PROJECT_ROOT}/backups/"
@@ -135,6 +143,9 @@ docker builder prune -f
 echo "Reconstruction sans cache…"
 docker compose --profile vps build --no-cache --pull
 docker compose --profile vps up -d
+if [[ "${MONITORING_WAS_RUNNING}" == "true" ]]; then
+  "${PROJECT_ROOT}/scripts/monitoring-start.sh"
+fi
 
 API_DOMAIN="$(
   python3 "${PROJECT_ROOT}/scripts/env_get.py" \

@@ -492,6 +492,30 @@ ajouter de canal de notification ou de port public.
   `f2ce2018116f9d8e9f507e94880d69d57c10acf02e3462fedd376358732bdc2f` ;
 - syntaxe du script corrigé : valide.
 
+## Candidate rollback reproductible
+
+- version : `2.7.0-alpha.13` ;
+- sous-jalon : `4.13-upgrade-rollback-tests` ;
+- branche : `feature/upgrade-rollback-tests` ;
+- schéma et contrat API v1 : inchangés.
+
+La candidate isole la bascule des fichiers, vérifie réellement la conservation
+de `data/` pendant un échec et gère la supervision optionnelle sans conteneurs
+orphelins.
+
+### Validation locale
+
+- scénario de bascule puis rollback avec donnée sentinelle : réussi ;
+- état ambigu avec deux répertoires de données : refusé ;
+- conservation de l’état optionnel de la supervision : testée ;
+- suite ciblée upgrade, métadonnées et monitoring : 7 tests réussis ;
+- suite applicative complète : 65 tests, 4 ignorés et 5 sous-tests réussis ;
+- suite PostgreSQL isolée : 4 tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.13.zip` ;
+- archive réextraite et retestée : réussie ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.7.0-alpha.13 — Mise à niveau et rollback testables
+
+- Bascule des fichiers de release isolée dans une bibliothèque Bash testable.
+- Simulation déterministe d’une candidate en échec avec données persistantes.
+- Refus du rollback lorsqu’un état ambigu contient deux répertoires de données.
+- Conservation de l’état optionnel de Prometheus et Grafana pendant une mise à
+  niveau ou un rollback.
+- Suppression des avertissements de réseau occupé et de conteneurs de
+  supervision orphelins.
+- Cohérence du build racine, du build serveur et des valeurs Compose contrôlée.
+
 ## 2.7.0-alpha.12 — Alertes de supervision
 
 - Règles Prometheus pour l’indisponibilité de l’API, les erreurs HTTP 5xx et
