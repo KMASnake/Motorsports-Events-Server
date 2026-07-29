@@ -94,7 +94,7 @@ par l’environnement de test.
 - [x] ajouter des tests unitaires providers ;
 - [x] ajouter des tests d'intégration PostgreSQL ;
 - [x] modulariser l'administration ;
-- [ ] ajouter des logs structurés ;
+- [x] ajouter des logs structurés ;
 - [ ] automatiser et tester les sauvegardes ;
 - [ ] définir l'observabilité et les alertes ;
 - [ ] renforcer les tests de mise à niveau et de rollback.
@@ -148,7 +148,21 @@ un administrateur et ne contiennent aucune valeur sensible.
 - [x] vérifier la récupération des synchronisations orphelines ;
 - [x] vérifier que les lignes API et scheduler sont du JSON valide ;
 - [x] vérifier les événements HTTP et de synchronisation ;
-- [ ] intégrer la pull request après validation VPS.
+- [x] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : les logs applicatifs sont des objets JSON valides,
 corrélables, sans secret et exploitables par un collecteur externe.
+
+## 12. Valider la rotation des logs Docker
+
+- [x] définir une politique commune à tous les services ;
+- [x] limiter la taille et le nombre de fichiers ;
+- [x] compresser les fichiers tournés ;
+- [x] ajouter un test de non-régression de la configuration ;
+- [x] construire, réextraire et retester l’archive alpha.7 ;
+- [ ] installer `2.7.0-alpha.7` sur le VPS ;
+- [ ] vérifier les options réelles des cinq conteneurs ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : chaque conteneur utilise `json-file`, `max-size=10m`,
+`max-file=5` et `compress=true`, sans changement du contrat API ni du schéma.

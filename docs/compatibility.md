@@ -47,3 +47,4 @@ Les clients doivent ignorer les champs JSON inconnus et traiter
 - serveur 2.7.0-alpha.5 : API v1 inchangée, journal d’administration et
   révision de schéma `0002_admin_audit_log`.
 - serveur 2.7.0-alpha.6 : API et schéma inchangés, logs structurés JSON.
+- serveur 2.7.0-alpha.7 : API et schéma inchangés, rotation des logs Docker.

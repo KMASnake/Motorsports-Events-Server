@@ -1,3 +1,10 @@
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+    compress: "true"
+
 services:
   db:
     image: postgres:16-alpine
@@ -16,6 +23,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
+    logging: *default-logging
 
   api:
     build:
@@ -26,8 +34,8 @@ services:
       - .env
     environment:
       ADMIN_ENV_FILE: /run/motorsports-events/config.env
-      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.6}
-      APP_BUILD: ${APP_BUILD:-20260729-142027}
+      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.7}
+      APP_BUILD: ${APP_BUILD:-20260729-145707}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
     depends_on:
       migrate:
@@ -50,6 +58,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    logging: *default-logging
 
   scheduler:
     build:
@@ -60,14 +69,15 @@ services:
     env_file:
       - .env
     environment:
-      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.6}
-      APP_BUILD: ${APP_BUILD:-20260729-142027}
+      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.7}
+      APP_BUILD: ${APP_BUILD:-20260729-145707}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
     depends_on:
       migrate:
         condition: service_completed_successfully
     networks:
       - backend
+    logging: *default-logging
 
   migrate:
     build:
@@ -82,6 +92,7 @@ services:
         condition: service_healthy
     networks:
       - backend
+    logging: *default-logging
 
   caddy:
     image: caddy:2-alpine
@@ -104,6 +115,7 @@ services:
       - ./data/caddy-config:/config
     networks:
       - proxy
+    logging: *default-logging
 
 networks:
   backend:
