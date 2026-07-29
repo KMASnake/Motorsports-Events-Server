@@ -12,6 +12,12 @@ from ..config import get_settings
 class OcBlackTopProvider(Provider):
     name = "ocblacktop"
 
+    def __init__(
+        self,
+        transport: httpx.AsyncBaseTransport | None = None,
+    ) -> None:
+        self._transport = transport
+
     async def fetch(self, season: int) -> list[NormalizedEvent]:
         settings = get_settings()
 
@@ -21,7 +27,7 @@ class OcBlackTopProvider(Provider):
         headers = {
             "Accept": "application/json",
             "x-api-key": settings.ocblacktop_api_key,
-            "User-Agent": "Motorsports-Events-Server/2.7.0-alpha.1",
+            "User-Agent": "Motorsports-Events-Server/2.7.0-alpha.2",
         }
 
         results: list[NormalizedEvent] = []
@@ -29,6 +35,7 @@ class OcBlackTopProvider(Provider):
         async with httpx.AsyncClient(
             timeout=httpx.Timeout(25.0, connect=8.0),
             follow_redirects=False,
+            transport=self._transport,
         ) as client:
             for sport in settings.ocblacktop_sport_list:
                 if sport == "wrc":

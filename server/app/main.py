@@ -39,7 +39,7 @@ assert_schema_current()
 
 app = FastAPI(
     title=f"{settings.project_name} API",
-    version="2.7.0-alpha.1",
+    version="2.7.0-alpha.2",
     description=(
         f"Serveur central de {settings.project_name}. "
         "Le contrat /api/v1 reste rétrocompatible pendant toute la série 2.x."
@@ -106,7 +106,7 @@ app.include_router(admin_extension_router)
 def root():
     return {
         "name": settings.project_name,
-        "version": "2.7.0-alpha.1",
+        "version": "2.7.0-alpha.2",
         "docs": "/docs",
         "admin": "/admin",
     }

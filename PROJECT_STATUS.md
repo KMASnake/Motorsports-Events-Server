@@ -19,7 +19,7 @@ La version ajoute :
 - la protection des paramètres PostgreSQL et des secrets laissés vides ;
 - l’application explicite de la nouvelle configuration après redémarrage.
 
-## Candidate du Jalon 4
+## Sous-jalon Alembic validé
 
 - version : `2.7.0-alpha.1` ;
 - sous-jalon : `4.1-alembic-schema` ;
@@ -64,6 +64,44 @@ migration réussie et vérifient eux-mêmes la révision attendue.
 - sauvegarde PostgreSQL : valide ;
 - dossier de rollback : présent ;
 - journaux API, scheduler et migration : aucune erreur détectée.
+
+## Candidate qualité des providers
+
+- version : `2.7.0-alpha.2` ;
+- sous-jalon : `4.2-provider-quality` ;
+- build : `20260729-105950` ;
+- branche : `feature/provider-tests-coverage` ;
+- contrat API v1 et interfaces `fetch(season)` : inchangés.
+
+La candidate ajoute des transports HTTP injectables uniquement pour les tests,
+des réponses OCBlackTop et TheSportsDB entièrement simulées, ainsi qu’un seuil
+de couverture providers contrôlé par GitHub Actions.
+
+### Validation locale
+
+- 9 tests providers et 5 sous-tests réussis ;
+- pagination et normalisation OCBlackTop : réussies ;
+- WRC, temporisation 429 et erreurs HTTP/JSON : couverts ;
+- dates, statuts et normalisation TheSportsDB : couverts ;
+- suite complète : 43 tests et 5 sous-tests réussis ;
+- couverture providers : 92,41 % ;
+- seuil CI : 85 % ;
+- archive : `motorsports-events-server-2.7.0-alpha.2.zip` ;
+- SHA-256 :
+  `71be8eb347b95f8a4c3bdf4952a5def6a1fee844ba44a15aff2e3cb91b44f9b1` ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.2`, build `20260729-105950` ;
+- OCBlackTop : connexion réussie, 695 ms ;
+- TheSportsDB : connexion réussie, 77 ms ;
+- synchronisation : 0 créée, 243 mises à jour, 0 erreur ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- révision du schéma : `0001_initial_schema` ;
+- sports et données accessibles ;
+- aucune erreur dans les journaux API, scheduler et migration.
 
 ## Validation de la 2.6.0
 

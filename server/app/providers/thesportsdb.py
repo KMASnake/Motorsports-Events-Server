@@ -7,6 +7,12 @@ from ..config import get_settings
 class TheSportsDbProvider(Provider):
     name = "thesportsdb"
 
+    def __init__(
+        self,
+        transport: httpx.AsyncBaseTransport | None = None,
+    ) -> None:
+        self._transport = transport
+
     async def fetch(self, season: int) -> list[NormalizedEvent]:
         settings = get_settings()
         if not settings.thesportsdb_enabled:
@@ -16,7 +22,10 @@ class TheSportsDbProvider(Provider):
         base = settings.thesportsdb_base_url.rstrip("/")
         key = settings.thesportsdb_api_key
 
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with httpx.AsyncClient(
+            timeout=30,
+            transport=self._transport,
+        ) as client:
             for sport, league_id in settings.thesportsdb_league_map.items():
                 response = await client.get(
                     f"{base}/{key}/eventsseason.php",

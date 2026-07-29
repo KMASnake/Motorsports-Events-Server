@@ -131,19 +131,21 @@ def upgrade_database(database_url: str | None = None) -> str:
     expected = expected_revision(config)
     migration_engine = create_engine(url, pool_pre_ping=True)
 
-    with migration_engine.connect() as connection:
-        tables = set(inspect(connection).get_table_names())
-        revision = database_revision(connection)
-
-    if tables and revision is None:
+    try:
         with migration_engine.connect() as connection:
-            validate_existing_schema(connection)
-        command.stamp(config, expected)
-    else:
-        command.upgrade(config, "head")
+            tables = set(inspect(connection).get_table_names())
+            revision = database_revision(connection)
 
-    assert_schema_current(database_url=url, engine=migration_engine)
-    migration_engine.dispose()
+        if tables and revision is None:
+            with migration_engine.connect() as connection:
+                validate_existing_schema(connection)
+            command.stamp(config, expected)
+        else:
+            command.upgrade(config, "head")
+
+        assert_schema_current(database_url=url, engine=migration_engine)
+    finally:
+        migration_engine.dispose()
     return expected
 
 
