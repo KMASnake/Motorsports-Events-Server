@@ -25,13 +25,45 @@
 
 ## Jalon 4 — Stabilisation opérationnelle
 
-- [x] Signaler et corriger les incohérences temporelles depuis l’administration.
-- [x] Ajouter l’édition contrôlée de la configuration `.env`.
-- [ ] Ajouter Alembic.
-- [ ] Ajouter des tests unitaires providers.
-- [ ] Ajouter des tests d’intégration PostgreSQL.
-- [ ] Modulariser l’administration.
-- [ ] Ajouter des logs structurés.
-- [ ] Automatiser et tester les sauvegardes.
-- [ ] Ajouter l’observabilité.
-- [ ] Fiabiliser davantage les releases et mises à niveau.
+Objectif : préparer une release 2.7.0 robuste, entièrement testée et facilement maintenable.
+
+### Priorité 1 — Infrastructure
+- [ ] Intégrer Alembic pour les migrations.
+- [ ] Versionner toutes les migrations.
+- [ ] Vérifier automatiquement la version de schéma.
+
+### Priorité 2 — Qualité
+- [ ] Ajouter des tests unitaires des providers (OCBlackTop, TheSportsDB et suivants).
+- [ ] Utiliser des mocks des API externes.
+- [ ] Mesurer la couverture de code.
+
+### Priorité 3 — Base de données
+- [ ] Ajouter des tests d’intégration PostgreSQL via Docker.
+- [ ] Vérifier les migrations sur une base vierge et une base existante.
+- [ ] Ajouter des jeux de données de test.
+
+### Priorité 4 — Administration
+- [ ] Modulariser l’administration (Configuration, Providers, Synchronisations, Diagnostics, Système).
+- [ ] Ajouter un journal d’administration.
+
+### Priorité 5 — Exploitation
+- [ ] Ajouter des logs structurés JSON.
+- [ ] Mettre en place la rotation des logs.
+- [ ] Automatiser et tester les sauvegardes/restaurations.
+- [ ] Vérifier automatiquement les prérequis avant les mises à niveau.
+
+### Priorité 6 — Observabilité
+- [ ] Ajouter les endpoints /ready, /live et /metrics.
+- [ ] Préparer l’intégration Prometheus/Grafana.
+
+### Priorité 7 — Releases
+- [ ] Renforcer le pipeline GitHub Actions.
+- [ ] Générer automatiquement les archives et SHA256.
+- [ ] Exécuter les tests avant toute release.
+
+### Méthode de développement
+- Développer par branches fonctionnelles (`feature/...`).
+- Ouvrir une Pull Request par fonctionnalité.
+- Tester chaque PR sur le VPS avant fusion.
+- Ne jamais développer directement sur `main`.
+- Utiliser ce dépôt GitHub comme source de vérité unique.
