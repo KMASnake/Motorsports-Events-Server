@@ -271,7 +271,11 @@ désactivé explicitement.
 - récupération : les exécutions orphelines 522, 526 et 527 ont été clôturées
   avec l’état `interrupted` ;
 - aucune exécution récente ne reste en état `running` ;
-- validation finale du format de toutes les lignes de logs : en attente.
+- validation finale des logs : 48 lignes JSON valides ;
+- événements observés : `http.request`, `logging.configured`, `sync.started`,
+  `sync.completed` et `sync.provider_failed` ;
+- aucun journal d’accès `uvicorn.access` redondant ;
+- candidate `2.7.0-alpha.6` entièrement validée sur le VPS le 29 juillet 2026.
 
 ## Validation de la 2.6.0
 

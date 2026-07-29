@@ -146,8 +146,8 @@ un administrateur et ne contiennent aucune valeur sensible.
 - [x] installer `2.7.0-alpha.6` sur le VPS ;
 - [x] vérifier l’échec rapide sur quota mensuel OCBlackTop ;
 - [x] vérifier la récupération des synchronisations orphelines ;
-- [ ] vérifier que les lignes API et scheduler sont du JSON valide ;
-- [ ] vérifier les événements HTTP et de synchronisation ;
+- [x] vérifier que les lignes API et scheduler sont du JSON valide ;
+- [x] vérifier les événements HTTP et de synchronisation ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : les logs applicatifs sont des objets JSON valides,
