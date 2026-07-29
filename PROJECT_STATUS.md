@@ -1,53 +1,70 @@
 # État du projet
 
-Dernière mise à jour : 28 juillet 2026.
+Dernière mise à jour : 29 juillet 2026.
 
 ## Version retenue
 
 - projet : `motorsports-events-server` ;
-- version fonctionnelle : `2.5.2` ;
-- jalon : `3-versioned-client-contracts` ;
-- build : `20260728-210128` ;
+- version fonctionnelle : `2.6.0` ;
+- jalon : `4-admin-data-quality` ;
+- build : `20260728-214529` ;
 - API publique : `/api/v1` ;
 - dépôt GitHub : `KMASnake/Motorsports-Events-Server` (privé).
 
-## Release validée
+La version ajoute :
 
-- archive : `motorsports-events-server-2.5.2.zip` ;
+- le signalement des séances dont la fin précède le début ;
+- leur correction manuelle avec override persistant ;
+- l’édition contrôlée du `.env` depuis l’administration ;
+- la protection des paramètres PostgreSQL et des secrets laissés vides ;
+- l’application explicite de la nouvelle configuration après redémarrage.
+
+## Validation de la 2.6.0
+
+- validation reproductible : 27 tests réussis ;
+- suite Pytest : 31 tests réussis ;
+- intégration locale SQLite : détection, correction et override réussis ;
+- écriture `.env` : conservation des commentaires, paramètres inconnus et
+  secrets non remplacés réussie ;
+- archive : `motorsports-events-server-2.6.0.zip` ;
 - SHA-256 :
-  `0baf289ec16b05a38ff41e05de6f2bc94f547815e311751da04033d824bbd6df` ;
-- tests locaux : 21 réussis ;
+  `8d7cf792a76bc4dde77c3a08c307a2ce902a871c29e722f526c5323b8594bb8e` ;
 - archive réextraite et retestée : réussie ;
 - intégrité ZIP : réussie.
 
 ## Validation VPS
 
-La version 2.5.2 est validée sur le VPS :
+La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 
-- version locale et API : 2.5.2 ;
+- version locale et API : 2.6.0, build `20260728-214529` ;
 - API et PostgreSQL : `healthy` ;
 - Caddy et scheduler : actifs ;
 - `/api/v1/events` : HTTP 200 et JSON valide ;
-- pagination différentielle : pages 1–5 puis 6–10, sans doublon ;
-- synchronisation concurrente : HTTP 503 et `Retry-After: 10` ;
-- curseur invalidé après synchronisation : HTTP 409 ;
-- curseur invalide : HTTP 422 ;
+- trois incohérences IndyCar corrigées avec overrides actifs ;
 - synchronisation manuelle : 0 créée, 243 mises à jour, 0 erreur ;
-- aucun nouveau traceback ou `Internal Server Error`.
+- aucune incohérence IndyCar/Warmup après synchronisation ;
+- modification Web de `LOG_LEVEL=WARNING` réussie ;
+- permissions du `.env` conservées à `600` ;
+- redémarrage et santé API réussis.
 
 ## État Git
 
 - branche stable : `main` ;
 - publication 2.5.2 : pull request GitHub `#1` ;
 - branche de publication : `agent/publish-2.5.2-handoff` ;
-- référence officielle de release : tag annoté `v2.5.2`.
+- référence officielle de release : tag annoté `v2.5.2` ;
+- publication 2.6.0 : intégrée dans `main` ;
+- tag officiel `v2.6.0` : en attente.
 
 ## Problèmes connus
 
-- une séance provider « Warmup » a été observée avec `end_at < start_at` ;
-- cette anomalie de qualité des données ne bloque pas le contrat du Jalon 3 ;
-- elle doit être reproduite, attribuée au provider ou à la normalisation, puis
-  couverte par un test avant correction.
+- trois séances IndyCar ont été reçues d’OCBlackTop avec `end_at < start_at` ;
+- `last_provider_data` confirme que les dates erronées proviennent des données
+  OCBlackTop et non de leur correction locale ;
+- la 2.6.0 les signale et conserve les corrections comme overrides après
+  synchronisation ;
+- l’éditeur `.env` ne redémarre volontairement pas Docker : l’administrateur
+  doit exécuter `sudo ./restart.sh` après enregistrement.
 
 ## Exploitation
 

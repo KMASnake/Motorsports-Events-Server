@@ -13,17 +13,35 @@ précédente est terminée ou explicitement différée.
 Critère d'acceptation : `main` contient exactement la version validée sur VPS,
 le tag `v2.5.2` pointe sur cette version et la validation GitHub réussit.
 
-## 2. Qualifier la séance dont la fin précède le début
+## 2. Valider la 2.6.0
 
-- [ ] identifier le provider, l'épreuve et la donnée brute ;
-- [ ] déterminer si l'erreur vient du provider ou de la normalisation ;
-- [ ] définir une politique explicite : rejet, correction ou signalement ;
-- [ ] ajouter un test de non-régression avant toute correction.
+- [x] signaler les séances dont la fin précède le début ;
+- [x] permettre leur correction manuelle sans correction silencieuse ;
+- [x] conserver la correction comme override après synchronisation ;
+- [x] permettre l’édition contrôlée du `.env` depuis l’administration ;
+- [x] installer l’archive candidate sur le VPS ;
+- [x] valider le signalement et la correction d’une anomalie ;
+- [x] valider la modification d’un paramètre non sensible puis le redémarrage ;
+- [x] vérifier santé, événements et synchronisation ;
+- [x] reporter les résultats VPS dans `PROJECT_STATUS.md`.
 
-Critère d'acceptation : la cause est documentée dans une issue et aucun horaire
-n'est corrigé silencieusement sans règle métier approuvée.
+Critère d'acceptation : les deux fonctions sont validées sur le VPS, la
+synchronisation ne réintroduit pas l’horaire corrigé et les contrats API
+publics restent inchangés.
 
-## 3. Préparer le Jalon 4 — Stabilisation opérationnelle
+## 3. Publier la 2.6.0
+
+- [x] intégrer la version validée dans `main` ;
+- [ ] créer et pousser le tag annoté `v2.6.0` ;
+- [ ] reporter le commit et le tag dans `PROJECT_STATUS.md`.
+
+## 4. Qualifier l’origine de l’anomalie horaire
+
+- [x] identifier le provider, les épreuves et les données brutes ;
+- [x] déterminer si l’erreur vient du provider ou de la normalisation ;
+- [ ] documenter la cause dans une issue.
+
+## 5. Poursuivre le Jalon 4 — Stabilisation opérationnelle
 
 - [ ] introduire Alembic ;
 - [ ] ajouter des tests unitaires providers ;

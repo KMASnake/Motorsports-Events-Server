@@ -40,7 +40,7 @@ apply_runtime_migrations()
 
 app = FastAPI(
     title=f"{settings.project_name} API",
-    version="2.5.2",
+    version="2.6.0",
     description=(
         f"Serveur central de {settings.project_name}. "
         "Le contrat /api/v1 reste rétrocompatible pendant toute la série 2.x."
@@ -92,7 +92,9 @@ form.inline{{display:inline}} .flash{{padding:12px;border-radius:8px;background:
 </head>
 <body>
 <header><a href="/admin"><strong>{project}</strong></a>
-<nav><a href="/admin">Tableau de bord</a><a href="/docs">API</a>
+<nav><a href="/admin">Tableau de bord</a>
+<a href="/admin/temporal-issues">Incohérences horaires</a>
+<a href="/admin/settings">Paramètres</a><a href="/docs">API</a>
 <form class="inline" method="post" action="/admin/logout"><button class="secondary">Déconnexion</button></form></nav>
 </header>
 <main>{content}</main>
@@ -105,7 +107,7 @@ app.include_router(admin_extension_router)
 def root():
     return {
         "name": settings.project_name,
-        "version": "2.5.2",
+        "version": "2.6.0",
         "docs": "/docs",
         "admin": "/admin",
     }
@@ -476,6 +478,9 @@ def admin_dashboard(
         "events": db.query(func.count(Event.id)).scalar() or 0,
         "sessions": db.query(func.count(Session.id)).filter(Session.deleted.is_(False)).scalar() or 0,
         "overrides": db.query(func.count(ManualOverride.id)).filter(ManualOverride.active.is_(True)).scalar() or 0,
+        "temporal_issues": db.query(func.count(Session.id)).filter(
+            Session.end_at < Session.start_at
+        ).scalar() or 0,
     }
 
     sync_rows = db.query(SyncRun).order_by(SyncRun.started_at.desc()).limit(12).all()
@@ -536,6 +541,9 @@ def admin_dashboard(
 <div class="metric"><span class="muted">Épreuves</span><strong>{counts['events']}</strong></div>
 <div class="metric"><span class="muted">Séances</span><strong>{counts['sessions']}</strong></div>
 <div class="metric"><span class="muted">Corrections actives</span><strong>{counts['overrides']}</strong></div>
+<div class="metric"><span class="muted">Incohérences horaires</span>
+<strong>{counts['temporal_issues']}</strong>
+<a href="/admin/temporal-issues">Examiner et corriger</a></div>
 </div>
 
 <section class="panel"><h2>Version installée</h2>

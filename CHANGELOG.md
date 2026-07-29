@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.6.0 — Administration et qualité des données
+
+- Signalement des séances dont la fin précède le début.
+- Page d'administration dédiée aux incohérences horaires.
+- Correction immédiate des horaires avec override persistant.
+- Édition contrôlée du fichier `.env` depuis l'administration.
+- Masquage et conservation des secrets laissés vides.
+- Validation des domaines, URLs, ports, saisons, intervalles et fuseaux.
+- Protection des paramètres PostgreSQL contre les modifications Web.
+- Montage limité au seul fichier `.env` dans le conteneur API.
+- Redémarrage explicite requis, sans exposition du socket Docker.
+
 ## 2.5.2 — Cohérence pendant les synchronisations
 
 - Ajout de l'identifiant de synchronisation dans le curseur opaque.

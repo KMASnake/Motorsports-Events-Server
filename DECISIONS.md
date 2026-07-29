@@ -32,6 +32,14 @@ concurrentes par des réponses 409 ou 503.
 
 Voir `docs/decisions/0004-versioned-client-contract.md`.
 
+## ADR 0005 — Qualité temporelle et configuration administrable
+
+Les incohérences `end_at < start_at` sont signalées et corrigées explicitement
+par override. L'administration peut modifier le fichier `.env`, sauf les
+paramètres PostgreSQL protégés, puis demande un redémarrage contrôlé.
+
+Voir `docs/decisions/0005-admin-data-quality-and-config.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

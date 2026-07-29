@@ -23,6 +23,7 @@ output = Path(sys.argv[2])
 ignored = {
     ".git",
     ".venv",
+    ".pytest_cache",
     "__pycache__",
     "dist",
     "data",

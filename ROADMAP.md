@@ -25,6 +25,8 @@
 
 ## Jalon 4 — Stabilisation opérationnelle
 
+- [x] Signaler et corriger les incohérences temporelles depuis l’administration.
+- [x] Ajouter l’édition contrôlée de la configuration `.env`.
 - [ ] Ajouter Alembic.
 - [ ] Ajouter des tests unitaires providers.
 - [ ] Ajouter des tests d’intégration PostgreSQL.

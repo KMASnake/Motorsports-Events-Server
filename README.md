@@ -7,8 +7,8 @@ Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 
 ## Version courante
 
-La version **2.5.2 — Jalon 3** conserve la base 2.4.0 validée sur VPS et
-stabilise le contrat destiné aux clients :
+La version **2.6.0 — Administration et qualité des données** conserve le
+contrat du Jalon 3 et ajoute :
 
 - FastAPI ;
 - PostgreSQL ;
@@ -19,7 +19,9 @@ stabilise le contrat destiné aux clients :
 - installation Docker ;
 - sauvegarde, mise à niveau et rollback ;
 - API v1 documentée ;
-- synchronisation différentielle par curseur.
+- synchronisation différentielle par curseur ;
+- signalement et correction des incohérences horaires ;
+- édition sécurisée du fichier `.env` depuis l'administration.
 
 ## Structure
 
