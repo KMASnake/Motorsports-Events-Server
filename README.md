@@ -7,7 +7,7 @@ Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 
 ## Version courante
 
-La candidate **2.7.0-alpha.4 — Administration modulaire** conserve le contrat
+La candidate **2.7.0-alpha.5 — Journal d’administration** conserve le contrat
 API v1 et poursuit le Jalon 4 :
 
 - FastAPI ;
@@ -29,6 +29,7 @@ API v1 et poursuit le Jalon 4 :
 - environnement PostgreSQL 16 temporaire et isolé ;
 - migrations et synchronisation testées avec un jeu de données reproductible ;
 - routes d’administration isolées du point d’entrée de l’API publique.
+- journal persistant des actions administratives sans données sensibles.
 
 ## Structure
 

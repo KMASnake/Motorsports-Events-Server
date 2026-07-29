@@ -52,7 +52,7 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 
 ### Priorité 4 — Administration
 - [x] Modulariser l’administration sans refonte visuelle.
-- [ ] Ajouter un journal d’administration.
+- [x] Ajouter un journal d’administration.
 
 ### Priorité 5 — Exploitation
 - [ ] Ajouter des logs structurés JSON.

@@ -186,6 +186,33 @@ changement visuel n’est inclus.
 - synchronisation : 0 créée, 243 mises à jour, 0 erreur ;
 - journaux API, scheduler et migration : aucune erreur détectée.
 
+## Candidate journal d’administration
+
+- version : `2.7.0-alpha.5` ;
+- sous-jalon : `4.5-admin-audit-log` ;
+- build : `20260729-125029` ;
+- branche : `feature/admin-audit-log` ;
+- révision de schéma : `0002_admin_audit_log` ;
+- contrat API public : inchangé.
+
+La candidate ajoute un journal persistant pour les connexions,
+synchronisations, overrides, corrections temporelles, modifications de
+configuration et tests providers. Les détails ne contiennent que des
+métadonnées non sensibles.
+
+### Validation locale
+
+- suite applicative : 47 tests, 3 tests PostgreSQL ignorés hors Docker et
+  5 sous-tests réussis ;
+- migration SQLite vierge et depuis un schéma existant : réussie ;
+- migration PostgreSQL vierge et depuis un schéma existant : réussie ;
+- suite PostgreSQL : 3 tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.5.zip` ;
+- SHA-256 :
+  `162c4badd86dd100ae16808f7c0308a74dc7d29cc56fa0fd0181907cd27dcde3` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

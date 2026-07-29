@@ -64,6 +64,14 @@ de bord et les API d’administration sont regroupés derrière le routeur
 
 Voir `docs/decisions/0008-modular-admin-router.md`.
 
+## ADR 0009 — Journal d’administration
+
+Les actions administratives sont enregistrées avec leur résultat et des
+métadonnées non sensibles. Aucun secret, cookie ou contenu `.env` n’est
+persisté dans le journal.
+
+Voir `docs/decisions/0009-admin-audit-log.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

@@ -44,3 +44,5 @@ Les clients doivent ignorer les champs JSON inconnus et traiter
 - serveur 2.7.0-alpha.3 : API v1 inchangée, tests PostgreSQL isolés.
 - serveur 2.7.0-alpha.4 : API v1 et routes admin inchangées, routeurs
   d’administration isolés de `app.main`.
+- serveur 2.7.0-alpha.5 : API v1 inchangée, journal d’administration et
+  révision de schéma `0002_admin_audit_log`.

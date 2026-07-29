@@ -70,6 +70,7 @@ class SchemaMigrationTests(unittest.TestCase):
                     "sessions",
                     "manual_overrides",
                     "sync_runs",
+                    "admin_audit_logs",
                 }.issubset(tables)
             )
             command.check(self.alembic_config(url))
@@ -79,7 +80,14 @@ class SchemaMigrationTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             url = f"sqlite:///{Path(directory) / 'existing.db'}"
             engine = create_engine(url)
-            Base.metadata.create_all(engine)
+            Base.metadata.create_all(
+                engine,
+                tables=[
+                    table
+                    for table in Base.metadata.sorted_tables
+                    if table.name != "admin_audit_logs"
+                ],
+            )
             with engine.begin() as connection:
                 connection.execute(
                     text(
@@ -101,8 +109,16 @@ class SchemaMigrationTests(unittest.TestCase):
                 stored = connection.execute(
                     text("SELECT version_num FROM alembic_version")
                 ).scalar_one()
+                audit_table = connection.execute(
+                    text(
+                        "SELECT count(*) FROM sqlite_master "
+                        "WHERE type = 'table' "
+                        "AND name = 'admin_audit_logs'"
+                    )
+                ).scalar_one()
             self.assertEqual(1, count)
             self.assertEqual(revision, stored)
+            self.assertEqual(1, audit_table)
             engine.dispose()
 
     def test_incomplete_existing_schema_is_refused(self):

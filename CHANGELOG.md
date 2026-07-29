@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0-alpha.5 — Journal d’administration
+
+- Ajout de la migration `0002_admin_audit_log`.
+- Journal persistant consultable dans `/admin/audit`.
+- API protégée `GET /api/v1/admin/audit`.
+- Traçage des connexions, synchronisations, overrides, corrections horaires,
+  changements de configuration et tests providers.
+- Conservation exclusive de métadonnées non sensibles.
+- Migration d’une base existante de `0001` vers `0002` testée.
+
 ## 2.7.0-alpha.4 — Administration modulaire
 
 - Extraction des routes d’administration hors du point d’entrée public.

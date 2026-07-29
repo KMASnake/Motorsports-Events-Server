@@ -1,6 +1,7 @@
 """Compatibilité avec l'ancien emplacement des modèles SQLAlchemy."""
 
 from .infrastructure.persistence.models import (
+    AdminAuditLog,
     Event,
     ManualOverride,
     Session,
@@ -10,6 +11,7 @@ from .infrastructure.persistence.models import (
 )
 
 __all__ = [
+    "AdminAuditLog",
     "Event",
     "ManualOverride",
     "Session",
