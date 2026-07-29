@@ -1,0 +1,35 @@
+groups:
+  - name: motorsports-events-api
+    rules:
+      - alert: MotorsportsApiUnavailable
+        expr: up{job="motorsports-events-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: API Motorsports Events indisponible
+          description: Prometheus ne parvient plus à collecter les métriques de l'API depuis 2 minutes.
+
+      - alert: MotorsportsApiHigh5xxRate
+        expr: |
+          (
+            sum(rate(motorsports_http_requests_total{status=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(motorsports_http_requests_total[5m])), 0.001)
+          ) > 0.05
+          and
+          sum(rate(motorsports_http_requests_total[5m])) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Taux élevé d'erreurs HTTP 5xx
+          description: Plus de 5 % des requêtes retournent une erreur 5xx depuis 5 minutes.
+
+      - alert: MotorsportsApiRepeatedRestarts
+        expr: resets(motorsports_api_uptime_seconds[30m]) > 1
+        labels:
+          severity: warning
+        annotations:
+          summary: Redémarrages répétés de l'API
+          description: L'uptime de l'API a été réinitialisé plus d'une fois en 30 minutes.

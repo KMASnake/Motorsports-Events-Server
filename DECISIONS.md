@@ -108,6 +108,13 @@ avec accès par tunnel SSH.
 
 Voir `docs/decisions/0014-private-prometheus-grafana.md`.
 
+## ADR 0015 — Alertes locales de supervision
+
+Prometheus évalue localement les alertes techniques. Grafana les affiche sans
+canal de notification ni nouvelle exposition réseau.
+
+Voir `docs/decisions/0015-local-monitoring-alerts.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

@@ -5,13 +5,33 @@
     {
       "type": "stat",
       "title": "API disponible",
-      "targets": [{"expr": "motorsports_api_up", "refId": "A"}],
+      "targets": [{"expr": "up{job=\"motorsports-events-api\"}", "refId": "A"}],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "green", "value": 1}
+            ]
+          }
+        },
+        "overrides": []
+      },
       "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
     },
     {
       "type": "stat",
       "title": "Uptime (secondes)",
       "targets": [{"expr": "motorsports_api_uptime_seconds", "refId": "A"}],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "fixed", "fixedColor": "green"},
+          "unit": "s"
+        },
+        "overrides": []
+      },
       "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
     },
     {
@@ -32,6 +52,28 @@
         "refId": "A"
       }],
       "gridPos": {"h": 9, "w": 24, "x": 0, "y": 9}
+    },
+    {
+      "type": "stat",
+      "title": "Alertes actives",
+      "targets": [{
+        "expr": "sum(ALERTS{alertstate=\"firing\"}) OR vector(0)",
+        "refId": "A"
+      }],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "red", "value": 1}
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 18}
     }
   ],
   "refresh": "30s",
@@ -41,5 +83,5 @@
   "time": {"from": "now-6h", "to": "now"},
   "title": "Motorsports Events — API",
   "uid": "motorsports-events-api",
-  "version": 1
+  "version": 2
 }

@@ -424,7 +424,73 @@ nécessite un mot de passe et fournit un tableau de bord API préconfiguré.
 - suite PostgreSQL : 4 tests réussis ;
 - archive réextraite et retestée ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.11` ;
+- API, scheduler, PostgreSQL et Caddy : actifs ;
+- Prometheus collecte `/metrics` toutes les 30 secondes ;
+- Grafana écoute uniquement sur `127.0.0.1:3000` ;
+- Prometheus ne publie aucun port hôte ;
+- source Prometheus et tableau API provisionnés ;
+- disponibilité API : `1` ;
+- taux d’erreurs HTTP observé : `0` ;
+- mot de passe Grafana initial exposé hors dépôt puis remplacé.
+
+## Candidate alertes de supervision
+
+- version : `2.7.0-alpha.12` ;
+- sous-jalon : `4.12-monitoring-alerts` ;
+- branche : `feature/monitoring-alerts` ;
+- schéma et contrat API v1 : inchangés.
+
+La candidate ajoute des règles locales pour l’indisponibilité, les erreurs
+HTTP 5xx et les redémarrages répétés. Grafana affiche les alertes actives sans
+ajouter de canal de notification ou de port public.
+
+### Validation locale
+
+- configuration Prometheus : valide avec 3 règles chargées par `promtool` ;
+- configuration Compose combinée : valide ;
+- suite applicative légère : 51 tests, dont 33 réussis et 18 ignorés lorsque
+  les dépendances applicatives ne sont pas installées ;
+- suite PostgreSQL isolée : 4 tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.12.zip` ;
+- archive réextraite et retestée : réussie ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- première installation VPS : rollback automatique réussi, car les valeurs
+  Compose alpha.11 écrasaient la version alpha.12 embarquée ;
+- correctif : versions et builds Compose alignés et protégés par un test de
+  non-régression ;
+- anomalie détectée après rollback : le déplacement de `data/` vers la
+  candidate pouvait supprimer les données PostgreSQL lors de sa suppression ;
+- correctif : `data/` est désormais replacé dans le rollback avant toute
+  suppression de la candidate ;
+- restauration VPS depuis la sauvegarde pré-upgrade : réussie ;
+- correctif de rollback extrait de l’archive corrigée et installé sur le VPS ;
+- validation VPS de l’archive corrigée : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.12`, build `20260729-163135` ;
+- schéma : `0002_admin_audit_log` ;
+- API, PostgreSQL, scheduler, Caddy, Prometheus et Grafana : actifs ;
+- règles Prometheus : configuration valide, 3 règles chargées ;
+- incident réel détecté : `MotorsportsApiRepeatedRestarts` actif après les
+  mises à niveau et le rollback, avec extinction automatique attendue après
+  la fenêtre de 30 minutes ;
+- première candidate refusée automatiquement car les valeurs Compose alpha.11
+  écrasaient sa version applicative alpha.12 ;
+- ce rollback a révélé que `data/`, déplacé dans la candidate, pouvait être
+  supprimé avec elle ;
+- base restaurée depuis
+  `pre-upgrade-20260729-142828.sql.gz` : 13 sports, 243 événements,
+  1 186 séances et 3 overrides ;
+- sauvegarde post-incident de 6 254 octets explicitement écartée ;
+- `upgrade.sh` corrigé installé depuis l’archive dont le SHA-256 est
+  `f2ce2018116f9d8e9f507e94880d69d57c10acf02e3462fedd376358732bdc2f` ;
+- syntaxe du script corrigé : valide.
 
 ## Validation de la 2.6.0
 
