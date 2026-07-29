@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0-alpha.4 — Administration modulaire
+
+- Extraction des routes d’administration hors du point d’entrée public.
+- Ajout d’un routeur d’administration agrégateur.
+- Conservation de toutes les URLs, méthodes, redirections et réponses.
+- Ajout de tests empêchant le retour des routes admin dans `app.main`.
+- Aucun changement visuel ni modification du contrat API public.
+
 ## 2.7.0-alpha.3 — Intégration PostgreSQL
 
 - Ajout d’un environnement Docker PostgreSQL 16 réservé aux tests.
