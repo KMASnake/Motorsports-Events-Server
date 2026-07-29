@@ -286,9 +286,24 @@ supplémentaire n’est exposé.
 - [x] construire et retester l’archive `2.7.0-rc.1` ;
 - [x] valider l’artefact GitHub sur le VPS ;
 - [x] vérifier les données, services, sondes et sauvegardes ;
-- [ ] intégrer la pull request après validation VPS ;
-- [ ] promouvoir la candidate validée en `2.7.0`.
+- [x] intégrer la pull request après validation VPS ;
+- [x] promouvoir la candidate validée en `2.7.0`.
 
 Critère d’acceptation : la RC ne contient aucun changement fonctionnel après
 l’alpha.15, toutes les validations de `docs/release-checklist.md` réussissent
 et les données de production sont conservées.
+
+## 22. Publier la version stable 2.7.0
+
+- [x] aligner les versions racine, serveur et Compose sur `2.7.0` ;
+- [x] exécuter les suites applicative et PostgreSQL ;
+- [x] construire et retester l’archive stable ;
+- [x] installer l’artefact GitHub stable sur le VPS ;
+- [x] vérifier version, données, services, sondes et sauvegardes ;
+- [ ] intégrer la pull request dans `main` ;
+- [ ] créer et pousser le tag annoté `v2.7.0` ;
+- [ ] publier la release GitHub avec le ZIP et son SHA-256.
+
+Critère d’acceptation : l’artefact stable est identique fonctionnellement à la
+RC qualifiée, s’installe sans perte sur le VPS et le tag `v2.7.0` désigne
+exactement le commit publié dans `main`.

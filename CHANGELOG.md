@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.7.0 — Stabilisation opérationnelle
+
+- Migrations Alembic et tests d’intégration PostgreSQL isolés.
+- Tests unitaires simulés des providers et seuil de couverture en CI.
+- Administration modulaire et journal d’audit sans secrets.
+- Logs JSON corrélés, rotation Docker et synchronisations concurrentes
+  empêchées.
+- Sauvegardes quotidiennes atomiques, vérifiées et restaurables.
+- Contrôle préalable, mise à niveau et rollback reproductibles.
+- Endpoints de vie, disponibilité et métriques Prometheus.
+- Supervision Prometheus/Grafana privée avec alertes locales.
+- Artefacts GitHub construits uniquement après réussite des tests.
+- Contrat `/api/v1` conservé.
+
 ## 2.7.0-rc.1 — Candidate de stabilisation
 
 - Gel fonctionnel du jalon 4 avant publication de la version stable.
