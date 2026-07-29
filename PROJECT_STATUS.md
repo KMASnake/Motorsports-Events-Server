@@ -560,6 +560,9 @@ après réussite des validations applicative et PostgreSQL.
 - première exécution GitHub : artefact produit, mais empreinte contenant le
   chemin absolu du runner et donc non portable après téléchargement ;
 - correctif : le fichier d’empreinte référence uniquement le nom du ZIP ;
+- deuxième exécution GitHub : vérification lancée depuis la racine alors que
+  le nom portable doit être résolu depuis `dist/` ;
+- correctif : la vérification CI s’exécute désormais dans `dist/` ;
 - validation GitHub et VPS : en attente.
 
 ## Validation de la 2.6.0

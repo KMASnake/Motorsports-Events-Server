@@ -12,7 +12,8 @@ def test_release_artifact_requires_all_test_jobs():
     release = workflow[workflow.index("  release-artifact:"):]
     assert "needs: [validate, postgres-integration]" in release
     assert "run: ./scripts/build-release.sh" in release
-    assert "run: sha256sum -c dist/*.zip.sha256" in release
+    assert "cd dist" in release
+    assert '"motorsports-events-server-$(cat ../VERSION).zip.sha256"' in release
     assert "uses: actions/upload-artifact@v4" in release
     assert "dist/*.zip" in release
     assert "dist/*.zip.sha256" in release
