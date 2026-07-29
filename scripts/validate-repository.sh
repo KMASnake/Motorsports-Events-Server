@@ -18,6 +18,8 @@ for required in \
   Caddyfile \
   install.sh \
   server/Dockerfile \
+  server/alembic.ini \
+  server/alembic/versions/0001_initial_schema.py \
   server/app/main.py
 do
   if [[ ! -e "${ROOT}/${required}" ]]; then

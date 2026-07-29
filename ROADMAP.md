@@ -36,9 +36,9 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 > **Directive pour Codex :** jusqu'à la validation complète du jalon 4, aucune refonte graphique ou UX/UI ne doit être entreprise. Les modifications des pages web doivent uniquement servir les besoins techniques des fonctionnalités en cours. Le design sera traité dans une phase dédiée après la sortie de la version 2.7.0.
 
 ### Priorité 1 — Infrastructure
-- [ ] Intégrer Alembic pour les migrations.
-- [ ] Versionner toutes les migrations.
-- [ ] Vérifier automatiquement la version de schéma.
+- [x] Intégrer Alembic pour les migrations.
+- [x] Versionner toutes les migrations.
+- [x] Vérifier automatiquement la version de schéma.
 
 ### Priorité 2 — Qualité
 - [ ] Ajouter des tests unitaires des providers.

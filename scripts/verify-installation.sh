@@ -24,6 +24,11 @@ echo "État Docker :"
 docker compose --profile vps ps
 echo
 
+echo "Version du schéma :"
+docker compose run --rm --no-deps migrate \
+  python -m app.schema_migrations check
+echo
+
 echo "Santé API :"
 curl -fsS "https://${API_DOMAIN}/api/v1/health"
 echo

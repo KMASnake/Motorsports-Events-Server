@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.0-alpha.1 — Infrastructure Alembic
+
+- Ajout d’une migration initiale décrivant l’intégralité du schéma.
+- Migration exécutée par un service Docker dédié avant l’API et le scheduler.
+- Adoption contrôlée des bases 2.6.0 existantes sans perte de données.
+- Refus des schémas existants incomplets ou inconnus.
+- Vérification automatique de la révision au démarrage et à l’installation.
+- Suppression des migrations SQL ad hoc au profit d’Alembic.
+
 ## 2.6.0 — Administration et qualité des données
 
 - Signalement des séances dont la fin précède le début.

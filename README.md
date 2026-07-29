@@ -7,8 +7,8 @@ Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 
 ## Version courante
 
-La version **2.6.0 — Administration et qualité des données** conserve le
-contrat du Jalon 3 et ajoute :
+La candidate **2.7.0-alpha.1 — Infrastructure Alembic** conserve le contrat
+API v1 et introduit le premier sous-jalon d’infrastructure du Jalon 4 :
 
 - FastAPI ;
 - PostgreSQL ;
@@ -22,6 +22,8 @@ contrat du Jalon 3 et ajoute :
 - synchronisation différentielle par curseur ;
 - signalement et correction des incohérences horaires ;
 - édition sécurisée du fichier `.env` depuis l'administration.
+- migrations de schéma versionnées avec Alembic ;
+- contrôle automatique de la révision avant démarrage.
 
 ## Structure
 

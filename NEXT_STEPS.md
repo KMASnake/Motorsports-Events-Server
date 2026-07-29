@@ -32,18 +32,34 @@ publics restent inchangés.
 ## 3. Publier la 2.6.0
 
 - [x] intégrer la version validée dans `main` ;
-- [ ] créer et pousser le tag annoté `v2.6.0` ;
+- [x] créer le tag annoté `v2.6.0` sur le commit validé ;
+- [ ] pousser le tag `v2.6.0` sur GitHub ;
 - [ ] reporter le commit et le tag dans `PROJECT_STATUS.md`.
 
-## 4. Qualifier l’origine de l’anomalie horaire
+## 4. Valider le sous-jalon Alembic
+
+- [x] ajouter Alembic et une migration initiale complète ;
+- [x] ajouter un service de migration avant l’API et le scheduler ;
+- [x] adopter sans perte une base 2.6.0 existante ;
+- [x] refuser un schéma incomplet ou une révision incorrecte ;
+- [x] tester SQLite et PostgreSQL 16 localement ;
+- [ ] installer `2.7.0-alpha.1` sur le VPS ;
+- [ ] vérifier la révision `0001_initial_schema` ;
+- [ ] vérifier santé, données, synchronisation et rollback ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : la base VPS conserve toutes ses données, possède la
+révision attendue et les services restent sains après mise à niveau.
+
+## 5. Qualifier l’origine de l’anomalie horaire
 
 - [x] identifier le provider, les épreuves et les données brutes ;
 - [x] déterminer si l’erreur vient du provider ou de la normalisation ;
 - [ ] documenter la cause dans une issue.
 
-## 5. Poursuivre le Jalon 4 — Stabilisation opérationnelle
+## 6. Poursuivre le Jalon 4 — Stabilisation opérationnelle
 
-- [ ] introduire Alembic ;
+- [x] introduire Alembic ;
 - [ ] ajouter des tests unitaires providers ;
 - [ ] ajouter des tests d'intégration PostgreSQL ;
 - [ ] modulariser l'administration ;

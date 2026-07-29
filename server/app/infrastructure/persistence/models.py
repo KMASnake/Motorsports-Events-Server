@@ -4,6 +4,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     JSON,
     String,
@@ -50,6 +51,7 @@ class Event(Base):
     )
     __table_args__ = (
         UniqueConstraint("source", "source_event_id", name="uq_event_source"),
+        Index("ix_events_sport_id", "sport_id"),
     )
 
 
@@ -76,6 +78,9 @@ class Session(Base):
             "source_session_id",
             name="uq_session_source",
         ),
+        Index("ix_sessions_category", "category"),
+        Index("ix_sessions_is_race", "is_race"),
+        Index("ix_sessions_start_at", "start_at"),
     )
 
 

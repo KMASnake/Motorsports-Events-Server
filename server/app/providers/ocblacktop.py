@@ -21,7 +21,7 @@ class OcBlackTopProvider(Provider):
         headers = {
             "Accept": "application/json",
             "x-api-key": settings.ocblacktop_api_key,
-            "User-Agent": "Motorsports-Events-Server/2.6.0",
+            "User-Agent": "Motorsports-Events-Server/2.7.0-alpha.1",
         }
 
         results: list[NormalizedEvent] = []

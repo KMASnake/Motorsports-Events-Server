@@ -3,13 +3,14 @@ import logging
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from .config import get_settings
-from .database import Base, engine, SessionLocal
+from .database import SessionLocal
+from .schema_migrations import assert_schema_current
 from .sync_service import synchronize
 
 logging.basicConfig(level=get_settings().log_level)
 logger = logging.getLogger("motorsport-calendar")
 
-Base.metadata.create_all(bind=engine)
+assert_schema_current()
 
 
 def job():

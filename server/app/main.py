@@ -27,20 +27,19 @@ from .api.schemas import (
     VersionResponse,
 )
 from .config import get_settings
-from .database import Base, engine, get_db
+from .database import get_db
 from .models import Event, ManualOverride, Session, Sport, SyncRun
-from .migrations import apply_runtime_migrations
+from .schema_migrations import assert_schema_current
 from .security import require_admin_key, require_public_key
 from .sync_service import synchronize
 from .version_info import version_payload
 
 settings = get_settings()
-Base.metadata.create_all(bind=engine)
-apply_runtime_migrations()
+assert_schema_current()
 
 app = FastAPI(
     title=f"{settings.project_name} API",
-    version="2.6.0",
+    version="2.7.0-alpha.1",
     description=(
         f"Serveur central de {settings.project_name}. "
         "Le contrat /api/v1 reste rétrocompatible pendant toute la série 2.x."
@@ -107,7 +106,7 @@ app.include_router(admin_extension_router)
 def root():
     return {
         "name": settings.project_name,
-        "version": "2.6.0",
+        "version": "2.7.0-alpha.1",
         "docs": "/docs",
         "admin": "/admin",
     }

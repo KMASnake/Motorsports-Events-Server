@@ -27,7 +27,10 @@ def read_text_file(name: str, default: str = "unknown") -> str:
 
 def version_payload() -> dict:
     return {
-        "version": os.getenv("APP_VERSION", read_text_file("VERSION", "2.6.0")),
+        "version": os.getenv(
+            "APP_VERSION",
+            read_text_file("VERSION", "2.7.0-alpha.1"),
+        ),
         "build": os.getenv("APP_BUILD", read_text_file("BUILD", "unknown")),
         "git_commit": os.getenv(
             "APP_GIT_COMMIT",
