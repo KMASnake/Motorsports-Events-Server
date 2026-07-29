@@ -35,9 +35,9 @@ def job():
                 "event": "sync.completed",
                 "sync_run_id": run.id,
                 "status": run.status,
-                "created": run.created,
-                "updated": run.updated,
-                "errors": run.errors,
+                "created_count": run.created,
+                "updated_count": run.updated,
+                "error_count": run.errors,
             },
         )
     finally:

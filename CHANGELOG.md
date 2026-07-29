@@ -8,6 +8,8 @@
 - Désactivation du journal d’accès texte d’Uvicorn.
 - Masquage récursif des champs sensibles.
 - Masquage des clés connues lorsqu’elles apparaissent dans un message.
+- Utilisation de noms de compteurs compatibles avec les attributs `LogRecord`.
+- Conversion des erreurs HTTP non gérées en réponse JSON corrélée.
 
 ## 2.7.0-alpha.5 — Journal d’administration
 

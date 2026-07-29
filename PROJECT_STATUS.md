@@ -241,15 +241,20 @@ La candidate structure les logs API, scheduler, HTTP et synchronisation en
 JSON. Les requêtes possèdent un identifiant de corrélation. Les champs
 sensibles et valeurs secrètes configurées sont masqués.
 
+La première validation VPS a révélé que le champ contextuel `created` entrait
+en conflit avec l’attribut réservé `LogRecord.created`. Les compteurs utilisent
+désormais les suffixes `_count`, et les exceptions HTTP non gérées sont
+journalisées puis converties en réponse JSON corrélée.
+
 ### Validation locale
 
-- suite applicative : 51 tests, 3 tests PostgreSQL ignorés hors Docker et
+- suite applicative : 52 tests, 3 tests PostgreSQL ignorés hors Docker et
   5 sous-tests réussis ;
 - suite PostgreSQL isolée : 3 tests réussis ;
 - format JSON, contexte et redaction : testés ;
 - archive : `motorsports-events-server-2.7.0-alpha.6.zip` ;
 - SHA-256 :
-  `c54a61e25d21621e33145530b2c4f8fd75c22ff0ccd41e549bbe3c11d7d64667` ;
+  `fc91e3d8a49276b312329ab02447dc27679942a0774db7128b084d2b5831c72a` ;
 - archive réextraite et retestée : réussie ;
 - validation VPS : en attente.
 

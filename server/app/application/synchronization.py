@@ -166,9 +166,9 @@ async def synchronize(db: OrmSession) -> SyncRun:
             "event": "sync.completed",
             "sync_run_id": run.id,
             "status": run.status,
-            "created": created,
-            "updated": updated,
-            "errors": errors,
+            "created_count": created,
+            "updated_count": updated,
+            "error_count": errors,
         },
     )
     return run

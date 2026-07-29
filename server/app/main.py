@@ -3,6 +3,7 @@ import logging
 from time import perf_counter
 from uuid import uuid4
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import BigInteger, and_, cast, func, or_
 from sqlalchemy.orm import Session as OrmSession, joinedload
 
@@ -75,7 +76,11 @@ async def structured_access_log(request: Request, call_next):
                 "duration_ms": round((perf_counter() - started) * 1000, 2),
             },
         )
-        raise
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error"},
+            headers={"X-Request-ID": request_id},
+        )
     response.headers["X-Request-ID"] = request_id
     logger.info(
         "HTTP request completed",

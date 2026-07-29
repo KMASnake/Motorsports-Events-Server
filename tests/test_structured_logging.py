@@ -87,3 +87,19 @@ class StructuredLoggingTests(unittest.TestCase):
             ROOT / "server" / "Dockerfile"
         ).read_text(encoding="utf-8")
         self.assertIn("--no-access-log", dockerfile)
+
+    def test_sync_context_does_not_use_reserved_log_record_fields(self):
+        reserved = set(logging.makeLogRecord({}).__dict__)
+        synchronization = (
+            ROOT / "server" / "app" / "application" / "synchronization.py"
+        ).read_text(encoding="utf-8")
+        scheduler = (
+            ROOT / "server" / "app" / "scheduler.py"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('"created_count":', synchronization)
+        self.assertIn('"updated_count":', synchronization)
+        self.assertIn('"error_count":', synchronization)
+        for name in ("created", "thread", "process", "module"):
+            self.assertIn(name, reserved)
+            self.assertNotIn(f'"{name}": run.', scheduler)
