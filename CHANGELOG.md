@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0-alpha.14 — Artefacts de release GitHub
+
+- Construction automatique de l’archive après les tests applicatifs et
+  PostgreSQL.
+- Vérification du SHA-256 avant publication.
+- Archive ZIP et empreinte publiées ensemble comme artefact GitHub Actions.
+- Fichier SHA-256 portable, sans chemin absolu propre au runner.
+- Échec explicite du job si un fichier de livraison manque.
+- Conservation des artefacts pendant quatorze jours.
+
 ## 2.7.0-alpha.13 — Mise à niveau et rollback testables
 
 - Bascule des fichiers de release isolée dans une bibliothèque Bash testable.

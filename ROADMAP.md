@@ -65,9 +65,9 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 - [x] Préparer l’intégration Prometheus/Grafana.
 
 ### Priorité 7 — Releases
-- [ ] Renforcer le pipeline GitHub Actions.
-- [ ] Générer automatiquement les archives et SHA256.
-- [ ] Exécuter les tests avant toute release.
+- [x] Renforcer le pipeline GitHub Actions.
+- [x] Générer automatiquement les archives et SHA256.
+- [x] Exécuter les tests avant toute release.
 
 ## Après le jalon 4
 
