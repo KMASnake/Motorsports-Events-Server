@@ -43,9 +43,9 @@ publics restent inchangés.
 - [x] adopter sans perte une base 2.6.0 existante ;
 - [x] refuser un schéma incomplet ou une révision incorrecte ;
 - [x] tester SQLite et PostgreSQL 16 localement ;
-- [ ] installer `2.7.0-alpha.1` sur le VPS ;
-- [ ] vérifier la révision `0001_initial_schema` ;
-- [ ] vérifier santé, données, synchronisation et rollback ;
+- [x] installer `2.7.0-alpha.1` sur le VPS ;
+- [x] vérifier la révision `0001_initial_schema` ;
+- [x] vérifier santé, données, synchronisation et rollback ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : la base VPS conserve toutes ses données, possède la

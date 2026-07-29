@@ -45,10 +45,25 @@ migration réussie et vérifient eux-mêmes la révision attendue.
 - PostgreSQL 16 vierge migré : réussi ;
 - adoption PostgreSQL 16 avec conservation d’une donnée IndyCar : réussie ;
 - archive candidate : `motorsports-events-server-2.7.0-alpha.1.zip` ;
-- SHA-256 : voir le fichier compagnon
-  `motorsports-events-server-2.7.0-alpha.1.zip.sha256` ;
+- SHA-256 :
+  `fc907f58f58297af030904e5a42e8f4570f604092bdffad8421ddc3ea1f376f8` ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS de la candidate
+
+- version locale et API : `2.7.0-alpha.1`, build `20260729-101537` ;
+- service de migration : `Exited (0)` ;
+- révision du schéma : `0001_initial_schema` ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- données conservées : 18 épreuves et 110 séances IndyCar ;
+- corrections conservées : 10 Warmup et aucune incohérence temporelle ;
+- synchronisation : 0 créée, 243 mises à jour, 0 erreur ;
+- révision inchangée après synchronisation ;
+- sauvegarde PostgreSQL : valide ;
+- dossier de rollback : présent ;
+- journaux API, scheduler et migration : aucune erreur détectée.
 
 ## Validation de la 2.6.0
 
