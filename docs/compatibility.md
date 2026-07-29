@@ -41,3 +41,4 @@ Les clients doivent ignorer les champs JSON inconnus et traiter
   configuration ;
 - serveur 2.7.0-alpha.1 : API v1 inchangée, migrations de schéma Alembic.
 - serveur 2.7.0-alpha.2 : API v1 inchangée, tests providers et couverture CI.
+- serveur 2.7.0-alpha.3 : API v1 inchangée, tests PostgreSQL isolés.

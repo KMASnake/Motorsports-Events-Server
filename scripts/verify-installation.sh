@@ -25,7 +25,7 @@ docker compose --profile vps ps
 echo
 
 echo "Version du schéma :"
-docker compose run --rm --no-deps migrate \
+docker compose exec -T api \
   python -m app.schema_migrations check
 echo
 

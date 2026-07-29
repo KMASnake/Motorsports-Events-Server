@@ -15,12 +15,15 @@ find "${ROOT}" -type f -name '*.sh' -print0 |
 for required in \
   VERSION \
   docker-compose.yml \
+  docker-compose.test.yml \
   Caddyfile \
   install.sh \
   server/Dockerfile \
   server/alembic.ini \
   server/alembic/versions/0001_initial_schema.py \
-  server/app/main.py
+  server/app/main.py \
+  tests/Dockerfile \
+  tests/fixtures/indycar_events.json
 do
   if [[ ! -e "${ROOT}/${required}" ]]; then
     echo "Élément obligatoire absent : ${required}"
