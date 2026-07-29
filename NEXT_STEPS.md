@@ -269,8 +269,10 @@ sur le VPS sans différence avec une archive locale.
 
 - [x] créer les répertoires de provisioning facultatifs `plugins/` et
   `alerting/` dans l’image ou le montage Grafana ;
-- [ ] vérifier que Grafana démarre sans erreur de provisioning ;
+- [x] vérifier que Grafana démarre sans erreur de provisioning ;
 - [x] conserver la liaison privée à `127.0.0.1:3000`.
+- [x] installer et valider l’alpha.15 sur le VPS ;
+- [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : le démarrage de Grafana ne produit plus d’erreur liée
 aux répertoires de provisioning absents et aucun port de supervision

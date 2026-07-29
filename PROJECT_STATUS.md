@@ -612,7 +612,21 @@ provisionings existants restent inchangés.
 - archive : `motorsports-events-server-2.7.0-alpha.15.zip` ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.15`, build `20260729-192233` ;
+- API et PostgreSQL : sains ;
+- scheduler et Caddy : actifs ;
+- schéma : `0002_admin_audit_log` ;
+- 13 sports accessibles ;
+- Prometheus et Grafana : actifs ;
+- Grafana lié uniquement à `127.0.0.1:3000` ;
+- Prometheus sans port hôte ;
+- répertoires `/etc/grafana/provisioning/plugins` et
+  `/etc/grafana/provisioning/alerting` présents ;
+- aucun message d’erreur de provisioning Grafana détecté.
 
 ## Validation de la 2.6.0
 
@@ -666,10 +680,7 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - l’éditeur `.env` ne redémarre volontairement pas Docker : l’administrateur
   doit exécuter `sudo ./restart.sh` après enregistrement ;
 - OCBlackTop refuse actuellement les synchronisations avec une réponse
-  `HTTP 429 Monthly limit exceeded` jusqu’au renouvellement du quota ;
-- Grafana journalise au démarrage l’absence des répertoires facultatifs
-  `/etc/grafana/provisioning/plugins` et
-  `/etc/grafana/provisioning/alerting`.
+  `HTTP 429 Monthly limit exceeded` jusqu’au renouvellement du quota.
 
 ## Exploitation
 
