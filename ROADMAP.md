@@ -61,7 +61,7 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 - [x] Vérifier automatiquement les prérequis avant les mises à niveau.
 
 ### Priorité 6 — Observabilité
-- [ ] Ajouter les endpoints /ready, /live et /metrics.
+- [x] Ajouter les endpoints /ready, /live et /metrics.
 - [ ] Préparer l’intégration Prometheus/Grafana.
 
 ### Priorité 7 — Releases

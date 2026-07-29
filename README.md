@@ -7,7 +7,7 @@ Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 
 ## Version courante
 
-La candidate **2.7.0-alpha.9 — Sauvegardes automatisées** conserve le contrat
+La candidate **2.7.0-alpha.10 — Sauvegardes automatisées** conserve le contrat
 API v1 et poursuit le Jalon 4 :
 
 - FastAPI ;
