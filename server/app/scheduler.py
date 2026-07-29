@@ -5,9 +5,20 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from .config import get_settings
 from .database import SessionLocal
 from .schema_migrations import assert_schema_current
-from .sync_service import synchronize
+from .sync_service import SynchronizationInProgress, synchronize
+from .structured_logging import configure_logging
 
-logging.basicConfig(level=get_settings().log_level)
+logging_settings = get_settings()
+configure_logging(
+    logging_settings.log_level,
+    service="scheduler",
+    sensitive_values=(
+        logging_settings.admin_api_key,
+        logging_settings.public_api_key,
+        logging_settings.ocblacktop_api_key,
+        logging_settings.thesportsdb_api_key,
+    ),
+)
 logger = logging.getLogger("motorsport-calendar")
 
 assert_schema_current()
@@ -16,10 +27,25 @@ assert_schema_current()
 def job():
     db = SessionLocal()
     try:
-        run = asyncio.run(synchronize(db))
+        try:
+            run = asyncio.run(synchronize(db))
+        except SynchronizationInProgress:
+            logger.info(
+                "Scheduled synchronization skipped",
+                extra={"service": "scheduler", "event": "sync.skipped"},
+            )
+            return
         logger.info(
-            "Synchronisation %s created=%s updated=%s errors=%s",
-            run.status, run.created, run.updated, run.errors
+            "Scheduled synchronization completed",
+            extra={
+                "service": "scheduler",
+                "event": "sync.completed",
+                "sync_run_id": run.id,
+                "status": run.status,
+                "created_count": run.created,
+                "updated_count": run.updated,
+                "error_count": run.errors,
+            },
         )
     finally:
         db.close()

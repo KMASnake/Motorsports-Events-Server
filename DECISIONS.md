@@ -72,6 +72,14 @@ persisté dans le journal.
 
 Voir `docs/decisions/0009-admin-audit-log.md`.
 
+## ADR 0010 — Logs structurés JSON
+
+L’API et le scheduler écrivent des événements JSON sur la sortie standard.
+Les accès HTTP sont corrélés par identifiant de requête et les secrets sont
+masqués avant sérialisation.
+
+Voir `docs/decisions/0010-structured-json-logging.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

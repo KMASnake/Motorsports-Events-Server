@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.7.0-alpha.6 — Logs structurés JSON
+
+- Format JSON commun pour l’API, le scheduler et les bibliothèques.
+- Journal HTTP avec identifiant de requête, statut et durée.
+- Événements structurés de début, fin et erreur de synchronisation.
+- Désactivation du journal d’accès texte d’Uvicorn.
+- Masquage récursif des champs sensibles.
+- Masquage des clés connues lorsqu’elles apparaissent dans un message.
+- Utilisation de noms de compteurs compatibles avec les attributs `LogRecord`.
+- Conversion des erreurs HTTP non gérées en réponse JSON corrélée.
+- Verrou PostgreSQL empêchant les synchronisations API et scheduler simultanées.
+- Clôture automatique des synchronisations orphelines comme interrompues.
+- Échec immédiat, sans attente de cinq minutes, lorsque le quota mensuel
+  OCBlackTop est épuisé.
+
 ## 2.7.0-alpha.5 — Journal d’administration
 
 - Ajout de la migration `0002_admin_audit_log`.

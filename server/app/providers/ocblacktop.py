@@ -27,7 +27,7 @@ class OcBlackTopProvider(Provider):
         headers = {
             "Accept": "application/json",
             "x-api-key": settings.ocblacktop_api_key,
-            "User-Agent": "Motorsports-Events-Server/2.7.0-alpha.5",
+            "User-Agent": "Motorsports-Events-Server/2.7.0-alpha.6",
         }
 
         results: list[NormalizedEvent] = []
@@ -145,8 +145,21 @@ class OcBlackTopProvider(Provider):
         response = await client.get(url, headers=headers, params=params)
 
         if response.status_code == 429:
+            try:
+                rate_limit_payload = response.json()
+            except ValueError:
+                rate_limit_payload = {}
+            rate_limit_message = (
+                rate_limit_payload.get("message", "")
+                if isinstance(rate_limit_payload, dict)
+                else ""
+            )
+            if "monthly limit" in rate_limit_message.lower():
+                raise RuntimeError(
+                    f"HTTP 429 : {rate_limit_message} [{response.url}]"
+                )
             retry_after = int(response.headers.get("retry-after", "60") or "60")
-            await asyncio.sleep(min(max(retry_after, 1), 300))
+            await asyncio.sleep(min(max(retry_after, 1), 30))
             response = await client.get(url, headers=headers, params=params)
 
         try:

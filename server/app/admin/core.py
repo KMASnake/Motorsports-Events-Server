@@ -10,7 +10,7 @@ from ..config import get_settings
 from ..database import get_db
 from ..models import Event, ManualOverride, Session, Sport, SyncRun
 from ..security import require_admin_key
-from ..sync_service import synchronize
+from ..sync_service import SynchronizationInProgress, synchronize
 from ..version_info import version_payload
 from .audit import record_admin_action
 
@@ -68,7 +68,10 @@ form.inline{{display:inline}} .flash{{padding:12px;border-radius:8px;background:
 
 @router.post("/api/v1/admin/sync", dependencies=[Depends(require_admin_key)])
 async def run_sync(db: OrmSession = Depends(get_db)):
-    run = await synchronize(db)
+    try:
+        run = await synchronize(db)
+    except SynchronizationInProgress as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     record_admin_action(
         db,
         "sync.run",
@@ -329,7 +332,11 @@ async def admin_sync(
 ):
     if not admin_cookie_valid(me_admin):
         return RedirectResponse("/admin/login", status_code=303)
-    run = await synchronize(db)
+    try:
+        run = await synchronize(db)
+    except SynchronizationInProgress:
+        message = quote("Une synchronisation est déjà en cours.")
+        return RedirectResponse(f"/admin?message={message}", status_code=303)
     record_admin_action(
         db,
         "sync.run",

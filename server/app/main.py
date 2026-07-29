@@ -1,5 +1,9 @@
 from datetime import datetime, timezone
+import logging
+from time import perf_counter
+from uuid import uuid4
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import BigInteger, and_, cast, func, or_
 from sqlalchemy.orm import Session as OrmSession, joinedload
 
@@ -27,19 +31,70 @@ from .database import get_db
 from .models import Event, Session, Sport, SyncRun
 from .schema_migrations import assert_schema_current
 from .security import require_public_key
+from .structured_logging import configure_logging
 from .version_info import version_payload
 
 settings = get_settings()
+configure_logging(
+    settings.log_level,
+    service="api",
+    sensitive_values=(
+        settings.admin_api_key,
+        settings.public_api_key,
+        settings.ocblacktop_api_key,
+        settings.thesportsdb_api_key,
+    ),
+)
+logger = logging.getLogger("motorsports.http")
 assert_schema_current()
 
 app = FastAPI(
     title=f"{settings.project_name} API",
-    version="2.7.0-alpha.5",
+    version="2.7.0-alpha.6",
     description=(
         f"Serveur central de {settings.project_name}. "
         "Le contrat /api/v1 reste rétrocompatible pendant toute la série 2.x."
     ),
 )
+
+
+@app.middleware("http")
+async def structured_access_log(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID") or uuid4().hex
+    started = perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.exception(
+            "HTTP request failed",
+            extra={
+                "service": "api",
+                "event": "http.request",
+                "request_id": request_id,
+                "method": request.method,
+                "path": request.url.path,
+                "duration_ms": round((perf_counter() - started) * 1000, 2),
+            },
+        )
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error"},
+            headers={"X-Request-ID": request_id},
+        )
+    response.headers["X-Request-ID"] = request_id
+    logger.info(
+        "HTTP request completed",
+        extra={
+            "service": "api",
+            "event": "http.request",
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "duration_ms": round((perf_counter() - started) * 1000, 2),
+        },
+    )
+    return response
 
 
 app.include_router(admin_router)
@@ -48,7 +103,7 @@ app.include_router(admin_router)
 def root():
     return {
         "name": settings.project_name,
-        "version": "2.7.0-alpha.5",
+        "version": "2.7.0-alpha.6",
         "docs": "/docs",
         "admin": "/admin",
     }

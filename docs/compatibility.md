@@ -46,3 +46,4 @@ Les clients doivent ignorer les champs JSON inconnus et traiter
   d’administration isolés de `app.main`.
 - serveur 2.7.0-alpha.5 : API v1 inchangée, journal d’administration et
   révision de schéma `0002_admin_audit_log`.
+- serveur 2.7.0-alpha.6 : API et schéma inchangés, logs structurés JSON.

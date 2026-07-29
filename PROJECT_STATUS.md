@@ -228,6 +228,55 @@ métadonnées non sensibles.
 - page `/admin/audit` accessible ;
 - journaux API, scheduler et migration : aucune erreur détectée.
 
+## Candidate logs structurés JSON
+
+- version : `2.7.0-alpha.6` ;
+- sous-jalon : `4.6-structured-json-logs` ;
+- build : `20260729-142027` ;
+- branche : `feature/structured-json-logs` ;
+- révision de schéma : `0002_admin_audit_log` inchangée ;
+- contrats API public et administration : inchangés.
+
+La candidate structure les logs API, scheduler, HTTP et synchronisation en
+JSON. Les requêtes possèdent un identifiant de corrélation. Les champs
+sensibles et valeurs secrètes configurées sont masqués.
+
+La première validation VPS a révélé que le champ contextuel `created` entrait
+en conflit avec l’attribut réservé `LogRecord.created`. Les compteurs utilisent
+désormais les suffixes `_count`, et les exceptions HTTP non gérées sont
+journalisées puis converties en réponse JSON corrélée.
+
+La seconde validation a confirmé que l’API restait saine, mais a révélé deux
+synchronisations concurrentes et une attente de 300 secondes sur la réponse
+OCBlackTop `429 Monthly limit exceeded`. La candidate corrigée utilise un
+verrou consultatif PostgreSQL commun à l’API et au scheduler, clôt les anciennes
+exécutions `running` comme `interrupted` et échoue immédiatement lorsque le
+quota mensuel est épuisé. Le journal d’accès Uvicorn redondant est aussi
+désactivé explicitement.
+
+### Validation locale
+
+- suite applicative : 53 tests, 4 tests PostgreSQL ignorés hors Docker et
+  5 sous-tests réussis ;
+- suite PostgreSQL isolée : 4 tests réussis, dont verrou concurrent et
+  récupération d’une exécution orpheline ;
+- format JSON, contexte et redaction : testés ;
+- archive : `motorsports-events-server-2.7.0-alpha.6.zip` ;
+- SHA-256 de la candidate corrigée : voir le fichier `.zip.sha256` livré
+  avec l’archive (l’empreinte précédente est obsolète) ;
+- archive réextraite et retestée : réussie ;
+- validation VPS fonctionnelle : réussie le 29 juillet 2026 ;
+- synchronisation avec quota mensuel OCBlackTop épuisé : fin en 1,235 seconde,
+  état `completed_with_errors`, 30 mises à jour et 1 erreur explicite ;
+- récupération : les exécutions orphelines 522, 526 et 527 ont été clôturées
+  avec l’état `interrupted` ;
+- aucune exécution récente ne reste en état `running` ;
+- validation finale des logs : 48 lignes JSON valides ;
+- événements observés : `http.request`, `logging.configured`, `sync.started`,
+  `sync.completed` et `sync.provider_failed` ;
+- aucun journal d’accès `uvicorn.access` redondant ;
+- candidate `2.7.0-alpha.6` entièrement validée sur le VPS le 29 juillet 2026.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

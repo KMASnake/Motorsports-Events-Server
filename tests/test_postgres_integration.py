@@ -199,6 +199,10 @@ class PostgreSqlIntegrationTests(unittest.TestCase):
             )
             try:
                 with SessionLocal() as db:
+                    orphaned = SyncRun(status="running")
+                    db.add(orphaned)
+                    db.commit()
+
                     with (
                         patch.object(
                             OcBlackTopProvider,
@@ -214,6 +218,9 @@ class PostgreSqlIntegrationTests(unittest.TestCase):
                         first = asyncio.run(synchronize(db))
 
                     self.assertEqual("completed", first.status)
+                    db.refresh(orphaned)
+                    self.assertEqual("interrupted", orphaned.status)
+                    self.assertIsNotNone(orphaned.finished_at)
                     self.assertEqual(1, first.created)
                     self.assertEqual(1, db.query(Sport).count())
                     self.assertEqual(1, db.query(Event).count())
@@ -250,9 +257,40 @@ class PostgreSqlIntegrationTests(unittest.TestCase):
                     persisted = db.get(Session, warmup.id)
                     self.assertEqual(corrected_end, persisted.end_at)
                     self.assertEqual(1, db.query(ManualOverride).count())
-                    self.assertEqual(2, db.query(SyncRun).count())
+                    self.assertEqual(3, db.query(SyncRun).count())
                     self.assertEqual(1, second.updated)
                     self.assertEqual(0, second.errors)
+            finally:
+                engine.dispose()
+
+    def test_concurrent_synchronization_is_rejected(self):
+        from app.application.synchronization import (
+            SynchronizationInProgress,
+            _POSTGRES_SYNC_LOCK_ID,
+            synchronize,
+        )
+        from app.schema_migrations import upgrade_database
+
+        with temporary_database() as database_url:
+            upgrade_database(database_url)
+            engine = create_engine(database_url)
+            SessionLocal = sessionmaker(bind=engine)
+            try:
+                with (
+                    engine.connect() as lock_connection,
+                    SessionLocal() as db,
+                ):
+                    acquired = lock_connection.scalar(
+                        text("SELECT pg_try_advisory_lock(:lock_id)"),
+                        {"lock_id": _POSTGRES_SYNC_LOCK_ID},
+                    )
+                    self.assertTrue(acquired)
+                    with self.assertRaises(SynchronizationInProgress):
+                        asyncio.run(synchronize(db))
+                    lock_connection.execute(
+                        text("SELECT pg_advisory_unlock(:lock_id)"),
+                        {"lock_id": _POSTGRES_SYNC_LOCK_ID},
+                    )
             finally:
                 engine.dispose()
 
