@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.0-rc.1 — Candidate de stabilisation
+
+- Gel fonctionnel du jalon 4 avant publication de la version stable.
+- Contrat `/api/v1`, schéma PostgreSQL et comportement des providers
+  inchangés depuis l’alpha.15 validée.
+- Ajout d’une checklist commune de qualification et de promotion.
+- Validation locale, PostgreSQL, archive GitHub et VPS exigées avant
+  intégration.
+
 ## 2.7.0-alpha.15 — Provisioning Grafana complet
 
 - Ajout des répertoires de provisioning Grafana facultatifs `alerting/` et
