@@ -46,7 +46,11 @@ with ZipFile(output, "w", ZIP_DEFLATED) as archive:
         )
 PY
 
-sha256sum "${ARCHIVE}" > "${ARCHIVE}.sha256"
+(
+  cd "${DIST}"
+  sha256sum "$(basename "${ARCHIVE}")" \
+    > "$(basename "${ARCHIVE}").sha256"
+)
 
 echo "Release créée : ${ARCHIVE}"
 echo "Empreinte : ${ARCHIVE}.sha256"

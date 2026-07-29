@@ -557,6 +557,9 @@ après réussite des validations applicative et PostgreSQL.
 - archive locale : `motorsports-events-server-2.7.0-alpha.14.zip` ;
 - archive réextraite et retestée : réussie ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- première exécution GitHub : artefact produit, mais empreinte contenant le
+  chemin absolu du runner et donc non portable après téléchargement ;
+- correctif : le fichier d’empreinte référence uniquement le nom du ZIP ;
 - validation GitHub et VPS : en attente.
 
 ## Validation de la 2.6.0

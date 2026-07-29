@@ -6,6 +6,7 @@
   PostgreSQL.
 - Vérification du SHA-256 avant publication.
 - Archive ZIP et empreinte publiées ensemble comme artefact GitHub Actions.
+- Fichier SHA-256 portable, sans chemin absolu propre au runner.
 - Échec explicite du job si un fichier de livraison manque.
 - Conservation des artefacts pendant quatorze jours.
 
