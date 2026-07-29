@@ -58,9 +58,9 @@ révision attendue et les services restent sains après mise à niveau.
 - [x] couvrir pagination, normalisation, statuts et erreurs ;
 - [x] mesurer la couverture des providers ;
 - [x] imposer un seuil minimal de 85 % dans la CI ;
-- [ ] installer `2.7.0-alpha.2` sur le VPS ;
-- [ ] tester les deux providers depuis l’administration ;
-- [ ] exécuter une synchronisation complète sans erreur ;
+- [x] installer `2.7.0-alpha.2` sur le VPS ;
+- [x] tester les deux providers depuis l’administration ;
+- [x] exécuter une synchronisation complète sans erreur ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : la CI maintient au moins 85 % de couverture providers,

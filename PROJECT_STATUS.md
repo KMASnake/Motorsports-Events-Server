@@ -87,9 +87,21 @@ de couverture providers contrôlé par GitHub Actions.
 - couverture providers : 92,41 % ;
 - seuil CI : 85 % ;
 - archive : `motorsports-events-server-2.7.0-alpha.2.zip` ;
-- SHA-256 : voir le fichier compagnon
-  `motorsports-events-server-2.7.0-alpha.2.zip.sha256` ;
-- validation VPS : en attente.
+- SHA-256 :
+  `71be8eb347b95f8a4c3bdf4952a5def6a1fee844ba44a15aff2e3cb91b44f9b1` ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.2`, build `20260729-105950` ;
+- OCBlackTop : connexion réussie, 695 ms ;
+- TheSportsDB : connexion réussie, 77 ms ;
+- synchronisation : 0 créée, 243 mises à jour, 0 erreur ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- révision du schéma : `0001_initial_schema` ;
+- sports et données accessibles ;
+- aucune erreur dans les journaux API, scheduler et migration.
 
 ## Validation de la 2.6.0
 
