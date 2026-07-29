@@ -669,6 +669,28 @@ checklist de qualification utilisée avant promotion en `2.7.0`.
 - seules erreurs observées : réponses `HTTP 429 Monthly limit exceeded`
   d’OCBlackTop, problème externe connu.
 
+## Candidate stable 2.7.0
+
+- version : `2.7.0` ;
+- sous-jalon : `4.17-stable-release` ;
+- branche : `agent/release-2.7.0` ;
+- build : `20260729-194637` ;
+- schéma : `0002_admin_audit_log` inchangé ;
+- contrat API v1 : inchangé.
+
+La candidate stable est la promotion de `2.7.0-rc.1`. Aucun fichier
+applicatif, aucune migration et aucun contrat ne changent ; seules les
+métadonnées et la documentation de publication sont mises à jour.
+
+### Validation locale
+
+- validation du dépôt avant modification : réussie ;
+- suite complète : 72 tests et 5 sous-tests réussis ;
+- archive : `motorsports-events-server-2.7.0.zip` ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
