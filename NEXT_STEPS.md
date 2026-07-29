@@ -272,8 +272,23 @@ sur le VPS sans différence avec une archive locale.
 - [x] vérifier que Grafana démarre sans erreur de provisioning ;
 - [x] conserver la liaison privée à `127.0.0.1:3000`.
 - [x] installer et valider l’alpha.15 sur le VPS ;
-- [ ] intégrer la pull request après validation VPS.
+- [x] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : le démarrage de Grafana ne produit plus d’erreur liée
 aux répertoires de provisioning absents et aucun port de supervision
 supplémentaire n’est exposé.
+
+## 21. Qualifier la release candidate 2.7.0
+
+- [x] geler les fonctionnalités du jalon 4 ;
+- [x] ajouter une checklist de qualification reproductible ;
+- [x] exécuter les suites applicative et PostgreSQL ;
+- [x] construire et retester l’archive `2.7.0-rc.1` ;
+- [ ] valider l’artefact GitHub sur le VPS ;
+- [ ] vérifier les données, services, sondes et sauvegardes ;
+- [ ] intégrer la pull request après validation VPS ;
+- [ ] promouvoir la candidate validée en `2.7.0`.
+
+Critère d’acceptation : la RC ne contient aucun changement fonctionnel après
+l’alpha.15, toutes les validations de `docs/release-checklist.md` réussissent
+et les données de production sont conservées.

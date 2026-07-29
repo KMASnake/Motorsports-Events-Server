@@ -628,6 +628,28 @@ provisionings existants restent inchangés.
   `/etc/grafana/provisioning/alerting` présents ;
 - aucun message d’erreur de provisioning Grafana détecté.
 
+## Release candidate 2.7.0
+
+- version : `2.7.0-rc.1` ;
+- sous-jalon : `4.16-release-candidate` ;
+- branche : `agent/release-candidate-2.7.0` ;
+- build : `20260729-193421` ;
+- schéma : `0002_admin_audit_log` inchangé ;
+- contrat API v1 : inchangé.
+
+Cette candidate gèle l’ensemble des fonctions validées jusqu’à l’alpha.15.
+Elle n’introduit aucun changement fonctionnel et ajoute uniquement la
+checklist de qualification utilisée avant promotion en `2.7.0`.
+
+### Validation locale
+
+- validation du dépôt avant modification : réussie ;
+- suite complète : 72 tests et 5 sous-tests réussis ;
+- archive : `motorsports-events-server-2.7.0-rc.1.zip` ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
