@@ -67,17 +67,32 @@ Critère d’acceptation : la CI maintient au moins 85 % de couverture providers
 les tests administratifs réussissent et la synchronisation VPS reste sans
 erreur.
 
-## 6. Qualifier l’origine de l’anomalie horaire
+## 6. Valider le sous-jalon PostgreSQL
+
+- [x] créer un environnement PostgreSQL 16 isolé ;
+- [x] tester une base vierge et une base existante ;
+- [x] ajouter un jeu IndyCar versionné ;
+- [x] tester persistance, synchronisation et override ;
+- [x] intégrer le test à GitHub Actions ;
+- [ ] installer `2.7.0-alpha.3` sur le VPS ;
+- [ ] vérifier version, schéma, santé et synchronisation ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : les tests Docker passent dans GitHub Actions, la
+candidate reste saine sur le VPS et aucune donnée de production n’est utilisée
+par l’environnement de test.
+
+## 7. Qualifier l’origine de l’anomalie horaire
 
 - [x] identifier le provider, les épreuves et les données brutes ;
 - [x] déterminer si l’erreur vient du provider ou de la normalisation ;
 - [ ] documenter la cause dans une issue.
 
-## 7. Poursuivre le Jalon 4 — Stabilisation opérationnelle
+## 8. Poursuivre le Jalon 4 — Stabilisation opérationnelle
 
 - [x] introduire Alembic ;
 - [x] ajouter des tests unitaires providers ;
-- [ ] ajouter des tests d'intégration PostgreSQL ;
+- [x] ajouter des tests d'intégration PostgreSQL ;
 - [ ] modulariser l'administration ;
 - [ ] ajouter des logs structurés ;
 - [ ] automatiser et tester les sauvegardes ;

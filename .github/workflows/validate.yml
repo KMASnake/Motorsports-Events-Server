@@ -27,3 +27,12 @@ jobs:
             --cov-report=xml \
             --cov-fail-under=85 \
             tests
+
+  postgres-integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run isolated PostgreSQL integration tests
+        run: ./scripts/test-postgres.sh

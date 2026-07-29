@@ -103,6 +103,34 @@ de couverture providers contrôlé par GitHub Actions.
 - sports et données accessibles ;
 - aucune erreur dans les journaux API, scheduler et migration.
 
+## Candidate intégration PostgreSQL
+
+- version : `2.7.0-alpha.3` ;
+- sous-jalon : `4.3-postgres-integration` ;
+- build : `20260729-111254` ;
+- branche : `feature/postgres-integration-tests` ;
+- contrat API v1 et schéma de production : inchangés.
+
+La candidate ajoute un environnement PostgreSQL 16 temporaire, trois tests
+d’intégration et un jeu IndyCar versionné. Les conteneurs, réseaux, volumes et
+bases créés pour les tests sont supprimés automatiquement.
+
+### Validation locale
+
+- migration PostgreSQL vierge vers `0001_initial_schema` : réussie ;
+- adoption d’un schéma existant avec conservation des données : réussie ;
+- persistance du jeu IndyCar : réussie ;
+- synchronisation répétée sans doublon : réussie ;
+- override conservé après synchronisation : réussi ;
+- nettoyage des ressources Docker : réussi ;
+- suite PostgreSQL : 3 tests réussis sans avertissement ;
+- suite applicative : 43 tests, 3 tests PostgreSQL ignorés hors Docker et
+  5 sous-tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.3.zip` ;
+- SHA-256 : voir le fichier compagnon
+  `motorsports-events-server-2.7.0-alpha.3.zip.sha256` ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

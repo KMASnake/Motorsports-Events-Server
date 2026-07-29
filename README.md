@@ -7,7 +7,7 @@ Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 
 ## Version courante
 
-La candidate **2.7.0-alpha.2 — Qualité des providers** conserve le contrat
+La candidate **2.7.0-alpha.3 — Intégration PostgreSQL** conserve le contrat
 API v1 et poursuit le Jalon 4 :
 
 - FastAPI ;
@@ -26,6 +26,8 @@ API v1 et poursuit le Jalon 4 :
 - contrôle automatique de la révision avant démarrage.
 - tests unitaires sans réseau pour OCBlackTop et TheSportsDB ;
 - couverture des providers mesurée et contrôlée dans la CI.
+- environnement PostgreSQL 16 temporaire et isolé ;
+- migrations et synchronisation testées avec un jeu de données reproductible.
 
 ## Structure
 
@@ -53,6 +55,12 @@ sudo ./install.sh
 
 ```bash
 ./scripts/validate-repository.sh
+```
+
+Validation d’intégration PostgreSQL isolée :
+
+```bash
+./scripts/test-postgres.sh
 ```
 
 ## Génération d’une release

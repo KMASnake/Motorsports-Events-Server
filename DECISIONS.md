@@ -48,6 +48,14 @@ applique les migrations avant le démarrage de l’API et du scheduler. Une base
 
 Voir `docs/decisions/0006-alembic-schema-migrations.md`.
 
+## ADR 0007 — Tests PostgreSQL isolés
+
+Les tests d’intégration utilisent un projet Docker Compose dédié, PostgreSQL
+sur stockage temporaire et des bases créées par test. Aucun test ne se connecte
+à la base locale ou VPS.
+
+Voir `docs/decisions/0007-isolated-postgres-tests.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

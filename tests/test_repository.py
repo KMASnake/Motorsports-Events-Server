@@ -12,6 +12,7 @@ def test_server_repository_does_not_contain_clients():
 
 def test_required_server_files_exist():
     assert (ROOT / "docker-compose.yml").is_file()
+    assert (ROOT / "docker-compose.test.yml").is_file()
     assert (ROOT / "install.sh").is_file()
     assert (ROOT / "server" / "Dockerfile").is_file()
     assert (ROOT / "server" / "alembic.ini").is_file()
@@ -23,6 +24,10 @@ def test_required_server_files_exist():
         / "0001_initial_schema.py"
     ).is_file()
     assert (ROOT / "server" / "app" / "main.py").is_file()
+    assert (ROOT / "tests" / "Dockerfile").is_file()
+    assert (
+        ROOT / "tests" / "fixtures" / "indycar_events.json"
+    ).is_file()
 
 
 def test_version_is_defined():

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.0-alpha.3 — Intégration PostgreSQL
+
+- Ajout d’un environnement Docker PostgreSQL 16 réservé aux tests.
+- Migration testée sur une base vierge et une base existante.
+- Jeu de données IndyCar reproductible et versionné.
+- Persistance des sports, événements, séances et données JSON vérifiée.
+- Synchronisation répétée et conservation d’un override vérifiées.
+- Nettoyage automatique des conteneurs et données temporaires.
+- Exécution dédiée ajoutée à GitHub Actions.
+
 ## 2.7.0-alpha.2 — Qualité des providers
 
 - Ajout de tests HTTP déterministes avec `httpx.MockTransport`.

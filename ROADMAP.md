@@ -46,9 +46,9 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 - [x] Mesurer la couverture de code.
 
 ### Priorité 3 — Base de données
-- [ ] Ajouter des tests d’intégration PostgreSQL via Docker.
-- [ ] Vérifier les migrations sur une base vierge et une base existante.
-- [ ] Ajouter des jeux de données de test.
+- [x] Ajouter des tests d’intégration PostgreSQL via Docker.
+- [x] Vérifier les migrations sur une base vierge et une base existante.
+- [x] Ajouter des jeux de données de test.
 
 ### Priorité 4 — Administration
 - [ ] Modulariser l’administration sans refonte visuelle.

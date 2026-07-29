@@ -1,0 +1,38 @@
+{
+  "events": [
+    {
+      "source": "fixture",
+      "source_event_id": "indycar-fixture-1",
+      "sport_id": "indycar",
+      "name": "Integration Grand Prix",
+      "round": 7,
+      "status": "scheduled",
+      "venue": "Test Raceway",
+      "city": "Test City",
+      "country": "France",
+      "country_code": "FR",
+      "raw_data": {
+        "fixture": true,
+        "provider_revision": 1
+      },
+      "sessions": [
+        {
+          "source_session_id": "indycar-practice-1",
+          "name": "Warmup",
+          "session_type": "practice",
+          "start_at": "2026-08-16T12:30:00+00:00",
+          "end_at": "2026-08-16T13:30:00+00:00",
+          "status": "scheduled"
+        },
+        {
+          "source_session_id": "indycar-race-1",
+          "name": "Race",
+          "session_type": "race",
+          "start_at": "2026-08-16T15:00:00+00:00",
+          "end_at": "2026-08-16T17:00:00+00:00",
+          "status": "scheduled"
+        }
+      ]
+    }
+  ]
+}
