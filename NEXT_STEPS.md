@@ -184,3 +184,12 @@ Critère d’acceptation : chaque conteneur utilise `json-file`, `max-size=10m`,
 Critère d’acceptation : une sauvegarde quotidienne est créée en mode `0600`,
 restaurée avec succès dans une base temporaire, soumise à rétention et
 rattrapée après une indisponibilité du VPS.
+
+## 14. Valider le contrôle préalable aux mises à niveau
+
+- [x] contrôler archive, outils, Docker, Compose, `.env` et espace disque ;
+- [x] exécuter le contrôle avant toute écriture ou interruption ;
+- [x] tester l’ordre d’exécution et les contrôles obligatoires ;
+- [ ] construire et retester l’archive alpha.9 ;
+- [ ] installer et valider l’alpha.9 sur le VPS ;
+- [ ] intégrer la pull request après validation VPS.

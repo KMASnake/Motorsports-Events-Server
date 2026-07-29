@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.0-alpha.9 — Prérequis de mise à niveau
+
+- Validation de l’archive avant toute écriture.
+- Contrôle de Docker, Compose, des outils, du `.env` et de l’espace disque.
+- Vérification d’une racine unique et des fichiers obligatoires du ZIP.
+- Refus précoce sans arrêt des services ni création de sauvegarde.
+
 ## 2.7.0-alpha.8 — Sauvegardes automatisées
 
 - Création atomique des sauvegardes PostgreSQL compressées.
