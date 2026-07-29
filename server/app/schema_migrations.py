@@ -14,6 +14,7 @@ from .config import get_settings
 
 
 SERVER_ROOT = Path(__file__).resolve().parent.parent
+LEGACY_SCHEMA_REVISION = "0001_initial_schema"
 REQUIRED_SCHEMA = {
     "sports": {
         "id",
@@ -139,7 +140,8 @@ def upgrade_database(database_url: str | None = None) -> str:
         if tables and revision is None:
             with migration_engine.connect() as connection:
                 validate_existing_schema(connection)
-            command.stamp(config, expected)
+            command.stamp(config, LEGACY_SCHEMA_REVISION)
+            command.upgrade(config, "head")
         else:
             command.upgrade(config, "head")
 

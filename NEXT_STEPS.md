@@ -116,3 +116,18 @@ procédure de rollback avant implémentation.
 Critère d’acceptation : les contrats publics et administratifs restent
 identiques, aucune refonte visuelle n’est introduite et toutes les actions
 d’administration validées en 2.6.0 fonctionnent encore.
+
+## 10. Valider le journal d’administration
+
+- [x] ajouter la migration `0002_admin_audit_log` ;
+- [x] enregistrer les actions administratives sensibles ;
+- [x] exclure les valeurs `.env`, clés API et cookies ;
+- [x] ajouter la page `/admin/audit` et l’API protégée ;
+- [x] tester une base vierge et la migration depuis `0001` ;
+- [x] construire, réextraire et retester l’archive alpha.5 ;
+- [x] installer `2.7.0-alpha.5` sur le VPS ;
+- [x] vérifier les entrées produites et l’absence de secrets ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : les actions prévues sont persistées, consultables par
+un administrateur et ne contiennent aucune valeur sensible.

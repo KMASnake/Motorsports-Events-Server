@@ -118,6 +118,7 @@ class PostgreSqlIntegrationTests(unittest.TestCase):
                 self.assertEqual(
                     {
                         "alembic_version",
+                        "admin_audit_logs",
                         "events",
                         "manual_overrides",
                         "sessions",
@@ -130,7 +131,7 @@ class PostgreSqlIntegrationTests(unittest.TestCase):
                     stored = connection.execute(
                         text("SELECT version_num FROM alembic_version")
                     ).scalar_one()
-                self.assertEqual("0001_initial_schema", revision)
+                self.assertEqual("0002_admin_audit_log", revision)
                 self.assertEqual(revision, stored)
             finally:
                 engine.dispose()
@@ -144,7 +145,14 @@ class PostgreSqlIntegrationTests(unittest.TestCase):
         with temporary_database() as database_url:
             engine = create_engine(database_url)
             try:
-                Base.metadata.create_all(engine)
+                Base.metadata.create_all(
+                    engine,
+                    tables=[
+                        table
+                        for table in Base.metadata.sorted_tables
+                        if table.name != "admin_audit_logs"
+                    ],
+                )
                 SessionLocal = sessionmaker(bind=engine)
                 with SessionLocal.begin() as db:
                     db.add(
@@ -161,7 +169,7 @@ class PostgreSqlIntegrationTests(unittest.TestCase):
                     sport = db.get(Sport, "indycar")
                     self.assertIsNotNone(sport)
                     self.assertEqual("IndyCar", sport.name)
-                self.assertEqual("0001_initial_schema", revision)
+                self.assertEqual("0002_admin_audit_log", revision)
             finally:
                 engine.dispose()
 

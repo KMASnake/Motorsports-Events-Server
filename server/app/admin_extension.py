@@ -22,6 +22,7 @@ from .application.temporal_corrections import (
     correct_session_timing,
     temporal_anomalies,
 )
+from .admin.audit import record_admin_action
 from .config import get_settings
 from .database import engine, get_db
 from .domain.temporal_consistency import (
@@ -306,7 +307,8 @@ code{{white-space:pre-wrap}}
 </style></head><body><header>
 <a href="/admin"><strong>{project}</strong></a>
 <a href="/admin/temporal-issues">Incohérences horaires</a>
-<a href="/admin/settings">Paramètres</a><a href="/docs">API</a>
+<a href="/admin/settings">Paramètres</a><a href="/admin/audit">Journal</a>
+<a href="/docs">API</a>
 </header><main>{content}</main></body></html>"""
 
 
@@ -386,6 +388,7 @@ async function copySecret(id){{await navigator.clipboard.writeText(document.getE
 async def update_settings(
     request: Request,
     me_admin: str | None = Cookie(default=None),
+    db: OrmSession = Depends(get_db),
 ):
     if not cookie_valid(me_admin):
         return RedirectResponse("/admin/login", status_code=303)
@@ -398,11 +401,22 @@ async def update_settings(
         updates = validate_env_updates(submitted, current)
         write_env_updates(env_path, updates)
     except (OSError, ValueError) as exc:
+        record_admin_action(
+            db,
+            "settings.update",
+            status="failure",
+            details={"error": type(exc).__name__},
+        )
         return RedirectResponse(
             f"/admin/settings?error={quote(str(exc))}",
             status_code=303,
         )
 
+    record_admin_action(
+        db,
+        "settings.update",
+        details={"fields": sorted(updates)},
+    )
     return RedirectResponse(
         "/admin/settings?message="
         + quote(
@@ -495,11 +509,25 @@ def correct_temporal_issue(
             parsed_end,
         )
     except (LookupError, ValueError) as exc:
+        record_admin_action(
+            db,
+            "temporal_issue.correct",
+            status="failure",
+            resource_type="session",
+            resource_id=session_id,
+            details={"error": type(exc).__name__},
+        )
         return RedirectResponse(
             f"/admin/temporal-issues?error={quote(str(exc))}",
             status_code=303,
         )
 
+    record_admin_action(
+        db,
+        "temporal_issue.correct",
+        resource_type="session",
+        resource_id=session_id,
+    )
     return RedirectResponse(
         "/admin/temporal-issues?message="
         + quote("Horaire corrigé et override enregistré."),
@@ -526,10 +554,27 @@ def download_qr(me_admin: str | None = Cookie(default=None)):
 
 
 @router.post("/admin/providers/test", response_class=HTMLResponse, include_in_schema=False)
-async def provider_test_page(me_admin: str | None = Cookie(default=None)):
+async def provider_test_page(
+    me_admin: str | None = Cookie(default=None),
+    db: OrmSession = Depends(get_db),
+):
     if not cookie_valid(me_admin):
         return RedirectResponse("/admin/login", status_code=303)
     results = [await test_ocblacktop(), await test_thesportsdb()]
+    record_admin_action(
+        db,
+        "providers.test",
+        status="success" if all(row["ok"] for row in results) else "failure",
+        details={
+            "providers": {
+                row["provider"]: {
+                    "ok": row["ok"],
+                    "latency_ms": row["latency_ms"],
+                }
+                for row in results
+            }
+        },
+    )
     rows = "".join(
         f"<tr><td>{escape(r['provider'])}</td><td>{'OK' if r['ok'] else 'Erreur'}</td>"
         f"<td>{escape(r['message'])}</td><td>{r['latency_ms'] or '—'} ms</td></tr>"
@@ -553,8 +598,27 @@ def api_system():
 
 
 @router.post("/api/v1/admin/providers/test", dependencies=[Depends(require_admin_key)])
-async def api_provider_tests():
-    return {
+async def api_provider_tests(db: OrmSession = Depends(get_db)):
+    results = {
         "ocblacktop": await test_ocblacktop(),
         "thesportsdb": await test_thesportsdb(),
     }
+    record_admin_action(
+        db,
+        "providers.test",
+        status=(
+            "success"
+            if all(row["ok"] for row in results.values())
+            else "failure"
+        ),
+        details={
+            "providers": {
+                name: {
+                    "ok": row["ok"],
+                    "latency_ms": row["latency_ms"],
+                }
+                for name, row in results.items()
+            }
+        },
+    )
+    return results

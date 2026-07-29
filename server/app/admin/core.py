@@ -12,6 +12,7 @@ from ..models import Event, ManualOverride, Session, Sport, SyncRun
 from ..security import require_admin_key
 from ..sync_service import synchronize
 from ..version_info import version_payload
+from .audit import record_admin_action
 
 
 router = APIRouter()
@@ -57,7 +58,8 @@ form.inline{{display:inline}} .flash{{padding:12px;border-radius:8px;background:
 <header><a href="/admin"><strong>{project}</strong></a>
 <nav><a href="/admin">Tableau de bord</a>
 <a href="/admin/temporal-issues">Incohérences horaires</a>
-<a href="/admin/settings">Paramètres</a><a href="/docs">API</a>
+<a href="/admin/settings">Paramètres</a><a href="/admin/audit">Journal</a>
+<a href="/docs">API</a>
 <form class="inline" method="post" action="/admin/logout"><button class="secondary">Déconnexion</button></form></nav>
 </header>
 <main>{content}</main>
@@ -67,6 +69,17 @@ form.inline{{display:inline}} .flash{{padding:12px;border-radius:8px;background:
 @router.post("/api/v1/admin/sync", dependencies=[Depends(require_admin_key)])
 async def run_sync(db: OrmSession = Depends(get_db)):
     run = await synchronize(db)
+    record_admin_action(
+        db,
+        "sync.run",
+        resource_type="sync_run",
+        resource_id=run.id,
+        details={
+            "created": run.created,
+            "updated": run.updated,
+            "errors": run.errors,
+        },
+    )
     return {
         "id": run.id,
         "status": run.status,
@@ -110,6 +123,13 @@ def save_override(payload: dict, db: OrmSession = Depends(get_db)):
     db.add(row)
     db.commit()
     db.refresh(row)
+    record_admin_action(
+        db,
+        "override.save",
+        resource_type="manual_override",
+        resource_id=row.id,
+        details={"sport_id": row.sport_id},
+    )
     return row
 
 
@@ -123,6 +143,12 @@ def delete_override(override_id: int, db: OrmSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Correction introuvable.")
     db.delete(row)
     db.commit()
+    record_admin_action(
+        db,
+        "override.delete",
+        resource_type="manual_override",
+        resource_id=override_id,
+    )
     return {"deleted": True}
 
 
@@ -142,9 +168,14 @@ button{{width:100%;padding:11px;background:#b42318;color:white;border:0;border-r
 
 
 @router.post("/admin/login", include_in_schema=False)
-def admin_login(admin_key: str = Form(...)):
+def admin_login(
+    admin_key: str = Form(...),
+    db: OrmSession = Depends(get_db),
+):
     if admin_key != settings.admin_api_key:
+        record_admin_action(db, "auth.login", status="failure")
         return RedirectResponse("/admin/login?error=1", status_code=303)
+    record_admin_action(db, "auth.login")
     response = RedirectResponse("/admin", status_code=303)
     response.set_cookie(
         "me_admin",
@@ -299,6 +330,17 @@ async def admin_sync(
     if not admin_cookie_valid(me_admin):
         return RedirectResponse("/admin/login", status_code=303)
     run = await synchronize(db)
+    record_admin_action(
+        db,
+        "sync.run",
+        resource_type="sync_run",
+        resource_id=run.id,
+        details={
+            "created": run.created,
+            "updated": run.updated,
+            "errors": run.errors,
+        },
+    )
     message = quote(
         f"Synchronisation {run.status} : {run.created} créés, "
         f"{run.updated} mis à jour, {run.errors} erreur(s)."
@@ -318,6 +360,12 @@ def admin_delete_override(
     if row is not None:
         db.delete(row)
         db.commit()
+        record_admin_action(
+            db,
+            "override.delete",
+            resource_type="manual_override",
+            resource_id=override_id,
+        )
     return RedirectResponse(
         "/admin?message=Correction%20supprim%C3%A9e.",
         status_code=303,
