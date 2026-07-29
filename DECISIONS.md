@@ -115,6 +115,14 @@ canal de notification ni nouvelle exposition réseau.
 
 Voir `docs/decisions/0015-local-monitoring-alerts.md`.
 
+## ADR 0016 — Rollback atomique des fichiers
+
+La candidate reçoit les données persistantes par déplacement sur le même
+système de fichiers. Tout rollback les replace avant de supprimer la candidate
+et refuse les états ambigus.
+
+Voir `docs/decisions/0016-atomic-upgrade-files.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

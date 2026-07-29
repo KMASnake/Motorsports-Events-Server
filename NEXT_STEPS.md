@@ -212,7 +212,7 @@ rattrapée après une indisponibilité du VPS.
 - [x] tester la confidentialité de la configuration ;
 - [x] construire et retester l’archive alpha.11 ;
 - [x] installer et valider l’alpha.11 sur le VPS ;
-- [ ] intégrer la pull request après validation VPS.
+- [x] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : Prometheus collecte l’API, Grafana reste lié à
 localhost, le tableau provisionné affiche la disponibilité, l’uptime, les
@@ -226,9 +226,26 @@ requêtes et un taux d’erreurs nul.
 - [x] corriger la couleur trompeuse de l’uptime ;
 - [x] construire et retester l’archive alpha.12 ;
 - [x] installer et valider l’alpha.12 sur le VPS ;
-- [ ] intégrer la pull request après validation VPS.
+- [x] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : les règles sont chargées sans erreur, aucune alerte
 n’est active en fonctionnement nominal, une indisponibilité contrôlée fait
 passer l’alerte attendue à l’état actif et aucun port supplémentaire n’est
 exposé.
+
+## 18. Valider le rollback reproductible
+
+- [x] isoler les opérations de bascule de fichiers ;
+- [x] simuler l’échec d’une candidate avec une donnée persistante ;
+- [x] vérifier le retour à l’ancienne version et la conservation de la donnée ;
+- [x] refuser un état ambigu avec deux répertoires `data/` ;
+- [x] conserver l’état actif ou inactif de la supervision ;
+- [x] construire et retester l’archive alpha.13 ;
+- [x] installer et provoquer un rollback contrôlé sur le VPS ;
+- [x] vérifier version, données, sauvegarde et supervision après rollback ;
+- [ ] intégrer la pull request après validation VPS.
+
+Critère d’acceptation : une candidate volontairement invalide déclenche le
+rollback automatique, l’ancienne version et les données réapparaissent, la
+supervision retrouve son état initial et aucune restauration PostgreSQL n’est
+nécessaire.

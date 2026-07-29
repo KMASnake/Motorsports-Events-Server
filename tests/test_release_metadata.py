@@ -12,8 +12,10 @@ def test_compose_defaults_match_release_files():
         ROOT / "server" / "VERSION"
     ).read_text(encoding="utf-8").strip()
     server_build = (ROOT / "server" / "BUILD").read_text(encoding="utf-8").strip()
+    root_build = (ROOT / "BUILD").read_text(encoding="utf-8").strip()
 
     assert root_version == server_version
+    assert root_build == server_build
     assert re.findall(r"APP_VERSION: \$\{APP_VERSION:-(.+)\}", compose) == [
         root_version,
         root_version,

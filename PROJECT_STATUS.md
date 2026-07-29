@@ -492,6 +492,53 @@ ajouter de canal de notification ou de port public.
   `f2ce2018116f9d8e9f507e94880d69d57c10acf02e3462fedd376358732bdc2f` ;
 - syntaxe du script corrigé : valide.
 
+## Candidate rollback reproductible
+
+- version : `2.7.0-alpha.13` ;
+- sous-jalon : `4.13-upgrade-rollback-tests` ;
+- branche : `feature/upgrade-rollback-tests` ;
+- schéma et contrat API v1 : inchangés.
+
+La candidate isole la bascule des fichiers, vérifie réellement la conservation
+de `data/` pendant un échec et gère la supervision optionnelle sans conteneurs
+orphelins.
+
+### Validation locale
+
+- scénario de bascule puis rollback avec donnée sentinelle : réussi ;
+- état ambigu avec deux répertoires de données : refusé ;
+- conservation de l’état optionnel de la supervision : testée ;
+- suite ciblée upgrade, métadonnées et monitoring : 7 tests réussis ;
+- suite applicative complète : 65 tests, 4 ignorés et 5 sous-tests réussis ;
+- suite PostgreSQL isolée : 4 tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.13.zip` ;
+- archive réextraite et retestée : réussie ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- installation normale : version locale et API `2.7.0-alpha.13`, build
+  `20260729-165716` ;
+- API et PostgreSQL : sains ;
+- scheduler et Caddy : actifs ;
+- schéma : `0002_admin_audit_log` ;
+- données avant rollback : 13 sports, 243 événements, 1 186 séances et
+  3 overrides ;
+- sonde volontaire : version attendue
+  `2.7.0-alpha.13-rollback-probe`, version exécutée `2.7.0-alpha.13` ;
+- écart de version détecté et rollback automatique déclenché ;
+- version après rollback : `2.7.0-alpha.13` ;
+- données après rollback : 13 sports, 243 événements, 1 186 séances et
+  3 overrides ;
+- aucune restauration PostgreSQL nécessaire ;
+- Prometheus et Grafana redémarrés automatiquement ;
+- Grafana reste lié à `127.0.0.1:3000` et Prometheus sans port hôte ;
+- archive de sonde :
+  `motorsports-events-server-2.7.0-alpha.13-rollback-probe.zip` ;
+- SHA-256 de la sonde :
+  `e40cf0edb32a412fed8d2d8acad76c7ac6e5a26e2db56d7ce8425615775fdfed`.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
