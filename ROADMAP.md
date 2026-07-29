@@ -26,7 +26,6 @@
 ## Jalon 4 — Stabilisation opérationnelle
 
 ### Acquis de la version 2.6.0
-
 - [x] Signaler les incohérences temporelles dans l’administration.
 - [x] Permettre leur correction avec un override persistant après synchronisation.
 - [x] Ajouter l’édition contrôlée du fichier `.env` depuis l’administration.
@@ -34,49 +33,47 @@
 
 Objectif : préparer une release 2.7.0 robuste, entièrement testée et facilement maintenable.
 
-### Priorité 1 — Infrastructure
+> **Directive pour Codex :** jusqu'à la validation complète du jalon 4, aucune refonte graphique ou UX/UI ne doit être entreprise. Les modifications des pages web doivent uniquement servir les besoins techniques des fonctionnalités en cours. Le design sera traité dans une phase dédiée après la sortie de la version 2.7.0.
 
+### Priorité 1 — Infrastructure
 - [ ] Intégrer Alembic pour les migrations.
 - [ ] Versionner toutes les migrations.
 - [ ] Vérifier automatiquement la version de schéma.
 
 ### Priorité 2 — Qualité
-
-- [ ] Ajouter des tests unitaires des providers (OCBlackTop, TheSportsDB et suivants).
+- [ ] Ajouter des tests unitaires des providers.
 - [ ] Utiliser des mocks des API externes.
 - [ ] Mesurer la couverture de code.
 
 ### Priorité 3 — Base de données
-
 - [ ] Ajouter des tests d’intégration PostgreSQL via Docker.
 - [ ] Vérifier les migrations sur une base vierge et une base existante.
 - [ ] Ajouter des jeux de données de test.
 
 ### Priorité 4 — Administration
-
-- [ ] Modulariser l’administration (Configuration, Providers, Synchronisations, Diagnostics, Système).
+- [ ] Modulariser l’administration sans refonte visuelle.
 - [ ] Ajouter un journal d’administration.
 
 ### Priorité 5 — Exploitation
-
 - [ ] Ajouter des logs structurés JSON.
 - [ ] Mettre en place la rotation des logs.
 - [ ] Automatiser et tester les sauvegardes/restaurations.
 - [ ] Vérifier automatiquement les prérequis avant les mises à niveau.
 
 ### Priorité 6 — Observabilité
-
 - [ ] Ajouter les endpoints /ready, /live et /metrics.
 - [ ] Préparer l’intégration Prometheus/Grafana.
 
 ### Priorité 7 — Releases
-
 - [ ] Renforcer le pipeline GitHub Actions.
 - [ ] Générer automatiquement les archives et SHA256.
 - [ ] Exécuter les tests avant toute release.
 
-### Méthode de développement
+## Après le jalon 4
 
+La version 3.0.0 sera consacrée à la refonte complète de l'interface d'administration : UX, UI, tableaux de bord, thème clair/sombre, ergonomie et identité visuelle.
+
+### Méthode de développement
 - Développer par branches fonctionnelles (`feature/...`).
 - Ouvrir une Pull Request par fonctionnalité.
 - Tester chaque PR sur le VPS avant fusion.
