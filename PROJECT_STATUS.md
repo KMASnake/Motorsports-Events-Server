@@ -751,6 +751,13 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
   par le commit `6eb45728ed6e1649a038e8cd7e3cf360729c8a69` ;
 - rotation des logs alpha.7 : pull request GitHub `#9`, intégrée dans `main`
   par le commit `7ed0dd76a3eaaa6cce36cb084e71be4f25d9c2a9` ;
+- publication 2.7.0 : pull request GitHub `#19`, intégrée dans `main` par le
+  commit `c66dfcf6b477395b9cff111860eb9dcb472a5f1b` ;
+- tag annoté `v2.7.0` publié sur ce commit ;
+- release GitHub :
+  `https://github.com/KMASnake/Motorsports-Events-Server/releases/tag/v2.7.0` ;
+- SHA-256 de l’archive officielle :
+  `683320f45d9a1ca1bd2635a43f6e399361637ebffb074d48212c6a82f82013c9`.
 
 ## Problèmes connus
 
