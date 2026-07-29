@@ -277,6 +277,42 @@ désactivé explicitement.
 - aucun journal d’accès `uvicorn.access` redondant ;
 - candidate `2.7.0-alpha.6` entièrement validée sur le VPS le 29 juillet 2026.
 
+## Candidate rotation des logs Docker
+
+- version : `2.7.0-alpha.7` ;
+- sous-jalon : `4.7-docker-log-rotation` ;
+- build : `20260729-145707` ;
+- branche : `feature/docker-log-rotation` ;
+- révision de schéma : `0002_admin_audit_log` inchangée ;
+- contrats API public et administration : inchangés.
+
+La candidate applique aux cinq services une politique Docker `json-file`
+commune : fichiers de 10 Mio maximum, cinq fichiers conservés et compression
+des fichiers tournés. Les conteneurs sont recréés pendant la mise à niveau,
+ce qui applique la politique sans modifier la configuration globale du démon.
+
+### Validation locale
+
+- configuration Compose résolue avec succès ;
+- présence de la politique sur les cinq services testée ;
+- suite applicative : 54 tests et 5 sous-tests réussis ;
+- suite PostgreSQL isolée : 4 tests réussis ;
+- syntaxe Python et shell : réussie ;
+- archive : `motorsports-events-server-2.7.0-alpha.7.zip` ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.7`, build `20260729-145707` ;
+- révision du schéma : `0002_admin_audit_log` ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- sports et données accessibles ;
+- services `db`, `api`, `scheduler`, `migrate` et `caddy` : pilote
+  `json-file`, `max-size=10m`, `max-file=5`, `compress=true`.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
@@ -314,6 +350,8 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - publication 2.6.0 : intégrée dans `main` ;
 - tag officiel `v2.6.0` publié sur
   `eaa63e2533d71aa4dcaaff46aa745b2e92505e9e` ;
+- logs structurés alpha.6 : pull request GitHub `#8`, intégrée dans `main`
+  par le commit `6eb45728ed6e1649a038e8cd7e3cf360729c8a69` ;
 
 ## Problèmes connus
 

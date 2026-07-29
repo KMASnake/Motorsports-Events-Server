@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0-alpha.7 — Rotation des logs Docker
+
+- Rotation `json-file` appliquée aux cinq services de production.
+- Taille bornée à 10 Mio par fichier et cinq fichiers par conteneur.
+- Compression automatique des fichiers tournés.
+- Configuration Compose commune sans modification globale du démon Docker.
+- Contrat API et schéma PostgreSQL inchangés.
+
 ## 2.7.0-alpha.6 — Logs structurés JSON
 
 - Format JSON commun pour l’API, le scheduler et les bibliothèques.

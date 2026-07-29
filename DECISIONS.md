@@ -80,6 +80,13 @@ masqués avant sérialisation.
 
 Voir `docs/decisions/0010-structured-json-logging.md`.
 
+## ADR 0011 — Rotation des journaux Docker
+
+Tous les services utilisent le pilote `json-file` avec une taille et un nombre
+de fichiers bornés, ainsi que la compression des fichiers tournés.
+
+Voir `docs/decisions/0011-docker-log-rotation.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité
