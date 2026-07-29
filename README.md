@@ -7,7 +7,7 @@ Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
 
 ## Version courante
 
-La candidate **2.7.0-alpha.7 — Rotation des logs Docker** conserve le contrat
+La candidate **2.7.0-alpha.8 — Sauvegardes automatisées** conserve le contrat
 API v1 et poursuit le Jalon 4 :
 
 - FastAPI ;
@@ -32,6 +32,8 @@ API v1 et poursuit le Jalon 4 :
 - journal persistant des actions administratives sans données sensibles.
 - logs JSON corrélés et expurgés des valeurs sensibles.
 - rotation automatique et compression des journaux de tous les conteneurs.
+- sauvegardes PostgreSQL atomiques, vérifiées par restauration temporaire et
+  planifiées quotidiennement par systemd.
 
 ## Structure
 

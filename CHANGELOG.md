@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.0-alpha.8 — Sauvegardes automatisées
+
+- Création atomique des sauvegardes PostgreSQL compressées.
+- Vérification gzip puis restauration dans une base temporaire.
+- Restauration de production refusée avant validation complète de l’archive.
+- Redémarrage garanti de l’API et du scheduler après une erreur de restauration.
+- Rétention configurable, 30 jours par défaut.
+- Timer systemd quotidien, persistant et légèrement randomisé.
+
 ## 2.7.0-alpha.7 — Rotation des logs Docker
 
 - Rotation `json-file` appliquée aux cinq services de production.

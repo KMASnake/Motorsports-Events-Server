@@ -313,6 +313,46 @@ ce qui applique la politique sans modifier la configuration globale du démon.
 - services `db`, `api`, `scheduler`, `migrate` et `caddy` : pilote
   `json-file`, `max-size=10m`, `max-file=5`, `compress=true`.
 
+## Candidate sauvegardes automatisées
+
+- version : `2.7.0-alpha.8` ;
+- sous-jalon : `4.8-automated-backups` ;
+- build : `20260729-151518` ;
+- branche : `feature/automated-backups` ;
+- révision de schéma : `0002_admin_audit_log` inchangée ;
+- contrats API public et administration : inchangés.
+
+La candidate crée chaque sauvegarde dans un fichier temporaire, contrôle sa
+compression puis la restaure dans une base PostgreSQL jetable avant de la
+publier. Les restaurations de production exécutent le même contrôle préalable
+et garantissent le redémarrage de l’API et du scheduler. Un timer systemd
+persistant planifie l’opération quotidiennement à 03:15 avec un délai aléatoire
+maximal de 15 minutes.
+
+### Validation locale
+
+- tests déterministes sauvegarde, restauration et timer : 4 réussis ;
+- syntaxe shell : réussie ;
+- suite applicative : 57 tests et 5 sous-tests réussis ;
+- suite PostgreSQL isolée : 4 tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.8.zip` ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.8`, build `20260729-151518` ;
+- révision du schéma : `0002_admin_audit_log` ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- timer systemd : chargé, activé et en attente ;
+- prochaine exécution observée : 30 juillet 2026 à 03:22:59 UTC ;
+- sauvegarde réelle : créée et restaurée dans une base temporaire ;
+- archive gzip : valide ;
+- taille observée : 147 468 octets ;
+- permissions et propriétaire : `0600`, `root:root`.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;
@@ -352,6 +392,8 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
   `eaa63e2533d71aa4dcaaff46aa745b2e92505e9e` ;
 - logs structurés alpha.6 : pull request GitHub `#8`, intégrée dans `main`
   par le commit `6eb45728ed6e1649a038e8cd7e3cf360729c8a69` ;
+- rotation des logs alpha.7 : pull request GitHub `#9`, intégrée dans `main`
+  par le commit `7ed0dd76a3eaaa6cce36cb084e71be4f25d9c2a9` ;
 
 ## Problèmes connus
 
