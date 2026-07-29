@@ -129,14 +129,26 @@ bases créés pour les tests sont supprimés automatiquement.
 - archive : `motorsports-events-server-2.7.0-alpha.3.zip` ;
 - SHA-256 : voir le fichier compagnon
   `motorsports-events-server-2.7.0-alpha.3.zip.sha256` ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
 
 La première validation VPS a révélé que `verify-installation.sh` lançait son
 contrôle de schéma dans un conteneur temporaire avec `--no-deps`. Ce conteneur
 ne résolvait pas l’alias Docker `db`, alors que l’API déployée restait
 opérationnelle. Le contrôle utilise désormais le conteneur API déjà sain et
-connecté au réseau de production. Une nouvelle archive alpha.3 doit être
-installée avant validation.
+connecté au réseau de production. L’archive alpha.3 corrigée a ensuite été
+installée et validée.
+
+### Validation VPS
+
+- version locale et API : `2.7.0-alpha.3`, build `20260729-111254` ;
+- API et PostgreSQL : sains ;
+- Caddy et scheduler : actifs ;
+- service de migration : terminé correctement ;
+- révision du schéma : `0001_initial_schema` ;
+- sports accessibles ;
+- synchronisation : 0 créée, 243 mises à jour, 0 erreur ;
+- journaux API, scheduler et migration : aucune erreur détectée ;
+- correctif de vérification du schéma : validé depuis le conteneur API.
 
 ## Validation de la 2.6.0
 

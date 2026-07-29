@@ -74,8 +74,8 @@ erreur.
 - [x] ajouter un jeu IndyCar versionné ;
 - [x] tester persistance, synchronisation et override ;
 - [x] intégrer le test à GitHub Actions ;
-- [ ] installer `2.7.0-alpha.3` sur le VPS ;
-- [ ] vérifier version, schéma, santé et synchronisation ;
+- [x] installer `2.7.0-alpha.3` sur le VPS ;
+- [x] vérifier version, schéma, santé et synchronisation ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : les tests Docker passent dans GitHub Actions, la
