@@ -590,6 +590,30 @@ après réussite des validations applicative et PostgreSQL.
 - deux avertissements Grafana non bloquants signalent l’absence des
   répertoires de provisioning `plugins/` et `alerting/`.
 
+## Candidate provisioning Grafana
+
+- version : `2.7.0-alpha.15` ;
+- sous-jalon : `4.15-grafana-provisioning` ;
+- branche : `agent/grafana-provisioning-cleanup` ;
+- schéma et contrat API v1 : inchangés.
+
+La candidate ajoute les répertoires facultatifs `alerting/` et `plugins/` au
+montage de provisioning existant. Les répertoires contiennent un marqueur afin
+d’être conservés par Git et dans l’archive ZIP. Les ports de supervision et les
+provisionings existants restent inchangés.
+
+### Validation locale
+
+- validation du dépôt : réussie avant modification ;
+- quatre répertoires de provisioning couverts par un test de non-régression ;
+- liaison Grafana à `127.0.0.1:3000` conservée ;
+- Prometheus reste sans port hôte ;
+- suite complète : 72 tests et 5 sous-tests réussis ;
+- archive : `motorsports-events-server-2.7.0-alpha.15.zip` ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- archive réextraite et retestée : réussie ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

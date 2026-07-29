@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.7.0-alpha.15 — Provisioning Grafana complet
+
+- Ajout des répertoires de provisioning Grafana facultatifs `alerting/` et
+  `plugins/`.
+- Conservation des répertoires vides dans les archives de release.
+- Test de non-régression couvrant les quatre catégories de provisioning.
+- Exposition privée de Grafana et Prometheus inchangée.
+
 ## 2.7.0-alpha.14 — Artefacts de release GitHub
 
 - Construction automatique de l’archive après les tests applicatifs et

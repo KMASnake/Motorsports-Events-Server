@@ -29,3 +29,15 @@ def test_monitoring_is_private_and_scrapes_api():
     assert "motorsports_api_up" in expressions
     assert "motorsports_http_requests_total" in expressions
     assert "ALERTS" in expressions
+
+
+def test_all_grafana_provisioning_directories_are_packaged():
+    provisioning = ROOT / "monitoring/grafana/provisioning"
+
+    for directory in ("alerting", "dashboards", "datasources", "plugins"):
+        assert (provisioning / directory).is_dir()
+
+    assert (
+        "./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro"
+        in (ROOT / "docker-compose.monitoring.yml").read_text()
+    )
