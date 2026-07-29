@@ -125,8 +125,8 @@ d’administration validées en 2.6.0 fonctionnent encore.
 - [x] ajouter la page `/admin/audit` et l’API protégée ;
 - [x] tester une base vierge et la migration depuis `0001` ;
 - [x] construire, réextraire et retester l’archive alpha.5 ;
-- [ ] installer `2.7.0-alpha.5` sur le VPS ;
-- [ ] vérifier les entrées produites et l’absence de secrets ;
+- [x] installer `2.7.0-alpha.5` sur le VPS ;
+- [x] vérifier les entrées produites et l’absence de secrets ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : les actions prévues sont persistées, consultables par
