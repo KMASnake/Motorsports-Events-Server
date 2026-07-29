@@ -33,7 +33,7 @@ publics restent inchangés.
 
 - [x] intégrer la version validée dans `main` ;
 - [x] créer le tag annoté `v2.6.0` sur le commit validé ;
-- [ ] pousser le tag `v2.6.0` sur GitHub ;
+- [x] pousser le tag `v2.6.0` sur GitHub ;
 - [ ] reporter le commit et le tag dans `PROJECT_STATUS.md`.
 
 ## 4. Valider le sous-jalon Alembic

@@ -85,9 +85,8 @@ La version 2.6.0 est validée sur le VPS le 29 juillet 2026 :
 - branche de publication : `agent/publish-2.5.2-handoff` ;
 - référence officielle de release : tag annoté `v2.5.2` ;
 - publication 2.6.0 : intégrée dans `main` ;
-- tag annoté `v2.6.0` créé localement sur
+- tag officiel `v2.6.0` publié sur
   `eaa63e2533d71aa4dcaaff46aa745b2e92505e9e` ;
-- publication du tag `v2.6.0` sur GitHub : en attente d’authentification.
 
 ## Problèmes connus
 
