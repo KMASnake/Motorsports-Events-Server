@@ -130,6 +130,14 @@ applicative et PostgreSQL sont toutes deux réussies.
 
 Voir `docs/decisions/0017-tested-release-artifacts.md`.
 
+## ADR 0018 — Configuration administrative contrôlée
+
+Le `.env` brut n’est jamais exposé par HTTP. Les paramètres sont modifiés
+depuis la page d’administration, tandis que l’API de configuration client
+protégée ne renvoie qu’un document construit sans secret serveur.
+
+Voir `docs/decisions/0018-controlled-admin-configuration.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité
