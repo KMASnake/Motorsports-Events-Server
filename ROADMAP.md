@@ -62,7 +62,7 @@ Objectif : préparer une release 2.7.0 robuste, entièrement testée et facileme
 
 ### Priorité 6 — Observabilité
 - [x] Ajouter les endpoints /ready, /live et /metrics.
-- [ ] Préparer l’intégration Prometheus/Grafana.
+- [x] Préparer l’intégration Prometheus/Grafana.
 
 ### Priorité 7 — Releases
 - [ ] Renforcer le pipeline GitHub Actions.

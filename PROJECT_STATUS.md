@@ -406,6 +406,26 @@ aucun secret ni identifiant métier et bornent les labels aux routes déclarées
 - `/metrics` : exposition Prometheus valide avec compteurs HTTP bornés ;
 - type : `text/plain; version=0.0.4; charset=utf-8`.
 
+## Candidate supervision privée
+
+- version : `2.7.0-alpha.11` ;
+- sous-jalon : `4.11-private-monitoring` ;
+- build : `20260729-160213` ;
+- branche : `feature/prometheus-grafana` ;
+- schéma et contrat API v1 : inchangés.
+
+Prometheus reste interne à Docker. Grafana écoute sur `127.0.0.1:3000`,
+nécessite un mot de passe et fournit un tableau de bord API préconfiguré.
+
+### Validation locale
+
+- configuration Compose combinée : valide ;
+- suite applicative : 61 tests et 5 sous-tests réussis ;
+- suite PostgreSQL : 4 tests réussis ;
+- archive réextraite et retestée ;
+- SHA-256 : voir le fichier compagnon `.zip.sha256` ;
+- validation VPS : en attente.
+
 ## Validation de la 2.6.0
 
 - validation reproductible : 27 tests réussis ;

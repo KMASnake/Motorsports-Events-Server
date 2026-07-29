@@ -34,8 +34,8 @@ services:
       - .env
     environment:
       ADMIN_ENV_FILE: /run/motorsports-events/config.env
-      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.10}
-      APP_BUILD: ${APP_BUILD:-20260729-154303}
+      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.11}
+      APP_BUILD: ${APP_BUILD:-20260729-160213}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
     depends_on:
       migrate:
@@ -69,8 +69,8 @@ services:
     env_file:
       - .env
     environment:
-      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.10}
-      APP_BUILD: ${APP_BUILD:-20260729-154303}
+      APP_VERSION: ${APP_VERSION:-2.7.0-alpha.11}
+      APP_BUILD: ${APP_BUILD:-20260729-160213}
       APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
     depends_on:
       migrate:

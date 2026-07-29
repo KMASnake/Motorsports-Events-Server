@@ -101,6 +101,13 @@ sans labels à forte cardinalité.
 
 Voir `docs/decisions/0013-observability-endpoints.md`.
 
+## ADR 0014 — Supervision privée
+
+Prometheus reste interne à Docker et Grafana écoute uniquement sur localhost,
+avec accès par tunnel SSH.
+
+Voir `docs/decisions/0014-private-prometheus-grafana.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité
