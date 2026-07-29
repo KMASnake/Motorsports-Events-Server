@@ -143,7 +143,9 @@ un administrateur et ne contiennent aucune valeur sensible.
 - [x] supprimer l’attente longue sur quota mensuel OCBlackTop ;
 - [x] récupérer automatiquement les exécutions `running` orphelines ;
 - [x] construire, réextraire et retester l’archive alpha.6 ;
-- [ ] installer `2.7.0-alpha.6` sur le VPS ;
+- [x] installer `2.7.0-alpha.6` sur le VPS ;
+- [x] vérifier l’échec rapide sur quota mensuel OCBlackTop ;
+- [x] vérifier la récupération des synchronisations orphelines ;
 - [ ] vérifier que les lignes API et scheduler sont du JSON valide ;
 - [ ] vérifier les événements HTTP et de synchronisation ;
 - [ ] intégrer la pull request après validation VPS.

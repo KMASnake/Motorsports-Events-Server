@@ -265,7 +265,13 @@ désactivé explicitement.
 - SHA-256 de la candidate corrigée : voir le fichier `.zip.sha256` livré
   avec l’archive (l’empreinte précédente est obsolète) ;
 - archive réextraite et retestée : réussie ;
-- validation VPS : en attente.
+- validation VPS fonctionnelle : réussie le 29 juillet 2026 ;
+- synchronisation avec quota mensuel OCBlackTop épuisé : fin en 1,235 seconde,
+  état `completed_with_errors`, 30 mises à jour et 1 erreur explicite ;
+- récupération : les exécutions orphelines 522, 526 et 527 ont été clôturées
+  avec l’état `interrupted` ;
+- aucune exécution récente ne reste en état `running` ;
+- validation finale du format de toutes les lignes de logs : en attente.
 
 ## Validation de la 2.6.0
 
