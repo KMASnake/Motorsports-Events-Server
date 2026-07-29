@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 import logging
+from threading import Lock
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session as OrmSession
 
 from ..config import get_settings
@@ -12,9 +14,65 @@ from ..providers.ocblacktop import OcBlackTopProvider
 from ..providers.thesportsdb import TheSportsDbProvider
 
 logger = logging.getLogger("motorsports.sync")
+_local_sync_lock = Lock()
+_POSTGRES_SYNC_LOCK_ID = 734_833_218
+
+
+class SynchronizationInProgress(RuntimeError):
+    """Raised when another API or scheduler process already owns the sync lock."""
+
+
+def _mark_orphaned_runs(db: OrmSession) -> None:
+    now = datetime.now(timezone.utc)
+    for stale_run in db.query(SyncRun).filter(SyncRun.status == "running").all():
+        stale_run.status = "interrupted"
+        stale_run.finished_at = now
+        stale_run.errors = max(stale_run.errors, 1)
+        stale_run.details = "\n".join(
+            part for part in (stale_run.details, "Synchronisation interrompue.") if part
+        )
+    db.commit()
 
 
 async def synchronize(db: OrmSession) -> SyncRun:
+    bind = db.get_bind()
+    lock_connection = None
+    local_lock_acquired = False
+
+    if bind.dialect.name == "postgresql":
+        lock_connection = bind.connect()
+        acquired = bool(
+            lock_connection.scalar(
+                text("SELECT pg_try_advisory_lock(:lock_id)"),
+                {"lock_id": _POSTGRES_SYNC_LOCK_ID},
+            )
+        )
+    else:
+        local_lock_acquired = _local_sync_lock.acquire(blocking=False)
+        acquired = local_lock_acquired
+
+    if not acquired:
+        if lock_connection is not None:
+            lock_connection.close()
+        raise SynchronizationInProgress(
+            "Une synchronisation est déjà en cours."
+        )
+
+    try:
+        _mark_orphaned_runs(db)
+        return await _synchronize_locked(db)
+    finally:
+        if lock_connection is not None:
+            lock_connection.execute(
+                text("SELECT pg_advisory_unlock(:lock_id)"),
+                {"lock_id": _POSTGRES_SYNC_LOCK_ID},
+            )
+            lock_connection.close()
+        elif local_lock_acquired:
+            _local_sync_lock.release()
+
+
+async def _synchronize_locked(db: OrmSession) -> SyncRun:
     settings = get_settings()
     run = SyncRun(status="running")
     db.add(run)

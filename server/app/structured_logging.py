@@ -79,10 +79,14 @@ def configure_logging(
     root.addHandler(handler)
     root.setLevel(level.upper())
 
-    for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
+    for name in ("uvicorn", "uvicorn.error"):
         logger = logging.getLogger(name)
         logger.handlers.clear()
         logger.propagate = True
+    access_logger = logging.getLogger("uvicorn.access")
+    access_logger.handlers.clear()
+    access_logger.propagate = False
+    access_logger.disabled = True
 
     logging.LoggerAdapter(
         logging.getLogger("motorsports.lifecycle"),

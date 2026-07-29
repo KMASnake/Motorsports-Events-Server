@@ -5,7 +5,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from .config import get_settings
 from .database import SessionLocal
 from .schema_migrations import assert_schema_current
-from .sync_service import synchronize
+from .sync_service import SynchronizationInProgress, synchronize
 from .structured_logging import configure_logging
 
 logging_settings = get_settings()
@@ -27,7 +27,14 @@ assert_schema_current()
 def job():
     db = SessionLocal()
     try:
-        run = asyncio.run(synchronize(db))
+        try:
+            run = asyncio.run(synchronize(db))
+        except SynchronizationInProgress:
+            logger.info(
+                "Scheduled synchronization skipped",
+                extra={"service": "scheduler", "event": "sync.skipped"},
+            )
+            return
         logger.info(
             "Scheduled synchronization completed",
             extra={

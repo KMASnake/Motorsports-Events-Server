@@ -177,6 +177,30 @@ class OcBlackTopProviderTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual({"data": []}, payload)
         sleep.assert_awaited_once_with(2)
 
+    async def test_monthly_rate_limit_fails_without_waiting(self):
+        provider = OcBlackTopProvider()
+        transport = httpx.MockTransport(
+            lambda _request: httpx.Response(
+                429,
+                headers={"retry-after": "300"},
+                json={"message": "Monthly limit exceeded"},
+            )
+        )
+        async with httpx.AsyncClient(transport=transport) as client:
+            with patch(
+                "app.providers.ocblacktop.asyncio.sleep",
+                new=AsyncMock(),
+            ) as sleep:
+                with self.assertRaisesRegex(RuntimeError, "Monthly limit exceeded"):
+                    await provider._request(
+                        client,
+                        "https://ocblacktop.test/events",
+                        {},
+                        {},
+                        require_data=True,
+                    )
+        sleep.assert_not_awaited()
+
     async def test_invalid_responses_are_rejected(self):
         cases = (
             (

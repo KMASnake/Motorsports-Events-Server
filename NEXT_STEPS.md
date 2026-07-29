@@ -139,6 +139,9 @@ un administrateur et ne contiennent aucune valeur sensible.
 - [x] structurer les événements de synchronisation ;
 - [x] désactiver les accès Uvicorn en texte ;
 - [x] masquer les champs et valeurs sensibles ;
+- [x] empêcher les synchronisations concurrentes entre API et scheduler ;
+- [x] supprimer l’attente longue sur quota mensuel OCBlackTop ;
+- [x] récupérer automatiquement les exécutions `running` orphelines ;
 - [x] construire, réextraire et retester l’archive alpha.6 ;
 - [ ] installer `2.7.0-alpha.6` sur le VPS ;
 - [ ] vérifier que les lignes API et scheduler sont du JSON valide ;

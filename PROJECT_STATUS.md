@@ -246,15 +246,24 @@ en conflit avec l’attribut réservé `LogRecord.created`. Les compteurs utilis
 désormais les suffixes `_count`, et les exceptions HTTP non gérées sont
 journalisées puis converties en réponse JSON corrélée.
 
+La seconde validation a confirmé que l’API restait saine, mais a révélé deux
+synchronisations concurrentes et une attente de 300 secondes sur la réponse
+OCBlackTop `429 Monthly limit exceeded`. La candidate corrigée utilise un
+verrou consultatif PostgreSQL commun à l’API et au scheduler, clôt les anciennes
+exécutions `running` comme `interrupted` et échoue immédiatement lorsque le
+quota mensuel est épuisé. Le journal d’accès Uvicorn redondant est aussi
+désactivé explicitement.
+
 ### Validation locale
 
-- suite applicative : 52 tests, 3 tests PostgreSQL ignorés hors Docker et
+- suite applicative : 53 tests, 4 tests PostgreSQL ignorés hors Docker et
   5 sous-tests réussis ;
-- suite PostgreSQL isolée : 3 tests réussis ;
+- suite PostgreSQL isolée : 4 tests réussis, dont verrou concurrent et
+  récupération d’une exécution orpheline ;
 - format JSON, contexte et redaction : testés ;
 - archive : `motorsports-events-server-2.7.0-alpha.6.zip` ;
-- SHA-256 :
-  `fc91e3d8a49276b312329ab02447dc27679942a0774db7128b084d2b5831c72a` ;
+- SHA-256 de la candidate corrigée : voir le fichier `.zip.sha256` livré
+  avec l’archive (l’empreinte précédente est obsolète) ;
 - archive réextraite et retestée : réussie ;
 - validation VPS : en attente.
 
