@@ -514,7 +514,30 @@ orphelins.
 - archive : `motorsports-events-server-2.7.0-alpha.13.zip` ;
 - archive réextraite et retestée : réussie ;
 - SHA-256 : voir le fichier compagnon `.zip.sha256` ;
-- validation VPS : en attente.
+- validation VPS : réussie le 29 juillet 2026.
+
+### Validation VPS
+
+- installation normale : version locale et API `2.7.0-alpha.13`, build
+  `20260729-165716` ;
+- API et PostgreSQL : sains ;
+- scheduler et Caddy : actifs ;
+- schéma : `0002_admin_audit_log` ;
+- données avant rollback : 13 sports, 243 événements, 1 186 séances et
+  3 overrides ;
+- sonde volontaire : version attendue
+  `2.7.0-alpha.13-rollback-probe`, version exécutée `2.7.0-alpha.13` ;
+- écart de version détecté et rollback automatique déclenché ;
+- version après rollback : `2.7.0-alpha.13` ;
+- données après rollback : 13 sports, 243 événements, 1 186 séances et
+  3 overrides ;
+- aucune restauration PostgreSQL nécessaire ;
+- Prometheus et Grafana redémarrés automatiquement ;
+- Grafana reste lié à `127.0.0.1:3000` et Prometheus sans port hôte ;
+- archive de sonde :
+  `motorsports-events-server-2.7.0-alpha.13-rollback-probe.zip` ;
+- SHA-256 de la sonde :
+  `e40cf0edb32a412fed8d2d8acad76c7ac6e5a26e2db56d7ce8425615775fdfed`.
 
 ## Validation de la 2.6.0
 

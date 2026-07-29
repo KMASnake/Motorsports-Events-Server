@@ -241,8 +241,8 @@ exposé.
 - [x] refuser un état ambigu avec deux répertoires `data/` ;
 - [x] conserver l’état actif ou inactif de la supervision ;
 - [x] construire et retester l’archive alpha.13 ;
-- [ ] installer et provoquer un rollback contrôlé sur le VPS ;
-- [ ] vérifier version, données, sauvegarde et supervision après rollback ;
+- [x] installer et provoquer un rollback contrôlé sur le VPS ;
+- [x] vérifier version, données, sauvegarde et supervision après rollback ;
 - [ ] intégrer la pull request après validation VPS.
 
 Critère d’acceptation : une candidate volontairement invalide déclenche le
