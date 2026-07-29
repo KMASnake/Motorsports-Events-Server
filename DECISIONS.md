@@ -94,6 +94,13 @@ restauration réussie dans une base PostgreSQL temporaire.
 
 Voir `docs/decisions/0012-verified-automated-backups.md`.
 
+## ADR 0013 — Endpoints d’observabilité
+
+Les sondes de vie, disponibilité et métriques sont publiques, minimales et
+sans labels à forte cardinalité.
+
+Voir `docs/decisions/0013-observability-endpoints.md`.
+
 ## Règle de décision
 
 Tout changement d'architecture, de schéma SQL, de contrat public, de sécurité

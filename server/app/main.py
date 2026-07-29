@@ -3,8 +3,8 @@ import logging
 from time import perf_counter
 from uuid import uuid4
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
-from sqlalchemy import BigInteger, and_, cast, func, or_
+from fastapi.responses import JSONResponse, PlainTextResponse
+from sqlalchemy import BigInteger, and_, cast, func, or_, text
 from sqlalchemy.orm import Session as OrmSession, joinedload
 
 from .admin import router as admin_router
@@ -29,6 +29,7 @@ from .api.schemas import (
 from .config import get_settings
 from .database import get_db
 from .models import Event, Session, Sport, SyncRun
+from .observability import prometheus_metrics, record_request
 from .schema_migrations import assert_schema_current
 from .security import require_public_key
 from .structured_logging import configure_logging
@@ -50,7 +51,7 @@ assert_schema_current()
 
 app = FastAPI(
     title=f"{settings.project_name} API",
-    version="2.7.0-alpha.9",
+    version="2.7.0-alpha.10",
     description=(
         f"Serveur central de {settings.project_name}. "
         "Le contrat /api/v1 reste rétrocompatible pendant toute la série 2.x."
@@ -82,6 +83,9 @@ async def structured_access_log(request: Request, call_next):
             headers={"X-Request-ID": request_id},
         )
     response.headers["X-Request-ID"] = request_id
+    route = request.scope.get("route")
+    route_path = getattr(route, "path", "unmatched")
+    record_request(request.method, route_path, response.status_code)
     logger.info(
         "HTTP request completed",
         extra={
@@ -103,7 +107,7 @@ app.include_router(admin_router)
 def root():
     return {
         "name": settings.project_name,
-        "version": "2.7.0-alpha.9",
+        "version": "2.7.0-alpha.10",
         "docs": "/docs",
         "admin": "/admin",
     }
@@ -118,6 +122,28 @@ def api_version():
 @app.get("/api/v1/health", response_model=HealthResponse)
 def health():
     return {"status": "ok", "time": datetime.now(timezone.utc)}
+
+
+@app.get("/live", include_in_schema=False)
+def live():
+    return {"status": "ok"}
+
+
+@app.get("/ready", include_in_schema=False)
+def ready(db: OrmSession = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Database unavailable") from exc
+    return {"status": "ready"}
+
+
+@app.get("/metrics", include_in_schema=False)
+def metrics():
+    return PlainTextResponse(
+        prometheus_metrics(),
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+    )
 
 
 @app.get(

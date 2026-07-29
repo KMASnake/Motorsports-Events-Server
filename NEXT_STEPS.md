@@ -193,3 +193,12 @@ rattrapée après une indisponibilité du VPS.
 - [x] construire et retester l’archive alpha.9 ;
 - [x] installer et valider l’alpha.9 sur le VPS ;
 - [ ] intégrer la pull request après validation VPS.
+
+## 15. Valider les endpoints d’observabilité
+
+- [x] ajouter `/live`, `/ready` et `/metrics` ;
+- [x] vérifier PostgreSQL dans la readiness ;
+- [x] borner les labels et exclure les secrets ;
+- [x] construire et retester l’archive alpha.10 ;
+- [ ] installer et valider l’alpha.10 sur le VPS ;
+- [ ] intégrer la pull request après validation VPS.

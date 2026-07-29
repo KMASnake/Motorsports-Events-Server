@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.0-alpha.10 — Endpoints d’observabilité
+
+- `/live` contrôle la disponibilité du processus API.
+- `/ready` contrôle la connexion PostgreSQL.
+- `/metrics` expose des métriques Prometheus sans donnée sensible.
+- Compteurs HTTP bornés par méthode, route déclarée et statut.
+
 ## 2.7.0-alpha.9 — Prérequis de mise à niveau
 
 - Validation de l’archive avant toute écriture.
