@@ -1,6 +1,7 @@
 import { buildCalendarDays } from './eventUtils';
 import { eventColor } from './eventColors';
 import type { Championship, EventRow } from './eventTypes';
+import { assetRegistry } from '../../assets/assetRegistry';
 
 interface Props {
   month: Date;
@@ -30,7 +31,7 @@ export function EventCalendarView({ month, events, championships, selectedId, on
           onClick={(click) => { click.stopPropagation(); onSelect(event); }}
           aria-pressed={selectedId === event.id}
         >
-          <strong>{event.championship_name}</strong>
+          <strong className="event-chip-brand"><img src={assetRegistry.championship(event.championship_slug,event.championship_logo_url).src} alt=""/><span>{event.championship_name}</span>{assetRegistry.country(event.country_code).src&&<img className="event-chip-flag" src={assetRegistry.country(event.country_code).src!} alt={assetRegistry.country(event.country_code).alt}/>}</strong>
           <span>{event.name}</span>
           <small>{event.category ?? (event.published ? 'Publié' : 'Privé')}</small>
           {event.correction_count ? <em title="Correction locale">✎ {event.correction_count}</em> : null}

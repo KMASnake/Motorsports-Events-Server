@@ -34,6 +34,9 @@ aucune correction. L'API publique ne retourne que la valeur effective.
 - fallback championnat/circuit : création originale locale ;
 - pays : code ISO accessible, sans service distant ;
 - logos tiers : aucun fichier sans droit de redistribution n'est inclus.
+- correction post-recette : huit drapeaux SVG locaux et trois badges sport
+  originaux sont affichés dans le calendrier ; une `logo_url` autorisée
+  configurée par l'administrateur prend automatiquement la priorité.
 
 La provenance et les règles de remplacement sont détaillées dans
 `docs/assets/ASSET-SOURCES.md`.
@@ -56,6 +59,8 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
 - intégration corrections : override fournisseur créé, événement manuel exclu,
   métadonnées absentes de l'API publique ;
 - Chromium Playwright : 5 scénarios réussis, dont un contrôle 1280 × 720 ;
+- revalidation graphique : builds Web/API, Docker et Chromium réussis après
+  ajout des drapeaux et badges sport ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

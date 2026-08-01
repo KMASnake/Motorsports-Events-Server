@@ -17,10 +17,10 @@ export function EventDetailsPanel({ event, championships, onEdit, onDuplicate, o
   if (!event) return <aside className="event-details empty-details"><span>◫</span><h3>Aucun événement sélectionné</h3><p>Sélectionnez un bloc du calendrier ou une ligne de la liste.</p></aside>;
   return <aside className="event-details" style={{ '--event-color': eventColor(event, championships) } as React.CSSProperties}>
     <header><small>DÉTAIL DE L’ÉVÉNEMENT</small><Pill text={event.published ? 'PUBLIÉ' : 'PRIVÉ'} tone={event.published ? 'green' : 'muted'} /></header>
-    <div className="event-details-identity"><img src={assetRegistry.championship(event.championship_slug).src} alt={assetRegistry.championship(event.championship_slug).alt}/><div><small>{event.championship_name}</small><h3>{event.name}</h3></div></div>
+    <div className="event-details-identity"><img src={assetRegistry.championship(event.championship_slug,event.championship_logo_url).src} alt={assetRegistry.championship(event.championship_slug,event.championship_logo_url).alt}/><div><small>{event.championship_name}</small><h3>{event.name}</h3></div></div>
     <dl>
       <div><dt>Championnat</dt><dd>{event.championship_name}</dd></div>
-      <div><dt>Circuit</dt><dd>{event.circuit_name ?? 'Non défini'}<small><b className="country-badge" title={assetRegistry.country(event.country_code).alt}>{assetRegistry.country(event.country_code).label}</b> {event.circuit_city}</small></dd></div>
+      <div><dt>Circuit</dt><dd>{event.circuit_name ?? 'Non défini'}<small>{assetRegistry.country(event.country_code).src?<img className="country-flag" src={assetRegistry.country(event.country_code).src!} alt={assetRegistry.country(event.country_code).alt}/>:<b className="country-badge">{assetRegistry.country(event.country_code).label}</b>} {event.circuit_city}</small></dd></div>
       <div><dt>Début</dt><dd>{fullDate(event.starts_at)}</dd></div>
       <div><dt>Fin</dt><dd>{event.ends_at ? fullDate(event.ends_at) : 'Non définie'}</dd></div>
       <div><dt>Fuseau</dt><dd>{event.timezone}</dd></div>

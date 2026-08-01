@@ -2,8 +2,8 @@
   "generated_at": "2026-08-01T22:00:00+02:00",
   "repository_state": {
     "root_source": "8.1.0-alpha.2-lot.4.2",
-    "status": "lot-4.2-local-candidate",
-    "reason": "Lot 4.2 is implemented and locally validated; VPS validation remains required."
+    "status": "lot-4.2-graphics-fix-locally-validated",
+    "reason": "Local flags and sport identities passed Web/API builds, Docker health and Chromium validation; VPS visual acceptance remains required."
   },
   "working_lot_4_2": {
     "implemented": [
@@ -13,9 +13,10 @@
       "Field-level provider corrections and conflict resolution",
       "Corrections administration page",
       "Local branding, asset registry and documented fallbacks",
+      "Local country flags and sport identities with authorized logo URL support",
       "Safe hybrid test-data workflow and deterministic generator"
     ],
-    "local_validation": "passed",
+    "local_validation": "passed-after-graphics-fix",
     "vps_validation": "pending",
     "report": "docs/handoff/LOT-4.2-IMPLEMENTATION-REPORT.md"
   },

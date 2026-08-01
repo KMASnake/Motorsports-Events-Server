@@ -24,6 +24,7 @@ export interface EventRow {
   championship_id: string;
   championship_name: string;
   championship_slug: string;
+  championship_logo_url?: string | null;
   circuit_id: string | null;
   circuit_name: string | null;
   circuit_city: string | null;

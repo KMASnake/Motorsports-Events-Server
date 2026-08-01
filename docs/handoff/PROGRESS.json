@@ -4,8 +4,8 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-01",
-  "status": "local-candidate-vps-validation-required",
-  "overall_percent": 98,
+  "status": "graphics-fix-local-validation-passed",
+  "overall_percent": 97,
   "areas": {
     "docker": 100,
     "database": 98,
@@ -13,7 +13,7 @@
     "design_system_foundations": 82,
     "design_system_components": 45,
     "shell": 96,
-    "events_visual_fidelity": 95,
+    "events_visual_fidelity": 98,
     "championships_visual_fidelity": 95,
     "events_crud_list": 94,
     "events_calendar_view": 98,
@@ -42,6 +42,10 @@
     "Field-level provider corrections implemented",
     "Safe deterministic hybrid-data workflow implemented",
     "Lot 4.2 local unit, Docker and Chromium validation passed"
+    ,"VPS feedback confirmed missing visual flags and sport identities",
+    "Eight local SVG flags and three original sport identities added",
+    "Authorized championship logo URLs now take precedence when configured",
+    "Web/API builds, Docker health and five Chromium scenarios passed after the graphics fix"
   ],
   "next_action": {
     "owner": "Maintainer",

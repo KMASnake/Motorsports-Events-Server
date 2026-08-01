@@ -34,7 +34,7 @@ const publicSelect = `
   left join circuits ci on ci.id=e.circuit_id
 `;
 const adminSelect = `
-  select e.*,c.name championship_name,c.slug championship_slug,c.active championship_active,
+  select e.*,c.name championship_name,c.slug championship_slug,c.logo_url championship_logo_url,c.active championship_active,
     ci.name circuit_name,ci.city circuit_city,ci.country_code,
     (select count(*)::int from event_corrections ec where ec.event_id=e.id and ec.status in ('active','conflict')) correction_count
   from events e

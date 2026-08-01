@@ -14,6 +14,9 @@
 - chaîne hybride sécurisée d'export, import isolé, anonymisation, vérification
   bloquante et génération déterministe de données réalistes ;
 - tests unitaires, intégration PostgreSQL, Docker et captures Chromium étendus.
+- ajout après recette VPS des drapeaux locaux AU, DE, ES, FR, GB, IT, JP et US ;
+- ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
+  logos autorisées configurées dans l'administration.
 
 ## 8.1.0-alpha.2-lot.4-rev.1 — 2026-08-01
 
