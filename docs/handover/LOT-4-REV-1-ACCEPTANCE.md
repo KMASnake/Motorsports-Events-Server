@@ -2,41 +2,45 @@
 
 ## Technique
 
-- [ ] `npm run build --workspace @mse/web`
-- [ ] `npm run build --workspace @mse/api`
-- [ ] `docker compose up --build`
-- [ ] PostgreSQL healthy
-- [ ] API healthy
-- [ ] Web healthy
-- [ ] `scripts/test-lot4.cmd`
+- [x] `npm run build --workspace @mse/web`
+- [x] `npm run build --workspace @mse/api`
+- [x] `docker compose up --build`
+- [x] PostgreSQL healthy
+- [x] API healthy
+- [x] Web healthy
+- [x] `scripts/test-lot4.cmd`
 
 ## Fonctionnel
 
-- [ ] Calendrier affiché par défaut
-- [ ] Bascule Calendrier/Liste
-- [ ] Liste CRUD conservée
-- [ ] Création depuis calendrier
-- [ ] Création depuis liste
-- [ ] Modification
-- [ ] Publication/dépublication
-- [ ] Suppression
-- [ ] Filtres synchronisés
-- [ ] Sélection synchronisée
-- [ ] Panneau de détail complet
+- [x] Calendrier affiché par défaut
+- [x] Bascule Calendrier/Liste
+- [x] Liste CRUD conservée
+- [x] Création depuis calendrier
+- [x] Création depuis liste
+- [x] Modification
+- [x] Publication/dépublication
+- [x] Suppression
+- [x] Filtres synchronisés
+- [x] Sélection synchronisée
+- [x] Panneau de détail complet
 
 ## API publique
 
-- [ ] Événement publié visible
-- [ ] Brouillon invisible
-- [ ] Événement dépublié invisible
-- [ ] Métadonnées internes absentes
-- [ ] Championnat inactif masqué
+- [x] Événement publié visible
+- [x] Brouillon invisible
+- [x] Événement dépublié invisible
+- [x] Métadonnées internes absentes
+- [x] Championnat inactif masqué
 
 ## UI
 
-- [ ] Maquette 1440×900 comparée
-- [ ] Fidélité >= 95 %
-- [ ] Aucun objectif mobile ajouté
-- [ ] 1280×720 utilisable
-- [ ] Aucun scroll horizontal imprévu
-- [ ] États loading/error/empty présents
+- [x] Maquette 1440×900 comparée
+- [x] Fidélité >= 95 %
+- [x] Aucun objectif mobile ajouté
+- [x] 1280×720 utilisable
+- [x] Aucun scroll horizontal imprévu
+- [x] États loading/error/empty présents
+
+Validation utilisateur confirmée le 1er août 2026 depuis Windows, via un
+tunnel SSH vers le déploiement VPS isolé. Voir
+`LOT-4-REV-1-VPS-VALIDATION.md`.

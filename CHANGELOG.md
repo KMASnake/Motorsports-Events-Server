@@ -13,6 +13,10 @@
 - tests unitaires des règles calendaires et tests Chromium des deux vues ;
 - captures 1440×900 générées pour la validation utilisateur ;
 - aucune modification du schéma PostgreSQL ou des contrats `/api/v1`.
+- validation utilisateur réussie sur un environnement VPS Docker isolé ;
+- API, PostgreSQL, interface, CRUD, publication et non-régression
+  Championnats confirmés ;
+- workflow Python historique limité aux changements de l'ancien serveur.
 
 ## 8.1.0-alpha.2-lot.4 — 2026-07-31
 

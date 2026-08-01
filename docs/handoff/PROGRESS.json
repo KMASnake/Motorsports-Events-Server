@@ -4,8 +4,8 @@
   "lot": 4,
   "revision": 1,
   "updated_at": "2026-08-01",
-  "status": "awaiting-user-visual-validation",
-  "overall_percent": 89,
+  "status": "user-validated-pr-ready",
+  "overall_percent": 95,
   "areas": {
     "docker": 100,
     "database": 95,
@@ -13,17 +13,17 @@
     "design_system_foundations": 82,
     "design_system_components": 45,
     "shell": 96,
-    "events_visual_fidelity": 88,
-    "championships_visual_fidelity": 90,
+    "events_visual_fidelity": 95,
+    "championships_visual_fidelity": 95,
     "events_crud_list": 94,
     "events_calendar_view": 92,
-    "events_tests": 92,
-    "visual_tests": 80,
+    "events_tests": 95,
+    "visual_tests": 95,
     "accessibility": 72
   },
-  "validated_on_user_workstation": false,
+  "validated_on_user_workstation": true,
+  "validated_on_vps": true,
   "known_issues": [
-    "The 95 percent visual fidelity target requires user comparison on the Windows workstation.",
     "The baseline has no ESLint 9 configuration.",
     "npm audit reports an RSC-only React Router advisory; the application is a BrowserRouter SPA without RSC or Server Actions."
   ],
@@ -31,11 +31,14 @@
     "Calendar restored as the default Events view",
     "List and CRUD retained",
     "Shared filters, selection and details panel",
-    "Unit, Docker, API and Chromium validations passed"
+    "Unit, Docker, API and Chromium validations passed",
+    "Isolated VPS deployment validated with database and web health checks",
+    "Calendar, list, CRUD, publishing and Championships non-regression accepted by the user",
+    "Legacy Python CI scoped to legacy server paths"
   ],
   "next_action": {
-    "owner": "User",
-    "task": "Validate the rev.1 candidate and screenshots on Windows.",
+    "owner": "Maintainer",
+    "task": "Review and merge pull request 24 into main, then select the next lot.",
     "target_visual_fidelity": 95
   }
 }
