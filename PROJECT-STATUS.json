@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-08-01",
+  "repository_state": {
+    "root_source": "v8.1.0-alpha.2-lot.4",
+    "status": "working-unvalidated",
+    "reason": "CRUD Events is present, but the validated calendar view disappeared and must be restored."
+  },
+  "last_fully_validated_release": {
+    "version": "v8.1.0-alpha.2-lot.3-rev.5",
+    "validated_on_user_workstation": true,
+    "validated_features": [
+      "Docker Compose",
+      "PostgreSQL healthcheck",
+      "API healthcheck",
+      "Frontend healthcheck",
+      "MEDS foundations",
+      "MEDS global shell",
+      "Championship CRUD",
+      "Championship create/update/delete from API",
+      "Championship delete from web UI",
+      "Docker cleanup and reset scripts"
+    ]
+  },
+  "working_lot_4": {
+    "implemented": [
+      "Events administration CRUD",
+      "Public Events API",
+      "Admin Events API",
+      "Publishing and unpublishing",
+      "Event filters and list view"
+    ],
+    "not_accepted": [
+      "Calendar view disappeared",
+      "Visual fidelity to validated Events mockup is below target",
+      "Lot 4 rev.1 implementation by Codex is pending"
+    ]
+  },
+  "target": {
+    "next_version": "v8.1.0-alpha.2-lot.4-rev.1",
+    "owner": "Codex",
+    "specification": "docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md",
+    "visual_fidelity_target_percent": 95
+  }
+}

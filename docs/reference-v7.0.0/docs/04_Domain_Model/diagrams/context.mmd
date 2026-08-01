@@ -1,0 +1,19 @@
+flowchart TD
+  D[Discipline] --> C[Championnat]
+  C --> K[Catégorie facultative]
+  C --> S1[Saison sans catégorie]
+  K --> S2[Saison de catégorie]
+  S1 --> E1[Épreuve]
+  S2 --> E2[Épreuve]
+  E1 --> X1[Session]
+  E2 --> X2[Session]
+  P[Fournisseur] --> O[Observation brute]
+  O --> M[Matching / Mapping]
+  M --> C
+  M --> K
+  M --> S1
+  M --> E1
+  MAN[Création manuelle] --> C
+  MAN --> K
+  MAN --> S1
+  MAN --> E1

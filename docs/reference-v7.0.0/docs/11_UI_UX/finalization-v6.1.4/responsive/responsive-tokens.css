@@ -1,0 +1,22 @@
+:root {
+  --mse-breakpoint-mobile: 600px;
+  --mse-breakpoint-tablet: 900px;
+  --mse-breakpoint-desktop: 1200px;
+  --mse-sidebar-expanded: 215px;
+  --mse-sidebar-compact: 72px;
+}
+@media (max-width: 1199px) {
+  .mse-sidebar { width: var(--mse-sidebar-compact); }
+  .mse-content { margin-left: var(--mse-sidebar-compact); }
+}
+@media (max-width: 899px) {
+  .mse-sidebar { transform: translateX(-100%); }
+  .mse-sidebar[data-open="true"] { transform: translateX(0); }
+  .mse-content { margin-left: 0; }
+  .mse-grid-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 599px) {
+  .mse-grid-kpi { grid-template-columns: 1fr; }
+  .mse-dialog { width: 100vw; min-height: 100dvh; border-radius: 0; }
+  .mse-table-wrap { overflow-x: auto; }
+}

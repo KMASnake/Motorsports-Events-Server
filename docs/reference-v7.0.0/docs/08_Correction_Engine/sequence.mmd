@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant U as User
+  participant A as Admin API
+  participant C as Correction Service
+  participant R as Review Service
+  participant O as Override Manager
+  participant D as Canonical Store
+  participant P as Publication
+
+  U->>A: create correction
+  A->>C: validate and save draft
+  U->>A: submit
+  A->>R: request review
+  R-->>A: approved
+  A->>O: activate override
+  O->>D: apply effective value
+  O->>P: publish changed snapshot

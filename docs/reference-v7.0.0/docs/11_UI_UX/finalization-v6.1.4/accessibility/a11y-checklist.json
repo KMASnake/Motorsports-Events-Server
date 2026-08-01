@@ -1,0 +1,15 @@
+{
+  "standard": "WCAG 2.2 AA",
+  "checks": [
+    "keyboard_navigation",
+    "visible_focus",
+    "contrast",
+    "form_labels",
+    "error_association",
+    "aria_live",
+    "dialog_focus_trap",
+    "reduced_motion",
+    "touch_target",
+    "non_color_status"
+  ]
+}

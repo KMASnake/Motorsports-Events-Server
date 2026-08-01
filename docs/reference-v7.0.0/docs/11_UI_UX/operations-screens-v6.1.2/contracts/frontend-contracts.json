@@ -1,0 +1,59 @@
+{
+  "circuits": {
+    "endpoint": "/api/v1/admin/circuits",
+    "listFields": [
+      "id",
+      "name",
+      "city",
+      "countryCode",
+      "variantCount",
+      "latitude",
+      "longitude",
+      "upcomingEventCount",
+      "qualityScore",
+      "status",
+      "updatedAt"
+    ]
+  },
+  "api": {
+    "endpoints": [
+      "/api/v1/admin/api/metrics",
+      "/api/v1/admin/api-keys"
+    ],
+    "secretPolicy": "returned-once-on-create",
+    "keyFields": [
+      "id",
+      "label",
+      "prefix",
+      "owner",
+      "scopes",
+      "lastUsedAt",
+      "expiresAt",
+      "status"
+    ]
+  },
+  "observabilite": {
+    "endpoint": "/api/v1/admin/observability/overview",
+    "fields": [
+      "generatedAt",
+      "period",
+      "services",
+      "timeseries",
+      "incidents",
+      "deployments"
+    ]
+  },
+  "journaux": {
+    "endpoint": "/api/v1/admin/logs",
+    "pagination": "cursor",
+    "fields": [
+      "timestamp",
+      "level",
+      "service",
+      "message",
+      "correlationId",
+      "durationMs",
+      "context"
+    ]
+  }
+}

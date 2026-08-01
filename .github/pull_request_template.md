@@ -1,13 +1,37 @@
-## Description
+## Version / lot
 
-## Impact API
+## Objectif
 
-- [ ] Aucun changement
-- [ ] Changement rétrocompatible
-- [ ] Rupture nécessitant une nouvelle version d’API
+## Maquette de référence
 
-## Vérifications
+## Changements
 
-- [ ] `./scripts/validate-repository.sh`
-- [ ] Tests ajoutés ou adaptés
-- [ ] Documentation mise à jour
+## Tests exécutés
+
+- [ ] Build web
+- [ ] Build API
+- [ ] Docker Compose
+- [ ] Healthchecks
+- [ ] Validation du lot
+- [ ] Test visuel 1440×900
+- [ ] Test 1280×720
+
+## Fidélité visuelle
+
+Pourcentage mesuré :
+
+Écarts résiduels :
+
+## Non-régression
+
+- [ ] Championnats
+- [ ] API publique
+- [ ] API admin
+- [ ] Scripts Windows
+- [ ] Cleanup/reset
+
+## Documentation
+
+- [ ] PROJECT-STATUS.json mis à jour
+- [ ] PROGRESS.json mis à jour
+- [ ] Captures jointes

@@ -1,0 +1,6 @@
+body{margin:0;background:#090d12;color:#e7edf5;font-family:Inter,system-ui,sans-serif}
+header{padding:18px 24px;background:#0b1016;border-bottom:1px solid #25303b}
+nav{display:flex;gap:10px;padding:14px 24px;background:#0d1219}
+button{background:#111821;color:#e7edf5;border:1px solid #25303b;border-radius:6px;padding:10px 14px;cursor:pointer}
+button:hover,button:focus-visible{border-color:#d7252a;outline:none}
+main{padding:20px;text-align:center}img{max-width:100%;height:auto;border:1px solid #25303b}

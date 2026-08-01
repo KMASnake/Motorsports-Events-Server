@@ -1,0 +1,67 @@
+.ds-card {
+  background: var(--meds-surface, #0b1822);
+  border: 1px solid var(--meds-border, #203542);
+  border-radius: var(--meds-radius-card, 6px);
+}
+
+.ds-icon-button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 6px;
+}
+
+.ds-button-ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+.ds-metric-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.ds-metric-card > span,
+.ds-metric-card > small {
+  color: var(--meds-text-muted, #718594);
+}
+
+.ds-metric-card > strong {
+  font-size: 24px;
+}
+
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 7px;
+  font-size: 10px;
+}
+
+.ds-badge.green { color: #7fe536; background: #17371a; }
+.ds-badge.amber { color: #f5b942; background: #3a2a0c; }
+.ds-badge.red { color: #ff5c64; background: #40151a; }
+.ds-badge.blue { color: #48bafa; background: #10344a; }
+.ds-badge.muted { color: #9cacb8; background: #24313a; }
+
+.ds-progress {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #243642;
+}
+
+.ds-progress > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #6fd31c;
+  transition: width 150ms ease-out;
+}
+
+.ds-progress.amber > i { background: #f5a500; }
+.ds-progress.red > i { background: #ef3038; }
+.ds-progress.blue > i { background: #21a9ef; }
+.ds-progress.muted > i { background: #718594; }

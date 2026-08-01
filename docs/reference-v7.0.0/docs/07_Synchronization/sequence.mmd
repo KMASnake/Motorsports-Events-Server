@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant S as Scheduler
+  participant O as Orchestrator
+  participant A as Provider Adapter
+  participant R as Raw Store
+  participant N as Normalizer
+  participant M as Matching/Merge
+  participant C as Canonical Store
+  participant P as Publication
+
+  S->>O: request sync
+  O->>O: acquire lock
+  O->>A: fetch page
+  A-->>O: raw response
+  O->>R: persist raw observation
+  O->>N: normalize
+  N-->>O: normalized observations
+  O->>M: match and merge
+  M->>C: persist decisions
+  O->>P: publish if changed
+  O->>O: release lock and finalize

@@ -1,0 +1,3904 @@
+{
+  "name": "Motorsports Events Server GitHub Handover",
+  "generated_at": "2026-08-01",
+  "root_working_version": "v8.1.0-alpha.2-lot.4",
+  "last_validated_version": "v8.1.0-alpha.2-lot.3-rev.5",
+  "file_count": 779,
+  "files": [
+    {
+      "path": ".env.example",
+      "bytes": 291,
+      "sha256": "21d925ac1c619da96309c12211f3f676eac820f3220ca9e541b96a869d7dcdb2"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/codex-lot-4-rev-1.md",
+      "bytes": 543,
+      "sha256": "abc4531ac36915b77167617aa989254baa1171967c7c95de722b7911d2070866"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/ui-fidelity.md",
+      "bytes": 288,
+      "sha256": "849747c1d098617ee049700b0ce1c75eb3d9db79cf99bc484f933a798445bf10"
+    },
+    {
+      "path": ".github/PULL_REQUEST_TEMPLATE.md",
+      "bytes": 329,
+      "sha256": "0813b29033028cd09cdc1019fc3800fba361ca9341ff7bb368a50e4d29fa77a9"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "bytes": 539,
+      "sha256": "d986a3a754055a320385e5611786ef2816488fe2ac00aefdfbc633b905b058f1"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 334,
+      "sha256": "bd324e423e3ecbf78433e26625cf0a70e03448555f7c3115be24dab2ec2f7c1a"
+    },
+    {
+      "path": ".github/workflows/docker.yml",
+      "bytes": 275,
+      "sha256": "abd7d244f82b754db997d8e1ed59504485fdf2889a407d01846e9587149a9271"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 108,
+      "sha256": "ddd51987011cef9fa54470121c2d8a31690db026ae2e984d54642be23fb5808b"
+    },
+    {
+      "path": "BUILD-LOT3-VALIDATION.json",
+      "bytes": 8046,
+      "sha256": "72706930fde53d662ebb559ea7f5ad52c1869ad2951b33db524976f33dbe261e"
+    },
+    {
+      "path": "BUILD-VALIDATION.json",
+      "bytes": 174,
+      "sha256": "5fd3b4f8043b147430405c39925366e4439239b358dabc58eb6b2db1f643635c"
+    },
+    {
+      "path": "BUILD-VALIDATION.log",
+      "bytes": 552,
+      "sha256": "c5427613a33d64d25ad2248ed70db511be7886250db89868cd28597d21ee2f25"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 4238,
+      "sha256": "fceb688d9e7fff3f4a51082be823a4abe36f49448126eed5cde3a1152f434916"
+    },
+    {
+      "path": "CODEX.md",
+      "bytes": 1477,
+      "sha256": "b2e6db3dc6cb8c9fba7968461083c9477d6c7c2d51295f14b57ed6798b6fc6ab"
+    },
+    {
+      "path": "Makefile",
+      "bytes": 198,
+      "sha256": "9b76a615363912ffddb42f40d12c18fcfa7f50f8578b9b5dce19002a230855b4"
+    },
+    {
+      "path": "PROJECT-STATUS.json",
+      "bytes": 1339,
+      "sha256": "4a271084278bcf468f9fc1d16524dc78bd2c9f8970d54fe6bc00de3249cd4d66"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2040,
+      "sha256": "f9360e3eeb5dc61d052afa3ed08caa4c1fe159caa8bd48a144cfd35267a269e4"
+    },
+    {
+      "path": "SCRIPT-VALIDATION.json",
+      "bytes": 919,
+      "sha256": "8be89f498c8e8ce7e089a40cbb9454661779c4ea464f5c6bbe1668edee2cf273"
+    },
+    {
+      "path": "TESTING.md",
+      "bytes": 255,
+      "sha256": "f264d07833590e0d4f95112b8695a0db352794f754762ec6ee70b587d5303e7f"
+    },
+    {
+      "path": "VERSION.json",
+      "bytes": 294,
+      "sha256": "dbd26db09c4e9bdcd6d3da74d5d0cd66b5a4dab859840d3df206acbac947dca1"
+    },
+    {
+      "path": "apps/api/Dockerfile",
+      "bytes": 566,
+      "sha256": "0b2e84c3fb12c0c2be2e37af7ebc9f92d5cb65e246f2b5fa38f0fccc8536a041"
+    },
+    {
+      "path": "apps/api/dist/lib/db.js",
+      "bytes": 282,
+      "sha256": "d57c63575f839f52cb39a61922a38401946e198e9bd3cabbf04205690e6033ad"
+    },
+    {
+      "path": "apps/api/dist/routes/catalog.js",
+      "bytes": 1024,
+      "sha256": "9aa19df0099ea86ade2d96f762d8e041ce950caeab36e523146de01c7c45c963"
+    },
+    {
+      "path": "apps/api/dist/routes/championships.js",
+      "bytes": 6094,
+      "sha256": "c8263393c039e7f28af2638913b20604344284116953ad5b5851b235e7980964"
+    },
+    {
+      "path": "apps/api/dist/routes/dashboard.js",
+      "bytes": 653,
+      "sha256": "b74308aefe5e3a4ddb237d11ad6a772cd1ccb095714f8c34f73587929151f749"
+    },
+    {
+      "path": "apps/api/dist/routes/health.js",
+      "bytes": 513,
+      "sha256": "77ba4677a1c56533574b968e984fc4793327a76fde1ddc75f1071c39145086a4"
+    },
+    {
+      "path": "apps/api/dist/server.js",
+      "bytes": 705,
+      "sha256": "7058eff21f58253e70b8c8bd69eb41adec59aabe0c4e5ff824c10420e3189f01"
+    },
+    {
+      "path": "apps/api/package.json",
+      "bytes": 646,
+      "sha256": "880b18c9a4f0f38f8131eb4ecff0edb13bb9b0bb527e847a21b5ccae85d0139c"
+    },
+    {
+      "path": "apps/api/src/lib/db.ts",
+      "bytes": 278,
+      "sha256": "34aa6026ec9c1bd09a2d313eb74ce3b45e288e361b4558c6a4c1ba5d986c0573"
+    },
+    {
+      "path": "apps/api/src/routes/catalog.ts",
+      "bytes": 284,
+      "sha256": "d36659d49d58b885b8851e8e009d5a359003bfb81630695f5894c662d429634e"
+    },
+    {
+      "path": "apps/api/src/routes/championships.ts",
+      "bytes": 6022,
+      "sha256": "ea871c2d7ea549313307d6e2dac07fd7e59fe265ede6755f118cd1a1c4d56a56"
+    },
+    {
+      "path": "apps/api/src/routes/dashboard.ts",
+      "bytes": 673,
+      "sha256": "4bb49f86c8cf9d9c4092bde00275b9fee59d0413e9717926f4ce9d1ec9e45009"
+    },
+    {
+      "path": "apps/api/src/routes/events.ts",
+      "bytes": 8815,
+      "sha256": "a8edf94be1cec6a8f9f17b025f123360fe5dd0ae9dbee62c41136ed3e6ba2caa"
+    },
+    {
+      "path": "apps/api/src/routes/health.ts",
+      "bytes": 544,
+      "sha256": "022040bb632331015fa97d97dee8f8b793014dc4131b31a6f7ce636db948eb54"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "bytes": 1299,
+      "sha256": "4e55c3306353ab7ce2a05163209e88c3f86a8f13da1f34fd7439d2a68410fe42"
+    },
+    {
+      "path": "apps/api/tests/health.test.ts",
+      "bytes": 196,
+      "sha256": "3e3f86fadfb9bd0d50cb74d2f93fb6b5e08a1276f1e8d285b46f00a4905eec76"
+    },
+    {
+      "path": "apps/api/tsconfig.json",
+      "bytes": 264,
+      "sha256": "66f329026df785839f8d975eef6cf9a0004e66d7f52fc7ca3055b846a69055a5"
+    },
+    {
+      "path": "apps/web/Dockerfile",
+      "bytes": 412,
+      "sha256": "4b46d3429601df66ca11ad6d5b84d6473ca80871a3cd28e6a5d5bcfb10ac54f9"
+    },
+    {
+      "path": "apps/web/index.html",
+      "bytes": 267,
+      "sha256": "a140c70a54f4d88bd7da2aab0a4b31edf64ef621d13c3cb157dd71246be8623c"
+    },
+    {
+      "path": "apps/web/nginx.conf",
+      "bytes": 277,
+      "sha256": "308a8ac2c35e1b9e222b675a007c5b0a8153a9ac90b088713a20c44c70c3836d"
+    },
+    {
+      "path": "apps/web/package.json",
+      "bytes": 694,
+      "sha256": "38dc000a8c2412ab4ec2cd337ed35b227c4c28b6a8cb02a56047aa33a07c102d"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "bytes": 8506,
+      "sha256": "35b04fc5a447e70b2bcc71243d4d42de6092107b3e5074702207d3c3c5daed71"
+    },
+    {
+      "path": "apps/web/src/design-system/README.md",
+      "bytes": 388,
+      "sha256": "95fd4a8057c291159eece39fbbabe15238dd3b92fac11b6f688bed53f357f720"
+    },
+    {
+      "path": "apps/web/src/design-system/components/index.tsx",
+      "bytes": 3213,
+      "sha256": "bbeb52c41316d408469f968fcdc0724f9d950e63915d0a78c76ecf8101f15896"
+    },
+    {
+      "path": "apps/web/src/design-system/components.css",
+      "bytes": 1404,
+      "sha256": "0aef2fd9ccc1aa3b0a5c709d881c7b9b8ece3974f16d76c9c370307292c708c0"
+    },
+    {
+      "path": "apps/web/src/design-system/index.ts",
+      "bytes": 100,
+      "sha256": "dbb141d24db682273a1f8920f4e0e5de2b2af5edd8e0504f9cc9bc72aa197beb"
+    },
+    {
+      "path": "apps/web/src/design-system/layout/AppShell.tsx",
+      "bytes": 821,
+      "sha256": "ebf2d8c5389a56f493e423c8638007a012e5a1de0a419bfca4b60b933827a0b6"
+    },
+    {
+      "path": "apps/web/src/design-system/layout/PageHeader.tsx",
+      "bytes": 379,
+      "sha256": "6bf9da89460c6b3cee91dc197c2d57adab619f0b52ead9107b02abbb84351e7c"
+    },
+    {
+      "path": "apps/web/src/design-system/layout/Sidebar.tsx",
+      "bytes": 1521,
+      "sha256": "322540490bff97824192026a7d2d0ba56f02b26e29490e30d32c2ed85d37b5c4"
+    },
+    {
+      "path": "apps/web/src/design-system/layout/Topbar.tsx",
+      "bytes": 1584,
+      "sha256": "f635d5128099b3ac67d6c786977eb445e4c46965cff3ee30688379bde044c291"
+    },
+    {
+      "path": "apps/web/src/design-system/layout/icons.tsx",
+      "bytes": 3231,
+      "sha256": "7852aa9c6be9ad32c6b7604bf37a981e9ceff4aebf597bba8db69994e140dbd8"
+    },
+    {
+      "path": "apps/web/src/design-system/layout/index.ts",
+      "bytes": 113,
+      "sha256": "1c7e33bd1cda006e2b16a3f94f75b4bc717d6d0493e7266dd8ee00c870029c1e"
+    },
+    {
+      "path": "apps/web/src/design-system/layout/navigation.ts",
+      "bytes": 2266,
+      "sha256": "2e877d0608f428abbeb7a09a1845c75e934ad3275c74bab0bce1feb0ac7a561b"
+    },
+    {
+      "path": "apps/web/src/design-system/tokens/index.ts",
+      "bytes": 1069,
+      "sha256": "f8e74b04b68d1c6f1194636e62159557210b4c2b677842ecccac50973d330ea8"
+    },
+    {
+      "path": "apps/web/src/design-system/tokens.css",
+      "bytes": 1058,
+      "sha256": "919b7532ae8fb859b63d99c8f91a93147abbc6f9fa1688fe77bc1730e6f75e2a"
+    },
+    {
+      "path": "apps/web/src/design-system/tokens.json",
+      "bytes": 436,
+      "sha256": "ba527504116b1ba9f4ffdb0708da752b135b552ac9bf488c1f530ddf60de5205"
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "bytes": 375,
+      "sha256": "f535cd1d9b892d545c3b24803920bc3a0bca2ced3d4806b7bd4aeb1f740a8e9f"
+    },
+    {
+      "path": "apps/web/src/pages/ChampionshipsPage.tsx",
+      "bytes": 11391,
+      "sha256": "0794f0402eebeda0f692550be161c86ac07581c1b09c84df3317e1aeb52928fd"
+    },
+    {
+      "path": "apps/web/src/pages/EventsPage.tsx",
+      "bytes": 13011,
+      "sha256": "fd1fd5cb4ba1d152349666274cf3641d351a991e0b83f5dcb9938c6fa5939b2e"
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "bytes": 18904,
+      "sha256": "98cc34db8263dc82a554b20ddb6a0b2132b58ca4c18541e0c209448e3c2f6dcd"
+    },
+    {
+      "path": "apps/web/src/vite-env.d.ts",
+      "bytes": 158,
+      "sha256": "e0d4ed2617fce78e328dce5b4ecaa05bf664570fb762c2b6e92ba9f74b1ba860"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "bytes": 538,
+      "sha256": "252d1b5e7ec9db2367c73ed96817c3a268faed85696418a77ba36e77035e68a3"
+    },
+    {
+      "path": "apps/web/tsconfig.tsbuildinfo",
+      "bytes": 532,
+      "sha256": "3483ef0172a176142d2626691ea3d2b74ba288d14aa07692fc0255ac0f508f2e"
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "bytes": 135,
+      "sha256": "74b09cebcffb3a70d459d02d886dbbe7d2aef0332fb1b1bd729c83d586b90e9a"
+    },
+    {
+      "path": "docker-compose.yml",
+      "bytes": 1557,
+      "sha256": "2e1fbf5da520e799c62ff5b8f029e02c4b6352dbaf4d8f6d1ce1d0e6e5993933"
+    },
+    {
+      "path": "docs/handoff/CODEX-HANDOFF.md",
+      "bytes": 553,
+      "sha256": "282757bea211f31ec33898cd063fbee87c7648b0800218ffb33124ac45b132bd"
+    },
+    {
+      "path": "docs/handoff/LOT-1-FOUNDATIONS.md",
+      "bytes": 1252,
+      "sha256": "68752d305a5649d022dfed79cffd0ad1238b7d07b01c104a8d1369fa726c0245"
+    },
+    {
+      "path": "docs/handoff/LOT-2-REV-1.md",
+      "bytes": 581,
+      "sha256": "9f415c1d77d27e9ae1bd4af54291ac9e715fa3fa291d8e16e3855c78878eca9e"
+    },
+    {
+      "path": "docs/handoff/LOT-2-REV-2.md",
+      "bytes": 564,
+      "sha256": "1a786e802a8e88b64c38554016a5d2a83865ff2c6ee1e47e64120ca13d1ec0ba"
+    },
+    {
+      "path": "docs/handoff/LOT-2-SHELL.md",
+      "bytes": 1203,
+      "sha256": "3fbc437380039aba5c1beac87ca39cbef1455ab7d5b6a8c6d5566bcb30d04a79"
+    },
+    {
+      "path": "docs/handoff/LOT-3-CHAMPIONSHIPS.md",
+      "bytes": 861,
+      "sha256": "d94c334a8c840a4f6f993185b4cbe81dbd233d73cdfac44ee7a1464056ede269"
+    },
+    {
+      "path": "docs/handoff/LOT-3-REV-1.md",
+      "bytes": 574,
+      "sha256": "dbbd92099aadb382fab6caaacf44501a2360035ca33bc47106281f72d9100bba"
+    },
+    {
+      "path": "docs/handoff/LOT-3-REV-2.md",
+      "bytes": 557,
+      "sha256": "637af7ffb7fa2d8761b1423c656c9ab9294632ed9162893b3a9879b64e6ef1f9"
+    },
+    {
+      "path": "docs/handoff/LOT-3-REV-3.md",
+      "bytes": 709,
+      "sha256": "538e6d7f98fdf131f5c224e9e8f7007fb88980476fab93e8d0dda96b5cbaef9d"
+    },
+    {
+      "path": "docs/handoff/LOT-3-REV-4.md",
+      "bytes": 404,
+      "sha256": "c1f52fdc01bf74e7a195d1d3fe3137746b439361ab53e3bb6f40e8e774802e22"
+    },
+    {
+      "path": "docs/handoff/LOT-3-REV-5.md",
+      "bytes": 592,
+      "sha256": "e2ba9d70a57561aec84b469a3e254127800342f8e456e2e674bc03851d80961d"
+    },
+    {
+      "path": "docs/handoff/LOT-4-EVENTS.md",
+      "bytes": 838,
+      "sha256": "4f8f41fd919d991bffde1e2329c3bafc667c13edbebeda403846d31795cfdd20"
+    },
+    {
+      "path": "docs/handoff/PROGRESS.json",
+      "bytes": 1070,
+      "sha256": "f89cbdc92d6e1082b874362e2977b7a9c2978c4c21a28fbf99a1b8e1a477fc6f"
+    },
+    {
+      "path": "docs/handoff/UI-FIDELITY-CHECKLIST.md",
+      "bytes": 625,
+      "sha256": "43fae7af0770b002e7ffd845182a49eb19441e5f16a6b0872f39e4b1b7783c77"
+    },
+    {
+      "path": "docs/handoff/UI_CONTRACT.md",
+      "bytes": 641,
+      "sha256": "455b8d453110542858e7ceb81dee6b278ea6f1afdf6f56dc0b247ee3ffd72d9d"
+    },
+    {
+      "path": "docs/handover/CODEX-EXECUTION-PROMPT-LOT-4-REV-1.md",
+      "bytes": 931,
+      "sha256": "9ee55e57f21704b87a29a169b7689045321908f6f51567e608ce1aeb387dc291"
+    },
+    {
+      "path": "docs/handover/CODEX-HANDOFF.md",
+      "bytes": 553,
+      "sha256": "282757bea211f31ec33898cd063fbee87c7648b0800218ffb33124ac45b132bd"
+    },
+    {
+      "path": "docs/handover/GITHUB-PUBLISH.md",
+      "bytes": 605,
+      "sha256": "785a67ae744db9f52f2bae4a0e2de1d68170cb31a39bac9462cdcb5f3ac2f10f"
+    },
+    {
+      "path": "docs/handover/LOT-1-FOUNDATIONS.md",
+      "bytes": 1252,
+      "sha256": "68752d305a5649d022dfed79cffd0ad1238b7d07b01c104a8d1369fa726c0245"
+    },
+    {
+      "path": "docs/handover/LOT-2-REV-1.md",
+      "bytes": 581,
+      "sha256": "9f415c1d77d27e9ae1bd4af54291ac9e715fa3fa291d8e16e3855c78878eca9e"
+    },
+    {
+      "path": "docs/handover/LOT-2-REV-2.md",
+      "bytes": 564,
+      "sha256": "1a786e802a8e88b64c38554016a5d2a83865ff2c6ee1e47e64120ca13d1ec0ba"
+    },
+    {
+      "path": "docs/handover/LOT-2-SHELL.md",
+      "bytes": 1203,
+      "sha256": "3fbc437380039aba5c1beac87ca39cbef1455ab7d5b6a8c6d5566bcb30d04a79"
+    },
+    {
+      "path": "docs/handover/LOT-3-CHAMPIONSHIPS.md",
+      "bytes": 861,
+      "sha256": "d94c334a8c840a4f6f993185b4cbe81dbd233d73cdfac44ee7a1464056ede269"
+    },
+    {
+      "path": "docs/handover/LOT-3-REV-1.md",
+      "bytes": 574,
+      "sha256": "dbbd92099aadb382fab6caaacf44501a2360035ca33bc47106281f72d9100bba"
+    },
+    {
+      "path": "docs/handover/LOT-3-REV-2.md",
+      "bytes": 557,
+      "sha256": "637af7ffb7fa2d8761b1423c656c9ab9294632ed9162893b3a9879b64e6ef1f9"
+    },
+    {
+      "path": "docs/handover/LOT-3-REV-3.md",
+      "bytes": 709,
+      "sha256": "538e6d7f98fdf131f5c224e9e8f7007fb88980476fab93e8d0dda96b5cbaef9d"
+    },
+    {
+      "path": "docs/handover/LOT-3-REV-4.md",
+      "bytes": 404,
+      "sha256": "c1f52fdc01bf74e7a195d1d3fe3137746b439361ab53e3bb6f40e8e774802e22"
+    },
+    {
+      "path": "docs/handover/LOT-3-REV-5.md",
+      "bytes": 592,
+      "sha256": "e2ba9d70a57561aec84b469a3e254127800342f8e456e2e674bc03851d80961d"
+    },
+    {
+      "path": "docs/handover/LOT-4-EVENTS.md",
+      "bytes": 838,
+      "sha256": "4f8f41fd919d991bffde1e2329c3bafc667c13edbebeda403846d31795cfdd20"
+    },
+    {
+      "path": "docs/handover/LOT-4-REV-1-ACCEPTANCE.md",
+      "bytes": 1021,
+      "sha256": "7be663ef9f403d209d277e325e71dbbb739568cf86cec8237be6eed740eef022"
+    },
+    {
+      "path": "docs/handover/LOT-4-REV-1-ADR.md",
+      "bytes": 881,
+      "sha256": "1d26da0f1e790e355d67c51b5e767a04f4eab660feb545a94eb92c7f16bdd503"
+    },
+    {
+      "path": "docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md",
+      "bytes": 9240,
+      "sha256": "31ba504e94fd8b5a28b3b29e67141a72ddb8ea3e8b0fc6762d1f05df9a38ca05"
+    },
+    {
+      "path": "docs/handover/PROGRESS.json",
+      "bytes": 1426,
+      "sha256": "54f79997f8040f5545cd96221d29c8b630d0c3999916d5cbe965d8abbd6fb7c3"
+    },
+    {
+      "path": "docs/handover/UI-FIDELITY-CHECKLIST.md",
+      "bytes": 625,
+      "sha256": "43fae7af0770b002e7ffd845182a49eb19441e5f16a6b0872f39e4b1b7783c77"
+    },
+    {
+      "path": "docs/handover/UI_CONTRACT.md",
+      "bytes": 641,
+      "sha256": "455b8d453110542858e7ceb81dee6b278ea6f1afdf6f56dc0b247ee3ffd72d9d"
+    },
+    {
+      "path": "docs/handover/VALIDATED-HISTORY.md",
+      "bytes": 1369,
+      "sha256": "55cb222256c5f0034a4dee5d119ac629785601a1dedb7458e09b0960320eca3c"
+    },
+    {
+      "path": "docs/reference/Motorsports-Events-Component-States-v6.1.md",
+      "bytes": 13361,
+      "sha256": "86450e66829f30b27be67c48314abf7b8bcd31fb49f298a9d4283c4bf8d6bcb8"
+    },
+    {
+      "path": "docs/reference/Motorsports-Events-Pixel-Spec-v6.1.md",
+      "bytes": 10008,
+      "sha256": "85559031b5b9b28cb3798e1eee538a8e82634cbda3179165d432099ae773022a"
+    },
+    {
+      "path": "docs/reference/Motorsports-Events-UI-Audit-v6.1.md",
+      "bytes": 9176,
+      "sha256": "1ce443100115ed780653790fbf39058a9431df7204c93ba6307a9ccd5d1f461c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/CHANGELOG.md",
+      "bytes": 6900,
+      "sha256": "98f50be5ecc52f4162de84301f49299cd415ef20b10a099a2b7aa4660499e717"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/README.md",
+      "bytes": 606,
+      "sha256": "cce4441899cd4eee7c70683f58e1e04169e089dd3c810260a759efa8b10b7bf8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/ROADMAP.md",
+      "bytes": 181,
+      "sha256": "684250bc4df345de7d1e1c5e5e05e8640183e511654fb1bcc173fbb359da5c82"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/SHA256SUMS.txt",
+      "bytes": 35911,
+      "sha256": "84d46a6a99b4e270b1ff9bef749bd6579a7be868c0e0a06f3eac1406b28457bc"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/VERSION.json",
+      "bytes": 153,
+      "sha256": "a6ff3f25ce0494af0121f16a001179cd77274a6944b4d39d91f76ae045913173"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/contact-sheet-v6.1.3.png",
+      "bytes": 236602,
+      "sha256": "31a6934b6d3d95b4af682380a4829a8b2761829c7c1afe0acaa676bbbb3e004e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/contact-sheet.png",
+      "bytes": 706116,
+      "sha256": "5a86e55a45ad40c0fff5c8fe0fba18b453f7605fa5d930d180407fc32bbc106e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/00_Project/README.md",
+      "bytes": 312,
+      "sha256": "78ab4e16af64124687cc2deea725c970978b109ca2560391fd1e535d60e9691b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/00_Project/codex-readiness.md",
+      "bytes": 653,
+      "sha256": "fccde295e4ada1dd27d5bd6d74639fe76a923f7a95b33ea3da108768e5bfa8ae"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/00_Project/consistency-report-v6.1.md",
+      "bytes": 574,
+      "sha256": "82e190aa4d2f95b7a46288ac576ba4453e5ec28e724319a06339c05537b962a7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/00_Project/global-documentation-index.md",
+      "bytes": 835,
+      "sha256": "f93828cae9d7f32b86160b311e9b2a28d7d2076a8471193fa04e0586f7887d67"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/00_Project/glossary.md",
+      "bytes": 983,
+      "sha256": "a62dc4d66413460882a27b08fd533142f4c56bedaf399d8f3a2735b7ef03a371"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/00_Project/scope.md",
+      "bytes": 793,
+      "sha256": "e9c00c30a208118003a39ae9b1afbaddd9f2a9244542c1adf37a9f49f4073456"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/01_Product_Vision/glossary.md",
+      "bytes": 983,
+      "sha256": "a62dc4d66413460882a27b08fd533142f4c56bedaf399d8f3a2735b7ef03a371"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/01_Product_Vision/personas.md",
+      "bytes": 491,
+      "sha256": "ef8088c5875c8aa6319bbaaf6a54da674f3611ae09fe990792e91cdcf03598b6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/01_Product_Vision/vision.md",
+      "bytes": 495,
+      "sha256": "5d95cb13ad05262c8c84459b7bac03c3d905c1d03ef7fbde4e7ef0e856f2aba6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/02_Functional_Specifications/core-capabilities.md",
+      "bytes": 894,
+      "sha256": "e08467f78e9623cc1ca32f350a6995cc3e93c431deaa429adcfc817d94aa50cf"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/02_Functional_Specifications/manual-data-creation.md",
+      "bytes": 739,
+      "sha256": "11fd4e202bb29a614e02153bb99148ec8b4752e4d76074cc0268c9b6f6f5e7ad"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/03_Business_Rules/core-rules.md",
+      "bytes": 2701,
+      "sha256": "d9613179f7933934d0b5d0996edd043d887bdbd6fadc458db9ce5fa54b815866"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/README.md",
+      "bytes": 569,
+      "sha256": "08f0d5d3bc844685085fb02f261baaf32856a7105895a835a8bb345c9095c62b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/aggregate-roots.md",
+      "bytes": 525,
+      "sha256": "5841f935d5d82a587739614a73403fd2e27228ae37bb1c35030368dc2300f8bb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/bounded-contexts.md",
+      "bytes": 450,
+      "sha256": "c1e4fabea3a8636f4d5002ee68e5310cd6bebe557c5553e9031506bca6a37cc2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/diagrams/context.mmd",
+      "bytes": 420,
+      "sha256": "6f6d628b86485511652b36b835c65d4ffb5f8efdc8c442bb7444ea054b799bbe"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/domain-events.md",
+      "bytes": 502,
+      "sha256": "5b0b194e969680e055ec4f7cd05ae7e7bc8fa04c4fb17e2080ac58274fd65829"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/domain-services.md",
+      "bytes": 482,
+      "sha256": "5e3c3e5997c12dc6ae5f9c544cf5bde61a9d6fe933eb92a60a341adc270f2955"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/AuditEntry.md",
+      "bytes": 430,
+      "sha256": "80667b90b63066486a36c591e08273a349a89989e5d63638fd19ce2da54376c5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Category.md",
+      "bytes": 463,
+      "sha256": "cda2d1863405ac244cf35dafd56d4d476af98fbe82ac8361d9351bfbea5000dd"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Championship.md",
+      "bytes": 544,
+      "sha256": "e8d5f34dd040d15be009e5cf4a195be59bad8cc2410d1e59e192b756dd0abdc8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Circuit.md",
+      "bytes": 448,
+      "sha256": "91b7eab3c22082ca759cdc5511835bf639440422bc0b7f9733df9dbde018b526"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Conflict.md",
+      "bytes": 500,
+      "sha256": "31d01e2c54a060a34eceaf7e903caba520f32b7026ca3f911fc80fe912b5cd61"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Correction.md",
+      "bytes": 539,
+      "sha256": "282fd0158d9218d5b6bde2b63ca9198a62d59e7f3feff96990c02d93c38e703f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Discipline.md",
+      "bytes": 430,
+      "sha256": "41c74987eb4e22df235aed5e37c9bada06c749396112c412a37fbec81d0a52ef"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Event.md",
+      "bytes": 423,
+      "sha256": "7afc2698b34404b6bdc7dc169d352542d9bb5f7b8ce4ca3023041262d460e1c4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Override.md",
+      "bytes": 459,
+      "sha256": "b893fdfabf8ef4fca1bc45490db05708f76db332ebcb0733443c5330241bfe01"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Provider.md",
+      "bytes": 502,
+      "sha256": "c8b8ea48549a4ecd22512da5cc5969000d008f3f02bf3fb93c360dbb62faa310"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/RawObservation.md",
+      "bytes": 524,
+      "sha256": "0ee948f03ceb8fdd7e5d1318a684d3c9f47911b5e5291a44bd6dccb29fe2a63d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Season.md",
+      "bytes": 594,
+      "sha256": "ab3e6cabd020f7c2be4008b3c42bd5e69fa2730be9e397a8b640eae33797ef22"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Session.md",
+      "bytes": 568,
+      "sha256": "b880e4d162c6ab1a686f1f0f0ba38111f5df17d947e2d160581ab5efd0db9a07"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/04_Domain_Model/entities/Synchronization.md",
+      "bytes": 545,
+      "sha256": "4e9e99f024891365c61bf5475fd2bb572eb1f4ae4e62478fc8ee4d2fd06d1cd4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/README.md",
+      "bytes": 207,
+      "sha256": "89cd666c2092528441839fb5af0a3ff3b35fc4fe430e1349ddd9672d1845a49c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/constraints.md",
+      "bytes": 564,
+      "sha256": "3dbd78389457a4816e1337b35c0fb5f71131996e7cc28fcff601d3f25002525d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/data-dictionary.md",
+      "bytes": 992,
+      "sha256": "802abffb2443cee8b7154edb20e1ce2cf89df5a1cb4be20ea3d0c6c60a2f9633"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/erd.mmd",
+      "bytes": 731,
+      "sha256": "16b49379c26995f8794b9c07ad6a789f67a0b30b7e15223f3ca1dacfba9c1961"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/history-and-versioning.md",
+      "bytes": 500,
+      "sha256": "802aee2862aeb5080219f5c54c183c69b05e02985cae10209f3bf43fc96ae167"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/indexing.md",
+      "bytes": 549,
+      "sha256": "779bd23a6c313c4a3c2da59bb5b1605ce8f930759f5255ed691c1e29e8c2dfb2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/keys-and-identifiers.md",
+      "bytes": 708,
+      "sha256": "8f9a4716b636f15cfce654de2fd5ca55f13882840c8a8df84da8d42de9c59db9"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/logical-model.md",
+      "bytes": 602,
+      "sha256": "1277adebea68a4bad55b5b303a71f8f33142bddb75a1b8328318bb02c45435d4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/migrations.md",
+      "bytes": 642,
+      "sha256": "4054eb4588dc0e3a3ec48602ccb78548046800954c4482e6e86a81534f111ae5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/query-projections.md",
+      "bytes": 366,
+      "sha256": "a6349f7b98726185e1794f31249c81539f0a1aab786e9c04f4663e9b7e0f5a2e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/retention-policy.md",
+      "bytes": 508,
+      "sha256": "ce972623d0c9dc3e5b483d8d9e7cf3d95f5b1431251149ead3da9e2eb3554057"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/security.md",
+      "bytes": 357,
+      "sha256": "b82be0919d080e8efb20213a9aba9a9247fcf89d3cc342ea76e69fb532688b6e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/05_Database/test-cases.md",
+      "bytes": 725,
+      "sha256": "6376b4e9a943d1d295f74b4289f9374c4bd93e081ee643e955547c247df583b4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/README.md",
+      "bytes": 268,
+      "sha256": "e01eca72ae74ea59aabc6bab3c2da3ed3f39edf7fe346b4d1a3af0167425be06"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/acceptance-tests.md",
+      "bytes": 772,
+      "sha256": "75d95ac5bb49be299de6991f67c61920815d566bb57613806430f4c64827123d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/admin-endpoints.md",
+      "bytes": 473,
+      "sha256": "3b0d0c309f751d166c8a7e68ec9a95d5d4a134e0766623cf52586e9ea80844ab"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/api-conventions.md",
+      "bytes": 332,
+      "sha256": "b8f241f529d4b763d713eabc25067af3c850e114dab62e059297b99f7edcb3cb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/authentication-authorization.md",
+      "bytes": 395,
+      "sha256": "6031943c699ef5695764eba402f53249733161a875792a7509289f847b9f87ee"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/error-format.md",
+      "bytes": 407,
+      "sha256": "9359927f638eb705c838d84801402435d6cbd5cc9dd27d4b7744b68f7e972e27"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/examples/public-responses.md",
+      "bytes": 329,
+      "sha256": "87c69f489a8739be7e062be6328536e61da5be5e46d7ff56d6bf932c1a94874f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/idempotency.md",
+      "bytes": 276,
+      "sha256": "a9bfbb06cfd981745d285470ed9084792b93a473deaad071620cf60e77b9c5c1"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/openapi/motorsports-events-api-v1.yaml",
+      "bytes": 13272,
+      "sha256": "257b65d41d673efc361142a28b97913917258389c996b805bfbbbde79fe14130"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/pagination-filtering-sorting.md",
+      "bytes": 371,
+      "sha256": "0308354349923435fb1f2c7f13d1435464543d590e5ec05342954647f7b68cb1"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/public-endpoints.md",
+      "bytes": 557,
+      "sha256": "2e97ae4a438f836b01354c94a6ec6679eb799d7878d53ed28ab0c9228fe70d71"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/resources.md",
+      "bytes": 191,
+      "sha256": "542577ab321112fff84aab11880808c169825c9ae8c73e3c579b7903945b723d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/versioning.md",
+      "bytes": 354,
+      "sha256": "1bf1b646b22db8f7400fbbbd6136d1444d40f94ab743ce67b924f759a15bb42c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/06_APIs/webhooks.md",
+      "bytes": 368,
+      "sha256": "93cc4d1fe9f7bcdd2a77a6a1b1079d3cfdbf424c7fedd1eb62cb957b69e972e2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/README.md",
+      "bytes": 439,
+      "sha256": "3c9163dc62211280e5d3167ccf858373bf1d1da27d19ee876fa5e0a52ce25ee5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/acceptance-tests.md",
+      "bytes": 536,
+      "sha256": "332f371ed9dc709a49529daabd89b22bb8cec4671c531a765aff9fde2a5bdc45"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/architecture.md",
+      "bytes": 418,
+      "sha256": "25d8af74f63d851b3e8ad09e6821d379d71557faa5f36051d28b7d65e723e39f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/change-detection.md",
+      "bytes": 433,
+      "sha256": "4628df53ee719324e9cff35047c730aa3ac4b56d09f9d289e9515b7332d84905"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/conflicts.md",
+      "bytes": 464,
+      "sha256": "745077a62b1a053b8eeea8e99850ceba5cead2e95900a2f52ef290e1ac6fd3e1"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/deletion-and-disappearance.md",
+      "bytes": 430,
+      "sha256": "6d8cb3ba212419d89f82e93c01ed953e266a5ed621f5a1413427761a908e4111"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/failure-scenarios.md",
+      "bytes": 639,
+      "sha256": "8474594949e6ab08306413617690db154f42f1595ab06bf127645c6b4107a436"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/idempotency.md",
+      "bytes": 509,
+      "sha256": "c07bfd05b5e7977ae448f75da56a2b6302050e66c780b72cae2651aaa2c08528"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/locking-and-concurrency.md",
+      "bytes": 539,
+      "sha256": "61785ad690cb0b45c4732bdced242cdeb4e722ddb2b7c69051bffce8c8241619"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/matching.md",
+      "bytes": 291,
+      "sha256": "cf410c2e0f604aaa5ee623b1a700b56d54b3a4ac12fab0c29e6a10f6d2e96f96"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/merge-policy.md",
+      "bytes": 321,
+      "sha256": "a3e9218667c44714746e9372c3d40d57e1e4f5eaaca0adea08839bc59c90a372"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/normalization.md",
+      "bytes": 478,
+      "sha256": "d23d21c89f842e6515e5617ff342203774e0c92735fea8bd22e56e4376bf2677"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/observability.md",
+      "bytes": 437,
+      "sha256": "a00d340dade86f01c53f38934544073e6f696eb152eee3ece17fb858be227bf0"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/operational-dashboard.md",
+      "bytes": 291,
+      "sha256": "2404550541770deaa632bc2cd2d1387a9523204d76eea79bf8352dfcbf68c6b6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/pagination-and-cursors.md",
+      "bytes": 500,
+      "sha256": "aef3f5d7b31b96079af95d08f28fff76e03320270fa840a176fb81f3e307b79b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/pipeline.md",
+      "bytes": 1452,
+      "sha256": "510eddef17260a34e493d64eb62da2711030bcf0e063bca6e3cd6c9eebcda5ca"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/provider-adapter-contract.md",
+      "bytes": 350,
+      "sha256": "c41e86bc0dfb78d68f15f1833f438457c1a5a029692ad97c6038c65aa238dfdb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/rate-limiting.md",
+      "bytes": 430,
+      "sha256": "66e1834beb13584bb25baa250dbe829ba06945ba9ffbcf4e6fea400da08159cc"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/retry-policy.md",
+      "bytes": 419,
+      "sha256": "b87663f7bea9c3917b5573458091eae79aefdc03b3a80e13978c56331800d188"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/run-lifecycle.md",
+      "bytes": 486,
+      "sha256": "25b01a47c813f905bb7d4c823bed3cb5185a2e918f8d925dd8b0248a44ff8ac4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/scheduling.md",
+      "bytes": 369,
+      "sha256": "5454297f8186c511e70c8f5bc12e0cdb4a5846ab1fa997bc76d27c1f1a9cf0cb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/security.md",
+      "bytes": 347,
+      "sha256": "2bf462aba4810efb7bf9b5fbc893833f834dd1193515f248798ebead91245a4b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/07_Synchronization/sequence.mmd",
+      "bytes": 561,
+      "sha256": "9b4b7ac0421bd6b18d2bcf83adca1984b7a166809848f1b3814d6ee8c2b8c439"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/README.md",
+      "bytes": 430,
+      "sha256": "1755fa8e45d925e75555a53449a4df78369f6cc62e95a49d76901f62b3d176b7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/acceptance-tests.md",
+      "bytes": 402,
+      "sha256": "ca816b60d67b69b6690dfad62bff72c4beffaff50f0740db720e00ca019e693f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/api-contracts.md",
+      "bytes": 540,
+      "sha256": "0cfb0808448f5b9db0a00a84e97e944c786b76f7719d2e17f650ad54bfd1b08c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/architecture.md",
+      "bytes": 644,
+      "sha256": "d1176814c594cb1e419e537e7875da7f213ea62334f408a34116cd907c3887eb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/audit.md",
+      "bytes": 391,
+      "sha256": "e7e2828fd46fdfb7f727e18b8bfa7ccde441b715af3de8556398ec895399d32c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/bulk-corrections.md",
+      "bytes": 483,
+      "sha256": "4479b6d376ef768a36a002dda3f12427a5967665ec996723d4274847766cbacd"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/concurrency.md",
+      "bytes": 403,
+      "sha256": "f6b0217d5b31126928064e1b08fff4fc70a29a8dcebe41b57749c0178afee346"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/conflict-integration.md",
+      "bytes": 488,
+      "sha256": "272e4b0ca125175834e7635bbd81506a574fd433f8ecae9ee28567df3c5edbff"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/correctable-fields.md",
+      "bytes": 368,
+      "sha256": "4d4217e294db1f9fa1baa4da1250fb3bc066f07b7c5d108dfa4ea03f7a78c501"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/correction-model.md",
+      "bytes": 402,
+      "sha256": "249db1be001bf4519bc08e4721b182106677cf44b304b814307c22ed6f2c2ed5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/failure-scenarios.md",
+      "bytes": 534,
+      "sha256": "f20e027c9c3243c74dd49f4b8ea9ed53dcbe44d14b124fd181ef8597d0b5ccd5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/field-level-overrides.md",
+      "bytes": 467,
+      "sha256": "160437b64811562800908424ec4f92f1f1ce1353b19409b2b54904b5199f8c03"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/lifecycle.md",
+      "bytes": 563,
+      "sha256": "bfd76b9e1f98da77ff8ea54346a3ef4fe53b8cfea6e6f6101648bd35d8639acd"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/notifications.md",
+      "bytes": 311,
+      "sha256": "9d4a115f54af82c372274808a2dbe4ffdbc7a5168acf4b2a4769c703938c7884"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/permissions.md",
+      "bytes": 452,
+      "sha256": "3e48f6e3bda506a578b89bb86caaf3133371e3f9c4162053edf9bf250060c2fe"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/priority-rules.md",
+      "bytes": 430,
+      "sha256": "b333e033ec9befa7eaa1d805e04b95688089db7bb08a555975839bddaf03e4b4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/reversion-policies.md",
+      "bytes": 614,
+      "sha256": "32e5521aed68bedbf8f70fb6b433f38ca15be6cfe6ccc42ec1e1f6fc3caf354a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/reversion.md",
+      "bytes": 619,
+      "sha256": "0bbf3e35b86b915588bc21ddc37deae7dbf10ce0794944fe58a8547fa4b75e70"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/review-workflow.md",
+      "bytes": 540,
+      "sha256": "7a854c9fe2905bade731dbfb5403801a74c53822edd982454afe2ef4ef59d76e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/sequence.mmd",
+      "bytes": 455,
+      "sha256": "8a90a1f1a3f45907e239d27e1188e91792c6fc1ba57ea15a3f341b3fd66c43e5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/synchronization-interaction.md",
+      "bytes": 560,
+      "sha256": "e9aab946329136e6180394846d19699de226abdd3fd1b172289823df1c756d77"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/temporal-corrections.md",
+      "bytes": 352,
+      "sha256": "e78c6739bc711c3998c0f5353564f84f38a544984fcebff47217ee3a7eeb6a8f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/08_Correction_Engine/validation-rules.md",
+      "bytes": 392,
+      "sha256": "2e9628fd299b53858a49c26d1d46c4f233823e8ecf235409068330cb3195bd27"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/README.md",
+      "bytes": 185,
+      "sha256": "eb2c1521696b07e8613876cf8746de9196663630a045a9e65301ca4f1c6d1858"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/api-security.md",
+      "bytes": 227,
+      "sha256": "d3d792a4d70d58547f7a7e382a22b4e18aea3d4befb03a5698f977cfa8ea88c4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/audit-logging.md",
+      "bytes": 289,
+      "sha256": "f0529b30e14cc04b952a94cfd0078d750a9f046f977f39c74f0b190161c2ff55"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/authentication.md",
+      "bytes": 206,
+      "sha256": "4bca8ac8e12ac82dea3c1f53383a6f973e9d69e2efc867d25f7472f3580ac09c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/authorization.md",
+      "bytes": 258,
+      "sha256": "41e381969e3f330993e8b8d91931debf46e5a74a47356938063d0939c0d66d37"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/backup-and-restore.md",
+      "bytes": 247,
+      "sha256": "b295f0bf4250613930b6b96e2f8d58463debd10a3d5b4dacc122a22c17507135"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/container-hardening.md",
+      "bytes": 234,
+      "sha256": "699609d5ec9a454e85da271333ad4a54ecc9dba4a1750df69b5c0ebc0597a9cf"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/database-security.md",
+      "bytes": 198,
+      "sha256": "a1226cf1c75ab84fbb4218958d42989e803baaf7b4dabce2785db61757a6ce7b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/dependency-security.md",
+      "bytes": 206,
+      "sha256": "27c9ae7b7551e2a59f196793e080f39c361b0b0bb97723467f41d25dc433e10b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/disaster-recovery.md",
+      "bytes": 249,
+      "sha256": "49d4725eeb359b39acf50bd9893d352b0892d5210894d825a7047020931f07c5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/encryption.md",
+      "bytes": 215,
+      "sha256": "c23cd01665db9b24f8b6b2e020c96b562632131fb9c98387237c7d2ec92c2d92"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/environment-separation.md",
+      "bytes": 187,
+      "sha256": "829f47ca65c8dc85a07e10acc7532511f45fbb4f42252273f7b286f108e9eb23"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/incident-response.md",
+      "bytes": 241,
+      "sha256": "bb94af0c699448b9c99a63d3fdc6c04b99b8b39169bb553326666b097678ce52"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/input-validation.md",
+      "bytes": 294,
+      "sha256": "81f0aa4c47cb69f01bd720bc404559025df30bb8fe4a79d06c880c27f65d014f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/key-rotation.md",
+      "bytes": 248,
+      "sha256": "75190d76c364330e68753f1d42f9563c9334ef744d8f3cb4c965b0ab50fd794f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/log-retention.md",
+      "bytes": 210,
+      "sha256": "0b38713b3e166fa664cb099a9fee42c0ae3c902923328e41b164dd60e93fd06d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/network-security.md",
+      "bytes": 231,
+      "sha256": "cf50bd75ebff59c2dc91e8db3e8540a77f5c208a264d0e45a487de1d9e4f2163"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/owasp-protections.md",
+      "bytes": 199,
+      "sha256": "25a3c1d0c7f76b0e24d477d96a7b89633d8a1de63dae3a39a47e16f519ea0330"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/permissions-matrix.md",
+      "bytes": 538,
+      "sha256": "4238e4ef59b2cb2663a306efd72ce388e63325924152c12ece07c93f61da539d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/privacy-rgpd.md",
+      "bytes": 234,
+      "sha256": "a91b0d6f93a81dd18c42887a54bfccab05a007cf4b3af6d6daeeb724660c87e7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/secrets-management.md",
+      "bytes": 225,
+      "sha256": "c679b5251b2b3d9001011dc87c19f86801437ab19c0a6b8b5748c424ba900a95"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/security-acceptance-tests.md",
+      "bytes": 821,
+      "sha256": "c611183a3d9c58f858d53939dadf99b7ee5d53f458c5385dd8286786994c7590"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/security-architecture.md",
+      "bytes": 296,
+      "sha256": "8896e4ad8bd400d6aed13488c57efce0c06b83b3f91b5eb930033e05217895a4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/security-checklist.md",
+      "bytes": 429,
+      "sha256": "54942298b9f7a1002fb28372bf7a0adba936bbac4a42d68beaebe3180eef0cab"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/security-monitoring.md",
+      "bytes": 248,
+      "sha256": "4504ef8a801e224b1de177c87e84d0fc7e06048a69cdd561a6fbce0721fbcfc8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/ssrf-protection.md",
+      "bytes": 221,
+      "sha256": "fe87759e8886cb641c97767968b0e4c0408aeeebee0de87b70463c228bc3d064"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/threat-model.md",
+      "bytes": 345,
+      "sha256": "3dc76fb6737500cb75e2b9b3e60954fd2157975911e73042ecfe67e2818eebf6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/vulnerability-management.md",
+      "bytes": 196,
+      "sha256": "d8a9fcdc493f63801e6f4637a3d5ad72eb43e2a2a922aa18e878c160c07f38e2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/webhook-security.md",
+      "bytes": 226,
+      "sha256": "c4b6ad589dc4934c393b17da3d3d3506d4c3b875e89e05ce5619550f2fa0bc08"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/09_Security/worker-security.md",
+      "bytes": 240,
+      "sha256": "bee4f7b3d7043fb5c2972b9c94dca90575ddb33869db12ee3013beb66e6eb3b6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/README.md",
+      "bytes": 446,
+      "sha256": "88c1d2441fd3e8c1a637a4cd92acbc6b7d4cb43425f25d82f5ac8404442e2889"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/acceptance-tests-catalog.md",
+      "bytes": 922,
+      "sha256": "11162b39005407a3c52e5b5494d4f368942ffe406ba947cc90d22bb26e1b119f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/accessibility-usability.md",
+      "bytes": 377,
+      "sha256": "c85bad27b35025da565ebb278b0a22fa7f4047a96c14bf0cca51b39ca1a645d4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/admin-e2e.md",
+      "bytes": 261,
+      "sha256": "496fc5a53c088ac9cbebd3793451cf98e487a4393fdfff5c989c68fd03af8e7c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/backup-restore-validation.md",
+      "bytes": 393,
+      "sha256": "5c594a9397152d67b090507c3c6a72cd3ebcbeadb27d92bc0051b97560fb8002"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/defect-management.md",
+      "bytes": 412,
+      "sha256": "098a56fb56692cbe41ac80aa1b1dc66f1f415209bdbcbd8c07d82eacf5514f99"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/e2e-critical-journeys.md",
+      "bytes": 1112,
+      "sha256": "e28b4c8848f275781340d78f1aa1d9cbe3f7d1b995c917bf3b22e7609a7cb4c9"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/e2e-domain-v6.1.md",
+      "bytes": 663,
+      "sha256": "923a0ed0a16860b37103c9fba66a7567a2cfe6ba11738cd0e24b10146889d264"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/entry-exit-criteria.md",
+      "bytes": 499,
+      "sha256": "5004e7fb447bda33692afbef6614fca15d8b1b1adb9559d725ca7f8eabeb16ae"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/evidence-and-reporting.md",
+      "bytes": 368,
+      "sha256": "5fae858dbe7b2dfd7f62102661166f0eb680b9ca4b46c506772860aefbc35626"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/go-no-go.md",
+      "bytes": 383,
+      "sha256": "dac2f8bfe402f450a338fa724fba507f263ce53ffec2fef50dc2d5684a6ccb1f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/performance-testing.md",
+      "bytes": 443,
+      "sha256": "b7bb9554e3957bdffa627857d777dfe77126170bea961aa6f6dc3a9feff6a3ff"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/performance-thresholds.md",
+      "bytes": 476,
+      "sha256": "04d8691ac3b13cfe92b219c656ec088569102f687f5d9050a7e419f59d1b20cb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/public-api-e2e.md",
+      "bytes": 270,
+      "sha256": "679e98f88d740f1c16fbf297f82e12a6600bd8524311e77b55f5a06a31230fa0"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/regression-suite.md",
+      "bytes": 471,
+      "sha256": "393e49fe412b85b107c5213b5ca3ad53911995483ff5167e3c4821eb3bdda2be"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/release-candidate-checklist.md",
+      "bytes": 416,
+      "sha256": "c577343241080a2622817f5f7ffb7c070c328b9be3d753dee3443b61f019a2a2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/resilience-testing.md",
+      "bytes": 442,
+      "sha256": "e513fcad62215be7f33a0ae21cf236e442a191312e517df5cecb87c0a7e27540"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/security-validation.md",
+      "bytes": 316,
+      "sha256": "a5abcafda16ca496ef4a35c01c1f1b07ef5171d68b3fa24643ce48f3088edc8e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/test-data.md",
+      "bytes": 520,
+      "sha256": "417974e58438a24925aa02d4b29dda530528abadc9448c82ae1d65738cfb2ac3"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/test-environments.md",
+      "bytes": 408,
+      "sha256": "88605ff4bab8a786983a3fcb63a23e628a1299c80b2f7b4757a111eefc6a6358"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/test-strategy.md",
+      "bytes": 441,
+      "sha256": "35e1e75f904963b60352c832bca9cdf6965aeebc82e1ad311e48e5f08e2955fa"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/traceability-matrix.md",
+      "bytes": 284,
+      "sha256": "cca596f7c454ea19705e2d3d162fd565662d1df4ff9c6622c54be730f70af7d1"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/traceability-v6.1.md",
+      "bytes": 402,
+      "sha256": "5ccd00a796cc4ca7d158854b5afdbecfcec1e4ee76e6475d1c34460a84f756fc"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/10_Acceptance/user-acceptance-tests.md",
+      "bytes": 298,
+      "sha256": "e955627f30efbc35e873254923aa37c8dc99ae6d6b67fb794e32b406f56523ab"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/README.md",
+      "bytes": 426,
+      "sha256": "8ae8b0de71b5943fb65dc91e6ce8c7b6a65f0daba5e6549e08beffa8d9bf5466"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/api-evolution.md",
+      "bytes": 252,
+      "sha256": "5197483f150529b545f680cb1e88356f76b252a740735c3d53193ce325c3d40a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/architecture-standards.md",
+      "bytes": 369,
+      "sha256": "05efbbdd058d19cbbd6abff0ae70add94f003e937bd3b05e7a3569cef628c254"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/ci-cd-pipeline.md",
+      "bytes": 559,
+      "sha256": "45a62cc0a791ce664f6330d44f102b60c8d7a9734dd3e1f58b3f97cc39e0cc1e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/code-review-checklist.md",
+      "bytes": 508,
+      "sha256": "bd629530bcac87993178c9189166c418fe21e0e6c8af83f322ec3499a998ff35"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/codex-operating-rules.md",
+      "bytes": 441,
+      "sha256": "c3a6fe32d298e4621f3315bcb754e454727f0385425bce7dfd4fc0998aa74918"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/coding-standards.md",
+      "bytes": 532,
+      "sha256": "8e05f5ce22fe7480c90ec3581d9bfebfdd736c3f3b9ef769795bee9c6b71c5b9"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/commit-conventions.md",
+      "bytes": 235,
+      "sha256": "49dcc354e3ec05ab53ca41a520e58e07518cc0c631a3f5e8d8515c35a70684a9"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/configuration.md",
+      "bytes": 351,
+      "sha256": "492b545a9766a8f1d1bf6059c6b56a67f98ded936c88f0e20d9589e45173dc43"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/contribution-guide.md",
+      "bytes": 291,
+      "sha256": "34f814fa5d90d70b312a9dde838e7ca66d99274c5d518b3ebbf4c682e4d53ef5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/database-migrations.md",
+      "bytes": 642,
+      "sha256": "4054eb4588dc0e3a3ec48602ccb78548046800954c4482e6e86a81534f111ae5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/definition-of-done.md",
+      "bytes": 477,
+      "sha256": "c364383745e25cac3ca130c6b5c57f4eb4bed660da768ecc18a1e993c1b6f1b3"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/dependency-map.md",
+      "bytes": 570,
+      "sha256": "50e1bb3201a323ab64a6262fb27458f1488b50b5f0a979d9bf5734f3d41399a4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/documentation-maintenance.md",
+      "bytes": 329,
+      "sha256": "45e96766667a4865b5a9cacfe8dc41c51b31416cc4b8f7615d6d900c6df5971f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/error-handling.md",
+      "bytes": 395,
+      "sha256": "3ad564745b333305f5c39fd960a1ace068268e037ccd572b7f91140ebfa418ac"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/final-validation.md",
+      "bytes": 414,
+      "sha256": "0d51b4685afea1df71e4e4a3d520619c1282264d285e7e5e1d2aac23c225044f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/first-codex-run.md",
+      "bytes": 700,
+      "sha256": "c0c17c5d96984808dfdf05f56fd0703ce979fb14b498432454d97b40a18acefe"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/git-workflow.md",
+      "bytes": 445,
+      "sha256": "775149879210e332b0b5dfba16b3c6b836b0dea854cc184a4f27ae69862db5d7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/implementation-roadmap.md",
+      "bytes": 341,
+      "sha256": "3827f5039652529e367125dc1455cd450b6810b0775c49769692de6a79a893d6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/maintenance-guide.md",
+      "bytes": 449,
+      "sha256": "28e0e8dabd2df565e49700aa319cbb1a7917de616e6208848fce4d84eb3cdb2d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/migration-guide.md",
+      "bytes": 370,
+      "sha256": "2ad88575617fb472f435edaa845ba238d03dd09d541457e40db45f6a63c769f4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/module-order.md",
+      "bytes": 351,
+      "sha256": "0973d48b8dd6dceb011b48c4fb0f2f1d1b9c493510968b5559f53c849022bd31"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/operations-guide.md",
+      "bytes": 432,
+      "sha256": "7c907328913cd089eea4f3fe9305f8593ffe975a6fdfe615a3e87aa87a4f943d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/release-checklist.md",
+      "bytes": 369,
+      "sha256": "9eadaa9b0bd4630826f42408ef1ce761715aa0d9b42c2f6444002d245013464e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_Implementation_Handbook/versioning-releases.md",
+      "bytes": 282,
+      "sha256": "398ac8a6ce2276a7416a4f3fa6846503b0176af1f44f39a9817f16bc44ac9d80"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/README-v6.1.md",
+      "bytes": 427,
+      "sha256": "e0373635ef07a0fad7832befef9d3e59a072949ff4c53d4779921728fc2ca0d5"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/README.md",
+      "bytes": 333,
+      "sha256": "6ca3d074c2fb70d2bbcf7cf5c6a54e6af43f6eb2c04f4c3771c8ed48b9f1babb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/acceptance-tests/administration-screens.feature",
+      "bytes": 811,
+      "sha256": "7f1141d4a6d9a31def0830b84960169dddcabd4e34c824df5c0b8876f6cb4e48"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/contracts/frontend-contracts.json",
+      "bytes": 786,
+      "sha256": "14486f62c45bd566a5a66d73796a2d7b0c45984e9bf1f72cd82dd2c6bf11a51a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/prototype/app.js",
+      "bytes": 159,
+      "sha256": "3d8785292f00f423a85b04eadb7c6e62af30701582daea5cbcf54777c6c089a3"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/prototype/index.html",
+      "bytes": 641,
+      "sha256": "0224c04924dcf032c31dd5f7dfc28f46e3bc8f92b12c651a1bb05ff6f4a13cca"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/prototype/styles.css",
+      "bytes": 506,
+      "sha256": "03006d60580018007bb3518c8fb5a548ee372cfffca8d0d238245ad5dda44cfd"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/maintenance.png",
+      "bytes": 89637,
+      "sha256": "e9df0ebbda9d662eb4597cc548b841c4f5912aa937c157fa6d8b2ad7ecc0e8fe"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/parametres.png",
+      "bytes": 70065,
+      "sha256": "9382332ee618135be5f6f91844a9705e8573464b966f21e34fbb2f8204bee7b3"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/sauvegardes.png",
+      "bytes": 96215,
+      "sha256": "f9f391559b6b356cffa101e7b9120e98786daeb1e13d7551caf28a64ef276034"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/utilisateurs.png",
+      "bytes": 70959,
+      "sha256": "0ffa4569061b1d0aaa29779d41daed82434205e242e1275a1ebbe66fe430b930"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/maintenance.md",
+      "bytes": 289,
+      "sha256": "2ff8feaa203683696ba20abc97243cebfe54ecbda3ec7a156312d7a15e143ca8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/parametres.md",
+      "bytes": 259,
+      "sha256": "0498c49ff46223d3da662495f05ae9a6102255c49c0d2b920acaabbdd27382ce"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/sauvegardes.md",
+      "bytes": 552,
+      "sha256": "7dfd8ca057b2de045c7abe35ae38959cc8b72486952c1bccc737b5d987f6ce78"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/utilisateurs.md",
+      "bytes": 341,
+      "sha256": "5a411c36ab22b0319d21a2fe3d79aa9b07139ec5b3bb8167f767ddc2301cce94"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/component-states-v6.1.md",
+      "bytes": 13361,
+      "sha256": "86450e66829f30b27be67c48314abf7b8bcd31fb49f298a9d4283c4bf8d6bcb8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4/CHANGELOG.md",
+      "bytes": 284,
+      "sha256": "c62921b3f6d6e3b9e385198ee3138acd22c3f6eecce180f12a49709feae17df7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4/INTEGRATION.md",
+      "bytes": 739,
+      "sha256": "725f4bd67d1ca7d896c43518b1ac0b478c6a805ce2e61967569fbf690740f534"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4/MERGE_INFO.md",
+      "bytes": 293,
+      "sha256": "48dbf36deb957115b5dfa25975c66c373f733266dd5c6c50e05082c664e4343c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4/README.md",
+      "bytes": 220,
+      "sha256": "d574e3f43953b6343348b0c7f0915ac457addf328ac8987c411815f06803236b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4.1/CONTRIBUTING.md",
+      "bytes": 62,
+      "sha256": "487c5a15180aa68542428d313c6742a6c44e959065864c3550a7920f205222a3"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4.1/README.md",
+      "bytes": 75,
+      "sha256": "a9596b5771386ac4f8aecd6e0bab5fbc0a6845bf57dc40a9a83480fa3880a638"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4.2/README.md",
+      "bytes": 394,
+      "sha256": "b8e5388164caf38614cd7ae5bf0bf7158c31d9e206c1539c034a9a40e98483c8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4.3/README.md",
+      "bytes": 331,
+      "sha256": "33f76da0a80b68ed770e8488c3705d340149a0d64e5e4633f6c80b8b2efdbf17"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4.3/figma-import-checklist.md",
+      "bytes": 115,
+      "sha256": "a0f6c80b78ac15b08c83988e0ee4cbaed1297b2f6af64ea3391a6f8319916541"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4.3/measurement-protocol.md",
+      "bytes": 212,
+      "sha256": "41523fd9e4ec1a7e600512b0677f5fc4ac237e57104d1afc860f651e82ce94de"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/design-system-v4.3/readiness-report.md",
+      "bytes": 155,
+      "sha256": "6adf5d28dc7d0da7e0d59011b2c7e4f094225a4a4025d3e13ed09bc229f8895f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/accessibility/WCAG-2.2-AA.md",
+      "bytes": 902,
+      "sha256": "55f1383a5c3cc641f4325f1eb7ad6d7744499c403880577fc9ed969d57db348a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/accessibility/a11y-checklist.json",
+      "bytes": 265,
+      "sha256": "6f0838e79aa0012a9a5f837583a9fff3cfe625bab7fc8bbd0cc6fc8e7361e34a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/demo-data/README.md",
+      "bytes": 284,
+      "sha256": "f76b78a433162966fa1957b70a768f1d32abe1193bdb5d564b1d0525b86c8e1c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/demo-data/demo-data.json",
+      "bytes": 1219,
+      "sha256": "24118d616d149d055039bbcf99011ceacea1addd14c209daf2281691e0787527"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/global-states/README.md",
+      "bytes": 648,
+      "sha256": "746255c02a139752c727b032736dadeb14a00a8f1009c6e7477a28549f06f7e7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/global-states/global-states.json",
+      "bytes": 977,
+      "sha256": "6420c5752e28984eb2c41fa99c0316cfcf1c3f3c757e1f94b83d027583c9bfce"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/playwright.config.ts",
+      "bytes": 568,
+      "sha256": "c82bf5f44f868062f681c039dd1667247a5917e3d2cf2c75df4fe655b41ae67d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/tests/accessibility.spec.ts",
+      "bytes": 404,
+      "sha256": "bad1d8879136b140ae6fa46e0f9bf4cd5701483931f17a2c7cb5415c34f7e86a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/tests/global-states.spec.ts",
+      "bytes": 529,
+      "sha256": "8ec63e1013b699ea1ca22a0049c3e64ada0c93a8d69acaf72779b12adae53b84"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/tests/visual.spec.ts",
+      "bytes": 666,
+      "sha256": "5530cede481a9ee443c2942c5e10291b0156492e228c163f67e518a7a86a1a4b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/responsive/README.md",
+      "bytes": 806,
+      "sha256": "eb901d06c1f283549efe358effc78e8b18c6be29adcd7e70e87c505b1d59b479"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/responsive/responsive-tokens.css",
+      "bytes": 758,
+      "sha256": "c4b8d5ecd18da355f2900f7470caa6b2b1cd6a003d9ef177aaadb1bc5bef72bc"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/storybook/story-matrix.md",
+      "bytes": 337,
+      "sha256": "b274e9a5f7c15337992313eff5067ab149aa95b96c5a87775b52b360729e8fdf"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/README.md",
+      "bytes": 779,
+      "sha256": "b9971543092b41a26e40584f183f7b6fbe2c9ca938b41af6dea9f03dfe35f669"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/prototype/app.js",
+      "bytes": 5688,
+      "sha256": "d00efaa3d93dfcf2d3026514847b55b61a6b2faf23b6098def65cdbf97ee1733"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/prototype/index.html",
+      "bytes": 1322,
+      "sha256": "47f184f8c0aed73753619a245fb0959861b23a40004edeb029193610777b8be7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/prototype/styles.css",
+      "bytes": 4132,
+      "sha256": "4d3c1fd3899023a1fc5b1b57e0e488e9c806e3df65c9c059bf2904ed72027e17"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-1.png",
+      "bytes": 69865,
+      "sha256": "03bd2147241817820d0c1f2cb615a56ea1c3fceb554e86b0faed0c11e1cd44b8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-2.png",
+      "bytes": 71138,
+      "sha256": "415aec04a0d7f9aa2d6fcccb7e37f27c4c0141a38479f6c3c14a5750f2ef283c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-3.png",
+      "bytes": 75902,
+      "sha256": "9368e79f0e846b0792df5731867a4e2ed239dd87cc0b4c42c38dc71b54ff7838"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-4.png",
+      "bytes": 67385,
+      "sha256": "5b06e2c214b993780ea030028aa7292d892e6fdece6b21b59a0f13bfb40de157"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-5.png",
+      "bytes": 72019,
+      "sha256": "60f55d2b46eed5a107af59e0e8e9f88133f04d7ace3d0444bf92adda3032a6bb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-6.png",
+      "bytes": 75214,
+      "sha256": "016012a2ed69307f94185962bca8bb86a7634f4d72b628fedf64e88dbcff83a2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-7.png",
+      "bytes": 85457,
+      "sha256": "c4d14717f96ffd52fbe22cc298b8a4d3c5fcffb83735063a06c4b15082fd3a08"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/specification.md",
+      "bytes": 6047,
+      "sha256": "04c6002d196f43b6f95eda8f281311921adbb0b8fde02d5979f42eb8bb331647"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.md",
+      "bytes": 588,
+      "sha256": "749c5e590ab6f50232bcb9008b3bf88444e48036b4a5afc9987cfca5ec8041ed"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/README.md",
+      "bytes": 806,
+      "sha256": "1b373c662c6a976c1583aa2dbf13a5ad66d1298dc1aafc7972b6b8d7a4978b08"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/acceptance-tests/operations-screens.feature",
+      "bytes": 1151,
+      "sha256": "67333f40a201a810806b01d73532ce5b9fc983cb065af9efdf6e0eb1d7f810eb"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/contracts/frontend-contracts.json",
+      "bytes": 1057,
+      "sha256": "a612b1f0359eb26f27eac227f919697f68d6944b0779aa73d2c7292cc96bf59f"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/prototype/app.js",
+      "bytes": 3726,
+      "sha256": "22313867d21b4d13f84582e22c35d9ec09d16d19e3098598aad7e3673132c65a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/prototype/index.html",
+      "bytes": 483,
+      "sha256": "e9cdf71fea1177b7de587cdec71bf09fb87a3b2d38aef507021a654006cff479"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/prototype/styles.css",
+      "bytes": 2529,
+      "sha256": "b503146f02ac125a3c264e2809300497742399ad878da5e60179b027c19ffac4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/api.png",
+      "bytes": 64814,
+      "sha256": "835eaaa74aa85e54fee9f0a73d06b6adc5f692b225d13a002962c2a84163a655"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/circuits.png",
+      "bytes": 62703,
+      "sha256": "d91ab94c582d6d9703e1b33bfae511dc4ca26f42e19c0070a96119e8e9add264"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/journaux.png",
+      "bytes": 63380,
+      "sha256": "4f14a90976d851be4594bee58f4df4015bb202eceecdaff532abfa62b2d7f31b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/observabilite.png",
+      "bytes": 66503,
+      "sha256": "9b65604c9c3ee0ab391037a13bff4cea9d41386e7c2f6440b4fda969d4f0f57d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/api.md",
+      "bytes": 980,
+      "sha256": "daa3a6aafcbba3dd48b6b27bbf9a812958964738f2a03772062c53d4f54bceb9"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/circuits.md",
+      "bytes": 1121,
+      "sha256": "7592aca4a5c5c2897158ca8978a0652ad93d17e081830963685455b8726e3231"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/journaux.md",
+      "bytes": 920,
+      "sha256": "b5f608ae0b020d849aa1d10061cd571a617fec7c5d1f2e7ea87f511f6b81b478"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/observabilite.md",
+      "bytes": 848,
+      "sha256": "de40d795516ebd352b599c065be7419bfdba5c8c90040e43ee48718c3285c0da"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/pixel-spec-v6.1.md",
+      "bytes": 10008,
+      "sha256": "85559031b5b9b28cb3798e1eee538a8e82634cbda3179165d432099ae773022a"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Championnats.png",
+      "bytes": 84877,
+      "sha256": "56d54b91c8f44f5112443646bf1a714ad242aff961e3220d6ea3ee42244e3714"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Corrections.png",
+      "bytes": 79512,
+      "sha256": "92025f766447ea25085df8365260e9a3a0333191aaa66426680b005b8c678de6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Creation-manuelle.png",
+      "bytes": 76105,
+      "sha256": "389d4e43286f145e86d4b46a526670d499e2f2902778adeb5d4b6435d4d5a5b7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Dashboard.png",
+      "bytes": 96388,
+      "sha256": "efc8951e5e5b0bfd83c07ad65023ce7e104eeb747ff0364eac4aede8613994f9"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Detail-evenement.png",
+      "bytes": 82085,
+      "sha256": "ab6afade454668d9f02806d875b7b3457d23ce183acb54138384124e0119641c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Evenements.png",
+      "bytes": 80131,
+      "sha256": "bf7c0fa9164415ca49fdbfd0cae6c834e8a93c6a8ff843744d0fe874595643a0"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Motorsports_Events_UI_Storyboard_v6.1.docx",
+      "bytes": 628717,
+      "sha256": "1962c1ee145c45bd304ceadb658c043acd64fbebb75439dd12daf90d93898973"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Motorsports_Events_UI_Storyboard_v6.1.pdf",
+      "bytes": 664389,
+      "sha256": "56a274f1da1ef8afdd16edd97f9c87fb455c4810edd13c84c335dcacd2cf70b7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Providers.png",
+      "bytes": 78422,
+      "sha256": "ab1040b344dee714112bd9594bcfbc3a857cb0a6806e45f95da75d3de25cd624"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/README.md",
+      "bytes": 370,
+      "sha256": "cdfb28b3588fe19d06acfb93373e2378ed9a1f9e8bd08e137f6fe8bbc1ca98d0"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/reference-assets/Synchronisation.png",
+      "bytes": 77222,
+      "sha256": "89208bca0ec7f292b49da945234d11a05dc58c5427227fc62b1dc53c3bbab060"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/screen-update-matrix-v6.1.md",
+      "bytes": 884,
+      "sha256": "1aae16da83928d2d775e80480d97ead5490cd437acf1323fdbdc93cd68eaeb78"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/tokens/component-states.css",
+      "bytes": 2125,
+      "sha256": "045f03cab9b155162d3e3a4003cf6cd854bcabe0a2b2bba359ab82ad437215ef"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/tokens/component-states.json",
+      "bytes": 1812,
+      "sha256": "e08c1dc427c24df3d1f7774e2381583d63fa18b3b3756f8af66dd10160465980"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/tokens/tokens.css",
+      "bytes": 1085,
+      "sha256": "ead47c9a418ef2ce95e3e0f44cc11398ff119b1548fb2a032ad6ba444af04be4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/11_UI_UX/tokens/tokens.json",
+      "bytes": 3028,
+      "sha256": "5b60e7ada131e30aba83e22b750bc4112c0178f1970672027bf8a13f83d10efe"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/UI_ADMINISTRATION_IMPLEMENTATION_v6.1.3.md",
+      "bytes": 633,
+      "sha256": "e4bb74fcd7cbf33e3801a737d7852932ed679e4a65a6c3376ee1a67f46cea9ce"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/UI_FINALIZATION_IMPLEMENTATION_v6.1.4.md",
+      "bytes": 883,
+      "sha256": "572c2d255a85fa1c5b7db8088c5dc7374e6e77cd10d5fe15376a12705be95a01"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/UI_MANUAL_WIZARD_IMPLEMENTATION_v6.1.1.md",
+      "bytes": 1470,
+      "sha256": "a0cbfa52e7d5646f5caedf206a56ef400c445ece810fb174d1deedf8932ed26c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/UI_OPERATIONS_IMPLEMENTATION_v6.1.2.md",
+      "bytes": 1009,
+      "sha256": "b90eef716243215bb4c99f3920acc11434139096068b4544ddd336909857c8ef"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/acceptance-implementation-v5.7.md",
+      "bytes": 748,
+      "sha256": "cc3fe572e81662b47471c0b4c305a1be9b22507bce922bb6bf6be2c832d4f267"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/api-implementation-v5.3.md",
+      "bytes": 479,
+      "sha256": "0323f2c7ca0eba8493d910ad14ce145045689e0464b0ff1d030e6db323f1ddd7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/correction-engine-implementation-v5.5.md",
+      "bytes": 834,
+      "sha256": "3b545919592a5d4e703a7d9e277c5c7a8dc25997f0e2a54f2dbf7fad77280678"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/database-implementation-v5.2.md",
+      "bytes": 717,
+      "sha256": "b4ec5fd61a8308a66d832f75c4d5ce4fbfbcd00db69f0f4999b39bc777a190f8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/domain-coding-checklist.md",
+      "bytes": 476,
+      "sha256": "559048f5c1cb2a97944a1b65caa0dec65a75f3590d4316acf860d5ee3a116a6c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/final-codex-handbook-v5.8.md",
+      "bytes": 643,
+      "sha256": "64252d57ab486520dbc5c56344f610e29444410391e9db7dbb950b8555f06c4d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/final-codex-handbook-v6.1.md",
+      "bytes": 840,
+      "sha256": "7a9bcefdb2247bdfa154fee15ba596c2524b1caa6e309a6333233db6afb0e0cc"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/implementation-order-v5.1.md",
+      "bytes": 688,
+      "sha256": "eb67229dd8daa08b71d7426beeb316dfee60c41e0af57f90a01761bf84fe1791"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/implementation-order-v6.1.md",
+      "bytes": 351,
+      "sha256": "0973d48b8dd6dceb011b48c4fb0f2f1d1b9c493510968b5559f53c849022bd31"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/security-implementation-v5.6.md",
+      "bytes": 554,
+      "sha256": "0d1593c6541d4d19f872f27c6acca59a1258fced981caf0d87044b7b2e56e281"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/19_Codex_Guides/synchronization-implementation-v5.4.md",
+      "bytes": 836,
+      "sha256": "84221386cc6fa3516bedb0d510e72e639c49476f368b21190a112719655b721c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-001-canonical-model.md",
+      "bytes": 440,
+      "sha256": "be16f9b791ab4d09d97d8ca3b712a146f51bfe3f467bbf56e3d1fec1e6968c98"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-002-field-level-corrections.md",
+      "bytes": 357,
+      "sha256": "0e452985baf06f08ddda0fabee0d237a181f1457ece9824b5d4de0fb481cfa1c"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-003-append-only-observations.md",
+      "bytes": 376,
+      "sha256": "c8093f728e68e8822c75098228df9d1904842018aac62d57ddbb3864001ecbe9"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-004-logical-deletion.md",
+      "bytes": 302,
+      "sha256": "68104d34e6d87bcf00f82a8c467a60ec6316638d4e63d7af57b994681fe41b12"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-005-rest-versioned-api.md",
+      "bytes": 185,
+      "sha256": "5e4df7087f98fb1bd2cf2aef9f137ac33398b769871534a042d1fc3c7fb56e3d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-006-public-admin-separation.md",
+      "bytes": 180,
+      "sha256": "cdc6ef07a746e0fe06d3f82e3cc4ba15a2dec805552694c6ab8ec07e451c6eb2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-007-provider-adapter-boundary.md",
+      "bytes": 200,
+      "sha256": "c64fc971c1b1d834ea3e2eb4bc836ebb7c014e95b04d931e09a3b17a542c126e"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-008-checkpointed-synchronization.md",
+      "bytes": 153,
+      "sha256": "a735f1947376063b8c3f61d114372e96cf569880c0f028bfb828dd76136aca07"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-009-no-delete-on-partial-response.md",
+      "bytes": 211,
+      "sha256": "877dd0194f0721c3b50f32df679bf258d89089d88d9db4cc7e348062b7fb47e2"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-010-field-scoped-overrides.md",
+      "bytes": 184,
+      "sha256": "cad1f48adaa3132c899cdc0e2cd9c27ae699b3af21a77f5ff28294162e61b38d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-011-reversion-as-new-decision.md",
+      "bytes": 163,
+      "sha256": "e585f204f85def638b9045b5fe8f212622e706899b9b7ebde75a7f0a0c82d4c3"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-012-manual-reversion-default.md",
+      "bytes": 186,
+      "sha256": "3e42d00f3286b4900217bdb088e046901bc3200f8153e9525102078e76126ae3"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-013-deny-by-default.md",
+      "bytes": 139,
+      "sha256": "7b6b28c160198c23729ec2debf26b5e7f84f04358198098a18af38ecd380f272"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-014-secrets-outside-code.md",
+      "bytes": 136,
+      "sha256": "5e345ab7b48b28014d8b0bb37c10f3462b42f8ba3d4458cbe58a0722a082a85b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-015-non-root-containers.md",
+      "bytes": 128,
+      "sha256": "f61502e2e2872cf12e276000b5a6bdb681f81bb520f60348c7857ae590796c08"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-016-audited-sensitive-actions.md",
+      "bytes": 151,
+      "sha256": "fb773d6fcf05eb66f03cd1a642bddc182218d5986435e22a9607befd0b7fe0d7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-017-traceable-acceptance.md",
+      "bytes": 129,
+      "sha256": "8b9db97d41f7e134bbf6e5d68d039e999deec967c6de6c8597518e6f5298c5a8"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-018-no-release-with-critical-defect.md",
+      "bytes": 146,
+      "sha256": "cd7bf59c40f8d2b0455eac34b0394c5f674314d751e9a60c3e5270b6924062d6"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-019-restore-before-production.md",
+      "bytes": 165,
+      "sha256": "a360b6eadb12b7dbb797d9bbe8a57b64487a06fa513ff1ae81e380858a770533"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-020-incremental-vertical-delivery.md",
+      "bytes": 200,
+      "sha256": "4c863dc75b0bf8d365e3fc97f80122be48ac8042d8b64b9a92037c0357793726"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-021-openapi-as-public-contract.md",
+      "bytes": 158,
+      "sha256": "a4d75cda09ed39d4dd2ec26ebb97674b3dfa1e7061e4249048271e1fb12e0506"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-022-documentation-as-versioned-product.md",
+      "bytes": 170,
+      "sha256": "9ba0412a9d77d02f098a8feb830fa1c39b7e3e45be55b6a3f5f41fbfe47a569b"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-023-no-critical-feature-without-runbook.md",
+      "bytes": 168,
+      "sha256": "4cec9216afe8efd095a2385f1fa6d1b6eac5f72ab0d0e758ba80a35b3dee7809"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-024-discipline-as-first-class-entity.md",
+      "bytes": 308,
+      "sha256": "98d4d35455d28c387bfbfba68d1272ac88a23e596eef8829c0b32bdbcfa1f3b7"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-025-optional-category-and-season-parentage.md",
+      "bytes": 366,
+      "sha256": "507d2a7360ec3d879962d7a7f44db2d8659bf5df1758ab5c1286844d84077c62"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-026-event-technical-name.md",
+      "bytes": 221,
+      "sha256": "d42a9208a5ba644a3d84b54c3b10889b7ad4971b0423637090426de7e63db520"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/20_ADR/ADR-027-manual-first-canonical-data.md",
+      "bytes": 238,
+      "sha256": "cc1b17a689172ca87a0b8f41c415568028fba8299f8c42d5c017ebccc6973f75"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/21_Migration_v6.1/README.md",
+      "bytes": 402,
+      "sha256": "95800485c6f9961e3f96ae7d3d785acbe64c625172832cb36f568b462d002685"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/21_Migration_v6.1/acceptance-checklist.md",
+      "bytes": 590,
+      "sha256": "6e67e9ee54bd951414e4fb3eebd90de7c9894e8f8862d147abbeeab292ea7cd4"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/21_Migration_v6.1/data-mapping.md",
+      "bytes": 506,
+      "sha256": "64f527aecfd6ffc6b380353327131a84e3af2ac05eea5d1e009a95842262f828"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/docs/21_Migration_v6.1/rollback.md",
+      "bytes": 295,
+      "sha256": "a85c337a219a6e8f7b651ccdc9dbdd6012970b6a9b788d238a47af176db4b49d"
+    },
+    {
+      "path": "docs/reference/documentation-v7.0.0/manifest.json",
+      "bytes": 51324,
+      "sha256": "1a72b4467dfbc500b053afdc9e4bbb33e92974f64d4f8878e54b9a950f3face2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/CHANGELOG.md",
+      "bytes": 6900,
+      "sha256": "98f50be5ecc52f4162de84301f49299cd415ef20b10a099a2b7aa4660499e717"
+    },
+    {
+      "path": "docs/reference-v7.0.0/README.md",
+      "bytes": 606,
+      "sha256": "cce4441899cd4eee7c70683f58e1e04169e089dd3c810260a759efa8b10b7bf8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/ROADMAP.md",
+      "bytes": 181,
+      "sha256": "684250bc4df345de7d1e1c5e5e05e8640183e511654fb1bcc173fbb359da5c82"
+    },
+    {
+      "path": "docs/reference-v7.0.0/SHA256SUMS.txt",
+      "bytes": 35911,
+      "sha256": "84d46a6a99b4e270b1ff9bef749bd6579a7be868c0e0a06f3eac1406b28457bc"
+    },
+    {
+      "path": "docs/reference-v7.0.0/VERSION.json",
+      "bytes": 153,
+      "sha256": "a6ff3f25ce0494af0121f16a001179cd77274a6944b4d39d91f76ae045913173"
+    },
+    {
+      "path": "docs/reference-v7.0.0/contact-sheet-v6.1.3.png",
+      "bytes": 236602,
+      "sha256": "31a6934b6d3d95b4af682380a4829a8b2761829c7c1afe0acaa676bbbb3e004e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/contact-sheet.png",
+      "bytes": 706116,
+      "sha256": "5a86e55a45ad40c0fff5c8fe0fba18b453f7605fa5d930d180407fc32bbc106e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/00_Project/README.md",
+      "bytes": 312,
+      "sha256": "78ab4e16af64124687cc2deea725c970978b109ca2560391fd1e535d60e9691b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/00_Project/codex-readiness.md",
+      "bytes": 653,
+      "sha256": "fccde295e4ada1dd27d5bd6d74639fe76a923f7a95b33ea3da108768e5bfa8ae"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/00_Project/consistency-report-v6.1.md",
+      "bytes": 574,
+      "sha256": "82e190aa4d2f95b7a46288ac576ba4453e5ec28e724319a06339c05537b962a7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/00_Project/global-documentation-index.md",
+      "bytes": 835,
+      "sha256": "f93828cae9d7f32b86160b311e9b2a28d7d2076a8471193fa04e0586f7887d67"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/00_Project/glossary.md",
+      "bytes": 983,
+      "sha256": "a62dc4d66413460882a27b08fd533142f4c56bedaf399d8f3a2735b7ef03a371"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/00_Project/scope.md",
+      "bytes": 793,
+      "sha256": "e9c00c30a208118003a39ae9b1afbaddd9f2a9244542c1adf37a9f49f4073456"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/01_Product_Vision/glossary.md",
+      "bytes": 983,
+      "sha256": "a62dc4d66413460882a27b08fd533142f4c56bedaf399d8f3a2735b7ef03a371"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/01_Product_Vision/personas.md",
+      "bytes": 491,
+      "sha256": "ef8088c5875c8aa6319bbaaf6a54da674f3611ae09fe990792e91cdcf03598b6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/01_Product_Vision/vision.md",
+      "bytes": 495,
+      "sha256": "5d95cb13ad05262c8c84459b7bac03c3d905c1d03ef7fbde4e7ef0e856f2aba6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/02_Functional_Specifications/core-capabilities.md",
+      "bytes": 894,
+      "sha256": "e08467f78e9623cc1ca32f350a6995cc3e93c431deaa429adcfc817d94aa50cf"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/02_Functional_Specifications/manual-data-creation.md",
+      "bytes": 739,
+      "sha256": "11fd4e202bb29a614e02153bb99148ec8b4752e4d76074cc0268c9b6f6f5e7ad"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/03_Business_Rules/core-rules.md",
+      "bytes": 2701,
+      "sha256": "d9613179f7933934d0b5d0996edd043d887bdbd6fadc458db9ce5fa54b815866"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/README.md",
+      "bytes": 569,
+      "sha256": "08f0d5d3bc844685085fb02f261baaf32856a7105895a835a8bb345c9095c62b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/aggregate-roots.md",
+      "bytes": 525,
+      "sha256": "5841f935d5d82a587739614a73403fd2e27228ae37bb1c35030368dc2300f8bb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/bounded-contexts.md",
+      "bytes": 450,
+      "sha256": "c1e4fabea3a8636f4d5002ee68e5310cd6bebe557c5553e9031506bca6a37cc2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/diagrams/context.mmd",
+      "bytes": 420,
+      "sha256": "6f6d628b86485511652b36b835c65d4ffb5f8efdc8c442bb7444ea054b799bbe"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/domain-events.md",
+      "bytes": 502,
+      "sha256": "5b0b194e969680e055ec4f7cd05ae7e7bc8fa04c4fb17e2080ac58274fd65829"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/domain-services.md",
+      "bytes": 482,
+      "sha256": "5e3c3e5997c12dc6ae5f9c544cf5bde61a9d6fe933eb92a60a341adc270f2955"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/AuditEntry.md",
+      "bytes": 430,
+      "sha256": "80667b90b63066486a36c591e08273a349a89989e5d63638fd19ce2da54376c5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Category.md",
+      "bytes": 463,
+      "sha256": "cda2d1863405ac244cf35dafd56d4d476af98fbe82ac8361d9351bfbea5000dd"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Championship.md",
+      "bytes": 544,
+      "sha256": "e8d5f34dd040d15be009e5cf4a195be59bad8cc2410d1e59e192b756dd0abdc8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Circuit.md",
+      "bytes": 448,
+      "sha256": "91b7eab3c22082ca759cdc5511835bf639440422bc0b7f9733df9dbde018b526"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Conflict.md",
+      "bytes": 500,
+      "sha256": "31d01e2c54a060a34eceaf7e903caba520f32b7026ca3f911fc80fe912b5cd61"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Correction.md",
+      "bytes": 539,
+      "sha256": "282fd0158d9218d5b6bde2b63ca9198a62d59e7f3feff96990c02d93c38e703f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Discipline.md",
+      "bytes": 430,
+      "sha256": "41c74987eb4e22df235aed5e37c9bada06c749396112c412a37fbec81d0a52ef"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Event.md",
+      "bytes": 423,
+      "sha256": "7afc2698b34404b6bdc7dc169d352542d9bb5f7b8ce4ca3023041262d460e1c4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Override.md",
+      "bytes": 459,
+      "sha256": "b893fdfabf8ef4fca1bc45490db05708f76db332ebcb0733443c5330241bfe01"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Provider.md",
+      "bytes": 502,
+      "sha256": "c8b8ea48549a4ecd22512da5cc5969000d008f3f02bf3fb93c360dbb62faa310"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/RawObservation.md",
+      "bytes": 524,
+      "sha256": "0ee948f03ceb8fdd7e5d1318a684d3c9f47911b5e5291a44bd6dccb29fe2a63d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Season.md",
+      "bytes": 594,
+      "sha256": "ab3e6cabd020f7c2be4008b3c42bd5e69fa2730be9e397a8b640eae33797ef22"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Session.md",
+      "bytes": 568,
+      "sha256": "b880e4d162c6ab1a686f1f0f0ba38111f5df17d947e2d160581ab5efd0db9a07"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/04_Domain_Model/entities/Synchronization.md",
+      "bytes": 545,
+      "sha256": "4e9e99f024891365c61bf5475fd2bb572eb1f4ae4e62478fc8ee4d2fd06d1cd4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/README.md",
+      "bytes": 207,
+      "sha256": "89cd666c2092528441839fb5af0a3ff3b35fc4fe430e1349ddd9672d1845a49c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/constraints.md",
+      "bytes": 564,
+      "sha256": "3dbd78389457a4816e1337b35c0fb5f71131996e7cc28fcff601d3f25002525d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/data-dictionary.md",
+      "bytes": 992,
+      "sha256": "802abffb2443cee8b7154edb20e1ce2cf89df5a1cb4be20ea3d0c6c60a2f9633"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/erd.mmd",
+      "bytes": 731,
+      "sha256": "16b49379c26995f8794b9c07ad6a789f67a0b30b7e15223f3ca1dacfba9c1961"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/history-and-versioning.md",
+      "bytes": 500,
+      "sha256": "802aee2862aeb5080219f5c54c183c69b05e02985cae10209f3bf43fc96ae167"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/indexing.md",
+      "bytes": 549,
+      "sha256": "779bd23a6c313c4a3c2da59bb5b1605ce8f930759f5255ed691c1e29e8c2dfb2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/keys-and-identifiers.md",
+      "bytes": 708,
+      "sha256": "8f9a4716b636f15cfce654de2fd5ca55f13882840c8a8df84da8d42de9c59db9"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/logical-model.md",
+      "bytes": 602,
+      "sha256": "1277adebea68a4bad55b5b303a71f8f33142bddb75a1b8328318bb02c45435d4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/migrations.md",
+      "bytes": 642,
+      "sha256": "4054eb4588dc0e3a3ec48602ccb78548046800954c4482e6e86a81534f111ae5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/query-projections.md",
+      "bytes": 366,
+      "sha256": "a6349f7b98726185e1794f31249c81539f0a1aab786e9c04f4663e9b7e0f5a2e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/retention-policy.md",
+      "bytes": 508,
+      "sha256": "ce972623d0c9dc3e5b483d8d9e7cf3d95f5b1431251149ead3da9e2eb3554057"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/security.md",
+      "bytes": 357,
+      "sha256": "b82be0919d080e8efb20213a9aba9a9247fcf89d3cc342ea76e69fb532688b6e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/05_Database/test-cases.md",
+      "bytes": 725,
+      "sha256": "6376b4e9a943d1d295f74b4289f9374c4bd93e081ee643e955547c247df583b4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/README.md",
+      "bytes": 268,
+      "sha256": "e01eca72ae74ea59aabc6bab3c2da3ed3f39edf7fe346b4d1a3af0167425be06"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/acceptance-tests.md",
+      "bytes": 772,
+      "sha256": "75d95ac5bb49be299de6991f67c61920815d566bb57613806430f4c64827123d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/admin-endpoints.md",
+      "bytes": 473,
+      "sha256": "3b0d0c309f751d166c8a7e68ec9a95d5d4a134e0766623cf52586e9ea80844ab"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/api-conventions.md",
+      "bytes": 332,
+      "sha256": "b8f241f529d4b763d713eabc25067af3c850e114dab62e059297b99f7edcb3cb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/authentication-authorization.md",
+      "bytes": 395,
+      "sha256": "6031943c699ef5695764eba402f53249733161a875792a7509289f847b9f87ee"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/error-format.md",
+      "bytes": 407,
+      "sha256": "9359927f638eb705c838d84801402435d6cbd5cc9dd27d4b7744b68f7e972e27"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/examples/public-responses.md",
+      "bytes": 329,
+      "sha256": "87c69f489a8739be7e062be6328536e61da5be5e46d7ff56d6bf932c1a94874f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/idempotency.md",
+      "bytes": 276,
+      "sha256": "a9bfbb06cfd981745d285470ed9084792b93a473deaad071620cf60e77b9c5c1"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/openapi/motorsports-events-api-v1.yaml",
+      "bytes": 13272,
+      "sha256": "257b65d41d673efc361142a28b97913917258389c996b805bfbbbde79fe14130"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/pagination-filtering-sorting.md",
+      "bytes": 371,
+      "sha256": "0308354349923435fb1f2c7f13d1435464543d590e5ec05342954647f7b68cb1"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/public-endpoints.md",
+      "bytes": 557,
+      "sha256": "2e97ae4a438f836b01354c94a6ec6679eb799d7878d53ed28ab0c9228fe70d71"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/resources.md",
+      "bytes": 191,
+      "sha256": "542577ab321112fff84aab11880808c169825c9ae8c73e3c579b7903945b723d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/versioning.md",
+      "bytes": 354,
+      "sha256": "1bf1b646b22db8f7400fbbbd6136d1444d40f94ab743ce67b924f759a15bb42c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/06_APIs/webhooks.md",
+      "bytes": 368,
+      "sha256": "93cc4d1fe9f7bcdd2a77a6a1b1079d3cfdbf424c7fedd1eb62cb957b69e972e2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/README.md",
+      "bytes": 439,
+      "sha256": "3c9163dc62211280e5d3167ccf858373bf1d1da27d19ee876fa5e0a52ce25ee5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/acceptance-tests.md",
+      "bytes": 536,
+      "sha256": "332f371ed9dc709a49529daabd89b22bb8cec4671c531a765aff9fde2a5bdc45"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/architecture.md",
+      "bytes": 418,
+      "sha256": "25d8af74f63d851b3e8ad09e6821d379d71557faa5f36051d28b7d65e723e39f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/change-detection.md",
+      "bytes": 433,
+      "sha256": "4628df53ee719324e9cff35047c730aa3ac4b56d09f9d289e9515b7332d84905"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/conflicts.md",
+      "bytes": 464,
+      "sha256": "745077a62b1a053b8eeea8e99850ceba5cead2e95900a2f52ef290e1ac6fd3e1"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/deletion-and-disappearance.md",
+      "bytes": 430,
+      "sha256": "6d8cb3ba212419d89f82e93c01ed953e266a5ed621f5a1413427761a908e4111"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/failure-scenarios.md",
+      "bytes": 639,
+      "sha256": "8474594949e6ab08306413617690db154f42f1595ab06bf127645c6b4107a436"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/idempotency.md",
+      "bytes": 509,
+      "sha256": "c07bfd05b5e7977ae448f75da56a2b6302050e66c780b72cae2651aaa2c08528"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/locking-and-concurrency.md",
+      "bytes": 539,
+      "sha256": "61785ad690cb0b45c4732bdced242cdeb4e722ddb2b7c69051bffce8c8241619"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/matching.md",
+      "bytes": 291,
+      "sha256": "cf410c2e0f604aaa5ee623b1a700b56d54b3a4ac12fab0c29e6a10f6d2e96f96"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/merge-policy.md",
+      "bytes": 321,
+      "sha256": "a3e9218667c44714746e9372c3d40d57e1e4f5eaaca0adea08839bc59c90a372"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/normalization.md",
+      "bytes": 478,
+      "sha256": "d23d21c89f842e6515e5617ff342203774e0c92735fea8bd22e56e4376bf2677"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/observability.md",
+      "bytes": 437,
+      "sha256": "a00d340dade86f01c53f38934544073e6f696eb152eee3ece17fb858be227bf0"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/operational-dashboard.md",
+      "bytes": 291,
+      "sha256": "2404550541770deaa632bc2cd2d1387a9523204d76eea79bf8352dfcbf68c6b6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/pagination-and-cursors.md",
+      "bytes": 500,
+      "sha256": "aef3f5d7b31b96079af95d08f28fff76e03320270fa840a176fb81f3e307b79b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/pipeline.md",
+      "bytes": 1452,
+      "sha256": "510eddef17260a34e493d64eb62da2711030bcf0e063bca6e3cd6c9eebcda5ca"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/provider-adapter-contract.md",
+      "bytes": 350,
+      "sha256": "c41e86bc0dfb78d68f15f1833f438457c1a5a029692ad97c6038c65aa238dfdb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/rate-limiting.md",
+      "bytes": 430,
+      "sha256": "66e1834beb13584bb25baa250dbe829ba06945ba9ffbcf4e6fea400da08159cc"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/retry-policy.md",
+      "bytes": 419,
+      "sha256": "b87663f7bea9c3917b5573458091eae79aefdc03b3a80e13978c56331800d188"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/run-lifecycle.md",
+      "bytes": 486,
+      "sha256": "25b01a47c813f905bb7d4c823bed3cb5185a2e918f8d925dd8b0248a44ff8ac4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/scheduling.md",
+      "bytes": 369,
+      "sha256": "5454297f8186c511e70c8f5bc12e0cdb4a5846ab1fa997bc76d27c1f1a9cf0cb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/security.md",
+      "bytes": 347,
+      "sha256": "2bf462aba4810efb7bf9b5fbc893833f834dd1193515f248798ebead91245a4b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/07_Synchronization/sequence.mmd",
+      "bytes": 561,
+      "sha256": "9b4b7ac0421bd6b18d2bcf83adca1984b7a166809848f1b3814d6ee8c2b8c439"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/README.md",
+      "bytes": 430,
+      "sha256": "1755fa8e45d925e75555a53449a4df78369f6cc62e95a49d76901f62b3d176b7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/acceptance-tests.md",
+      "bytes": 402,
+      "sha256": "ca816b60d67b69b6690dfad62bff72c4beffaff50f0740db720e00ca019e693f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/api-contracts.md",
+      "bytes": 540,
+      "sha256": "0cfb0808448f5b9db0a00a84e97e944c786b76f7719d2e17f650ad54bfd1b08c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/architecture.md",
+      "bytes": 644,
+      "sha256": "d1176814c594cb1e419e537e7875da7f213ea62334f408a34116cd907c3887eb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/audit.md",
+      "bytes": 391,
+      "sha256": "e7e2828fd46fdfb7f727e18b8bfa7ccde441b715af3de8556398ec895399d32c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/bulk-corrections.md",
+      "bytes": 483,
+      "sha256": "4479b6d376ef768a36a002dda3f12427a5967665ec996723d4274847766cbacd"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/concurrency.md",
+      "bytes": 403,
+      "sha256": "f6b0217d5b31126928064e1b08fff4fc70a29a8dcebe41b57749c0178afee346"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/conflict-integration.md",
+      "bytes": 488,
+      "sha256": "272e4b0ca125175834e7635bbd81506a574fd433f8ecae9ee28567df3c5edbff"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/correctable-fields.md",
+      "bytes": 368,
+      "sha256": "4d4217e294db1f9fa1baa4da1250fb3bc066f07b7c5d108dfa4ea03f7a78c501"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/correction-model.md",
+      "bytes": 402,
+      "sha256": "249db1be001bf4519bc08e4721b182106677cf44b304b814307c22ed6f2c2ed5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/failure-scenarios.md",
+      "bytes": 534,
+      "sha256": "f20e027c9c3243c74dd49f4b8ea9ed53dcbe44d14b124fd181ef8597d0b5ccd5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/field-level-overrides.md",
+      "bytes": 467,
+      "sha256": "160437b64811562800908424ec4f92f1f1ce1353b19409b2b54904b5199f8c03"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/lifecycle.md",
+      "bytes": 563,
+      "sha256": "bfd76b9e1f98da77ff8ea54346a3ef4fe53b8cfea6e6f6101648bd35d8639acd"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/notifications.md",
+      "bytes": 311,
+      "sha256": "9d4a115f54af82c372274808a2dbe4ffdbc7a5168acf4b2a4769c703938c7884"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/permissions.md",
+      "bytes": 452,
+      "sha256": "3e48f6e3bda506a578b89bb86caaf3133371e3f9c4162053edf9bf250060c2fe"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/priority-rules.md",
+      "bytes": 430,
+      "sha256": "b333e033ec9befa7eaa1d805e04b95688089db7bb08a555975839bddaf03e4b4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/reversion-policies.md",
+      "bytes": 614,
+      "sha256": "32e5521aed68bedbf8f70fb6b433f38ca15be6cfe6ccc42ec1e1f6fc3caf354a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/reversion.md",
+      "bytes": 619,
+      "sha256": "0bbf3e35b86b915588bc21ddc37deae7dbf10ce0794944fe58a8547fa4b75e70"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/review-workflow.md",
+      "bytes": 540,
+      "sha256": "7a854c9fe2905bade731dbfb5403801a74c53822edd982454afe2ef4ef59d76e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/sequence.mmd",
+      "bytes": 455,
+      "sha256": "8a90a1f1a3f45907e239d27e1188e91792c6fc1ba57ea15a3f341b3fd66c43e5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/synchronization-interaction.md",
+      "bytes": 560,
+      "sha256": "e9aab946329136e6180394846d19699de226abdd3fd1b172289823df1c756d77"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/temporal-corrections.md",
+      "bytes": 352,
+      "sha256": "e78c6739bc711c3998c0f5353564f84f38a544984fcebff47217ee3a7eeb6a8f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/08_Correction_Engine/validation-rules.md",
+      "bytes": 392,
+      "sha256": "2e9628fd299b53858a49c26d1d46c4f233823e8ecf235409068330cb3195bd27"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/README.md",
+      "bytes": 185,
+      "sha256": "eb2c1521696b07e8613876cf8746de9196663630a045a9e65301ca4f1c6d1858"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/api-security.md",
+      "bytes": 227,
+      "sha256": "d3d792a4d70d58547f7a7e382a22b4e18aea3d4befb03a5698f977cfa8ea88c4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/audit-logging.md",
+      "bytes": 289,
+      "sha256": "f0529b30e14cc04b952a94cfd0078d750a9f046f977f39c74f0b190161c2ff55"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/authentication.md",
+      "bytes": 206,
+      "sha256": "4bca8ac8e12ac82dea3c1f53383a6f973e9d69e2efc867d25f7472f3580ac09c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/authorization.md",
+      "bytes": 258,
+      "sha256": "41e381969e3f330993e8b8d91931debf46e5a74a47356938063d0939c0d66d37"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/backup-and-restore.md",
+      "bytes": 247,
+      "sha256": "b295f0bf4250613930b6b96e2f8d58463debd10a3d5b4dacc122a22c17507135"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/container-hardening.md",
+      "bytes": 234,
+      "sha256": "699609d5ec9a454e85da271333ad4a54ecc9dba4a1750df69b5c0ebc0597a9cf"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/database-security.md",
+      "bytes": 198,
+      "sha256": "a1226cf1c75ab84fbb4218958d42989e803baaf7b4dabce2785db61757a6ce7b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/dependency-security.md",
+      "bytes": 206,
+      "sha256": "27c9ae7b7551e2a59f196793e080f39c361b0b0bb97723467f41d25dc433e10b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/disaster-recovery.md",
+      "bytes": 249,
+      "sha256": "49d4725eeb359b39acf50bd9893d352b0892d5210894d825a7047020931f07c5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/encryption.md",
+      "bytes": 215,
+      "sha256": "c23cd01665db9b24f8b6b2e020c96b562632131fb9c98387237c7d2ec92c2d92"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/environment-separation.md",
+      "bytes": 187,
+      "sha256": "829f47ca65c8dc85a07e10acc7532511f45fbb4f42252273f7b286f108e9eb23"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/incident-response.md",
+      "bytes": 241,
+      "sha256": "bb94af0c699448b9c99a63d3fdc6c04b99b8b39169bb553326666b097678ce52"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/input-validation.md",
+      "bytes": 294,
+      "sha256": "81f0aa4c47cb69f01bd720bc404559025df30bb8fe4a79d06c880c27f65d014f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/key-rotation.md",
+      "bytes": 248,
+      "sha256": "75190d76c364330e68753f1d42f9563c9334ef744d8f3cb4c965b0ab50fd794f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/log-retention.md",
+      "bytes": 210,
+      "sha256": "0b38713b3e166fa664cb099a9fee42c0ae3c902923328e41b164dd60e93fd06d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/network-security.md",
+      "bytes": 231,
+      "sha256": "cf50bd75ebff59c2dc91e8db3e8540a77f5c208a264d0e45a487de1d9e4f2163"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/owasp-protections.md",
+      "bytes": 199,
+      "sha256": "25a3c1d0c7f76b0e24d477d96a7b89633d8a1de63dae3a39a47e16f519ea0330"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/permissions-matrix.md",
+      "bytes": 538,
+      "sha256": "4238e4ef59b2cb2663a306efd72ce388e63325924152c12ece07c93f61da539d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/privacy-rgpd.md",
+      "bytes": 234,
+      "sha256": "a91b0d6f93a81dd18c42887a54bfccab05a007cf4b3af6d6daeeb724660c87e7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/secrets-management.md",
+      "bytes": 225,
+      "sha256": "c679b5251b2b3d9001011dc87c19f86801437ab19c0a6b8b5748c424ba900a95"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/security-acceptance-tests.md",
+      "bytes": 821,
+      "sha256": "c611183a3d9c58f858d53939dadf99b7ee5d53f458c5385dd8286786994c7590"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/security-architecture.md",
+      "bytes": 296,
+      "sha256": "8896e4ad8bd400d6aed13488c57efce0c06b83b3f91b5eb930033e05217895a4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/security-checklist.md",
+      "bytes": 429,
+      "sha256": "54942298b9f7a1002fb28372bf7a0adba936bbac4a42d68beaebe3180eef0cab"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/security-monitoring.md",
+      "bytes": 248,
+      "sha256": "4504ef8a801e224b1de177c87e84d0fc7e06048a69cdd561a6fbce0721fbcfc8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/ssrf-protection.md",
+      "bytes": 221,
+      "sha256": "fe87759e8886cb641c97767968b0e4c0408aeeebee0de87b70463c228bc3d064"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/threat-model.md",
+      "bytes": 345,
+      "sha256": "3dc76fb6737500cb75e2b9b3e60954fd2157975911e73042ecfe67e2818eebf6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/vulnerability-management.md",
+      "bytes": 196,
+      "sha256": "d8a9fcdc493f63801e6f4637a3d5ad72eb43e2a2a922aa18e878c160c07f38e2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/webhook-security.md",
+      "bytes": 226,
+      "sha256": "c4b6ad589dc4934c393b17da3d3d3506d4c3b875e89e05ce5619550f2fa0bc08"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/09_Security/worker-security.md",
+      "bytes": 240,
+      "sha256": "bee4f7b3d7043fb5c2972b9c94dca90575ddb33869db12ee3013beb66e6eb3b6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/README.md",
+      "bytes": 446,
+      "sha256": "88c1d2441fd3e8c1a637a4cd92acbc6b7d4cb43425f25d82f5ac8404442e2889"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/acceptance-tests-catalog.md",
+      "bytes": 922,
+      "sha256": "11162b39005407a3c52e5b5494d4f368942ffe406ba947cc90d22bb26e1b119f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/accessibility-usability.md",
+      "bytes": 377,
+      "sha256": "c85bad27b35025da565ebb278b0a22fa7f4047a96c14bf0cca51b39ca1a645d4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/admin-e2e.md",
+      "bytes": 261,
+      "sha256": "496fc5a53c088ac9cbebd3793451cf98e487a4393fdfff5c989c68fd03af8e7c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/backup-restore-validation.md",
+      "bytes": 393,
+      "sha256": "5c594a9397152d67b090507c3c6a72cd3ebcbeadb27d92bc0051b97560fb8002"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/defect-management.md",
+      "bytes": 412,
+      "sha256": "098a56fb56692cbe41ac80aa1b1dc66f1f415209bdbcbd8c07d82eacf5514f99"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/e2e-critical-journeys.md",
+      "bytes": 1112,
+      "sha256": "e28b4c8848f275781340d78f1aa1d9cbe3f7d1b995c917bf3b22e7609a7cb4c9"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/e2e-domain-v6.1.md",
+      "bytes": 663,
+      "sha256": "923a0ed0a16860b37103c9fba66a7567a2cfe6ba11738cd0e24b10146889d264"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/entry-exit-criteria.md",
+      "bytes": 499,
+      "sha256": "5004e7fb447bda33692afbef6614fca15d8b1b1adb9559d725ca7f8eabeb16ae"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/evidence-and-reporting.md",
+      "bytes": 368,
+      "sha256": "5fae858dbe7b2dfd7f62102661166f0eb680b9ca4b46c506772860aefbc35626"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/go-no-go.md",
+      "bytes": 383,
+      "sha256": "dac2f8bfe402f450a338fa724fba507f263ce53ffec2fef50dc2d5684a6ccb1f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/performance-testing.md",
+      "bytes": 443,
+      "sha256": "b7bb9554e3957bdffa627857d777dfe77126170bea961aa6f6dc3a9feff6a3ff"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/performance-thresholds.md",
+      "bytes": 476,
+      "sha256": "04d8691ac3b13cfe92b219c656ec088569102f687f5d9050a7e419f59d1b20cb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/public-api-e2e.md",
+      "bytes": 270,
+      "sha256": "679e98f88d740f1c16fbf297f82e12a6600bd8524311e77b55f5a06a31230fa0"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/regression-suite.md",
+      "bytes": 471,
+      "sha256": "393e49fe412b85b107c5213b5ca3ad53911995483ff5167e3c4821eb3bdda2be"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/release-candidate-checklist.md",
+      "bytes": 416,
+      "sha256": "c577343241080a2622817f5f7ffb7c070c328b9be3d753dee3443b61f019a2a2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/resilience-testing.md",
+      "bytes": 442,
+      "sha256": "e513fcad62215be7f33a0ae21cf236e442a191312e517df5cecb87c0a7e27540"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/security-validation.md",
+      "bytes": 316,
+      "sha256": "a5abcafda16ca496ef4a35c01c1f1b07ef5171d68b3fa24643ce48f3088edc8e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/test-data.md",
+      "bytes": 520,
+      "sha256": "417974e58438a24925aa02d4b29dda530528abadc9448c82ae1d65738cfb2ac3"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/test-environments.md",
+      "bytes": 408,
+      "sha256": "88605ff4bab8a786983a3fcb63a23e628a1299c80b2f7b4757a111eefc6a6358"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/test-strategy.md",
+      "bytes": 441,
+      "sha256": "35e1e75f904963b60352c832bca9cdf6965aeebc82e1ad311e48e5f08e2955fa"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/traceability-matrix.md",
+      "bytes": 284,
+      "sha256": "cca596f7c454ea19705e2d3d162fd565662d1df4ff9c6622c54be730f70af7d1"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/traceability-v6.1.md",
+      "bytes": 402,
+      "sha256": "5ccd00a796cc4ca7d158854b5afdbecfcec1e4ee76e6475d1c34460a84f756fc"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/10_Acceptance/user-acceptance-tests.md",
+      "bytes": 298,
+      "sha256": "e955627f30efbc35e873254923aa37c8dc99ae6d6b67fb794e32b406f56523ab"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/README.md",
+      "bytes": 426,
+      "sha256": "8ae8b0de71b5943fb65dc91e6ce8c7b6a65f0daba5e6549e08beffa8d9bf5466"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/api-evolution.md",
+      "bytes": 252,
+      "sha256": "5197483f150529b545f680cb1e88356f76b252a740735c3d53193ce325c3d40a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/architecture-standards.md",
+      "bytes": 369,
+      "sha256": "05efbbdd058d19cbbd6abff0ae70add94f003e937bd3b05e7a3569cef628c254"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/ci-cd-pipeline.md",
+      "bytes": 559,
+      "sha256": "45a62cc0a791ce664f6330d44f102b60c8d7a9734dd3e1f58b3f97cc39e0cc1e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/code-review-checklist.md",
+      "bytes": 508,
+      "sha256": "bd629530bcac87993178c9189166c418fe21e0e6c8af83f322ec3499a998ff35"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/codex-operating-rules.md",
+      "bytes": 441,
+      "sha256": "c3a6fe32d298e4621f3315bcb754e454727f0385425bce7dfd4fc0998aa74918"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/coding-standards.md",
+      "bytes": 532,
+      "sha256": "8e05f5ce22fe7480c90ec3581d9bfebfdd736c3f3b9ef769795bee9c6b71c5b9"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/commit-conventions.md",
+      "bytes": 235,
+      "sha256": "49dcc354e3ec05ab53ca41a520e58e07518cc0c631a3f5e8d8515c35a70684a9"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/configuration.md",
+      "bytes": 351,
+      "sha256": "492b545a9766a8f1d1bf6059c6b56a67f98ded936c88f0e20d9589e45173dc43"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/contribution-guide.md",
+      "bytes": 291,
+      "sha256": "34f814fa5d90d70b312a9dde838e7ca66d99274c5d518b3ebbf4c682e4d53ef5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/database-migrations.md",
+      "bytes": 642,
+      "sha256": "4054eb4588dc0e3a3ec48602ccb78548046800954c4482e6e86a81534f111ae5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/definition-of-done.md",
+      "bytes": 477,
+      "sha256": "c364383745e25cac3ca130c6b5c57f4eb4bed660da768ecc18a1e993c1b6f1b3"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/dependency-map.md",
+      "bytes": 570,
+      "sha256": "50e1bb3201a323ab64a6262fb27458f1488b50b5f0a979d9bf5734f3d41399a4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/documentation-maintenance.md",
+      "bytes": 329,
+      "sha256": "45e96766667a4865b5a9cacfe8dc41c51b31416cc4b8f7615d6d900c6df5971f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/error-handling.md",
+      "bytes": 395,
+      "sha256": "3ad564745b333305f5c39fd960a1ace068268e037ccd572b7f91140ebfa418ac"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/final-validation.md",
+      "bytes": 414,
+      "sha256": "0d51b4685afea1df71e4e4a3d520619c1282264d285e7e5e1d2aac23c225044f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/first-codex-run.md",
+      "bytes": 700,
+      "sha256": "c0c17c5d96984808dfdf05f56fd0703ce979fb14b498432454d97b40a18acefe"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/git-workflow.md",
+      "bytes": 445,
+      "sha256": "775149879210e332b0b5dfba16b3c6b836b0dea854cc184a4f27ae69862db5d7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/implementation-roadmap.md",
+      "bytes": 341,
+      "sha256": "3827f5039652529e367125dc1455cd450b6810b0775c49769692de6a79a893d6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/maintenance-guide.md",
+      "bytes": 449,
+      "sha256": "28e0e8dabd2df565e49700aa319cbb1a7917de616e6208848fce4d84eb3cdb2d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/migration-guide.md",
+      "bytes": 370,
+      "sha256": "2ad88575617fb472f435edaa845ba238d03dd09d541457e40db45f6a63c769f4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/module-order.md",
+      "bytes": 351,
+      "sha256": "0973d48b8dd6dceb011b48c4fb0f2f1d1b9c493510968b5559f53c849022bd31"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/operations-guide.md",
+      "bytes": 432,
+      "sha256": "7c907328913cd089eea4f3fe9305f8593ffe975a6fdfe615a3e87aa87a4f943d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/release-checklist.md",
+      "bytes": 369,
+      "sha256": "9eadaa9b0bd4630826f42408ef1ce761715aa0d9b42c2f6444002d245013464e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_Implementation_Handbook/versioning-releases.md",
+      "bytes": 282,
+      "sha256": "398ac8a6ce2276a7416a4f3fa6846503b0176af1f44f39a9817f16bc44ac9d80"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/README-v6.1.md",
+      "bytes": 427,
+      "sha256": "e0373635ef07a0fad7832befef9d3e59a072949ff4c53d4779921728fc2ca0d5"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/README.md",
+      "bytes": 333,
+      "sha256": "6ca3d074c2fb70d2bbcf7cf5c6a54e6af43f6eb2c04f4c3771c8ed48b9f1babb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/acceptance-tests/administration-screens.feature",
+      "bytes": 811,
+      "sha256": "7f1141d4a6d9a31def0830b84960169dddcabd4e34c824df5c0b8876f6cb4e48"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/contracts/frontend-contracts.json",
+      "bytes": 786,
+      "sha256": "14486f62c45bd566a5a66d73796a2d7b0c45984e9bf1f72cd82dd2c6bf11a51a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/prototype/app.js",
+      "bytes": 159,
+      "sha256": "3d8785292f00f423a85b04eadb7c6e62af30701582daea5cbcf54777c6c089a3"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/prototype/index.html",
+      "bytes": 641,
+      "sha256": "0224c04924dcf032c31dd5f7dfc28f46e3bc8f92b12c651a1bb05ff6f4a13cca"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/prototype/styles.css",
+      "bytes": 506,
+      "sha256": "03006d60580018007bb3518c8fb5a548ee372cfffca8d0d238245ad5dda44cfd"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/maintenance.png",
+      "bytes": 89637,
+      "sha256": "e9df0ebbda9d662eb4597cc548b841c4f5912aa937c157fa6d8b2ad7ecc0e8fe"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/parametres.png",
+      "bytes": 70065,
+      "sha256": "9382332ee618135be5f6f91844a9705e8573464b966f21e34fbb2f8204bee7b3"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/sauvegardes.png",
+      "bytes": 96215,
+      "sha256": "f9f391559b6b356cffa101e7b9120e98786daeb1e13d7551caf28a64ef276034"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/screens/utilisateurs.png",
+      "bytes": 70959,
+      "sha256": "0ffa4569061b1d0aaa29779d41daed82434205e242e1275a1ebbe66fe430b930"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/maintenance.md",
+      "bytes": 289,
+      "sha256": "2ff8feaa203683696ba20abc97243cebfe54ecbda3ec7a156312d7a15e143ca8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/parametres.md",
+      "bytes": 259,
+      "sha256": "0498c49ff46223d3da662495f05ae9a6102255c49c0d2b920acaabbdd27382ce"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/sauvegardes.md",
+      "bytes": 552,
+      "sha256": "7dfd8ca057b2de045c7abe35ae38959cc8b72486952c1bccc737b5d987f6ce78"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/administration-screens-v6.1.3/specifications/utilisateurs.md",
+      "bytes": 341,
+      "sha256": "5a411c36ab22b0319d21a2fe3d79aa9b07139ec5b3bb8167f767ddc2301cce94"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/component-states-v6.1.md",
+      "bytes": 13361,
+      "sha256": "86450e66829f30b27be67c48314abf7b8bcd31fb49f298a9d4283c4bf8d6bcb8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4/CHANGELOG.md",
+      "bytes": 284,
+      "sha256": "c62921b3f6d6e3b9e385198ee3138acd22c3f6eecce180f12a49709feae17df7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4/INTEGRATION.md",
+      "bytes": 739,
+      "sha256": "725f4bd67d1ca7d896c43518b1ac0b478c6a805ce2e61967569fbf690740f534"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4/MERGE_INFO.md",
+      "bytes": 293,
+      "sha256": "48dbf36deb957115b5dfa25975c66c373f733266dd5c6c50e05082c664e4343c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4/README.md",
+      "bytes": 220,
+      "sha256": "d574e3f43953b6343348b0c7f0915ac457addf328ac8987c411815f06803236b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4.1/CONTRIBUTING.md",
+      "bytes": 62,
+      "sha256": "487c5a15180aa68542428d313c6742a6c44e959065864c3550a7920f205222a3"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4.1/README.md",
+      "bytes": 75,
+      "sha256": "a9596b5771386ac4f8aecd6e0bab5fbc0a6845bf57dc40a9a83480fa3880a638"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4.2/README.md",
+      "bytes": 394,
+      "sha256": "b8e5388164caf38614cd7ae5bf0bf7158c31d9e206c1539c034a9a40e98483c8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4.3/README.md",
+      "bytes": 331,
+      "sha256": "33f76da0a80b68ed770e8488c3705d340149a0d64e5e4633f6c80b8b2efdbf17"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4.3/figma-import-checklist.md",
+      "bytes": 115,
+      "sha256": "a0f6c80b78ac15b08c83988e0ee4cbaed1297b2f6af64ea3391a6f8319916541"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4.3/measurement-protocol.md",
+      "bytes": 212,
+      "sha256": "41523fd9e4ec1a7e600512b0677f5fc4ac237e57104d1afc860f651e82ce94de"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/design-system-v4.3/readiness-report.md",
+      "bytes": 155,
+      "sha256": "6adf5d28dc7d0da7e0d59011b2c7e4f094225a4a4025d3e13ed09bc229f8895f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/accessibility/WCAG-2.2-AA.md",
+      "bytes": 902,
+      "sha256": "55f1383a5c3cc641f4325f1eb7ad6d7744499c403880577fc9ed969d57db348a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/accessibility/a11y-checklist.json",
+      "bytes": 265,
+      "sha256": "6f0838e79aa0012a9a5f837583a9fff3cfe625bab7fc8bbd0cc6fc8e7361e34a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/demo-data/README.md",
+      "bytes": 284,
+      "sha256": "f76b78a433162966fa1957b70a768f1d32abe1193bdb5d564b1d0525b86c8e1c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/demo-data/demo-data.json",
+      "bytes": 1219,
+      "sha256": "24118d616d149d055039bbcf99011ceacea1addd14c209daf2281691e0787527"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/global-states/README.md",
+      "bytes": 648,
+      "sha256": "746255c02a139752c727b032736dadeb14a00a8f1009c6e7477a28549f06f7e7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/global-states/global-states.json",
+      "bytes": 977,
+      "sha256": "6420c5752e28984eb2c41fa99c0316cfcf1c3f3c757e1f94b83d027583c9bfce"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/playwright.config.ts",
+      "bytes": 568,
+      "sha256": "c82bf5f44f868062f681c039dd1667247a5917e3d2cf2c75df4fe655b41ae67d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/tests/accessibility.spec.ts",
+      "bytes": 404,
+      "sha256": "bad1d8879136b140ae6fa46e0f9bf4cd5701483931f17a2c7cb5415c34f7e86a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/tests/global-states.spec.ts",
+      "bytes": 529,
+      "sha256": "8ec63e1013b699ea1ca22a0049c3e64ada0c93a8d69acaf72779b12adae53b84"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/playwright/tests/visual.spec.ts",
+      "bytes": 666,
+      "sha256": "5530cede481a9ee443c2942c5e10291b0156492e228c163f67e518a7a86a1a4b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/responsive/README.md",
+      "bytes": 806,
+      "sha256": "eb901d06c1f283549efe358effc78e8b18c6be29adcd7e70e87c505b1d59b479"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/responsive/responsive-tokens.css",
+      "bytes": 758,
+      "sha256": "c4b8d5ecd18da355f2900f7470caa6b2b1cd6a003d9ef177aaadb1bc5bef72bc"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/finalization-v6.1.4/storybook/story-matrix.md",
+      "bytes": 337,
+      "sha256": "b274e9a5f7c15337992313eff5067ab149aa95b96c5a87775b52b360729e8fdf"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/README.md",
+      "bytes": 779,
+      "sha256": "b9971543092b41a26e40584f183f7b6fbe2c9ca938b41af6dea9f03dfe35f669"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/prototype/app.js",
+      "bytes": 5688,
+      "sha256": "d00efaa3d93dfcf2d3026514847b55b61a6b2faf23b6098def65cdbf97ee1733"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/prototype/index.html",
+      "bytes": 1322,
+      "sha256": "47f184f8c0aed73753619a245fb0959861b23a40004edeb029193610777b8be7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/prototype/styles.css",
+      "bytes": 4132,
+      "sha256": "4d3c1fd3899023a1fc5b1b57e0e488e9c806e3df65c9c059bf2904ed72027e17"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-1.png",
+      "bytes": 69865,
+      "sha256": "03bd2147241817820d0c1f2cb615a56ea1c3fceb554e86b0faed0c11e1cd44b8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-2.png",
+      "bytes": 71138,
+      "sha256": "415aec04a0d7f9aa2d6fcccb7e37f27c4c0141a38479f6c3c14a5750f2ef283c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-3.png",
+      "bytes": 75902,
+      "sha256": "9368e79f0e846b0792df5731867a4e2ed239dd87cc0b4c42c38dc71b54ff7838"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-4.png",
+      "bytes": 67385,
+      "sha256": "5b06e2c214b993780ea030028aa7292d892e6fdece6b21b59a0f13bfb40de157"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-5.png",
+      "bytes": 72019,
+      "sha256": "60f55d2b46eed5a107af59e0e8e9f88133f04d7ace3d0444bf92adda3032a6bb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-6.png",
+      "bytes": 75214,
+      "sha256": "016012a2ed69307f94185962bca8bb86a7634f4d72b628fedf64e88dbcff83a2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/screens/step-7.png",
+      "bytes": 85457,
+      "sha256": "c4d14717f96ffd52fbe22cc298b8a4d3c5fcffb83735063a06c4b15082fd3a08"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.1/specification.md",
+      "bytes": 6047,
+      "sha256": "04c6002d196f43b6f95eda8f281311921adbb0b8fde02d5979f42eb8bb331647"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/manual-creation-wizard-v6.1.md",
+      "bytes": 588,
+      "sha256": "749c5e590ab6f50232bcb9008b3bf88444e48036b4a5afc9987cfca5ec8041ed"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/README.md",
+      "bytes": 806,
+      "sha256": "1b373c662c6a976c1583aa2dbf13a5ad66d1298dc1aafc7972b6b8d7a4978b08"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/acceptance-tests/operations-screens.feature",
+      "bytes": 1151,
+      "sha256": "67333f40a201a810806b01d73532ce5b9fc983cb065af9efdf6e0eb1d7f810eb"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/contracts/frontend-contracts.json",
+      "bytes": 1057,
+      "sha256": "a612b1f0359eb26f27eac227f919697f68d6944b0779aa73d2c7292cc96bf59f"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/prototype/app.js",
+      "bytes": 3726,
+      "sha256": "22313867d21b4d13f84582e22c35d9ec09d16d19e3098598aad7e3673132c65a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/prototype/index.html",
+      "bytes": 483,
+      "sha256": "e9cdf71fea1177b7de587cdec71bf09fb87a3b2d38aef507021a654006cff479"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/prototype/styles.css",
+      "bytes": 2529,
+      "sha256": "b503146f02ac125a3c264e2809300497742399ad878da5e60179b027c19ffac4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/api.png",
+      "bytes": 64814,
+      "sha256": "835eaaa74aa85e54fee9f0a73d06b6adc5f692b225d13a002962c2a84163a655"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/circuits.png",
+      "bytes": 62703,
+      "sha256": "d91ab94c582d6d9703e1b33bfae511dc4ca26f42e19c0070a96119e8e9add264"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/journaux.png",
+      "bytes": 63380,
+      "sha256": "4f14a90976d851be4594bee58f4df4015bb202eceecdaff532abfa62b2d7f31b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/screens/observabilite.png",
+      "bytes": 66503,
+      "sha256": "9b65604c9c3ee0ab391037a13bff4cea9d41386e7c2f6440b4fda969d4f0f57d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/api.md",
+      "bytes": 980,
+      "sha256": "daa3a6aafcbba3dd48b6b27bbf9a812958964738f2a03772062c53d4f54bceb9"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/circuits.md",
+      "bytes": 1121,
+      "sha256": "7592aca4a5c5c2897158ca8978a0652ad93d17e081830963685455b8726e3231"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/journaux.md",
+      "bytes": 920,
+      "sha256": "b5f608ae0b020d849aa1d10061cd571a617fec7c5d1f2e7ea87f511f6b81b478"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/operations-screens-v6.1.2/specifications/observabilite.md",
+      "bytes": 848,
+      "sha256": "de40d795516ebd352b599c065be7419bfdba5c8c90040e43ee48718c3285c0da"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/pixel-spec-v6.1.md",
+      "bytes": 10008,
+      "sha256": "85559031b5b9b28cb3798e1eee538a8e82634cbda3179165d432099ae773022a"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Championnats.png",
+      "bytes": 84877,
+      "sha256": "56d54b91c8f44f5112443646bf1a714ad242aff961e3220d6ea3ee42244e3714"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Corrections.png",
+      "bytes": 79512,
+      "sha256": "92025f766447ea25085df8365260e9a3a0333191aaa66426680b005b8c678de6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Creation-manuelle.png",
+      "bytes": 76105,
+      "sha256": "389d4e43286f145e86d4b46a526670d499e2f2902778adeb5d4b6435d4d5a5b7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Dashboard.png",
+      "bytes": 96388,
+      "sha256": "efc8951e5e5b0bfd83c07ad65023ce7e104eeb747ff0364eac4aede8613994f9"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Detail-evenement.png",
+      "bytes": 82085,
+      "sha256": "ab6afade454668d9f02806d875b7b3457d23ce183acb54138384124e0119641c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Evenements.png",
+      "bytes": 80131,
+      "sha256": "bf7c0fa9164415ca49fdbfd0cae6c834e8a93c6a8ff843744d0fe874595643a0"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Motorsports_Events_UI_Storyboard_v6.1.docx",
+      "bytes": 628717,
+      "sha256": "1962c1ee145c45bd304ceadb658c043acd64fbebb75439dd12daf90d93898973"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Motorsports_Events_UI_Storyboard_v6.1.pdf",
+      "bytes": 664389,
+      "sha256": "56a274f1da1ef8afdd16edd97f9c87fb455c4810edd13c84c335dcacd2cf70b7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Providers.png",
+      "bytes": 78422,
+      "sha256": "ab1040b344dee714112bd9594bcfbc3a857cb0a6806e45f95da75d3de25cd624"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/README.md",
+      "bytes": 370,
+      "sha256": "cdfb28b3588fe19d06acfb93373e2378ed9a1f9e8bd08e137f6fe8bbc1ca98d0"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/reference-assets/Synchronisation.png",
+      "bytes": 77222,
+      "sha256": "89208bca0ec7f292b49da945234d11a05dc58c5427227fc62b1dc53c3bbab060"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/screen-update-matrix-v6.1.md",
+      "bytes": 884,
+      "sha256": "1aae16da83928d2d775e80480d97ead5490cd437acf1323fdbdc93cd68eaeb78"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/tokens/component-states.css",
+      "bytes": 2125,
+      "sha256": "045f03cab9b155162d3e3a4003cf6cd854bcabe0a2b2bba359ab82ad437215ef"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/tokens/component-states.json",
+      "bytes": 1812,
+      "sha256": "e08c1dc427c24df3d1f7774e2381583d63fa18b3b3756f8af66dd10160465980"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/tokens/tokens.css",
+      "bytes": 1085,
+      "sha256": "ead47c9a418ef2ce95e3e0f44cc11398ff119b1548fb2a032ad6ba444af04be4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/11_UI_UX/tokens/tokens.json",
+      "bytes": 3028,
+      "sha256": "5b60e7ada131e30aba83e22b750bc4112c0178f1970672027bf8a13f83d10efe"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/UI_ADMINISTRATION_IMPLEMENTATION_v6.1.3.md",
+      "bytes": 633,
+      "sha256": "e4bb74fcd7cbf33e3801a737d7852932ed679e4a65a6c3376ee1a67f46cea9ce"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/UI_FINALIZATION_IMPLEMENTATION_v6.1.4.md",
+      "bytes": 883,
+      "sha256": "572c2d255a85fa1c5b7db8088c5dc7374e6e77cd10d5fe15376a12705be95a01"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/UI_MANUAL_WIZARD_IMPLEMENTATION_v6.1.1.md",
+      "bytes": 1470,
+      "sha256": "a0cbfa52e7d5646f5caedf206a56ef400c445ece810fb174d1deedf8932ed26c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/UI_OPERATIONS_IMPLEMENTATION_v6.1.2.md",
+      "bytes": 1009,
+      "sha256": "b90eef716243215bb4c99f3920acc11434139096068b4544ddd336909857c8ef"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/acceptance-implementation-v5.7.md",
+      "bytes": 748,
+      "sha256": "cc3fe572e81662b47471c0b4c305a1be9b22507bce922bb6bf6be2c832d4f267"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/api-implementation-v5.3.md",
+      "bytes": 479,
+      "sha256": "0323f2c7ca0eba8493d910ad14ce145045689e0464b0ff1d030e6db323f1ddd7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/correction-engine-implementation-v5.5.md",
+      "bytes": 834,
+      "sha256": "3b545919592a5d4e703a7d9e277c5c7a8dc25997f0e2a54f2dbf7fad77280678"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/database-implementation-v5.2.md",
+      "bytes": 717,
+      "sha256": "b4ec5fd61a8308a66d832f75c4d5ce4fbfbcd00db69f0f4999b39bc777a190f8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/domain-coding-checklist.md",
+      "bytes": 476,
+      "sha256": "559048f5c1cb2a97944a1b65caa0dec65a75f3590d4316acf860d5ee3a116a6c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/final-codex-handbook-v5.8.md",
+      "bytes": 643,
+      "sha256": "64252d57ab486520dbc5c56344f610e29444410391e9db7dbb950b8555f06c4d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/final-codex-handbook-v6.1.md",
+      "bytes": 840,
+      "sha256": "7a9bcefdb2247bdfa154fee15ba596c2524b1caa6e309a6333233db6afb0e0cc"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/implementation-order-v5.1.md",
+      "bytes": 688,
+      "sha256": "eb67229dd8daa08b71d7426beeb316dfee60c41e0af57f90a01761bf84fe1791"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/implementation-order-v6.1.md",
+      "bytes": 351,
+      "sha256": "0973d48b8dd6dceb011b48c4fb0f2f1d1b9c493510968b5559f53c849022bd31"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/security-implementation-v5.6.md",
+      "bytes": 554,
+      "sha256": "0d1593c6541d4d19f872f27c6acca59a1258fced981caf0d87044b7b2e56e281"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/19_Codex_Guides/synchronization-implementation-v5.4.md",
+      "bytes": 836,
+      "sha256": "84221386cc6fa3516bedb0d510e72e639c49476f368b21190a112719655b721c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-001-canonical-model.md",
+      "bytes": 440,
+      "sha256": "be16f9b791ab4d09d97d8ca3b712a146f51bfe3f467bbf56e3d1fec1e6968c98"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-002-field-level-corrections.md",
+      "bytes": 357,
+      "sha256": "0e452985baf06f08ddda0fabee0d237a181f1457ece9824b5d4de0fb481cfa1c"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-003-append-only-observations.md",
+      "bytes": 376,
+      "sha256": "c8093f728e68e8822c75098228df9d1904842018aac62d57ddbb3864001ecbe9"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-004-logical-deletion.md",
+      "bytes": 302,
+      "sha256": "68104d34e6d87bcf00f82a8c467a60ec6316638d4e63d7af57b994681fe41b12"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-005-rest-versioned-api.md",
+      "bytes": 185,
+      "sha256": "5e4df7087f98fb1bd2cf2aef9f137ac33398b769871534a042d1fc3c7fb56e3d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-006-public-admin-separation.md",
+      "bytes": 180,
+      "sha256": "cdc6ef07a746e0fe06d3f82e3cc4ba15a2dec805552694c6ab8ec07e451c6eb2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-007-provider-adapter-boundary.md",
+      "bytes": 200,
+      "sha256": "c64fc971c1b1d834ea3e2eb4bc836ebb7c014e95b04d931e09a3b17a542c126e"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-008-checkpointed-synchronization.md",
+      "bytes": 153,
+      "sha256": "a735f1947376063b8c3f61d114372e96cf569880c0f028bfb828dd76136aca07"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-009-no-delete-on-partial-response.md",
+      "bytes": 211,
+      "sha256": "877dd0194f0721c3b50f32df679bf258d89089d88d9db4cc7e348062b7fb47e2"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-010-field-scoped-overrides.md",
+      "bytes": 184,
+      "sha256": "cad1f48adaa3132c899cdc0e2cd9c27ae699b3af21a77f5ff28294162e61b38d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-011-reversion-as-new-decision.md",
+      "bytes": 163,
+      "sha256": "e585f204f85def638b9045b5fe8f212622e706899b9b7ebde75a7f0a0c82d4c3"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-012-manual-reversion-default.md",
+      "bytes": 186,
+      "sha256": "3e42d00f3286b4900217bdb088e046901bc3200f8153e9525102078e76126ae3"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-013-deny-by-default.md",
+      "bytes": 139,
+      "sha256": "7b6b28c160198c23729ec2debf26b5e7f84f04358198098a18af38ecd380f272"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-014-secrets-outside-code.md",
+      "bytes": 136,
+      "sha256": "5e345ab7b48b28014d8b0bb37c10f3462b42f8ba3d4458cbe58a0722a082a85b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-015-non-root-containers.md",
+      "bytes": 128,
+      "sha256": "f61502e2e2872cf12e276000b5a6bdb681f81bb520f60348c7857ae590796c08"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-016-audited-sensitive-actions.md",
+      "bytes": 151,
+      "sha256": "fb773d6fcf05eb66f03cd1a642bddc182218d5986435e22a9607befd0b7fe0d7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-017-traceable-acceptance.md",
+      "bytes": 129,
+      "sha256": "8b9db97d41f7e134bbf6e5d68d039e999deec967c6de6c8597518e6f5298c5a8"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-018-no-release-with-critical-defect.md",
+      "bytes": 146,
+      "sha256": "cd7bf59c40f8d2b0455eac34b0394c5f674314d751e9a60c3e5270b6924062d6"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-019-restore-before-production.md",
+      "bytes": 165,
+      "sha256": "a360b6eadb12b7dbb797d9bbe8a57b64487a06fa513ff1ae81e380858a770533"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-020-incremental-vertical-delivery.md",
+      "bytes": 200,
+      "sha256": "4c863dc75b0bf8d365e3fc97f80122be48ac8042d8b64b9a92037c0357793726"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-021-openapi-as-public-contract.md",
+      "bytes": 158,
+      "sha256": "a4d75cda09ed39d4dd2ec26ebb97674b3dfa1e7061e4249048271e1fb12e0506"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-022-documentation-as-versioned-product.md",
+      "bytes": 170,
+      "sha256": "9ba0412a9d77d02f098a8feb830fa1c39b7e3e45be55b6a3f5f41fbfe47a569b"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-023-no-critical-feature-without-runbook.md",
+      "bytes": 168,
+      "sha256": "4cec9216afe8efd095a2385f1fa6d1b6eac5f72ab0d0e758ba80a35b3dee7809"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-024-discipline-as-first-class-entity.md",
+      "bytes": 308,
+      "sha256": "98d4d35455d28c387bfbfba68d1272ac88a23e596eef8829c0b32bdbcfa1f3b7"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-025-optional-category-and-season-parentage.md",
+      "bytes": 366,
+      "sha256": "507d2a7360ec3d879962d7a7f44db2d8659bf5df1758ab5c1286844d84077c62"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-026-event-technical-name.md",
+      "bytes": 221,
+      "sha256": "d42a9208a5ba644a3d84b54c3b10889b7ad4971b0423637090426de7e63db520"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/20_ADR/ADR-027-manual-first-canonical-data.md",
+      "bytes": 238,
+      "sha256": "cc1b17a689172ca87a0b8f41c415568028fba8299f8c42d5c017ebccc6973f75"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/21_Migration_v6.1/README.md",
+      "bytes": 402,
+      "sha256": "95800485c6f9961e3f96ae7d3d785acbe64c625172832cb36f568b462d002685"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/21_Migration_v6.1/acceptance-checklist.md",
+      "bytes": 590,
+      "sha256": "6e67e9ee54bd951414e4fb3eebd90de7c9894e8f8862d147abbeeab292ea7cd4"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/21_Migration_v6.1/data-mapping.md",
+      "bytes": 506,
+      "sha256": "64f527aecfd6ffc6b380353327131a84e3af2ac05eea5d1e009a95842262f828"
+    },
+    {
+      "path": "docs/reference-v7.0.0/docs/21_Migration_v6.1/rollback.md",
+      "bytes": 295,
+      "sha256": "a85c337a219a6e8f7b651ccdc9dbdd6012970b6a9b788d238a47af176db4b49d"
+    },
+    {
+      "path": "docs/reference-v7.0.0/manifest.json",
+      "bytes": 51324,
+      "sha256": "1a72b4467dfbc500b053afdc9e4bbb33e92974f64d4f8878e54b9a950f3face2"
+    },
+    {
+      "path": "docs/ui-reference/validated-mockups/championships-validated.png",
+      "bytes": 2243423,
+      "sha256": "509734d9721d9f431fce5b7e8f2f939c26087183dde0bb4269b006b232d79736"
+    },
+    {
+      "path": "docs/ui-reference/validated-mockups/dashboard-validated.png",
+      "bytes": 2209899,
+      "sha256": "1e1d1bbaf4171b55c051405a76e0a6b349b2f25f38b98c270fe9b27582282a2a"
+    },
+    {
+      "path": "docs/ui-reference/validated-mockups/events-validated.png",
+      "bytes": 2228857,
+      "sha256": "437c79c53c662256d5d6f1be40e12114035b528e8bd1e6acb50dfb4cb124c6e6"
+    },
+    {
+      "path": "docs/ui-reference/validated-mockups/synchronizations-validated.png",
+      "bytes": 2280546,
+      "sha256": "6e305ef415cc729e31ced30a0db4920c3927e7e7944cda517ce1517a0c3dd68e"
+    },
+    {
+      "path": "infra/postgres/init/001-bootstrap.sql",
+      "bytes": 3591,
+      "sha256": "7842b06912ee684f70a87938b799950b7496b5d295f79b19d446a1e5843e9c64"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 81986,
+      "sha256": "7d2ceaf073306657a36cdbb38539d188e370665f88440c6feebabdc45c560334"
+    },
+    {
+      "path": "package.json",
+      "bytes": 1429,
+      "sha256": "b7067d6ee35acac73cffdfacdd683e7bba23fc11d01d97a165c938181a111df3"
+    },
+    {
+      "path": "packages/types/package.json",
+      "bytes": 320,
+      "sha256": "f5685e3130cf7bf17cec58a3efcd5c2687c7cc6d4def1abe9c759e4baf0a9f90"
+    },
+    {
+      "path": "packages/types/src/index.ts",
+      "bytes": 259,
+      "sha256": "bef51fd704b4e5ea90c78499ead34c955ca2346a195b38699ac4d43d2c63bc7c"
+    },
+    {
+      "path": "packages/types/tsconfig.json",
+      "bytes": 212,
+      "sha256": "a0993628673c51da34cdcab9504b5d6d77049c38fb78a7cc2fbc284c3ea95fd9"
+    },
+    {
+      "path": "releases/validated/Motorsports-Events-Server-v8.1.0-alpha.2-lot.3-rev.5.zip",
+      "bytes": 12957072,
+      "sha256": "3e77afb3b3a240231082eb6368523907342e9d71116e28dd3235e7ee18800ef8"
+    },
+    {
+      "path": "releases/validated/Motorsports-Events-Server-v8.1.0-alpha.2-lot.3-rev.5.zip.sha256",
+      "bytes": 123,
+      "sha256": "46d9d3b57ab41fc624df4b12aeeb0e30d8d9a0a01587bd8b8c7a2391229bc8b4"
+    },
+    {
+      "path": "releases/working/Motorsports-Events-Server-v8.1.0-alpha.2-lot.4.zip",
+      "bytes": 12961835,
+      "sha256": "0d4414d60248c5b91dfc7130d4f63dc91c014d24f3d8361f1fbda66e466d2164"
+    },
+    {
+      "path": "releases/working/Motorsports-Events-Server-v8.1.0-alpha.2-lot.4.zip.sha256",
+      "bytes": 117,
+      "sha256": "510df0913975c8982d2f8abe69f98a85df857e4a771c8f8cbefb4ab724791fde"
+    },
+    {
+      "path": "scripts/check-bootstrap.mjs",
+      "bytes": 417,
+      "sha256": "277d12e864cb74471525e51ec8171c374065ea17554dcb8d0b7e5c32cf2b37ab"
+    },
+    {
+      "path": "scripts/cleanup.cmd",
+      "bytes": 173,
+      "sha256": "7f1c169252ce716ca17cf0f622cb573d13d511774909d0abe8af8295ef38a1b5"
+    },
+    {
+      "path": "scripts/cleanup.ps1",
+      "bytes": 3440,
+      "sha256": "f982f8c7a0161b1aea453cff58898a8bd7da3930e3f1a16f8a4442a776a2ea81"
+    },
+    {
+      "path": "scripts/cleanup.sh",
+      "bytes": 1457,
+      "sha256": "63465344bb5763a5a5ba90c8cdf48abe0687f08d8381ee66e84b6529420f729f"
+    },
+    {
+      "path": "scripts/reset-dev.cmd",
+      "bytes": 191,
+      "sha256": "480156994fe32cdccb02ec9ed4e0c8abd3e2418673c284b9cc13fbd28994dec3"
+    },
+    {
+      "path": "scripts/reset-dev.ps1",
+      "bytes": 2208,
+      "sha256": "539ce5b7754e65a40e64908fb71fe27da1f34afb20453559a17d168ee9d71a4c"
+    },
+    {
+      "path": "scripts/start-clean.cmd",
+      "bytes": 159,
+      "sha256": "b02229331c08016369113e7a4db578ebebddbef7b9cf3424b2cf8f7d3bd63bdd"
+    },
+    {
+      "path": "scripts/start-clean.ps1",
+      "bytes": 253,
+      "sha256": "54ad7a0ff15df7514d61483a333aeb2b7e0d22e30921397683b1661f81d481a8"
+    },
+    {
+      "path": "scripts/test-lot1.ps1",
+      "bytes": 995,
+      "sha256": "4019e70510a43d38fa3054c7fd7c9963db54cba409827128d3f81da4c02c50c3"
+    },
+    {
+      "path": "scripts/test-lot2.cmd",
+      "bytes": 75,
+      "sha256": "9799619a28d3ee0150d46d0a4bba26ad834c4511664c54a15a5f51439d8d34b6"
+    },
+    {
+      "path": "scripts/test-lot2.ps1",
+      "bytes": 1076,
+      "sha256": "ec90907991bdd681cbd30421e56f9d0cf5b3f24b5af68e9122fe705528307ef6"
+    },
+    {
+      "path": "scripts/test-lot3.cmd",
+      "bytes": 188,
+      "sha256": "54441ed62e510199e9a611a90caa922debe156f416911c7bcb64f97fbbdf2a35"
+    },
+    {
+      "path": "scripts/test-lot3.ps1",
+      "bytes": 660,
+      "sha256": "b3d625aa00537c8cdc661e165a56409f77125233f5f6c7a9bf942aa85831f2e6"
+    },
+    {
+      "path": "scripts/test-lot4.cmd",
+      "bytes": 154,
+      "sha256": "dd4d17558a81b91ed2f39a835e3ef0b70118fa76342c4f8d8f9e04f813b33749"
+    },
+    {
+      "path": "scripts/test-lot4.ps1",
+      "bytes": 247,
+      "sha256": "21f931261284c58353c898a96ebbde430311520c055a698d606ec5b1faa1bc97"
+    },
+    {
+      "path": "scripts/validate-lot2.mjs",
+      "bytes": 1199,
+      "sha256": "ca499558b9750b3a553ad44935e3f65a6aa04090b22b03409e698adbf6866722"
+    },
+    {
+      "path": "scripts/validate-lot3.mjs",
+      "bytes": 1863,
+      "sha256": "fc0f9ac8eea75ff6ff355bfe4b3d64aeff0826779ed2fe672f693acfbbb75217"
+    },
+    {
+      "path": "scripts/validate-lot4.mjs",
+      "bytes": 2382,
+      "sha256": "34253528620f4a6a76ea93c20b816a43e9a087756f57e8e9676dd6a3fa1fb709"
+    }
+  ]
+}

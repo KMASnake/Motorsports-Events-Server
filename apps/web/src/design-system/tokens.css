@@ -1,0 +1,33 @@
+:root {
+  --mse-bg-canvas:#071018;
+  --mse-bg-sidebar:#08121b;
+  --mse-bg-topbar:#071018;
+  --mse-bg-surface:#0d1821;
+  --mse-bg-surface-raised:#101d27;
+  --mse-bg-hover:#13232f;
+  --mse-border-subtle:#1d2d38;
+  --mse-border-strong:#2a3d49;
+  --mse-text-primary:#f4f7fa;
+  --mse-text-secondary:#aab8c4;
+  --mse-text-muted:#6f8392;
+  --mse-brand:#e3262e;
+  --mse-brand-hover:#f03b43;
+  --mse-success:#73d216;
+  --mse-warning:#f2a900;
+  --mse-danger:#ff2d36;
+  --mse-info:#1597e5;
+  --mse-f1:#ed1c24;
+  --mse-motogp:#d72922;
+  --mse-wsbk:#0d6ba8;
+  --mse-formulae:#7f3b91;
+  --mse-wrc:#0b6aa6;
+  --mse-motoe:#c85f09;
+  --mse-space-1:4px; --mse-space-2:8px; --mse-space-3:12px; --mse-space-4:16px;
+  --mse-space-5:24px; --mse-space-6:32px; --mse-space-7:48px; --mse-space-8:64px;
+  --mse-radius-sm:4px; --mse-radius-md:7px; --mse-radius-lg:10px; --mse-radius-pill:999px;
+  --mse-shadow-xs:0 1px 2px rgba(0,0,0,.22);
+  --mse-shadow-sm:0 8px 24px rgba(0,0,0,.18);
+  --mse-transition-fast:150ms ease-out;
+  --mse-sidebar-width:204px;
+  --mse-topbar-height:72px;
+}

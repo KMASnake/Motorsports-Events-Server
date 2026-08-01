@@ -1,0 +1,8 @@
+{
+  "source_structure": "passed",
+  "json_validation": "passed",
+  "npm_install": "failed",
+  "web_build": "not-run",
+  "api_build": "not-run",
+  "docker_build": "not-run"
+}

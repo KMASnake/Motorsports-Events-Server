@@ -1,0 +1,20 @@
+erDiagram
+  DISCIPLINE ||--o{ CHAMPIONSHIP : groups
+  CHAMPIONSHIP ||--o{ CATEGORY : offers
+  CHAMPIONSHIP ||--o{ SEASON : owns
+  CATEGORY o|--o{ SEASON : optionally_scopes
+  SEASON ||--o{ EVENT : contains
+  EVENT ||--o{ SESSION : contains
+  CIRCUIT o|--o{ EVENT : hosts
+  COUNTRY ||--o{ VENUE : contains
+  VENUE ||--o{ CIRCUIT : contains
+
+  PROVIDER ||--o{ PROVIDER_ENDPOINT : exposes
+  PROVIDER ||--o{ SYNCHRONIZATION_RUN : executes
+  SYNCHRONIZATION_RUN ||--o{ RAW_OBSERVATION : produces
+  PROVIDER ||--o{ PROVIDER_MAPPING : owns
+
+  RAW_OBSERVATION ||--o{ MATCH_CANDIDATE : suggests
+  CORRECTION ||--|| OVERRIDE : activates
+  CORRECTION ||--o{ CORRECTION_REVIEW : reviewed_by
+  OVERRIDE ||--o{ REVERSION_PROPOSAL : evaluated_by

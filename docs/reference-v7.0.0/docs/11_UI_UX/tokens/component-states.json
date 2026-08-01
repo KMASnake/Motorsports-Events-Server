@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "6.1",
+  "status": "implementation-reference",
+  "globalStates": ["default", "hover", "focus-visible", "active", "disabled"],
+  "asyncStates": ["idle", "loading", "success", "error"],
+  "dataStates": ["loading", "populated", "empty", "filtered-empty", "error", "stale"],
+  "breakpoints": {"desktopReference": 1536, "desktop": 1280, "compact": 1024, "tablet": 768, "mobile": 390},
+  "components": {
+    "Button": {"variants": ["primary", "secondary", "ghost", "danger", "danger-outline", "icon"], "states": ["default", "hover", "focus-visible", "active", "disabled", "loading"]},
+    "TextInput": {"states": ["default", "hover", "focus-visible", "filled", "disabled", "readonly", "error", "success", "loading"]},
+    "Select": {"states": ["default", "hover", "focus-visible", "open", "disabled", "error", "loading", "empty"]},
+    "Checkbox": {"states": ["unchecked", "checked", "indeterminate", "hover", "focus-visible", "disabled", "error"]},
+    "Card": {"states": ["default", "hoverable", "selected", "loading", "error", "disabled"]},
+    "DataTable": {"states": ["loading", "populated", "empty", "filtered-empty", "error", "stale"], "rowStates": ["default", "hover", "selected", "expanded", "disabled", "warning", "conflict"]},
+    "Toast": {"variants": ["info", "success", "warning", "error"]},
+    "SynchronizationStatus": {"values": ["queued", "running", "success", "partial", "failed", "cancelled", "paused"]}
+  },
+  "storybookRequiredStories": ["Default", "Hover", "FocusVisible", "Active", "Disabled", "Loading", "Error", "LongContent", "KeyboardNavigation", "ReducedMotion"],
+  "acceptance": {"geometryTolerancePx": 1, "textRasterTolerancePx": 2, "minimumTargetPx": 40, "normalTextContrast": 4.5, "largeTextContrast": 3.0}
+}

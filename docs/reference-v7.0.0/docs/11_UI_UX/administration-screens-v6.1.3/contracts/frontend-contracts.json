@@ -1,0 +1,44 @@
+{
+  "version": "6.1.3",
+  "screens": {
+    "backups": {
+      "route": "/admin/backups",
+      "permissions": [
+        "backup.read"
+      ],
+      "mutations": [
+        "backup.run",
+        "backup.restore"
+      ]
+    },
+    "users": {
+      "route": "/admin/users",
+      "permissions": [
+        "user.read"
+      ],
+      "mutations": [
+        "user.invite",
+        "user.update",
+        "user.suspend"
+      ]
+    },
+    "settings": {
+      "route": "/admin/settings",
+      "permissions": [
+        "settings.read"
+      ],
+      "mutations": [
+        "settings.update"
+      ]
+    },
+    "maintenance": {
+      "route": "/admin/maintenance",
+      "permissions": [
+        "maintenance.read"
+      ],
+      "mutations": [
+        "maintenance.execute"
+      ]
+    }
+  }
+}

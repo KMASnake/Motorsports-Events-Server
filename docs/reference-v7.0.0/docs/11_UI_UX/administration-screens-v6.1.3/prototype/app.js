@@ -1,0 +1,1 @@
+document.querySelectorAll('button[data-img]').forEach(b=>b.addEventListener('click',()=>{document.querySelector('#screen').src='../screens/'+b.dataset.img;}));

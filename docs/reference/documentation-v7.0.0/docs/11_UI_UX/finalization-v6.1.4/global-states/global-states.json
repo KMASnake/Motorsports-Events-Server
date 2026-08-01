@@ -1,0 +1,48 @@
+{
+  "states": {
+    "loading": {
+      "component": "SkeletonPage",
+      "blocking": false
+    },
+    "empty": {
+      "component": "EmptyState",
+      "blocking": false
+    },
+    "no_results": {
+      "component": "NoResultsState",
+      "blocking": false
+    },
+    "network_error": {
+      "component": "ErrorState",
+      "retry": true
+    },
+    "server_error": {
+      "component": "ErrorState",
+      "retry": true
+    },
+    "forbidden": {
+      "component": "ForbiddenState",
+      "retry": false
+    },
+    "session_expired": {
+      "component": "SessionExpiredDialog",
+      "blocking": true
+    },
+    "maintenance": {
+      "component": "MaintenanceBanner",
+      "blocking": false
+    },
+    "offline": {
+      "component": "OfflineBanner",
+      "blocking": false
+    },
+    "stale": {
+      "component": "StaleDataBanner",
+      "blocking": false
+    },
+    "destructive_confirmation": {
+      "component": "ConfirmDialog",
+      "blocking": true
+    }
+  }
+}

@@ -1,122 +1,58 @@
-x-default-logging: &default-logging
-  driver: json-file
-  options:
-    max-size: "10m"
-    max-file: "5"
-    compress: "true"
-
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: motorsports-events-db
-    restart: unless-stopped
+  postgres:
+    image: postgres:17-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-motorsports_events}
+      POSTGRES_USER: ${POSTGRES_USER:-mse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-    networks:
-      - backend
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mse} -d ${POSTGRES_DB:-motorsports_events}"]
+      interval: 5s
       timeout: 5s
-      retries: 12
-    logging: *default-logging
+      retries: 10
 
   api:
     build:
-      context: ./server
-    container_name: motorsports-events-api
-    restart: unless-stopped
-    env_file:
-      - .env
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
-      ADMIN_ENV_FILE: /run/motorsports-events/config.env
-      APP_VERSION: ${APP_VERSION:-2.7.0}
-      APP_BUILD: ${APP_BUILD:-20260729-194637}
-      APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
+      DATABASE_URL: ${DATABASE_URL:-postgresql://mse:change-me@postgres:5432/motorsports_events}
+      API_PORT: 3001
+      NODE_ENV: development
     ports:
-      - "${API_BIND_PORT:-8088}:8000"
-    volumes:
-      - ./.env:/run/motorsports-events/config.env
-    networks:
-      - backend
-      - proxy
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')"
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    logging: *default-logging
-
-  scheduler:
-    build:
-      context: ./server
-    container_name: motorsports-events-scheduler
-    restart: unless-stopped
-    command: ["python", "-m", "app.scheduler"]
-    env_file:
-      - .env
-    environment:
-      APP_VERSION: ${APP_VERSION:-2.7.0}
-      APP_BUILD: ${APP_BUILD:-20260729-194637}
-      APP_GIT_COMMIT: ${APP_GIT_COMMIT:-archive-build}
+      - "${API_HOST_PORT:-3001}:3001"
     depends_on:
-      migrate:
-        condition: service_completed_successfully
-    networks:
-      - backend
-    logging: *default-logging
-
-  migrate:
-    build:
-      context: ./server
-    container_name: motorsports-events-migrate
-    restart: "no"
-    command: ["python", "-m", "app.schema_migrations", "upgrade"]
-    env_file:
-      - .env
-    depends_on:
-      db:
+      postgres:
         condition: service_healthy
-    networks:
-      - backend
-    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
-  caddy:
-    image: caddy:2-alpine
-    container_name: motorsports-events-caddy
-    restart: unless-stopped
-    profiles: ["vps"]
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+    ports:
+      - "${WEB_HOST_PORT:-3000}:3000"
     depends_on:
       api:
         condition: service_healthy
-    environment:
-      API_DOMAIN: ${API_DOMAIN}
-      ACME_EMAIL: ${ACME_EMAIL}
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./data/caddy:/data
-      - ./data/caddy-config:/config
-    networks:
-      - proxy
-    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
-networks:
-  backend:
-  proxy:
+volumes:
+  postgres_data:

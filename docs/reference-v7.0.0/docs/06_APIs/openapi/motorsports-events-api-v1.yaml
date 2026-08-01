@@ -1,0 +1,288 @@
+openapi: 3.1.0
+info:
+  title: Motorsports Events API
+  version: 6.1.0
+  description: API canonique indépendante des fournisseurs.
+servers:
+  - url: /api/v1
+paths:
+  /disciplines:
+    get:
+      operationId: listDisciplines
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200': {description: Liste, content: {application/json: {schema: {$ref: '#/components/schemas/DisciplinePage'}}}}
+  /disciplines/{disciplineId}:
+    get:
+      operationId: getDiscipline
+      parameters: [{$ref: '#/components/parameters/DisciplineId'}]
+      responses:
+        '200': {description: Discipline, content: {application/json: {schema: {$ref: '#/components/schemas/Discipline'}}}}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /championships:
+    get:
+      operationId: listChampionships
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - {name: disciplineId, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Liste, content: {application/json: {schema: {$ref: '#/components/schemas/ChampionshipPage'}}}}
+  /categories:
+    get:
+      operationId: listCategories
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - {name: championshipId, in: query, schema: {type: string}}
+      responses:
+        '200': {description: Liste, content: {application/json: {schema: {$ref: '#/components/schemas/CategoryPage'}}}}
+  /seasons:
+    get:
+      operationId: listSeasons
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - {name: championshipId, in: query, schema: {type: string}}
+        - {name: categoryId, in: query, schema: {type: [string, 'null']}}
+        - {name: year, in: query, schema: {type: integer}}
+      responses:
+        '200': {description: Liste, content: {application/json: {schema: {$ref: '#/components/schemas/SeasonPage'}}}}
+  /events:
+    get:
+      operationId: listEvents
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - {name: disciplineId, in: query, schema: {type: string}}
+        - {name: championshipId, in: query, schema: {type: string}}
+        - {name: categoryId, in: query, schema: {type: [string, 'null']}}
+        - {name: seasonId, in: query, schema: {type: string}}
+        - {name: from, in: query, schema: {type: string, format: date-time}}
+        - {name: to, in: query, schema: {type: string, format: date-time}}
+      responses:
+        '200': {description: Liste, content: {application/json: {schema: {$ref: '#/components/schemas/EventPage'}}}}
+  /events/{eventId}:
+    get:
+      operationId: getEvent
+      parameters: [{$ref: '#/components/parameters/EventId'}]
+      responses:
+        '200': {description: Épreuve, content: {application/json: {schema: {$ref: '#/components/schemas/Event'}}}}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /sessions:
+    get:
+      operationId: listSessions
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - {name: eventId, in: query, schema: {type: string}}
+        - {name: championshipId, in: query, schema: {type: string}}
+        - {name: categoryId, in: query, schema: {type: [string, 'null']}}
+        - {name: from, in: query, schema: {type: string, format: date-time}}
+        - {name: to, in: query, schema: {type: string, format: date-time}}
+      responses:
+        '200': {description: Liste, content: {application/json: {schema: {$ref: '#/components/schemas/SessionPage'}}}}
+  /admin/catalog/manual:
+    post:
+      operationId: createManualCatalogBranch
+      security: [{bearerAuth: []}]
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/CreateManualCatalogRequest'}}}
+      responses:
+        '201': {description: Branche créée, content: {application/json: {schema: {$ref: '#/components/schemas/ManualCatalogResult'}}}}
+        '422': {$ref: '#/components/responses/ValidationError'}
+  /admin/provider-mappings:
+    post:
+      operationId: attachProviderMapping
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/CreateProviderMappingRequest'}}}
+      responses:
+        '201': {description: Mapping créé, content: {application/json: {schema: {$ref: '#/components/schemas/ProviderMapping'}}}}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /admin/synchronizations:
+    post:
+      operationId: startSynchronization
+      security: [{bearerAuth: []}]
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/StartSynchronizationRequest'}}}
+      responses:
+        '202': {description: Acceptée, content: {application/json: {schema: {$ref: '#/components/schemas/SynchronizationRun'}}}}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /admin/corrections:
+    post:
+      operationId: createCorrection
+      security: [{bearerAuth: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/CreateCorrectionRequest'}}}
+      responses:
+        '201': {description: Créée, content: {application/json: {schema: {$ref: '#/components/schemas/Correction'}}}}
+        '422': {$ref: '#/components/responses/ValidationError'}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+  parameters:
+    Page: {name: page, in: query, schema: {type: integer, minimum: 1, default: 1}}
+    PageSize: {name: pageSize, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 25}}
+    DisciplineId: {name: disciplineId, in: path, required: true, schema: {type: string}}
+    EventId: {name: eventId, in: path, required: true, schema: {type: string}}
+    IdempotencyKey: {name: Idempotency-Key, in: header, required: false, schema: {type: string, maxLength: 128}}
+  responses:
+    NotFound: {description: Ressource absente, content: {application/json: {schema: {$ref: '#/components/schemas/ErrorEnvelope'}}}}
+    Conflict: {description: Conflit, content: {application/json: {schema: {$ref: '#/components/schemas/ErrorEnvelope'}}}}
+    ValidationError: {description: Erreur métier, content: {application/json: {schema: {$ref: '#/components/schemas/ErrorEnvelope'}}}}
+  schemas:
+    Discipline:
+      type: object
+      required: [id, code, name, status]
+      properties:
+        id: {type: string}
+        code: {type: string, enum: [automobile, moto, karting, camion, drift, rallye-raid, motocross, speedway]}
+        name: {type: string}
+        status: {type: string, enum: [active, inactive, archived]}
+    Championship:
+      type: object
+      required: [id, disciplineId, code, officialName, status]
+      properties:
+        id: {type: string}
+        disciplineId: {type: string}
+        code: {type: string}
+        officialName: {type: string}
+        shortName: {type: [string, 'null']}
+        status: {type: string, enum: [draft, active, inactive, archived]}
+    Category:
+      type: object
+      required: [id, championshipId, code, name, status]
+      properties:
+        id: {type: string}
+        championshipId: {type: string}
+        code: {type: string}
+        name: {type: string}
+        status: {type: string, enum: [active, inactive, archived]}
+    Season:
+      type: object
+      required: [id, championshipId, label, status]
+      properties:
+        id: {type: string}
+        championshipId: {type: string}
+        categoryId: {type: [string, 'null'], description: Null pour une saison directement rattachée au championnat.}
+        label: {type: string}
+        year: {type: [integer, 'null']}
+        status: {type: string}
+        origin: {type: string, enum: [manual, provider, mixed]}
+    Event:
+      type: object
+      required: [id, seasonId, name, status]
+      properties:
+        id: {type: string}
+        seasonId: {type: string}
+        name: {type: string}
+        startsAt: {type: [string, 'null'], format: date-time}
+        endsAt: {type: [string, 'null'], format: date-time}
+        status: {type: string}
+        origin: {type: string, enum: [manual, provider, mixed]}
+    Session:
+      type: object
+      required: [id, eventId, type, displayName, startsAt, status, isRace, isSprintRace]
+      properties:
+        id: {type: string}
+        eventId: {type: string}
+        type: {type: string}
+        displayName: {type: string}
+        startsAt: {type: string, format: date-time}
+        endsAt: {type: [string, 'null'], format: date-time}
+        timezone: {type: string}
+        status: {type: string}
+        isRace: {type: boolean}
+        isSprintRace: {type: boolean}
+        origin: {type: string, enum: [manual, provider, mixed]}
+    PageMetadata:
+      type: object
+      required: [page, pageSize, totalItems, totalPages]
+      properties:
+        page: {type: integer}
+        pageSize: {type: integer}
+        totalItems: {type: integer}
+        totalPages: {type: integer}
+    DisciplinePage: {allOf: [{$ref: '#/components/schemas/PageMetadata'}, {type: object, properties: {items: {type: array, items: {$ref: '#/components/schemas/Discipline'}}}}]}
+    ChampionshipPage: {allOf: [{$ref: '#/components/schemas/PageMetadata'}, {type: object, properties: {items: {type: array, items: {$ref: '#/components/schemas/Championship'}}}}]}
+    CategoryPage: {allOf: [{$ref: '#/components/schemas/PageMetadata'}, {type: object, properties: {items: {type: array, items: {$ref: '#/components/schemas/Category'}}}}]}
+    SeasonPage: {allOf: [{$ref: '#/components/schemas/PageMetadata'}, {type: object, properties: {items: {type: array, items: {$ref: '#/components/schemas/Season'}}}}]}
+    EventPage: {allOf: [{$ref: '#/components/schemas/PageMetadata'}, {type: object, properties: {items: {type: array, items: {$ref: '#/components/schemas/Event'}}}}]}
+    SessionPage: {allOf: [{$ref: '#/components/schemas/PageMetadata'}, {type: object, properties: {items: {type: array, items: {$ref: '#/components/schemas/Session'}}}}]}
+    CreateManualCatalogRequest:
+      type: object
+      required: [discipline, championship, season, event, sessions]
+      properties:
+        discipline: {type: object, additionalProperties: true}
+        championship: {type: object, additionalProperties: true}
+        category: {type: [object, 'null'], additionalProperties: true}
+        season: {type: object, additionalProperties: true}
+        event: {type: object, additionalProperties: true}
+        sessions: {type: array, minItems: 1, items: {type: object, additionalProperties: true}}
+    ManualCatalogResult:
+      type: object
+      required: [disciplineId, championshipId, seasonId, eventId, sessionIds]
+      properties:
+        disciplineId: {type: string}
+        championshipId: {type: string}
+        categoryId: {type: [string, 'null']}
+        seasonId: {type: string}
+        eventId: {type: string}
+        sessionIds: {type: array, items: {type: string}}
+    CreateProviderMappingRequest:
+      type: object
+      required: [providerId, entityType, externalId, canonicalId]
+      properties:
+        providerId: {type: string}
+        entityType: {type: string, enum: [discipline, championship, category, season, event, session]}
+        externalId: {type: string}
+        canonicalId: {type: string}
+    ProviderMapping:
+      allOf:
+        - $ref: '#/components/schemas/CreateProviderMappingRequest'
+        - type: object
+          properties: {id: {type: string}, status: {type: string}}
+    StartSynchronizationRequest:
+      type: object
+      required: [providerId, scope]
+      properties:
+        providerId: {type: string}
+        scope: {type: string, enum: [all, discipline, championship, category, season]}
+        disciplineId: {type: [string, 'null']}
+        championshipId: {type: [string, 'null']}
+        categoryId: {type: [string, 'null']}
+        seasonId: {type: [string, 'null']}
+    SynchronizationRun:
+      type: object
+      required: [id, providerId, status, requestedAt]
+      properties:
+        id: {type: string}
+        providerId: {type: string}
+        status: {type: string}
+        requestedAt: {type: string, format: date-time}
+    CreateCorrectionRequest:
+      type: object
+      required: [entityType, entityId, field, value, reason]
+      properties:
+        entityType: {type: string, enum: [discipline, championship, category, season, event, session]}
+        entityId: {type: string}
+        field: {type: string}
+        value: {}
+        reason: {type: string}
+    Correction:
+      type: object
+      required: [id, status]
+      properties: {id: {type: string}, status: {type: string}}
+    ErrorEnvelope:
+      type: object
+      required: [code, message]
+      properties: {code: {type: string}, message: {type: string}, details: {type: array, items: {type: object}}}

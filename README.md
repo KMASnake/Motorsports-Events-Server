@@ -1,93 +1,95 @@
-# Motorsports Events Server
+# Motorsports Events Server — GitHub Handover
 
-Serveur central indépendant de la plateforme Motorsports Events.
+Ce dépôt constitue le package de passation complet destiné à GitHub et Codex.
 
-Ce dépôt ne contient ni le plugin MyBB ni l’application Android. Ces clients
-évolueront dans des dépôts séparés et communiqueront avec le serveur par l’API.
+## État du dépôt
 
-## Version courante
+La racine contient le code du **lot 4**, qui ajoute le CRUD des événements et
+les API publique/administration. Ce lot n'est pas encore validé comme version
+finale, car la vue calendrier validée a disparu.
 
-La candidate **2.7.0-alpha.11 — Sauvegardes automatisées** conserve le contrat
-API v1 et poursuit le Jalon 4 :
-
-- FastAPI ;
-- PostgreSQL ;
-- scheduler ;
-- OCBlackTop ;
-- TheSportsDB ;
-- Caddy ;
-- installation Docker ;
-- sauvegarde, mise à niveau et rollback ;
-- API v1 documentée ;
-- synchronisation différentielle par curseur ;
-- signalement et correction des incohérences horaires ;
-- édition sécurisée du fichier `.env` depuis l'administration ;
-- migrations de schéma versionnées avec Alembic ;
-- contrôle automatique de la révision avant démarrage ;
-- tests unitaires sans réseau pour OCBlackTop et TheSportsDB ;
-- couverture des providers mesurée et contrôlée dans la CI ;
-- environnement PostgreSQL 16 temporaire et isolé ;
-- migrations et synchronisation testées avec un jeu de données reproductible ;
-- routes d’administration isolées du point d’entrée de l’API publique.
-- journal persistant des actions administratives sans données sensibles.
-- logs JSON corrélés et expurgés des valeurs sensibles.
-- rotation automatique et compression des journaux de tous les conteneurs.
-- sauvegardes PostgreSQL atomiques, vérifiées par restauration temporaire et
-  planifiées quotidiennement par systemd.
-
-## Structure
+Le dernier jalon entièrement validé sur le poste de l'utilisateur est :
 
 ```text
-motorsports-events-server/
-├── server/               Application FastAPI
-│   └── app/admin/        Routeurs d’administration
-├── scripts/              Installation, exploitation et validation
-├── docs/                 Documentation et décisions d’architecture
-├── tests/                Tests du serveur
-├── docker-compose.yml
-├── Caddyfile
-├── install.sh
-├── upgrade.sh
-└── VERSION
+v8.1.0-alpha.2-lot.3-rev.5
 ```
 
-## Installation
+Son archive exacte est conservée dans :
 
-```bash
-chmod +x install.sh
-sudo ./install.sh
+```text
+releases/validated/
 ```
 
-## Validation du dépôt
+## Mission immédiate de Codex
 
-```bash
-./scripts/validate-repository.sh
+Implémenter :
+
+```text
+v8.1.0-alpha.2-lot.4-rev.1
 ```
 
-Validation d’intégration PostgreSQL isolée :
+en suivant :
 
-```bash
-./scripts/test-postgres.sh
+```text
+docs/handover/CODEX-EXECUTION-PROMPT-LOT-4-REV-1.md
+docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md
+docs/handover/LOT-4-REV-1-ACCEPTANCE.md
+docs/handover/LOT-4-REV-1-ADR.md
 ```
 
-## Génération d’une release
+Objectifs :
 
-```bash
-./scripts/build-release.sh
+- restaurer le calendrier comme vue Événements par défaut ;
+- conserver la vue liste et le CRUD du lot 4 ;
+- conserver les API publique et administration ;
+- atteindre au moins 95 % de fidélité à la maquette validée ;
+- ne pas régresser sur le module Championnats.
+
+## Maquettes officielles
+
+```text
+docs/ui-reference/validated-mockups/
 ```
 
-## Clients compatibles
+Les maquettes sont un contrat visuel. Elles ne sont pas de simples exemples.
 
-Les clients sont développés séparément :
+## Documentation historique
 
-- `motorsports-events-mybb`
-- `motorsports-events-android`
+```text
+docs/reference/documentation-v7.0.0/
+```
 
-Le contrat entre les projets est l’API REST versionnée du serveur.
+Elle contient les spécifications UI et d'architecture produites avant le
+développement du socle exécutable.
 
-Voir :
+## Démarrage local
 
-- `docs/api-v1.md` ;
-- `docs/clients/mybb.md` ;
-- `docs/clients/android.md` ;
-- `docs/compatibility.md`.
+Sous Windows :
+
+```cmd
+scripts\reset-dev.cmd
+```
+
+Validation du dernier lot :
+
+```cmd
+scripts\test-lot4.cmd
+```
+
+Le lot ne doit être déclaré validé qu'après :
+
+- build TypeScript web ;
+- build API ;
+- trois conteneurs healthy ;
+- validation API ;
+- test visuel ;
+- comparaison à la maquette ;
+- mise à jour de `PROJECT-STATUS.json` et des documents de passation.
+
+## Plateforme cible
+
+Console d'administration desktop :
+
+- résolution de référence : 1440 × 900 ;
+- minimum supporté : 1280 × 720 ;
+- aucune optimisation smartphone requise.

@@ -1,0 +1,50 @@
+{
+  "version": "8.1.0-alpha.2-lot.4-rev.1-specification",
+  "phase": "1.1",
+  "lot": 4,
+  "updated_at": "2026-08-01",
+  "status": "ready-for-codex-implementation",
+  "overall_percent": 79,
+  "areas": {
+    "docker": 100,
+    "database": 95,
+    "api": 92,
+    "design_system_foundations": 82,
+    "design_system_components": 36,
+    "shell": 96,
+    "dashboard_visual_fidelity": 86,
+    "events_visual_fidelity": 55,
+    "championships_visual_fidelity": 90,
+    "synchronizations_visual_fidelity": 92,
+    "circuits": 45,
+    "responsive": 72,
+    "accessibility": 58,
+    "visual_tests": 25,
+    "events_backend": 90,
+    "events_admin_api": 90,
+    "events_public_api": 90,
+    "events_crud_list": 88,
+    "events_calendar_view": 25,
+    "events_tests": 45,
+    "codex_specification": 100
+  },
+  "validated_on_user_workstation": false,
+  "next_lot": {
+    "version": "8.1.0-alpha.2-lot.4",
+    "scope": "Migration du Dashboard vers les composants MEDS et consolidation des états chargement/erreur."
+  },
+  "revision": 0,
+  "known_build_issue_fixed": "TS2322 tone string incompatibility",
+  "known_issues": [],
+  "revision_notes": [
+    "Lot 3 validé",
+    "Lot 4 : CRUD événements",
+    "Séparation API publique et administration",
+    "Origine/provider non exposés aux clients"
+  ],
+  "next_action": {
+    "owner": "Codex",
+    "task": "Implement LOT-4-REV-1-CALENDAR-SPEC.md",
+    "target_visual_fidelity": 95
+  }
+}

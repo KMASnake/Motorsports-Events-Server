@@ -1,0 +1,32 @@
+{
+  "name": "motorsports-events-server",
+  "version": "8.1.0-alpha.2-lot.4",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @mse/api & npm run dev --workspace @mse/web",
+    "dev:web": "npm run dev --workspace @mse/web",
+    "dev:api": "npm run dev --workspace @mse/api",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "compose:start": "docker compose up --build",
+    "compose:down": "docker compose down --remove-orphans",
+    "validate:lot2": "node scripts/validate-lot2.mjs",
+    "cleanup": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/cleanup.ps1",
+    "cleanup:all": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/cleanup.ps1 -Volumes -Images -Force",
+    "reset": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/reset-dev.ps1",
+    "validate:lot3": "node scripts/validate-lot3.mjs",
+    "test:lot3": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot3.ps1",
+    "validate:lot4": "node scripts/validate-lot4.mjs",
+    "test:lot4": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot4.ps1"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  }
+}

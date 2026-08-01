@@ -1,0 +1,22 @@
+# Catalogue d'acceptation v5.7
+
+- ACC-001 : synchronisation complète sans doublon.
+- ACC-002 : mise à jour incrémentale.
+- ACC-003 : protection d'un champ corrigé.
+- ACC-004 : réversion auditée.
+- ACC-005 : résolution de conflit.
+- ACC-006 : filtre course uniquement correct.
+- ACC-007 : reprise après panne worker.
+- ACC-008 : aucune suppression sur réponse partielle.
+- ACC-009 : API publique sans mention fournisseur.
+- ACC-010 : refus d'une permission absente.
+- ACC-011 : rotation d'un secret webhook.
+- ACC-012 : restauration complète.
+- ACC-013 : publication uniquement si changement.
+- ACC-014 : absence de fuite mémoire en endurance.
+- ACC-015 : respect des seuils API.
+- ACC-016 : audit complet des actions sensibles.
+- ACC-017 : correction en lot prévisualisée.
+- ACC-018 : environnement de test sans secret production.
+- ACC-019 : webhook rejoué rejeté.
+- ACC-020 : rapport final reproductible.

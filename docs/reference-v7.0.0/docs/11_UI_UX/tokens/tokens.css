@@ -1,0 +1,45 @@
+:root {
+  --mse-canvas: #090d12;
+  --mse-sidebar: #0d1219;
+  --mse-topbar: #0b1016;
+  --mse-surface: #111821;
+  --mse-surface-input: #0f161e;
+  --mse-surface-alt: #0f151d;
+  --mse-surface-header: #151e28;
+  --mse-border-soft: #202a35;
+  --mse-border: #25303b;
+  --mse-active-dark: #3b151a;
+  --mse-active-border: #6e2026;
+  --mse-brand: #d7252a;
+  --mse-text-primary: #e7edf5;
+  --mse-text-secondary: #8f9aaa;
+  --mse-success: #27b36a;
+  --mse-info: #3a89e8;
+  --mse-warning: #e59a2d;
+  --mse-purple: #8d6ade;
+
+  --mse-sidebar-width: 215px;
+  --mse-topbar-height: 71px;
+  --mse-content-inset-left: 29px;
+  --mse-content-inset-right: 23px;
+  --mse-content-max-width: 1269px;
+
+  --mse-space-1: 4px;
+  --mse-space-2: 8px;
+  --mse-space-3: 12px;
+  --mse-space-4: 16px;
+  --mse-space-5: 20px;
+  --mse-space-6: 24px;
+  --mse-space-7: 28px;
+  --mse-space-8: 32px;
+
+  --mse-radius-sm: 5px;
+  --mse-radius-md: 6px;
+  --mse-radius-lg: 8px;
+  --mse-radius-pill: 999px;
+
+  --mse-control-height: 43px;
+  --mse-table-header-height: 44px;
+  --mse-table-row-height: 42px;
+  --mse-kpi-height: 107px;
+}
