@@ -61,17 +61,33 @@ Validé :
 
 ## v8.1.0-alpha.2-lot.4
 
-Présent dans la racine du dépôt mais non accepté.
+Version intermédiaire remplacée par la rev.1 après rétablissement du calendrier.
 
-Ajouts :
+Ajouts conservés :
 
 - CRUD Événements ;
 - API publique ;
 - API admin ;
 - publication.
 
-Régression :
+Régression corrigée en rev.1 :
 
 - disparition de la vue calendrier validée.
 
-La prochaine tâche est la rev.1 décrite dans les spécifications Codex.
+## v8.1.0-alpha.2-lot.4-rev.1
+
+Validé par l'utilisateur le 1er août 2026 sur un déploiement VPS isolé.
+
+Validé :
+
+- PostgreSQL, API et frontend healthy ;
+- calendrier Événements affiché par défaut ;
+- bascule calendrier/liste et navigation mensuelle ;
+- filtres et sélection partagés ;
+- création, modification, duplication et suppression ;
+- publication et dépublication ;
+- API publique et API d'administration ;
+- absence de régression sur Championnats ;
+- production 2.7.0 laissée intacte.
+
+Référence : `LOT-4-REV-1-VPS-VALIDATION.md`.

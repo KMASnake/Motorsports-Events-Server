@@ -1,5 +1,23 @@
 # Changelog
 
+## 8.1.0-alpha.2-lot.4-rev.1 — 2026-08-01
+
+### Restauration du calendrier Événements
+
+- calendrier mensuel rétabli comme vue par défaut ;
+- vue Liste conservée avec le CRUD existant ;
+- filtres et sélection partagés entre les deux vues ;
+- panneau de détail avec modification, duplication et suppression ;
+- création préparée depuis un jour du calendrier ;
+- navigation clavier et attributs ARIA sur la bascule et les sélections ;
+- tests unitaires des règles calendaires et tests Chromium des deux vues ;
+- captures 1440×900 générées pour la validation utilisateur ;
+- aucune modification du schéma PostgreSQL ou des contrats `/api/v1`.
+- validation utilisateur réussie sur un environnement VPS Docker isolé ;
+- API, PostgreSQL, interface, CRUD, publication et non-régression
+  Championnats confirmés ;
+- workflow Python historique limité aux changements de l'ancien serveur.
+
 ## 8.1.0-alpha.2-lot.4 — 2026-07-31
 
 ### Lot 4 — Événements

@@ -1,24 +1,27 @@
 {
   "generated_at": "2026-08-01",
   "repository_state": {
-    "root_source": "v8.1.0-alpha.2-lot.4",
-    "status": "working-unvalidated",
-    "reason": "CRUD Events is present, but the validated calendar view disappeared and must be restored."
+    "root_source": "v8.1.0-alpha.2-lot.4-rev.1",
+    "status": "user-validated-on-vps-pr-ready",
+    "reason": "The isolated VPS deployment, API/database health and complete browser acceptance checklist were confirmed by the user."
   },
   "last_fully_validated_release": {
-    "version": "v8.1.0-alpha.2-lot.3-rev.5",
+    "version": "v8.1.0-alpha.2-lot.4-rev.1",
     "validated_on_user_workstation": true,
+    "validated_on_vps": true,
     "validated_features": [
       "Docker Compose",
       "PostgreSQL healthcheck",
       "API healthcheck",
       "Frontend healthcheck",
-      "MEDS foundations",
-      "MEDS global shell",
       "Championship CRUD",
-      "Championship create/update/delete from API",
-      "Championship delete from web UI",
-      "Docker cleanup and reset scripts"
+      "Events calendar as default view",
+      "Events list view",
+      "Events create/update/delete flows",
+      "Events publishing and unpublishing",
+      "Events filters and month navigation",
+      "Public and administration Events APIs",
+      "No regression on Championships"
     ]
   },
   "working_lot_4": {
@@ -27,18 +30,49 @@
       "Public Events API",
       "Admin Events API",
       "Publishing and unpublishing",
-      "Event filters and list view"
+      "Calendar view selected by default",
+      "Secondary list view",
+      "Shared filters and selection",
+      "Event details panel",
+      "Create, edit, duplicate and delete flows",
+      "Unit and Chromium browser tests"
     ],
-    "not_accepted": [
-      "Calendar view disappeared",
-      "Visual fidelity to validated Events mockup is below target",
-      "Lot 4 rev.1 implementation by Codex is pending"
+    "accepted": true
+  },
+  "local_validation": {
+    "web_build": "passed",
+    "api_build": "passed",
+    "workspace_typecheck": "passed",
+    "unit_tests": "4 passed",
+    "playwright_chromium": "2 passed",
+    "docker_services": "3 healthy",
+    "lot4_api_validator": "passed",
+    "screenshots": [
+      "tests/ui/screenshots/events-calendar-1440x900.png",
+      "tests/ui/screenshots/events-list-1440x900.png"
+    ],
+    "known_tooling_issues": [
+      "ESLint 9 configuration is absent from the baseline repository.",
+      "npm audit reports the React Router RSC CSRF advisory; this SPA does not use RSC or Server Actions, and a major Router 8 migration is outside rev.1."
     ]
   },
+  "vps_validation": {
+    "date": "2026-08-01",
+    "host": "vps-855f6d7e",
+    "directory": "/home/debian/motorsports-events-server-lot4-test",
+    "deployment": "isolated Docker Compose project mse-lot4-test",
+    "commit": "dcbf76575a648082e98df9202f4b3b6506338515",
+    "api_health": "passed with database=true",
+    "web_health": "passed",
+    "user_browser_acceptance": "passed",
+    "production_2_7_0_affected": false,
+    "report": "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md"
+  },
   "target": {
-    "next_version": "v8.1.0-alpha.2-lot.4-rev.1",
-    "owner": "Codex",
+    "next_version": "to be selected after merge",
+    "owner": "Maintainer",
     "specification": "docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md",
-    "visual_fidelity_target_percent": 95
+    "visual_fidelity_target_percent": 95,
+    "next_action": "Review and merge pull request 24 into main."
   }
 }
