@@ -15,6 +15,8 @@
   bloquante et génération déterministe de données réalistes ;
 - tests unitaires, intégration PostgreSQL, Docker et captures Chromium étendus.
 - ajout après recette VPS des drapeaux locaux AU, DE, ES, FR, GB, IT, JP et US ;
+- remplacement du jeu limité par les 270 SVG locaux `flag-icons` 7.2.3 sous
+  licence MIT, avec résolution automatique de tout code pays alpha-2 ;
 - ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
   logos autorisées configurées dans l'administration.
 

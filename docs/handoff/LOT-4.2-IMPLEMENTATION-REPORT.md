@@ -63,6 +63,10 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
   ajout des drapeaux et badges sport ;
 - validation VPS graphique du 2026-08-01 : l'utilisateur confirme que les
   identités sportives et les drapeaux des pays sont visibles dans l'interface ;
+- jeu complet : 270 drapeaux/territoires `flag-icons` 7.2.3 sous licence MIT,
+  résolution dynamique sans whitelist et contrôles directs de BR, ZA, NZ et MX ;
+- revalidation du jeu complet : 17 tests unitaires, builds Web/API, Docker et
+  5 scénarios Chromium réussis ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

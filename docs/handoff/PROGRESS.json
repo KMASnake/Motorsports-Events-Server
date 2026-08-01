@@ -4,7 +4,7 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-01",
-  "status": "graphics-fix-vps-validation-passed",
+  "status": "complete-flags-local-validation-passed",
   "overall_percent": 98,
   "areas": {
     "docker": 100,
@@ -47,6 +47,9 @@
     "Authorized championship logo URLs now take precedence when configured",
     "Web/API builds, Docker health and five Chromium scenarios passed after the graphics fix",
     "User confirmed sport identities and country flags are visible on the isolated VPS"
+    ,"Limited flags replaced by 270 local flag-icons 7.2.3 SVG assets under MIT license",
+    "Country resolution no longer uses an application whitelist",
+    "Seventeen unit tests, both builds, Docker and five Chromium scenarios passed with the complete flag set"
   ],
   "next_action": {
     "owner": "Maintainer",

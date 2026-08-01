@@ -12,6 +12,8 @@
 - [ ] publier la pull request Lot 4.2 ;
 - [x] installer le package dans un projet Docker VPS isolé ;
 - [x] valider sur VPS l'affichage des identités sportives et des drapeaux ;
+- [x] embarquer le jeu complet de drapeaux et supprimer la whitelist pays ;
+- [ ] valider sur VPS un pays absent de l'ancien jeu limité ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 
