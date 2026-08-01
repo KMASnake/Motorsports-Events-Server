@@ -19,6 +19,8 @@
   licence MIT, avec résolution automatique de tout code pays alpha-2 ;
 - ajout d'une légende dynamique sous le calendrier mensuel, limitée aux
   championnats actuellement visibles et synchronisée avec les filtres existants ;
+- navigation précédent/suivant adaptée à la vue active : mois, semaine, jour
+  ou fenêtre Agenda de trente jours, avec libellé de période correspondant ;
 - ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
   logos autorisées configurées dans l'administration.
 

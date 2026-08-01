@@ -3,8 +3,8 @@
   "phase": "4.2",
   "lot": 4,
   "revision": 2,
-  "updated_at": "2026-08-01",
-  "status": "calendar-legend-local-validation-passed",
+  "updated_at": "2026-08-02",
+  "status": "view-navigation-local-validation-passed",
   "overall_percent": 98,
   "areas": {
     "docker": 100,
@@ -51,7 +51,9 @@
     "Country resolution no longer uses an application whitelist",
     "Seventeen unit tests, both builds, Docker and five Chromium scenarios passed with the complete flag set",
     "Dynamic championship color legend added below the month calendar following user feedback",
-    "Legend revalidation passed with seventeen unit tests, both builds, Docker and five Chromium scenarios"
+    "Legend revalidation passed with seventeen unit tests, both builds, Docker and five Chromium scenarios",
+    "Previous and next navigation now uses one month, seven days, one day or thirty days according to the active view",
+    "View navigation revalidation passed with nineteen unit tests, both builds, three healthy Docker services and six Chromium scenarios"
   ],
   "next_action": {
     "owner": "Maintainer",

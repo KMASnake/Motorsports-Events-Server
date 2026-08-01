@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, eventDuration, filterEvents, formDateForDay, moveEvent, overlappingEvents, resizeEvent, slugify } from './eventUtils';
+import { buildCalendarDays, calendarPeriodLabel, eventDuration, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent, slugify } from './eventUtils';
 import type { EventRow } from './eventTypes';
 
 const event = (overrides: Partial<EventRow> = {}): EventRow => ({
@@ -32,4 +32,20 @@ describe('eventUtils', () => {
   it('conserve la durée pendant un déplacement',()=>{const moved=moveEvent(event(),new Date('2026-06-12T10:00:00Z'));expect(moved.starts_at).toBe('2026-06-12T10:00:00.000Z');expect(eventDuration(moved)).toBe(eventDuration(event()))});
   it('redimensionne uniquement la fin et refuse une durée négative',()=>{const row=event();expect(resizeEvent(row,new Date('2026-06-11T17:00:00Z')).starts_at).toBe(row.starts_at);expect(()=>resizeEvent(row,new Date('2026-06-10T00:00:00Z'))).toThrow()});
   it('détecte les chevauchements publiés sur le même circuit',()=>{const first=event({circuit_id:'track'});const second=event({id:'event-2',circuit_id:'track',starts_at:'2026-06-11T15:00:00Z',ends_at:'2026-06-11T17:00:00Z'});expect(overlappingEvents([first,second])).toHaveLength(2)});
+
+  it('navigue selon la granularité de chaque vue', () => {
+    const date = new Date(2026, 5, 10, 12);
+    expect(navigateCalendarDate(date, 'month', 1).getMonth()).toBe(6);
+    expect(navigateCalendarDate(date, 'week', 1).getDate()).toBe(17);
+    expect(navigateCalendarDate(date, 'day', -1).getDate()).toBe(9);
+    expect(navigateCalendarDate(date, 'agenda', 1).getDate()).toBe(10);
+    expect(navigateCalendarDate(date, 'agenda', 1).getMonth()).toBe(6);
+  });
+
+  it('décrit la période réellement affichée', () => {
+    const date = new Date(2026, 5, 10, 12);
+    expect(calendarPeriodLabel(date, 'month')).toContain('Juin 2026');
+    expect(calendarPeriodLabel(date, 'week')).toContain('8 juin');
+    expect(calendarPeriodLabel(date, 'day')).toContain('10 juin 2026');
+  });
 });

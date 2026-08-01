@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-01T22:00:00+02:00",
+  "generated_at": "2026-08-02T00:20:00+02:00",
   "repository_state": {
     "root_source": "8.1.0-alpha.2-lot.4.2",
-    "status": "lot-4.2-calendar-legend-locally-validated",
-    "reason": "The dynamic championship color legend passed Web/API builds, Docker and Chromium validation; VPS visual acceptance remains required."
+    "status": "lot-4.2-view-navigation-locally-validated",
+    "reason": "Previous/next navigation follows the active view granularity; unit tests, Web/API builds, Docker health and Chromium validation passed."
   },
   "working_lot_4_2": {
     "implemented": [
@@ -16,9 +16,10 @@
       "Local country flags and sport identities with authorized logo URL support",
       "Dynamic alpha-2 country resolution against 270 bundled local flags",
       "Dynamic championship color legend below the month calendar",
+      "View-aware previous and next calendar navigation",
       "Safe hybrid test-data workflow and deterministic generator"
     ],
-    "local_validation": "passed-with-calendar-legend",
+    "local_validation": "passed-with-view-navigation",
     "vps_validation": "pending",
     "graphics_vps_validation": "passed-2026-08-01",
     "report": "docs/handoff/LOT-4.2-IMPLEMENTATION-REPORT.md"
@@ -61,8 +62,8 @@
     "web_build": "passed",
     "api_build": "passed",
     "workspace_typecheck": "passed",
-    "unit_tests": "17 passed",
-    "playwright_chromium": "5 passed",
+    "unit_tests": "19 passed",
+    "playwright_chromium": "6 passed",
     "docker_services": "3 healthy",
     "lot4_api_validator": "passed",
     "screenshots": [

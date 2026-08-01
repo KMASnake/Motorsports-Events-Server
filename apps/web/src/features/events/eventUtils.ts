@@ -1,4 +1,4 @@
-import type { EventFiltersState, EventFormState, EventRow } from './eventTypes';
+import type { EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 
 export const emptyEventForm = (): EventFormState => ({
   championship_id: '', circuit_id: '', name: '', slug: '', category: '',
@@ -77,6 +77,26 @@ export function formDateForDay(date: Date) {
 export const monthLabel = (date: Date) => new Intl.DateTimeFormat('fr-FR', {
   month: 'long', year: 'numeric'
 }).format(date).replace(/^./, (letter) => letter.toUpperCase());
+
+export function navigateCalendarDate(date: Date, view: EventView, direction: -1 | 1) {
+  const next = new Date(date);
+  if (view === 'week') next.setDate(next.getDate() + direction * 7);
+  else if (view === 'day') next.setDate(next.getDate() + direction);
+  else if (view === 'agenda') next.setDate(next.getDate() + direction * 30);
+  else next.setMonth(next.getMonth() + direction, 1);
+  return next;
+}
+
+export function calendarPeriodLabel(date: Date, view: EventView) {
+  if (view === 'month' || view === 'list') return monthLabel(date);
+  if (view === 'day') return new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date).replace(/^./, (letter) => letter.toUpperCase());
+  const start = new Date(date);
+  if (view === 'week') start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  const end = new Date(start); end.setDate(start.getDate() + (view === 'week' ? 6 : 29));
+  const short = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+  const complete = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  return `${short.format(start)} – ${complete.format(end)}`;
+}
 
 export const fullDate = (value: string) => new Intl.DateTimeFormat('fr-FR', {
   dateStyle: 'long', timeStyle: 'short'

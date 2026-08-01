@@ -71,6 +71,11 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
   grille mensuelle, synchronisées avec le panneau de filtres existant ;
 - revalidation légende : 17 tests unitaires, builds Web/API, Docker et 5
   scénarios Chromium réussis ;
+- navigation contextuelle : les flèches utilisent un pas d'un jour en vue Jour,
+  de sept jours en vue Semaine, de trente jours en vue Agenda et d'un mois en
+  vues Mois/Liste ;
+- revalidation navigation : 19 tests unitaires, builds Web/API, 3 services
+  Docker sains et 6 scénarios Chromium réussis ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

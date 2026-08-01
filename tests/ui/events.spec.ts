@@ -89,4 +89,18 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByLabel('Calendrier mensuel des événements')).toBeVisible();
   });
 
+  test('adapte la navigation à la vue semaine et jour', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-07-01T10:00:00+02:00'));
+    await page.goto('/events');
+    const period = page.locator('.events-month-nav h2');
+    await page.getByRole('tab', { name: 'Semaine' }).click();
+    const week = await period.textContent();
+    await page.getByRole('button', { name: 'Période suivante' }).click();
+    expect(await period.textContent()).not.toBe(week);
+    await page.getByRole('tab', { name: 'Jour' }).click();
+    const day = await period.textContent();
+    await page.getByRole('button', { name: 'Période précédente' }).click();
+    expect(await period.textContent()).not.toBe(day);
+  });
+
 });

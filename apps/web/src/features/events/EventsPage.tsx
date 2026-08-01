@@ -9,7 +9,7 @@ import { EventsFilters } from './EventsFilters';
 import { EventsViewSwitcher } from './EventsViewSwitcher';
 import { EventCalendarAlternativeViews } from './EventCalendarAlternativeViews';
 import { EventLegend } from './EventLegend';
-import { emptyEventForm, eventToForm, filterEvents, formDateForDay, monthLabel, moveEvent, overlappingEvents, resizeEvent, slugify } from './eventUtils';
+import { calendarPeriodLabel, emptyEventForm, eventToForm, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent, slugify } from './eventUtils';
 import type { Championship, Circuit, EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 
 const defaultFilters: EventFiltersState = { search: '', championship: 'all', status: 'all', publication: 'all' };
@@ -88,7 +88,7 @@ export function EventsPage() {
     {message && <div className={`lot3-notice ${message.error ? 'error' : ''}`} role="status">{message.text}<button onClick={() => setMessage(null)}>×</button></div>}
     <div className="events-section-title"><h2>Calendrier des événements</h2></div>
     <div className="events-toolbar-main">
-      <div className="events-month-nav"><button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}>‹</button><button onClick={() => setMonth(new Date())}>Aujourd’hui</button><button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}>›</button><h2>{monthLabel(month)}</h2></div>
+      <div className="events-month-nav"><button onClick={() => setMonth((current) => navigateCalendarDate(current, view, -1))} aria-label="Période précédente">‹</button><button onClick={() => setMonth(new Date())}>Aujourd’hui</button><button onClick={() => setMonth((current) => navigateCalendarDate(current, view, 1))} aria-label="Période suivante">›</button><h2>{calendarPeriodLabel(month, view)}</h2></div>
       <EventsViewSwitcher value={view} onChange={changeView} />
       <button className="danger" onClick={() => startCreate()}>+ Nouvel événement</button>
     </div>

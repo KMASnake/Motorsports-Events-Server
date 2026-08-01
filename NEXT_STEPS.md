@@ -15,6 +15,8 @@
 - [x] embarquer le jeu complet de drapeaux et supprimer la whitelist pays ;
 - [ ] valider sur VPS un pays absent de l'ancien jeu limité ;
 - [ ] valider sur VPS la légende dynamique sous le calendrier mensuel ;
+- [ ] valider sur VPS que les flèches avancent d'un jour en vue Jour et de sept
+  jours en vue Semaine ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 
