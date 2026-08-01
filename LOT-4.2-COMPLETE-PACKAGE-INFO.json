@@ -1,0 +1,21 @@
+{
+  "package": "Motorsports Events Server Lot 4.2 Complete Codex Package",
+  "version": "v8.1.0-alpha.2-lot.4.2-specification-r3",
+  "generated_at": "2026-08-01",
+  "type": "additive-github-specification",
+  "base_required": "latest validated code before Lot 4.2",
+  "intermediate_revision_required": false,
+  "includes_application_source": false,
+  "target_branch": "codex/lot-4.2-complete",
+  "codex_entrypoint": "docs/handoff/LOT-4.2-COMPLETE-CODEX-PROMPT.md",
+  "functional_spec": "docs/handoff/LOT-4.2-CALENDAR-INTERACTIVE-SPEC.md",
+  "graphics_spec": "docs/handoff/LOT-4.2-GRAPHICS-SPEC.md",
+  "hybrid_data_spec": "docs/handoff/LOT-4.2-HYBRID-DATA-SPEC.md",
+  "visual_target_percent": 98,
+  "snapshot_policy": "sports-data-realistic, identities-and-secrets-synthetic",
+  "dumps_allowed_in_git": false,
+  "corrections_spec": "docs/handoff/LOT-4.2-CORRECTIONS-SPEC.md",
+  "provider_override_policy": "provider-source-preserved-local-override-visible-in-corrections",
+  "manual_event_policy": "manual-events-are-native-source-no-corrections",
+  "corrections_ui_policy": "field-level-highlight-provider-vs-local"
+}
