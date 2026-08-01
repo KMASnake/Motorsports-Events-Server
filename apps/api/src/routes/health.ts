@@ -8,7 +8,7 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
     return reply.code(database ? 200 : 503).send({
       status,
       service: 'motorsports-events-api',
-      version: '8.1.0-alpha.2-lot.4',
+      version: '8.1.0-alpha.2-lot.4-rev.1',
       timestamp: new Date().toISOString(),
       checks: { database }
     });

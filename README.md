@@ -4,46 +4,28 @@ Ce dépôt constitue le package de passation complet destiné à GitHub et Codex
 
 ## État du dépôt
 
-La racine contient le code du **lot 4**, qui ajoute le CRUD des événements et
-les API publique/administration. Ce lot n'est pas encore validé comme version
-finale, car la vue calendrier validée a disparu.
+La racine contient le **lot 4 rev.1**, qui réunit le CRUD des événements, les
+API publique/administration et la vue calendrier restaurée. Ce candidat a été
+validé par l'utilisateur le 1er août 2026 sur un environnement VPS isolé.
 
-Le dernier jalon entièrement validé sur le poste de l'utilisateur est :
-
-```text
-v8.1.0-alpha.2-lot.3-rev.5
-```
-
-Son archive exacte est conservée dans :
-
-```text
-releases/validated/
-```
-
-## Mission immédiate de Codex
-
-Implémenter :
+Le dernier jalon entièrement validé est :
 
 ```text
 v8.1.0-alpha.2-lot.4-rev.1
 ```
 
-en suivant :
+Le rapport de validation et la passation sont conservés dans :
 
 ```text
-docs/handover/CODEX-EXECUTION-PROMPT-LOT-4-REV-1.md
-docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md
-docs/handover/LOT-4-REV-1-ACCEPTANCE.md
-docs/handover/LOT-4-REV-1-ADR.md
+docs/handover/LOT-4-REV-1-VPS-VALIDATION.md
+docs/handover/LOT-4-REV-1-HANDOFF.md
 ```
 
-Objectifs :
+## Prochaine action
 
-- restaurer le calendrier comme vue Événements par défaut ;
-- conserver la vue liste et le CRUD du lot 4 ;
-- conserver les API publique et administration ;
-- atteindre au moins 95 % de fidélité à la maquette validée ;
-- ne pas régresser sur le module Championnats.
+Relire puis fusionner la PR #24 dans `main`, vérifier la CI après fusion et
+choisir explicitement le prochain lot. Ne pas installer cette architecture 8.1
+sur la production historique 2.7.0 avec l'ancien script de mise à niveau.
 
 ## Maquettes officielles
 

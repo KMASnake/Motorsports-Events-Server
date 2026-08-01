@@ -4,33 +4,20 @@
 
 1. `README.md`
 2. `PROJECT-STATUS.json`
-3. `docs/handover/CODEX-EXECUTION-PROMPT-LOT-4-REV-1.md`
-4. `docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md`
-5. `docs/handover/LOT-4-REV-1-ACCEPTANCE.md`
-6. `docs/handover/LOT-4-REV-1-ADR.md`
-7. `docs/ui-reference/validated-mockups/events-validated.png`
+3. `docs/handover/LOT-4-REV-1-HANDOFF.md`
+4. `docs/handover/LOT-4-REV-1-VPS-VALIDATION.md`
+5. `docs/handover/PROGRESS.json`
+6. `docs/handover/LOT-4-REV-1-ACCEPTANCE.md`
 
 ## Base fiable
 
-Le dernier jalon totalement validé est conservé dans :
-
-```text
-releases/validated/Motorsports-Events-Server-v8.1.0-alpha.2-lot.3-rev.5.zip
-```
-
-La racine est le lot 4 de travail. Ne pas confondre « présent dans le code »
-et « validé par l'utilisateur ».
+Le lot `v8.1.0-alpha.2-lot.4-rev.1` est validé par l'utilisateur sur un VPS
+isolé. La PR #24 doit être fusionnée avant de commencer un nouveau lot.
 
 ## Mission
 
-Restaurer la vue calendrier Événements sans perdre :
-
-- CRUD ;
-- liste ;
-- filtres ;
-- publication ;
-- API publique ;
-- API d'administration.
+Relire et fusionner la PR #24, vérifier `main`, puis attendre le choix explicite
+du prochain lot.
 
 ## Contraintes absolues
 
