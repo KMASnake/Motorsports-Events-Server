@@ -12,7 +12,7 @@ import { EventLegend } from './EventLegend';
 import { calendarPeriodLabel, emptyEventForm, eventToForm, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent, slugify } from './eventUtils';
 import type { Championship, Circuit, EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 
-const defaultFilters: EventFiltersState = { search: '', championship: 'all', status: 'all', publication: 'all', origin: 'all' };
+const defaultFilters: EventFiltersState = { search: '', championship: 'all', status: 'all', publication: 'all', provider: 'all' };
 const initialView = (): EventView => ['month','week','day','agenda','list'].includes(sessionStorage.getItem('mse-events-view') ?? '') ? sessionStorage.getItem('mse-events-view') as EventView : 'month';
 
 export function EventsPage() {

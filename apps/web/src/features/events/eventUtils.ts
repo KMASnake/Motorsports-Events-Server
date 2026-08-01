@@ -1,4 +1,5 @@
 import type { EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
+import { providerSource } from './providerDisplay';
 
 export const emptyEventForm = (): EventFormState => ({
   championship_id: '', circuit_id: '', name: '', slug: '', category: '',
@@ -40,7 +41,7 @@ export function filterEvents(events: EventRow[], filters: EventFiltersState) {
       && (filters.championship === 'all' || event.championship_id === filters.championship)
       && (filters.status === 'all' || event.status === filters.status)
       && (filters.publication === 'all' || event.published === (filters.publication === 'published'))
-      && (filters.origin === 'all' || event.origin === filters.origin);
+      && (filters.provider === 'all' || providerSource(event.origin,event.provider_key) === filters.provider);
   });
 }
 

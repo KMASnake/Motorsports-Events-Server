@@ -27,6 +27,8 @@
   fournisseurs connus par des libellés lisibles dans la page Corrections ;
 - ajout d'un filtre Fournisseur sur Événements et Corrections, et renommage des
   libellés visibles « Origine administrative » sans changement du contrat API ;
+- normalisation des sources visibles en `OC BlackTop`, `TheSportsDB` et
+  `Motorsports Events`, ce dernier couvrant les ajouts manuels et locaux ;
 - ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
   logos autorisées configurées dans l'administration.
 

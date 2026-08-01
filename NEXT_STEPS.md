@@ -23,6 +23,8 @@
   circuits et non leurs identifiants techniques ;
 - [ ] valider sur VPS les filtres Fournisseur des pages Événements et
   Corrections ainsi que leur réinitialisation ;
+- [ ] confirmer sur VPS que les trois libellés sont OC BlackTop, TheSportsDB et
+  Motorsports Events, notamment pour un ajout manuel ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 

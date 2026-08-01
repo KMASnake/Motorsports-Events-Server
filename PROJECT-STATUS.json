@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-02T01:00:00+02:00",
+  "generated_at": "2026-08-02T01:10:00+02:00",
   "repository_state": {
     "root_source": "8.1.0-alpha.2-lot.4.2",
-    "status": "lot-4.2-provider-filters-locally-validated",
-    "reason": "Events and Corrections expose readable Provider filters; API, Web, Docker and Chromium validation passed."
+    "status": "lot-4.2-provider-sources-locally-validated",
+    "reason": "Provider filters consistently expose OC BlackTop, TheSportsDB and Motorsports Events; API, Web, Docker and Chromium validation passed."
   },
   "working_lot_4_2": {
     "implemented": [
@@ -20,6 +20,7 @@
       "Idempotent synthetic provider fixtures and end-to-end Corrections validation",
       "Readable reference names in the Corrections administration page",
       "Provider filters on Events and Corrections with consistent administration labels",
+      "Canonical provider source labels with local and manual fallback to Motorsports Events",
       "Safe hybrid test-data workflow and deterministic generator"
     ],
     "local_validation": "passed-with-corrections-flow",

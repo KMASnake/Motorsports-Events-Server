@@ -4,7 +4,7 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-02",
-  "status": "provider-filters-local-validation-passed",
+  "status": "provider-sources-local-validation-passed",
   "overall_percent": 98,
   "areas": {
     "docker": 100,
@@ -58,7 +58,8 @@
     "Lot 4 API validator and Chromium now verify creation, display and cleanup of a real provider correction",
     "Corrections resolve championship and circuit identifiers to readable names and label known providers and fields",
     "Events filter by Manual, Synchronized or Hybrid provider mode; Corrections filter by the concrete provider key with a readable label",
-    "Administrative Origin labels were renamed Provider in the event UI without changing internal API values"
+    "Administrative Origin labels were renamed Provider in the event UI without changing internal API values",
+    "Provider selectors now expose exactly OC BlackTop, TheSportsDB and Motorsports Events; manual, local and unknown test sources map to Motorsports Events"
   ],
   "next_action": {
     "owner": "Maintainer",

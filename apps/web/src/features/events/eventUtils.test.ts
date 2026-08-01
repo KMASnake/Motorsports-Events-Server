@@ -21,12 +21,14 @@ describe('eventUtils', () => {
 
   it('partage les filtres entre calendrier et liste', () => {
     const rows = [event(), event({ id: 'event-2', championship_id: 'champ-2', name: 'Rallye du Portugal', published: false })];
-    expect(filterEvents(rows, { search: 'rallye', championship: 'all', status: 'all', publication: 'private', origin: 'all' }).map((row) => row.id)).toEqual(['event-2']);
+    expect(filterEvents(rows, { search: 'rallye', championship: 'all', status: 'all', publication: 'private', provider: 'all' }).map((row) => row.id)).toEqual(['event-2']);
   });
 
   it('filtre les événements par fournisseur administratif', () => {
     const rows = [event(), event({ id: 'event-2', origin: 'provider', provider_key: 'fixture' })];
-    expect(filterEvents(rows, { search: '', championship: 'all', status: 'all', publication: 'all', origin: 'provider' }).map((row) => row.id)).toEqual(['event-2']);
+    expect(filterEvents(rows, { search: '', championship: 'all', status: 'all', publication: 'all', provider: 'motorsports-events' }).map((row) => row.id)).toEqual(['event-1', 'event-2']);
+    const external = event({ id: 'event-3', origin: 'provider', provider_key: 'ocblacktop' });
+    expect(filterEvents([...rows, external], { search: '', championship: 'all', status: 'all', publication: 'all', provider: 'ocblacktop' }).map((row) => row.id)).toEqual(['event-3']);
   });
 
   it('prépare une création depuis un jour et normalise le slug', () => {
