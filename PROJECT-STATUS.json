@@ -1,9 +1,23 @@
 {
-  "generated_at": "2026-08-01",
+  "generated_at": "2026-08-01T22:00:00+02:00",
   "repository_state": {
-    "root_source": "v8.1.0-alpha.2-lot.4-rev.1",
-    "status": "user-validated-on-vps-pr-ready",
-    "reason": "The isolated VPS deployment, API/database health and complete browser acceptance checklist were confirmed by the user."
+    "root_source": "8.1.0-alpha.2-lot.4.2",
+    "status": "lot-4.2-local-candidate",
+    "reason": "Lot 4.2 is implemented and locally validated; VPS validation remains required."
+  },
+  "working_lot_4_2": {
+    "implemented": [
+      "Month, week, day and agenda calendar views",
+      "Optimistic move and resize with rollback",
+      "Quick creation, duplication and overlap warning",
+      "Field-level provider corrections and conflict resolution",
+      "Corrections administration page",
+      "Local branding, asset registry and documented fallbacks",
+      "Safe hybrid test-data workflow and deterministic generator"
+    ],
+    "local_validation": "passed",
+    "vps_validation": "pending",
+    "report": "docs/handoff/LOT-4.2-IMPLEMENTATION-REPORT.md"
   },
   "last_fully_validated_release": {
     "version": "v8.1.0-alpha.2-lot.4-rev.1",
@@ -43,13 +57,18 @@
     "web_build": "passed",
     "api_build": "passed",
     "workspace_typecheck": "passed",
-    "unit_tests": "4 passed",
-    "playwright_chromium": "2 passed",
+    "unit_tests": "12 passed",
+    "playwright_chromium": "5 passed",
     "docker_services": "3 healthy",
     "lot4_api_validator": "passed",
     "screenshots": [
       "tests/ui/screenshots/events-calendar-1440x900.png",
-      "tests/ui/screenshots/events-list-1440x900.png"
+      "tests/ui/screenshots/events-list-1440x900.png",
+      "tests/ui/screenshots/events-month-1440x900.png",
+      "tests/ui/screenshots/events-week-1440x900.png",
+      "tests/ui/screenshots/events-day-1440x900.png",
+      "tests/ui/screenshots/events-agenda-1440x900.png",
+      "tests/ui/screenshots/corrections-conflict-1440x900.png"
     ],
     "known_tooling_issues": [
       "ESLint 9 configuration is absent from the baseline repository.",
@@ -69,10 +88,10 @@
     "report": "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md"
   },
   "target": {
-    "next_version": "to be selected after merge",
+    "next_version": "8.1.0-alpha.2-lot.4.2",
     "owner": "Maintainer",
     "specification": "docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md",
     "visual_fidelity_target_percent": 95,
-    "next_action": "Review and merge pull request 24 into main."
+    "next_action": "Publish the Lot 4.2 pull request, then validate its isolated package on the VPS."
   }
 }

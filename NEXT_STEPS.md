@@ -1,5 +1,22 @@
 # Prochaines étapes
 
+## Lot 4.2 — validation et publication
+
+- [x] implémenter les vues Mois, Semaine, Jour et Agenda ;
+- [x] implémenter déplacement, redimensionnement, création rapide,
+  duplication, rollback et avertissement de conflit ;
+- [x] implémenter les corrections fournisseur champ par champ ;
+- [x] ajouter l'identité locale, le registre d'assets et les fallbacks ;
+- [x] ajouter la chaîne hybride sécurisée et le générateur déterministe ;
+- [x] valider unités, builds, PostgreSQL, Docker et Chromium localement ;
+- [ ] publier la pull request Lot 4.2 ;
+- [ ] installer le package dans un projet Docker VPS isolé ;
+- [ ] exécuter la recette manuelle Windows et consigner le résultat ;
+- [ ] fusionner seulement après validation utilisateur.
+
+Critère d'acceptation : toutes les checklists Lot 4.2 sont validées sans secret
+ni écriture vers la production, avec une API publique inchangée.
+
 Les tâches sont classées par priorité. Ne commencer une tâche que lorsque la
 précédente est terminée ou explicitement différée.
 

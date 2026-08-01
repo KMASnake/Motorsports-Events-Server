@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, filterEvents, formDateForDay, slugify } from './eventUtils';
+import { buildCalendarDays, eventDuration, filterEvents, formDateForDay, moveEvent, overlappingEvents, resizeEvent, slugify } from './eventUtils';
 import type { EventRow } from './eventTypes';
 
 const event = (overrides: Partial<EventRow> = {}): EventRow => ({
@@ -28,4 +28,8 @@ describe('eventUtils', () => {
     expect(formDateForDay(new Date(2026, 5, 7))).toBe('2026-06-07T09:00');
     expect(slugify('Grand Prix d’Été')).toBe('grand-prix-d-ete');
   });
+
+  it('conserve la durée pendant un déplacement',()=>{const moved=moveEvent(event(),new Date('2026-06-12T10:00:00Z'));expect(moved.starts_at).toBe('2026-06-12T10:00:00.000Z');expect(eventDuration(moved)).toBe(eventDuration(event()))});
+  it('redimensionne uniquement la fin et refuse une durée négative',()=>{const row=event();expect(resizeEvent(row,new Date('2026-06-11T17:00:00Z')).starts_at).toBe(row.starts_at);expect(()=>resizeEvent(row,new Date('2026-06-10T00:00:00Z'))).toThrow()});
+  it('détecte les chevauchements publiés sur le même circuit',()=>{const first=event({circuit_id:'track'});const second=event({id:'event-2',circuit_id:'track',starts_at:'2026-06-11T15:00:00Z',ends_at:'2026-06-11T17:00:00Z'});expect(overlappingEvents([first,second])).toHaveLength(2)});
 });

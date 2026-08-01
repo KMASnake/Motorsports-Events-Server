@@ -63,5 +63,5 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
 export const ALL_NAVIGATION_ITEMS = NAVIGATION_SECTIONS.flatMap((section) => section.items);
 
 export const PLACEHOLDER_NAVIGATION_ITEMS = ALL_NAVIGATION_ITEMS.filter(
-  ({ path }) => !['/', '/events', '/championships', '/circuits', '/synchronizations'].includes(path),
+  ({ path }) => !['/', '/events', '/championships', '/circuits', '/corrections', '/synchronizations'].includes(path),
 );

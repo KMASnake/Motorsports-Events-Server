@@ -5,8 +5,11 @@ import { dashboardRoutes } from './routes/dashboard.js';
 import { catalogRoutes } from './routes/catalog.js';
 import { championshipRoutes } from './routes/championships.js';
 import { eventRoutes } from './routes/events.js';
+import { correctionRoutes } from './routes/corrections.js';
+import { ensureApplicationSchema } from './lib/db.js';
 
 const app = Fastify({ logger: true });
+await ensureApplicationSchema();
 await app.register(cors, { origin: true });
 
 app.addHook('onRequest', async (request) => {
@@ -29,6 +32,7 @@ await app.register(dashboardRoutes);
 await app.register(catalogRoutes);
 await app.register(championshipRoutes);
 await app.register(eventRoutes);
+await app.register(correctionRoutes);
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';

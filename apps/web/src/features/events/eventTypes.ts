@@ -1,6 +1,6 @@
 export type EventStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'postponed';
 export type EventOrigin = 'manual' | 'provider' | 'mixed';
-export type EventView = 'calendar' | 'list';
+export type EventView = 'month' | 'week' | 'day' | 'agenda' | 'list';
 
 export interface Championship {
   id: string;
@@ -38,6 +38,9 @@ export interface EventRow {
   published: boolean;
   origin: EventOrigin;
   description: string | null;
+  provider_key?: string | null;
+  external_id?: string | null;
+  correction_count?: number;
 }
 
 export interface EventFormState {

@@ -1,5 +1,20 @@
 # Changelog
 
+## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
+
+### Calendrier interactif, corrections et données de test
+
+- vues Mois, Semaine, Jour et Agenda avec navigation et filtres communs ;
+- déplacement, redimensionnement accessible, création rapide, duplication,
+  mutations optimistes avec rollback et avertissement de chevauchement ;
+- corrections fournisseur champ par champ avec comparaison, conflit et actions
+  de résolution, sans exposition des métadonnées dans l'API publique ;
+- identité Motorsports Events locale, registre d'assets, codes pays accessibles
+  et fallbacks documentés ;
+- chaîne hybride sécurisée d'export, import isolé, anonymisation, vérification
+  bloquante et génération déterministe de données réalistes ;
+- tests unitaires, intégration PostgreSQL, Docker et captures Chromium étendus.
+
 ## 8.1.0-alpha.2-lot.4-rev.1 — 2026-08-01
 
 ### Restauration du calendrier Événements

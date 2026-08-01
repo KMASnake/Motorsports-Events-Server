@@ -46,6 +46,12 @@ export function setEventPublication(event: EventRow, published: boolean) {
   });
 }
 
+export function patchEvent(eventId: string, values: Partial<EventFormState>) {
+  return request<EventRow>(`/api/v1/admin/events/${eventId}`, {
+    method: 'PATCH', body: JSON.stringify(values)
+  });
+}
+
 export function deleteEvent(eventId: string) {
   return request<void>(`/api/v1/admin/events/${eventId}`, { method: 'DELETE' });
 }

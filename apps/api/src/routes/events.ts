@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { pool } from '../lib/db.js';
+import { isProviderEvent } from '../lib/correctionPolicy.js';
 
 const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
@@ -34,7 +35,8 @@ const publicSelect = `
 `;
 const adminSelect = `
   select e.*,c.name championship_name,c.slug championship_slug,c.active championship_active,
-    ci.name circuit_name,ci.city circuit_city,ci.country_code
+    ci.name circuit_name,ci.city circuit_city,ci.country_code,
+    (select count(*)::int from event_corrections ec where ec.event_id=e.id and ec.status in ('active','conflict')) correction_count
   from events e
   join championships c on c.id=e.championship_id
   left join circuits ci on ci.id=e.circuit_id
@@ -119,14 +121,33 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
     const { id } = request.params as { id: string };
     const parsed = updateBody.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ message: 'Données invalides.', issues: parsed.error.issues });
+    const requested = request.body && typeof request.body === 'object' ? request.body as Record<string, unknown> : {};
+    const patch = Object.fromEntries(Object.entries(parsed.data).filter(([field]) => field in requested));
     const current = await pool.query('select * from events where id=$1', [id]);
     if (!current.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
-    const merged = eventBody.parse({ ...current.rows[0], ...parsed.data,
-      starts_at: new Date(parsed.data.starts_at ?? current.rows[0].starts_at).toISOString(),
-      ends_at: parsed.data.ends_at === undefined ? (current.rows[0].ends_at ? new Date(current.rows[0].ends_at).toISOString() : null) : parsed.data.ends_at
+    const merged = eventBody.parse({ ...current.rows[0], ...patch,
+      starts_at: new Date((patch.starts_at as string | undefined) ?? current.rows[0].starts_at).toISOString(),
+      ends_at: patch.ends_at === undefined ? (current.rows[0].ends_at ? new Date(current.rows[0].ends_at).toISOString() : null) : patch.ends_at
     });
     const dateError = validateDates(merged); if (dateError) return reply.code(400).send({ message: dateError });
     try {
+      if (isProviderEvent(current.rows[0]) && current.rows[0].provider_key) {
+        const corrections = ['championship_id','circuit_id','name','slug','category','starts_at','ends_at','timezone','status','published','description'] as const;
+        for (const field of corrections) {
+          if (!(field in patch)) continue;
+          const previous = normalizeComparable(current.rows[0][field]);
+          const next = normalizeComparable(patch[field]);
+          if (JSON.stringify(previous) === JSON.stringify(next)) continue;
+          await pool.query(`insert into event_corrections(
+            id,event_id,provider_key,external_id,field_name,provider_value,override_value,created_by
+          ) values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,'administrator')
+          on conflict(event_id,field_name) do update set override_value=excluded.override_value,
+            status='active',conflict_detected_at=null,updated_at=now()`, [
+            randomUUID(), id, current.rows[0].provider_key, current.rows[0].external_id, field,
+            JSON.stringify(previous), JSON.stringify(next)
+          ]);
+        }
+      }
       const result = await pool.query(`update events set championship_id=$2,circuit_id=$3,name=$4,slug=$5,
         category=$6,starts_at=$7,ends_at=$8,timezone=$9,status=$10,published=$11,origin=$12,
         provider_key=$13,external_id=$14,description=$15,updated_at=now() where id=$1 returning *`, [id, ...values(merged)]);
@@ -145,4 +166,9 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
     if (!result.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
     return reply.code(204).send();
   });
+}
+
+function normalizeComparable(value: unknown) {
+  if (value instanceof Date) return value.toISOString();
+  return value === undefined ? null : value;
 }

@@ -1,16 +1,16 @@
 {
-  "version": "8.1.0-alpha.2-lot.4-rev.1",
+  "version": "8.1.0-alpha.2-lot.4.2",
   "series": "8.1.0-alpha.2",
   "lot": 4,
-  "revision": 1,
-  "status": "user-validated-pr-ready",
+  "revision": 2,
+  "status": "candidate-local-validation",
   "scope": [
     "event CRUD",
     "public events API",
     "admin events API",
     "MEDS desktop events calendar and list UI"
   ],
-  "validated_on_user_workstation": true,
-  "validated_on_vps": true,
-  "validation_date": "2026-08-01"
+  "validated_on_user_workstation": false,
+  "validated_on_vps": false,
+  "validation_date": null
 }

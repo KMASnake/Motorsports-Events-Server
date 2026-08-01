@@ -1,28 +1,30 @@
 {
-  "version": "8.1.0-alpha.2-lot.4-rev.1",
-  "phase": "1.1",
+  "version": "8.1.0-alpha.2-lot.4.2",
+  "phase": "4.2",
   "lot": 4,
-  "revision": 1,
+  "revision": 2,
   "updated_at": "2026-08-01",
-  "status": "user-validated-pr-ready",
-  "overall_percent": 95,
+  "status": "local-candidate-vps-validation-required",
+  "overall_percent": 98,
   "areas": {
     "docker": 100,
-    "database": 95,
-    "api": 92,
+    "database": 98,
+    "api": 98,
     "design_system_foundations": 82,
     "design_system_components": 45,
     "shell": 96,
     "events_visual_fidelity": 95,
     "championships_visual_fidelity": 95,
     "events_crud_list": 94,
-    "events_calendar_view": 92,
-    "events_tests": 95,
-    "visual_tests": 95,
-    "accessibility": 72
+    "events_calendar_view": 98,
+    "events_tests": 98,
+    "visual_tests": 98,
+    "corrections": 98,
+    "hybrid_test_data": 98,
+    "accessibility": 86
   },
-  "validated_on_user_workstation": true,
-  "validated_on_vps": true,
+  "validated_on_user_workstation": false,
+  "validated_on_vps": false,
   "known_issues": [
     "The baseline has no ESLint 9 configuration.",
     "npm audit reports an RSC-only React Router advisory; the application is a BrowserRouter SPA without RSC or Server Actions."
@@ -34,11 +36,16 @@
     "Unit, Docker, API and Chromium validations passed",
     "Isolated VPS deployment validated with database and web health checks",
     "Calendar, list, CRUD, publishing and Championships non-regression accepted by the user",
-    "Legacy Python CI scoped to legacy server paths"
+    "Legacy Python CI scoped to legacy server paths",
+    "Month, week, day and agenda views implemented",
+    "Interactive optimistic calendar mutations implemented",
+    "Field-level provider corrections implemented",
+    "Safe deterministic hybrid-data workflow implemented",
+    "Lot 4.2 local unit, Docker and Chromium validation passed"
   ],
   "next_action": {
     "owner": "Maintainer",
-    "task": "Review and merge pull request 24 into main, then select the next lot.",
-    "target_visual_fidelity": 95
+    "task": "Publish and validate the Lot 4.2 candidate on an isolated VPS before merge.",
+    "target_visual_fidelity": 98
   }
 }

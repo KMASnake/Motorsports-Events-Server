@@ -81,3 +81,24 @@ export const monthLabel = (date: Date) => new Intl.DateTimeFormat('fr-FR', {
 export const fullDate = (value: string) => new Intl.DateTimeFormat('fr-FR', {
   dateStyle: 'long', timeStyle: 'short'
 }).format(new Date(value));
+
+export function moveEvent(event: EventRow, nextStart: Date): EventRow {
+  const duration = event.ends_at ? new Date(event.ends_at).getTime() - new Date(event.starts_at).getTime() : 0;
+  return { ...event, starts_at: nextStart.toISOString(), ends_at: event.ends_at ? new Date(nextStart.getTime() + duration).toISOString() : null };
+}
+
+export function resizeEvent(event: EventRow, nextEnd: Date): EventRow {
+  if (nextEnd < new Date(event.starts_at)) throw new Error('La fin ne peut pas précéder le début.');
+  return { ...event, ends_at: nextEnd.toISOString() };
+}
+
+export function eventDuration(event: EventRow) {
+  return event.ends_at ? Math.max(0, new Date(event.ends_at).getTime() - new Date(event.starts_at).getTime()) : 0;
+}
+
+export function overlappingEvents(events: EventRow[]) {
+  return events.filter((event, index) => events.some((other, otherIndex) => otherIndex !== index
+    && event.published && other.published && event.circuit_id && event.circuit_id === other.circuit_id
+    && new Date(event.starts_at) < new Date(other.ends_at ?? other.starts_at)
+    && new Date(other.starts_at) < new Date(event.ends_at ?? event.starts_at)));
+}
