@@ -21,6 +21,8 @@
   fournisseur apparaît dans la page Corrections ;
 - [ ] vérifier sur VPS qu'une correction de circuit affiche les deux noms de
   circuits et non leurs identifiants techniques ;
+- [ ] valider sur VPS les filtres Fournisseur des pages Événements et
+  Corrections ainsi que leur réinitialisation ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 

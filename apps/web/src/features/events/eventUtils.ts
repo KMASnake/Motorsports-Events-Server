@@ -39,7 +39,8 @@ export function filterEvents(events: EventRow[], filters: EventFiltersState) {
     return (!query || haystack.includes(query))
       && (filters.championship === 'all' || event.championship_id === filters.championship)
       && (filters.status === 'all' || event.status === filters.status)
-      && (filters.publication === 'all' || event.published === (filters.publication === 'published'));
+      && (filters.publication === 'all' || event.published === (filters.publication === 'published'))
+      && (filters.origin === 'all' || event.origin === filters.origin);
   });
 }
 

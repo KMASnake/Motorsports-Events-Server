@@ -64,4 +64,5 @@ export interface EventFiltersState {
   championship: string;
   status: string;
   publication: string;
+  origin: EventOrigin | 'all';
 }

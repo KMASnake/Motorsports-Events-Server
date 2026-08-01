@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-02T00:45:00+02:00",
+  "generated_at": "2026-08-02T01:00:00+02:00",
   "repository_state": {
     "root_source": "8.1.0-alpha.2-lot.4.2",
-    "status": "lot-4.2-readable-corrections-locally-validated",
-    "reason": "Corrections display readable field, championship, circuit and provider names; API, Web, Docker and Chromium validation passed."
+    "status": "lot-4.2-provider-filters-locally-validated",
+    "reason": "Events and Corrections expose readable Provider filters; API, Web, Docker and Chromium validation passed."
   },
   "working_lot_4_2": {
     "implemented": [
@@ -19,6 +19,7 @@
       "View-aware previous and next calendar navigation",
       "Idempotent synthetic provider fixtures and end-to-end Corrections validation",
       "Readable reference names in the Corrections administration page",
+      "Provider filters on Events and Corrections with consistent administration labels",
       "Safe hybrid test-data workflow and deterministic generator"
     ],
     "local_validation": "passed-with-corrections-flow",
@@ -64,7 +65,7 @@
     "web_build": "passed",
     "api_build": "passed",
     "workspace_typecheck": "passed",
-    "unit_tests": "19 passed",
+    "unit_tests": "20 passed",
     "playwright_chromium": "6 passed",
     "docker_services": "3 healthy",
     "lot4_api_validator": "passed",

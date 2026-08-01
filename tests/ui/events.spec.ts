@@ -12,6 +12,8 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(calendarTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByLabel('Calendrier mensuel des événements')).toBeVisible();
     await expect(page.getByLabel('Légende des couleurs du calendrier')).toBeVisible();
+    await expect(page.getByLabel('Fournisseur')).toContainText('Tous les fournisseurs');
+    await expect(page.getByLabel('Fournisseur')).toContainText('Synchronisé');
     await page.screenshot({ path: 'tests/ui/screenshots/events-calendar-1440x900.png' });
 
     await listTab.click();
@@ -95,6 +97,9 @@ test.describe('Événements lot 4 rev.1', () => {
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
+    await page.getByLabel('Fournisseur').selectOption('playwright-fixture');
+    await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
+    await expect(page.getByLabel('Fournisseur')).toHaveValue('playwright-fixture');
     await expect(page.getByText('Valeur locale effective').first()).toBeVisible();
     await expect(page.getByText(source.circuit_name,{exact:true})).toBeVisible();
     await expect(page.getByText(targetCircuit.name,{exact:true})).toBeVisible();

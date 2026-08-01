@@ -26,7 +26,7 @@ export function EventDetailsPanel({ event, championships, onEdit, onDuplicate, o
       <div><dt>Fuseau</dt><dd>{event.timezone}</dd></div>
       <div><dt>Catégorie</dt><dd>{event.category ?? 'Non définie'}</dd></div>
       <div><dt>Statut</dt><dd>{event.status}</dd></div>
-      <div><dt>Origine administrative</dt><dd>{event.origin}</dd></div>
+      <div><dt>Fournisseur</dt><dd>{event.origin === 'manual' ? 'Manuel' : event.origin === 'provider' ? 'Synchronisé' : 'Hybride'}</dd></div>
     </dl>
     {event.description && <p className="event-details-description">{event.description}</p>}
     {event.correction_count ? <div className="event-correction-badge">✎ Corrigé · {event.correction_count} champ(s)</div> : null}

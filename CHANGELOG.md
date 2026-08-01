@@ -25,6 +25,8 @@
   validation de bout en bout de leur affichage dans la page Corrections ;
 - remplacement des identifiants de champs, championnats, circuits et
   fournisseurs connus par des libellés lisibles dans la page Corrections ;
+- ajout d'un filtre Fournisseur sur Événements et Corrections, et renommage des
+  libellés visibles « Origine administrative » sans changement du contrat API ;
 - ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
   logos autorisées configurées dans l'administration.
 

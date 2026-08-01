@@ -83,6 +83,10 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
 - lisibilité Corrections : les champs, championnats, circuits et fournisseurs
   connus sont présentés avec leurs noms, sans exposer les identifiants comme
   libellés principaux ;
+- filtres Fournisseur : Événements filtre les modes Manuel, Synchronisé et
+  Hybride ; Corrections filtre les fournisseurs effectivement présents ;
+- le libellé visible « Origine administrative » devient « Fournisseur » sans
+  renommer les valeurs ni les champs du contrat API ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

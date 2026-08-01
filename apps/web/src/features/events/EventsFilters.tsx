@@ -23,7 +23,11 @@ export function EventsFilters({ value, championships, onChange, onRefresh }: Pro
     <select aria-label="Publication" value={value.publication} onChange={(event) => set('publication', event.target.value)}>
       <option value="all">Toute publication</option><option value="published">Publiés</option><option value="private">Non publiés</option>
     </select>
-    <button onClick={() => onChange({ search: '', championship: 'all', status: 'all', publication: 'all' })}>Réinitialiser</button>
+    <select aria-label="Fournisseur" value={value.origin} onChange={(event) => set('origin', event.target.value)}>
+      <option value="all">Tous les fournisseurs</option><option value="manual">Manuel</option>
+      <option value="provider">Synchronisé</option><option value="mixed">Hybride</option>
+    </select>
+    <button onClick={() => onChange({ search: '', championship: 'all', status: 'all', publication: 'all', origin: 'all' })}>Réinitialiser</button>
     <button onClick={onRefresh} aria-label="Actualiser les événements">↻</button>
   </div>;
 }

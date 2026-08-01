@@ -21,7 +21,12 @@ describe('eventUtils', () => {
 
   it('partage les filtres entre calendrier et liste', () => {
     const rows = [event(), event({ id: 'event-2', championship_id: 'champ-2', name: 'Rallye du Portugal', published: false })];
-    expect(filterEvents(rows, { search: 'rallye', championship: 'all', status: 'all', publication: 'private' }).map((row) => row.id)).toEqual(['event-2']);
+    expect(filterEvents(rows, { search: 'rallye', championship: 'all', status: 'all', publication: 'private', origin: 'all' }).map((row) => row.id)).toEqual(['event-2']);
+  });
+
+  it('filtre les événements par fournisseur administratif', () => {
+    const rows = [event(), event({ id: 'event-2', origin: 'provider', provider_key: 'fixture' })];
+    expect(filterEvents(rows, { search: '', championship: 'all', status: 'all', publication: 'all', origin: 'provider' }).map((row) => row.id)).toEqual(['event-2']);
   });
 
   it('prépare une création depuis un jour et normalise le slug', () => {
