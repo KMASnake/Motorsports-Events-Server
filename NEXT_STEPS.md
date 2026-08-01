@@ -14,6 +14,7 @@
 - [x] valider sur VPS l'affichage des identités sportives et des drapeaux ;
 - [x] embarquer le jeu complet de drapeaux et supprimer la whitelist pays ;
 - [ ] valider sur VPS un pays absent de l'ancien jeu limité ;
+- [ ] valider sur VPS la légende dynamique sous le calendrier mensuel ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 

@@ -4,7 +4,7 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-01",
-  "status": "complete-flags-local-validation-passed",
+  "status": "calendar-legend-local-validation-passed",
   "overall_percent": 98,
   "areas": {
     "docker": 100,
@@ -49,7 +49,9 @@
     "User confirmed sport identities and country flags are visible on the isolated VPS"
     ,"Limited flags replaced by 270 local flag-icons 7.2.3 SVG assets under MIT license",
     "Country resolution no longer uses an application whitelist",
-    "Seventeen unit tests, both builds, Docker and five Chromium scenarios passed with the complete flag set"
+    "Seventeen unit tests, both builds, Docker and five Chromium scenarios passed with the complete flag set",
+    "Dynamic championship color legend added below the month calendar following user feedback",
+    "Legend revalidation passed with seventeen unit tests, both builds, Docker and five Chromium scenarios"
   ],
   "next_action": {
     "owner": "Maintainer",

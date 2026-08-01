@@ -11,6 +11,7 @@ test.describe('Événements lot 4 rev.1', () => {
 
     await expect(calendarTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByLabel('Calendrier mensuel des événements')).toBeVisible();
+    await expect(page.getByLabel('Légende des couleurs du calendrier')).toBeVisible();
     await page.screenshot({ path: 'tests/ui/screenshots/events-calendar-1440x900.png' });
 
     await listTab.click();
@@ -87,4 +88,5 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByRole('tab', { name: 'Mois' })).toBeVisible();
     await expect(page.getByLabel('Calendrier mensuel des événements')).toBeVisible();
   });
+
 });

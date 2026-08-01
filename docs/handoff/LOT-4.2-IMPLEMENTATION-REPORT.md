@@ -67,6 +67,10 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
   résolution dynamique sans whitelist et contrôles directs de BR, ZA, NZ et MX ;
 - revalidation du jeu complet : 17 tests unitaires, builds Web/API, Docker et
   5 scénarios Chromium réussis ;
+- légende calendrier : couleurs et identités des championnats visibles sous la
+  grille mensuelle, synchronisées avec le panneau de filtres existant ;
+- revalidation légende : 17 tests unitaires, builds Web/API, Docker et 5
+  scénarios Chromium réussis ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

@@ -8,6 +8,7 @@ import { EventListView } from './EventListView';
 import { EventsFilters } from './EventsFilters';
 import { EventsViewSwitcher } from './EventsViewSwitcher';
 import { EventCalendarAlternativeViews } from './EventCalendarAlternativeViews';
+import { EventLegend } from './EventLegend';
 import { emptyEventForm, eventToForm, filterEvents, formDateForDay, monthLabel, moveEvent, overlappingEvents, resizeEvent, slugify } from './eventUtils';
 import type { Championship, Circuit, EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 
@@ -85,15 +86,16 @@ export function EventsPage() {
   return <>
     <PageHeader title="ÉVÉNEMENTS" subtitle="Calendrier global des événements et sessions" />
     {message && <div className={`lot3-notice ${message.error ? 'error' : ''}`} role="status">{message.text}<button onClick={() => setMessage(null)}>×</button></div>}
-    <div className="events-section-title"><h2>Calendrier des événements</h2><button className="danger" onClick={() => startCreate()}>+ Nouvel événement</button></div>
+    <div className="events-section-title"><h2>Calendrier des événements</h2></div>
     <div className="events-toolbar-main">
       <div className="events-month-nav"><button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}>‹</button><button onClick={() => setMonth(new Date())}>Aujourd’hui</button><button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}>›</button><h2>{monthLabel(month)}</h2></div>
       <EventsViewSwitcher value={view} onChange={changeView} />
+      <button className="danger" onClick={() => startCreate()}>+ Nouvel événement</button>
     </div>
     <EventsFilters value={filters} championships={championships} onChange={setFilters} onRefresh={() => void load()} />
     {loading ? <div className="events-loading">Chargement des événements…</div> : <div className="events-workspace">
       <main>{view === 'month'
-        ? <EventCalendarView month={month} events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onCreateAt={startCreate} onMove={(event,date)=>void move(event,date)} />
+        ? <><EventCalendarView month={month} events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onCreateAt={startCreate} onMove={(event,date)=>void move(event,date)} /><EventLegend events={filtered} championships={championships} /></>
         : view === 'list' ? <EventListView events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onEdit={startEdit} onDelete={(event) => void remove(event)} onTogglePublication={(event) => void togglePublication(event)} />
         : <EventCalendarAlternativeViews view={view} date={month} events={filtered} selectedId={selectedId} onSelect={(event)=>setSelectedId(event.id)} onMove={(event,date)=>void move(event,date)} onCreateAt={startCreate}/>}
       </main>
