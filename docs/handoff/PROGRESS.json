@@ -4,7 +4,7 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-02",
-  "status": "view-navigation-local-validation-passed",
+  "status": "corrections-flow-local-validation-passed",
   "overall_percent": 98,
   "areas": {
     "docker": 100,
@@ -53,7 +53,9 @@
     "Dynamic championship color legend added below the month calendar following user feedback",
     "Legend revalidation passed with seventeen unit tests, both builds, Docker and five Chromium scenarios",
     "Previous and next navigation now uses one month, seven days, one day or thirty days according to the active view",
-    "View navigation revalidation passed with nineteen unit tests, both builds, three healthy Docker services and six Chromium scenarios"
+    "View navigation revalidation passed with nineteen unit tests, both builds, three healthy Docker services and six Chromium scenarios",
+    "Synthetic generator now creates 32 identifiable provider events and upgrades rows from an existing seed idempotently",
+    "Lot 4 API validator and Chromium now verify creation, display and cleanup of a real provider correction"
   ],
   "next_action": {
     "owner": "Maintainer",

@@ -21,6 +21,8 @@
   championnats actuellement visibles et synchronisée avec les filtres existants ;
 - navigation précédent/suivant adaptée à la vue active : mois, semaine, jour
   ou fenêtre Agenda de trente jours, avec libellé de période correspondant ;
+- génération idempotente de 32 événements fournisseur synthétiques et
+  validation de bout en bout de leur affichage dans la page Corrections ;
 - ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
   logos autorisées configurées dans l'administration.
 

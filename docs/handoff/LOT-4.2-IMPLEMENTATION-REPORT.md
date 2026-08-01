@@ -76,6 +76,10 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
   vues Mois/Liste ;
 - revalidation navigation : 19 tests unitaires, builds Web/API, 3 services
   Docker sains et 6 scénarios Chromium réussis ;
+- recette Corrections : le générateur produit 32 événements fournisseur sur
+  96 et met à niveau les lignes d'un jeu déjà présent sans écraser leur contenu ;
+- validation de bout en bout : modification d'un événement fournisseur,
+  création de l'override, lecture API, affichage Web et nettoyage réussis ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

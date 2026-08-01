@@ -8,4 +8,11 @@ let publicRows=await call('/api/v1/events');if(!publicRows.some(r=>r.id===create
 await call(`/api/v1/admin/events/${created.id}`,{method:'PATCH',body:JSON.stringify({published:false,status:'draft'})});publicRows=await call('/api/v1/events');if(publicRows.some(r=>r.id===created.id))throw new Error('Brouillon encore visible publiquement.');console.log('Dépublication OK');
 await call(`/api/v1/admin/events/${created.id}`,{method:'DELETE'});console.log('Suppression OK');
 const adminRows=await call('/api/v1/admin/events');if(adminRows.some(r=>r.id===created.id))throw new Error('Événement de test encore présent.');console.log('Liste finale OK');
+console.log('\n=== Corrections fournisseur ===');
+const providerEvent=await call('/api/v1/admin/events',{method:'POST',body:JSON.stringify({championship_id:championships[0].id,circuit_id:circuits[0]?.id??null,name:'Événement fournisseur Lot 4.2',slug:`${marker}-provider`,category:null,starts_at:'2026-12-21T10:00:00.000Z',ends_at:'2026-12-21T12:00:00.000Z',timezone:'Europe/Paris',status:'scheduled',published:true,origin:'provider',provider_key:'validation-fixture',external_id:marker,description:'Valeur fournisseur.'})});
+await call(`/api/v1/admin/events/${providerEvent.id}`,{method:'PATCH',body:JSON.stringify({name:'Événement fournisseur corrigé'})});
+const correctionRows=await call(`/api/v1/admin/corrections?event_id=${providerEvent.id}`);
+if(!correctionRows.some(row=>row.field_name==='name'&&row.override_value==='Événement fournisseur corrigé'))throw new Error('La modification fournisseur est absente de la page Corrections.');
+console.log('Création et lecture de la correction OK');
+await call(`/api/v1/admin/events/${providerEvent.id}`,{method:'DELETE'});console.log('Nettoyage correction OK');
 console.log('\nLot 4 techniquement accessible. Vérifier visuellement la liste, les filtres, le formulaire et la publication API.');

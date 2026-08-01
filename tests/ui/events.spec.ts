@@ -73,12 +73,32 @@ test.describe('Événements lot 4 rev.1', () => {
   });
 
   test('affiche les corrections champ par champ et le branding', async ({ page }) => {
+    const marker = `correction-ui-${Date.now()}`;
+    const workspace = await page.request.get(`${apiUrl}/api/v1/admin/events`);
+    const events = await workspace.json();
+    const source = events.find((event: { championship_id?: string; circuit_id?: string | null }) => event.championship_id && event.circuit_id);
+    const created = await page.request.post(`${apiUrl}/api/v1/admin/events`, { data: {
+      championship_id: source.championship_id, circuit_id: source.circuit_id,
+      name: 'Événement fournisseur test', slug: marker, category: null,
+      starts_at: '2026-12-22T10:00:00.000Z', ends_at: '2026-12-22T12:00:00.000Z',
+      timezone: 'Europe/Paris', status: 'scheduled', published: true,
+      origin: 'provider', provider_key: 'playwright-fixture', external_id: marker,
+      description: 'Valeur fournisseur.'
+    }});
+    expect(created.ok()).toBeTruthy();
+    const providerEvent = await created.json();
+    const patched = await page.request.patch(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`, { data: { name: 'Événement fournisseur corrigé' }});
+    expect(patched.ok()).toBeTruthy();
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
+    await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
+    await expect(page.getByText('Valeur locale effective').first()).toBeVisible();
     await page.screenshot({path:'tests/ui/screenshots/corrections-list-1440x900.png'});
     await page.screenshot({path:'tests/ui/screenshots/corrections-conflict-1440x900.png'});
     await expect(page.getByAltText('Motorsports Events Server')).toBeVisible();
     await page.screenshot({path:'tests/ui/screenshots/branding-header-1440x900.png'});
+    const deleted = await page.request.delete(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`);
+    expect(deleted.ok()).toBeTruthy();
   });
 
   test('reste exploitable en 1280 × 720', async ({ page }) => {

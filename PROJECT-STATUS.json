@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-02T00:20:00+02:00",
+  "generated_at": "2026-08-02T00:35:00+02:00",
   "repository_state": {
     "root_source": "8.1.0-alpha.2-lot.4.2",
-    "status": "lot-4.2-view-navigation-locally-validated",
-    "reason": "Previous/next navigation follows the active view granularity; unit tests, Web/API builds, Docker health and Chromium validation passed."
+    "status": "lot-4.2-corrections-flow-locally-validated",
+    "reason": "Synthetic provider events now exercise the complete override flow; API, Web, Docker and Chromium validation passed."
   },
   "working_lot_4_2": {
     "implemented": [
@@ -17,9 +17,10 @@
       "Dynamic alpha-2 country resolution against 270 bundled local flags",
       "Dynamic championship color legend below the month calendar",
       "View-aware previous and next calendar navigation",
+      "Idempotent synthetic provider fixtures and end-to-end Corrections validation",
       "Safe hybrid test-data workflow and deterministic generator"
     ],
-    "local_validation": "passed-with-view-navigation",
+    "local_validation": "passed-with-corrections-flow",
     "vps_validation": "pending",
     "graphics_vps_validation": "passed-2026-08-01",
     "report": "docs/handoff/LOT-4.2-IMPLEMENTATION-REPORT.md"
