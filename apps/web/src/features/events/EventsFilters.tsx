@@ -1,14 +1,15 @@
 import type { Championship, EventFiltersState } from './eventTypes';
-import { providerOptions } from './providerDisplay';
+import type { ProviderOption } from './providerDisplay';
 
 interface Props {
   value: EventFiltersState;
   championships: Championship[];
+  providers: ProviderOption[];
   onChange: (value: EventFiltersState) => void;
   onRefresh: () => void;
 }
 
-export function EventsFilters({ value, championships, onChange, onRefresh }: Props) {
+export function EventsFilters({ value, championships, providers, onChange, onRefresh }: Props) {
   const set = (field: keyof EventFiltersState, next: string) => onChange({ ...value, [field]: next });
   return <div className="events-filters" aria-label="Filtres des événements">
     <input aria-label="Rechercher" value={value.search} onChange={(event) => set('search', event.target.value)} placeholder="⌕  Rechercher un événement…" />
@@ -26,7 +27,7 @@ export function EventsFilters({ value, championships, onChange, onRefresh }: Pro
     </select>
     <select aria-label="Fournisseur" value={value.provider} onChange={(event) => set('provider', event.target.value)}>
       <option value="all">Tous les fournisseurs</option>
-      {providerOptions.map((option)=><option key={option.value} value={option.value}>{option.label}</option>)}
+      {providers.map((option)=><option key={option.value} value={option.value}>{option.label}</option>)}
     </select>
     <button onClick={() => onChange({ search: '', championship: 'all', status: 'all', publication: 'all', provider: 'all' })}>Réinitialiser</button>
     <button onClick={onRefresh} aria-label="Actualiser les événements">↻</button>

@@ -11,6 +11,7 @@ import { EventCalendarAlternativeViews } from './EventCalendarAlternativeViews';
 import { EventLegend } from './EventLegend';
 import { calendarPeriodLabel, emptyEventForm, eventToForm, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent, slugify } from './eventUtils';
 import type { Championship, Circuit, EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
+import { availableProviderOptions } from './providerDisplay';
 
 const defaultFilters: EventFiltersState = { search: '', championship: 'all', status: 'all', publication: 'all', provider: 'all' };
 const initialView = (): EventView => ['month','week','day','agenda','list'].includes(sessionStorage.getItem('mse-events-view') ?? '') ? sessionStorage.getItem('mse-events-view') as EventView : 'month';
@@ -43,6 +44,7 @@ export function EventsPage() {
 
   useEffect(() => { void load(); }, []);
   const filtered = useMemo(() => filterEvents(rows, filters), [rows, filters]);
+  const providers = useMemo(() => availableProviderOptions(rows), [rows]);
   const selected = rows.find((event) => event.id === selectedId) ?? null;
   const conflicts = useMemo(() => new Set(overlappingEvents(filtered).map((event)=>event.id)), [filtered]);
 
@@ -92,7 +94,7 @@ export function EventsPage() {
       <EventsViewSwitcher value={view} onChange={changeView} />
       <button className="danger" onClick={() => startCreate()}>+ Nouvel événement</button>
     </div>
-    <EventsFilters value={filters} championships={championships} onChange={setFilters} onRefresh={() => void load()} />
+    <EventsFilters value={filters} championships={championships} providers={providers} onChange={setFilters} onRefresh={() => void load()} />
     {loading ? <div className="events-loading">Chargement des événements…</div> : <div className="events-workspace">
       <main>{view === 'month'
         ? <><EventCalendarView month={month} events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onCreateAt={startCreate} onMove={(event,date)=>void move(event,date)} /><EventLegend events={filtered} championships={championships} /></>

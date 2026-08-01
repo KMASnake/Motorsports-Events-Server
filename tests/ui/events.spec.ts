@@ -99,9 +99,10 @@ test.describe('Événements lot 4 rev.1', () => {
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
-    await page.getByLabel('Fournisseur').selectOption('motorsports-events');
+    await expect(page.getByLabel('Fournisseur')).toContainText('Playwright Fixture');
+    await page.getByLabel('Fournisseur').selectOption('provider:playwright-fixture');
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
-    await expect(page.getByLabel('Fournisseur')).toHaveValue('motorsports-events');
+    await expect(page.getByLabel('Fournisseur')).toHaveValue('provider:playwright-fixture');
     await expect(page.getByText('Valeur locale effective').first()).toBeVisible();
     await expect(page.getByText(source.circuit_name,{exact:true})).toBeVisible();
     await expect(page.getByText(targetCircuit.name,{exact:true})).toBeVisible();

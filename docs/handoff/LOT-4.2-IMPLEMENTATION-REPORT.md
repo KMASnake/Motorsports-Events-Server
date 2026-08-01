@@ -88,8 +88,9 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
 - le libellé visible « Origine administrative » devient « Fournisseur » sans
   renommer les valeurs ni les champs du contrat API ;
 - les sélecteurs Fournisseur présentent `OC BlackTop`, `TheSportsDB` et
-  `Motorsports Events` ; les ajouts manuels et sources locales utilisent ce
-  dernier libellé ;
+  `Motorsports Events` ; les ajouts manuels utilisent ce dernier libellé ;
+- toute future clé fournisseur reçue de l'API est ajoutée automatiquement aux
+  filtres avec un libellé dérivé lisible, sans liste applicative fermée ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

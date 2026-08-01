@@ -25,6 +25,8 @@
   Corrections ainsi que leur réinitialisation ;
 - [ ] confirmer sur VPS que les trois libellés sont OC BlackTop, TheSportsDB et
   Motorsports Events, notamment pour un ajout manuel ;
+- [ ] injecter sur VPS une source synthétique supplémentaire et confirmer son
+  apparition automatique dans les deux filtres Fournisseur ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 

@@ -64,5 +64,5 @@ export interface EventFiltersState {
   championship: string;
   status: string;
   publication: string;
-  provider: 'ocblacktop' | 'thesportsdb' | 'motorsports-events' | 'all';
+  provider: string;
 }
