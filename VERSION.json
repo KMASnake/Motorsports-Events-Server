@@ -1,14 +1,14 @@
 {
-  "version": "8.1.0-alpha.2-lot.4",
+  "version": "8.1.0-alpha.2-lot.4-rev.1",
   "series": "8.1.0-alpha.2",
   "lot": 4,
-  "revision": 0,
-  "status": "local-validation-required",
+  "revision": 1,
+  "status": "user-validation-required",
   "scope": [
     "event CRUD",
     "public events API",
     "admin events API",
-    "MEDS desktop events UI"
+    "MEDS desktop events calendar and list UI"
   ],
   "validated_on_user_workstation": false
 }

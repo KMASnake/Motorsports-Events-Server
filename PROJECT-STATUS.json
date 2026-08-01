@@ -1,9 +1,9 @@
 {
   "generated_at": "2026-08-01",
   "repository_state": {
-    "root_source": "v8.1.0-alpha.2-lot.4",
-    "status": "working-unvalidated",
-    "reason": "CRUD Events is present, but the validated calendar view disappeared and must be restored."
+    "root_source": "v8.1.0-alpha.2-lot.4-rev.1",
+    "status": "locally-validated-user-acceptance-pending",
+    "reason": "Calendar and list now coexist with shared CRUD state; user visual acceptance is still required."
   },
   "last_fully_validated_release": {
     "version": "v8.1.0-alpha.2-lot.3-rev.5",
@@ -27,12 +27,33 @@
       "Public Events API",
       "Admin Events API",
       "Publishing and unpublishing",
-      "Event filters and list view"
+      "Calendar view selected by default",
+      "Secondary list view",
+      "Shared filters and selection",
+      "Event details panel",
+      "Create, edit, duplicate and delete flows",
+      "Unit and Chromium browser tests"
     ],
     "not_accepted": [
-      "Calendar view disappeared",
-      "Visual fidelity to validated Events mockup is below target",
-      "Lot 4 rev.1 implementation by Codex is pending"
+      "Visual fidelity >= 95 percent has not yet been confirmed by the user",
+      "Windows workstation validation is pending"
+    ]
+  },
+  "local_validation": {
+    "web_build": "passed",
+    "api_build": "passed",
+    "workspace_typecheck": "passed",
+    "unit_tests": "4 passed",
+    "playwright_chromium": "2 passed",
+    "docker_services": "3 healthy",
+    "lot4_api_validator": "passed",
+    "screenshots": [
+      "tests/ui/screenshots/events-calendar-1440x900.png",
+      "tests/ui/screenshots/events-list-1440x900.png"
+    ],
+    "known_tooling_issues": [
+      "ESLint 9 configuration is absent from the baseline repository.",
+      "npm audit reports the React Router RSC CSRF advisory; this SPA does not use RSC or Server Actions, and a major Router 8 migration is outside rev.1."
     ]
   },
   "target": {

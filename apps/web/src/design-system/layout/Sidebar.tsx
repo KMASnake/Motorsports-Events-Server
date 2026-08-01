@@ -39,7 +39,7 @@ export function Sidebar({
 
       <footer>
         <div className="exit"><MedsIcon name="logout" size={18} /></div>
-        <span>8.1.0-alpha.2-lot.4<br/><small>© 2026 Motorsports Events</small></span>
+        <span>8.1.0-alpha.2-lot.4-rev.1<br/><small>© 2026 Motorsports Events</small></span>
       </footer>
     </aside>
   );

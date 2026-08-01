@@ -1,38 +1,41 @@
 {
-  "version": "8.1.0-alpha.2-lot.4",
+  "version": "8.1.0-alpha.2-lot.4-rev.1",
   "phase": "1.1",
   "lot": 4,
-  "updated_at": "2026-07-31",
-  "status": "ready-for-local-validation",
-  "overall_percent": 75,
+  "revision": 1,
+  "updated_at": "2026-08-01",
+  "status": "awaiting-user-visual-validation",
+  "overall_percent": 89,
   "areas": {
     "docker": 100,
     "database": 95,
     "api": 92,
     "design_system_foundations": 82,
-    "design_system_components": 36,
+    "design_system_components": 45,
     "shell": 96,
-    "dashboard_visual_fidelity": 86,
-    "events_visual_fidelity": 82,
+    "events_visual_fidelity": 88,
     "championships_visual_fidelity": 90,
-    "synchronizations_visual_fidelity": 92,
-    "circuits": 45,
-    "responsive": 72,
-    "accessibility": 58,
-    "visual_tests": 25
+    "events_crud_list": 94,
+    "events_calendar_view": 92,
+    "events_tests": 92,
+    "visual_tests": 80,
+    "accessibility": 72
   },
   "validated_on_user_workstation": false,
-  "next_lot": {
-    "version": "8.1.0-alpha.2-lot.4",
-    "scope": "Migration du Dashboard vers les composants MEDS et consolidation des états chargement/erreur."
-  },
-  "revision": 0,
-  "known_build_issue_fixed": "TS2322 tone string incompatibility",
-  "known_issues": [],
+  "known_issues": [
+    "The 95 percent visual fidelity target requires user comparison on the Windows workstation.",
+    "The baseline has no ESLint 9 configuration.",
+    "npm audit reports an RSC-only React Router advisory; the application is a BrowserRouter SPA without RSC or Server Actions."
+  ],
   "revision_notes": [
-    "Lot 3 validé",
-    "Lot 4 : CRUD événements",
-    "Séparation API publique et administration",
-    "Origine/provider non exposés aux clients"
-  ]
+    "Calendar restored as the default Events view",
+    "List and CRUD retained",
+    "Shared filters, selection and details panel",
+    "Unit, Docker, API and Chromium validations passed"
+  ],
+  "next_action": {
+    "owner": "User",
+    "task": "Validate the rev.1 candidate and screenshots on Windows.",
+    "target_visual_fidelity": 95
+  }
 }
