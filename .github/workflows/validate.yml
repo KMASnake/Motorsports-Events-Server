@@ -1,8 +1,35 @@
 name: Validate server
 
 on:
+  workflow_dispatch:
   push:
+    paths:
+      - "server/**"
+      - "tests/test_*.py"
+      - "tests/fixtures/**"
+      - "scripts/validate-repository.sh"
+      - "scripts/test-postgres.sh"
+      - "scripts/build-release.sh"
+      - "docker-compose.test.yml"
+      - ".coveragerc"
+      - "pytest.ini"
+      - "VERSION"
+      - "BUILD"
+      - "MILESTONE"
   pull_request:
+    paths:
+      - "server/**"
+      - "tests/test_*.py"
+      - "tests/fixtures/**"
+      - "scripts/validate-repository.sh"
+      - "scripts/test-postgres.sh"
+      - "scripts/build-release.sh"
+      - "docker-compose.test.yml"
+      - ".coveragerc"
+      - "pytest.ini"
+      - "VERSION"
+      - "BUILD"
+      - "MILESTONE"
 
 jobs:
   validate:
