@@ -80,6 +80,9 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
   96 et met à niveau les lignes d'un jeu déjà présent sans écraser leur contenu ;
 - validation de bout en bout : modification d'un événement fournisseur,
   création de l'override, lecture API, affichage Web et nettoyage réussis ;
+- lisibilité Corrections : les champs, championnats, circuits et fournisseurs
+  connus sont présentés avec leurs noms, sans exposer les identifiants comme
+  libellés principaux ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

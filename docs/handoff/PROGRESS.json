@@ -4,7 +4,7 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-02",
-  "status": "corrections-flow-local-validation-passed",
+  "status": "readable-corrections-local-validation-passed",
   "overall_percent": 98,
   "areas": {
     "docker": 100,
@@ -55,7 +55,8 @@
     "Previous and next navigation now uses one month, seven days, one day or thirty days according to the active view",
     "View navigation revalidation passed with nineteen unit tests, both builds, three healthy Docker services and six Chromium scenarios",
     "Synthetic generator now creates 32 identifiable provider events and upgrades rows from an existing seed idempotently",
-    "Lot 4 API validator and Chromium now verify creation, display and cleanup of a real provider correction"
+    "Lot 4 API validator and Chromium now verify creation, display and cleanup of a real provider correction",
+    "Corrections resolve championship and circuit identifiers to readable names and label known providers and fields"
   ],
   "next_action": {
     "owner": "Maintainer",
