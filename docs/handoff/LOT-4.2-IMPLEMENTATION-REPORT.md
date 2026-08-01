@@ -61,6 +61,8 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
 - Chromium Playwright : 5 scénarios réussis, dont un contrôle 1280 × 720 ;
 - revalidation graphique : builds Web/API, Docker et Chromium réussis après
   ajout des drapeaux et badges sport ;
+- validation VPS graphique du 2026-08-01 : l'utilisateur confirme que les
+  identités sportives et les drapeaux des pays sont visibles dans l'interface ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

@@ -4,8 +4,8 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-01",
-  "status": "graphics-fix-local-validation-passed",
-  "overall_percent": 97,
+  "status": "graphics-fix-vps-validation-passed",
+  "overall_percent": 98,
   "areas": {
     "docker": 100,
     "database": 98,
@@ -45,7 +45,8 @@
     ,"VPS feedback confirmed missing visual flags and sport identities",
     "Eight local SVG flags and three original sport identities added",
     "Authorized championship logo URLs now take precedence when configured",
-    "Web/API builds, Docker health and five Chromium scenarios passed after the graphics fix"
+    "Web/API builds, Docker health and five Chromium scenarios passed after the graphics fix",
+    "User confirmed sport identities and country flags are visible on the isolated VPS"
   ],
   "next_action": {
     "owner": "Maintainer",

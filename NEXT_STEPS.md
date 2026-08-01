@@ -10,7 +10,8 @@
 - [x] ajouter la chaîne hybride sécurisée et le générateur déterministe ;
 - [x] valider unités, builds, PostgreSQL, Docker et Chromium localement ;
 - [ ] publier la pull request Lot 4.2 ;
-- [ ] installer le package dans un projet Docker VPS isolé ;
+- [x] installer le package dans un projet Docker VPS isolé ;
+- [x] valider sur VPS l'affichage des identités sportives et des drapeaux ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 
