@@ -91,6 +91,10 @@ Voir `docs/data/SANITIZATION-POLICY.md` et
   `Motorsports Events` ; les ajouts manuels utilisent ce dernier libellé ;
 - toute future clé fournisseur reçue de l'API est ajoutée automatiquement aux
   filtres avec un libellé dérivé lisible, sans liste applicative fermée ;
+- Championnats : la liste affiche la même identité sportive que le calendrier,
+  en privilégiant l'URL autorisée configurée puis l'asset local et le fallback ;
+- revalidation Championnats : image réellement chargée contrôlée dans Docker
+  et sept scénarios Chromium réussis ;
 - captures 1440 × 900 : Mois, Semaine, Jour, Agenda, glisser-déposer,
   avertissement, Corrections et identité.
 

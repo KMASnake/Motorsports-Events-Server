@@ -31,6 +31,8 @@
   `Motorsports Events`, ce dernier couvrant les ajouts manuels ;
 - découverte automatique des futures clés fournisseur et génération d'un
   libellé lisible dans les filtres Événements et Corrections ;
+- affichage des logos configurés ou des identités sportives locales dans la
+  page Championnats, avec fallback en cas d'asset absent ou invalide ;
 - ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
   logos autorisées configurées dans l'administration.
 

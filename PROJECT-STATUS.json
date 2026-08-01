@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-02T01:20:00+02:00",
+  "generated_at": "2026-08-02T01:35:00+02:00",
   "repository_state": {
     "root_source": "8.1.0-alpha.2-lot.4.2",
-    "status": "lot-4.2-dynamic-provider-sources-locally-validated",
-    "reason": "Provider filters discover future source keys dynamically while preserving official and manual labels; API, Web, Docker and Chromium validation passed."
+    "status": "lot-4.2-championship-logos-locally-validated",
+    "reason": "Championships reuse the shared local and authorized logo registry with a safe fallback; API, Web, Docker and Chromium validation passed."
   },
   "working_lot_4_2": {
     "implemented": [
@@ -22,6 +22,7 @@
       "Provider filters on Events and Corrections with consistent administration labels",
       "Canonical provider source labels with local and manual fallback to Motorsports Events",
       "Dynamic discovery and readable formatting of future provider keys",
+      "Sport identities and configured logos in the Championships table",
       "Safe hybrid test-data workflow and deterministic generator"
     ],
     "local_validation": "passed-with-corrections-flow",
@@ -68,7 +69,7 @@
     "api_build": "passed",
     "workspace_typecheck": "passed",
     "unit_tests": "21 passed",
-    "playwright_chromium": "6 passed",
+    "playwright_chromium": "7 passed",
     "docker_services": "3 healthy",
     "lot4_api_validator": "passed",
     "screenshots": [
@@ -78,6 +79,7 @@
       "tests/ui/screenshots/events-week-1440x900.png",
       "tests/ui/screenshots/events-day-1440x900.png",
       "tests/ui/screenshots/events-agenda-1440x900.png",
+      "tests/ui/screenshots/championships-logos-1440x900.png",
       "tests/ui/screenshots/corrections-conflict-1440x900.png"
     ],
     "known_tooling_issues": [

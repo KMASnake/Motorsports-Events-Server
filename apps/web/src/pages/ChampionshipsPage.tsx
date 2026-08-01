@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { PageHeader, Panel, StatusChip as Pill } from '../design-system';
+import { assetRegistry } from '../assets/assetRegistry';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
@@ -153,7 +154,7 @@ export function ChampionshipsPage() {
         <th>CHAMPIONNAT</th><th>CATÉGORIE</th><th>SAISON</th><th>STATUT</th><th>SYNCHRONISATION</th><th>ÉVÉNEMENTS</th><th>ACTIONS</th>
       </tr></thead><tbody>
         {filtered.map(row => <tr key={row.id}>
-          <td><div className="lot3-identity"><div className="lot3-logo">{row.short_name?.slice(0, 4) || row.name.slice(0, 3)}</div><div><strong>{row.name}</strong><small>{row.official_name || row.slug}</small></div></div></td>
+          <td><div className="lot3-identity"><img className="lot3-logo" src={assetRegistry.championship(row.slug,row.logo_url).src} alt={assetRegistry.championship(row.slug,row.logo_url).alt} onError={(event)=>{event.currentTarget.src=assetRegistry.championship(row.slug,null).src}}/><div><strong>{row.name}</strong><small>{row.official_name || row.slug}</small></div></div></td>
           <td>{row.category || <span className="muted-text">Non définie</span>}</td>
           <td>{row.season}</td>
           <td><Pill text={row.active ? 'ACTIF' : 'INACTIF'} tone={row.active ? 'green' : 'muted'} /></td>

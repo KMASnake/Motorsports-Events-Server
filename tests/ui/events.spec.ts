@@ -124,6 +124,15 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByLabel('Calendrier mensuel des événements')).toBeVisible();
   });
 
+  test('affiche les identités visuelles dans la page championnats', async ({ page }) => {
+    await page.goto('/championships');
+    const logos = page.locator('.lot3-identity img.lot3-logo');
+    await expect(logos.first()).toBeVisible();
+    expect(await logos.count()).toBeGreaterThan(0);
+    expect(await logos.first().evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
+    await page.screenshot({path:'tests/ui/screenshots/championships-logos-1440x900.png'});
+  });
+
   test('adapte la navigation à la vue semaine et jour', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-07-01T10:00:00+02:00'));
     await page.goto('/events');

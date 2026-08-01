@@ -4,7 +4,7 @@
   "lot": 4,
   "revision": 2,
   "updated_at": "2026-08-02",
-  "status": "dynamic-provider-sources-local-validation-passed",
+  "status": "championship-logos-local-validation-passed",
   "overall_percent": 98,
   "areas": {
     "docker": 100,
@@ -60,7 +60,8 @@
     "Events filter by Manual, Synchronized or Hybrid provider mode; Corrections filter by the concrete provider key with a readable label",
     "Administrative Origin labels were renamed Provider in the event UI without changing internal API values",
     "Provider selectors expose OC BlackTop, TheSportsDB and Motorsports Events; manual events map to Motorsports Events",
-    "Unknown future provider keys are discovered from API rows and added automatically with a readable generated label"
+    "Unknown future provider keys are discovered from API rows and added automatically with a readable generated label",
+    "Championships table now displays configured or local sport identities with a safe fallback; seven Chromium scenarios pass"
   ],
   "next_action": {
     "owner": "Maintainer",

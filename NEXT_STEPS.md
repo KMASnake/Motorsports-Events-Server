@@ -27,6 +27,7 @@
   Motorsports Events, notamment pour un ajout manuel ;
 - [ ] injecter sur VPS une source synthétique supplémentaire et confirmer son
   apparition automatique dans les deux filtres Fournisseur ;
+- [ ] vérifier sur VPS les logos locaux et configurés dans la page Championnats ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;
 - [ ] fusionner seulement après validation utilisateur.
 
