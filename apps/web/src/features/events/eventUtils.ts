@@ -2,9 +2,9 @@ import type { EventFiltersState, EventFormState, EventRow, EventView } from './e
 import { providerSource } from './providerDisplay';
 
 export const emptyEventForm = (): EventFormState => ({
-  championship_id: '', circuit_id: '', name: '', slug: '', category: '',
-  starts_at: '', ends_at: '', timezone: 'Europe/Paris', status: 'scheduled',
-  published: true, origin: 'manual', description: ''
+  championship_id: '', circuit_id: '', name: '', category: '',
+  starts_at: '', ends_at: '', status: 'scheduled',
+  published: true, description: ''
 });
 
 export const localDateTimeInput = (iso: string | null) => iso
@@ -16,14 +16,11 @@ export function eventToForm(event: EventRow): EventFormState {
     championship_id: event.championship_id,
     circuit_id: event.circuit_id ?? '',
     name: event.name,
-    slug: event.slug,
     category: event.category ?? '',
     starts_at: localDateTimeInput(event.starts_at),
     ends_at: localDateTimeInput(event.ends_at),
-    timezone: event.timezone,
     status: event.status,
     published: event.published,
-    origin: event.origin,
     description: event.description ?? ''
   };
 }

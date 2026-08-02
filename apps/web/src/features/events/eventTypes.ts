@@ -48,14 +48,11 @@ export interface EventFormState {
   championship_id: string;
   circuit_id: string;
   name: string;
-  slug: string;
   category: string;
   starts_at: string;
   ends_at: string;
-  timezone: string;
   status: EventStatus;
   published: boolean;
-  origin: EventOrigin;
   description: string;
 }
 

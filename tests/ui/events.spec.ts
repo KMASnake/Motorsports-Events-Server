@@ -34,6 +34,9 @@ test.describe('Événements lot 4 rev.1', () => {
     await page.getByLabel(/Créer un événement le/).first().click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByLabel('Début *')).not.toHaveValue('');
+    await expect(page.getByLabel(/Slug technique/i)).toHaveCount(0);
+    await expect(page.getByLabel(/Fuseau horaire/i)).toHaveCount(0);
+    await expect(page.getByLabel(/Mode de gestion/i)).toHaveCount(0);
   });
 
   test('expose les vues interactives et les captures du lot 4.2', async ({ page, request }) => {
@@ -41,21 +44,17 @@ test.describe('Événements lot 4 rev.1', () => {
     const events = await eventsResponse.json();
     const source = events.find((event: { circuit_id?: string | null; ends_at?: string | null; published: boolean }) => event.circuit_id && event.ends_at && event.published);
     expect(source).toBeTruthy();
-    const conflictSlug = `lot-42-overlap-${source.id}`;
-    const existingConflict = events.some((event: { slug: string }) => event.slug === conflictSlug);
+    const existingConflict = events.some((event: { name: string }) => event.name === 'Conflit visuel Lot 4.2');
     if (!existingConflict) {
       const created = await request.post(`${apiUrl}/api/v1/admin/events`, { data: {
         championship_id: source.championship_id,
         circuit_id: source.circuit_id,
         name: 'Conflit visuel Lot 4.2',
-        slug: conflictSlug,
         category: source.category,
         starts_at: source.starts_at,
         ends_at: source.ends_at,
-        timezone: source.timezone,
         status: 'scheduled',
         published: true,
-        origin: 'manual',
         description: 'Fixture isolée du test Chromium.'
       }});
       expect(created.ok()).toBeTruthy();
@@ -84,12 +83,12 @@ test.describe('Événements lot 4 rev.1', () => {
     const circuits = await circuitsResponse.json();
     const source = events.find((event: { championship_id?: string; circuit_id?: string | null }) => event.championship_id && event.circuit_id);
     const targetCircuit = circuits.find((circuit: { id:string }) => circuit.id !== source.circuit_id);
-    const created = await page.request.post(`${apiUrl}/api/v1/admin/events`, { data: {
+    const created = await page.request.post(`${apiUrl}/api/v1/admin/provider-events`, { data: {
       championship_id: source.championship_id, circuit_id: source.circuit_id,
-      name: 'Événement fournisseur test', slug: marker, category: null,
+      name: 'Événement fournisseur test', category: null,
       starts_at: '2026-12-22T10:00:00.000Z', ends_at: '2026-12-22T12:00:00.000Z',
       timezone: 'Europe/Paris', status: 'scheduled', published: true,
-      origin: 'provider', provider_key: 'playwright-fixture', external_id: marker,
+      provider_key: 'playwright-fixture', external_id: marker,
       description: 'Valeur fournisseur.'
     }});
     expect(created.ok()).toBeTruthy();

@@ -9,7 +9,7 @@ import { EventsFilters } from './EventsFilters';
 import { EventsViewSwitcher } from './EventsViewSwitcher';
 import { EventCalendarAlternativeViews } from './EventCalendarAlternativeViews';
 import { EventLegend } from './EventLegend';
-import { calendarPeriodLabel, emptyEventForm, eventToForm, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent, slugify } from './eventUtils';
+import { calendarPeriodLabel, emptyEventForm, eventToForm, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent } from './eventUtils';
 import type { Championship, Circuit, EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 import { availableProviderOptions } from './providerDisplay';
 
@@ -57,9 +57,9 @@ export function EventsPage() {
   function startEdit(event: EventRow) { setEditing(event); setForm(eventToForm(event)); setFormError(null); setEditorOpen(true); }
   function startDuplicate(event: EventRow) {
     const copy = eventToForm(event);
-    setEditing(null); setForm({ ...copy, name: `${copy.name} — copie`, slug: `${copy.slug}-copie-${Date.now().toString(36)}`, published:false, origin:'manual' }); setFormError(null); setEditorOpen(true);
+    setEditing(null); setForm({ ...copy, name: `${copy.name} — copie`, published:false }); setFormError(null); setEditorOpen(true);
   }
-  function changeName(name: string) { setForm((current) => ({ ...current, name, slug: editing ? current.slug : slugify(name) })); }
+  function changeName(name: string) { setForm((current) => ({ ...current, name })); }
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (form.ends_at && new Date(form.ends_at) < new Date(form.starts_at)) { setFormError('La date de fin doit être postérieure ou égale à la date de début.'); return; }

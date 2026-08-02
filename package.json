@@ -24,6 +24,7 @@
     "test:lot3": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot3.ps1",
     "validate:lot4": "node scripts/validate-lot4.mjs",
     "validate:step2": "node scripts/validate-step2.mjs",
+    "validate:step3": "node scripts/validate-step3.mjs",
     "test:lot4": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot4.ps1",
     "data:generate": "tsx scripts/data/generate-realistic-test-data.ts",
     "data:verify": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/data/verify-sanitized-data.ps1"

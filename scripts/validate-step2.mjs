@@ -30,7 +30,6 @@ try {
     category: null,
     starts_at: '2026-12-23T10:00:00.000Z',
     ends_at: '2026-12-23T12:00:00.000Z',
-    timezone: 'Europe/Paris',
     status: 'scheduled',
     published: true,
     description: 'Validation transactionnelle Lot 4.2 étape 2.'
@@ -38,7 +37,7 @@ try {
 
   const manual = await expectOk('/api/v1/admin/events', {
     method: 'POST',
-    body: JSON.stringify({ ...common, name: 'Événement manuel étape 2', slug: `${marker}-manual`, origin: 'manual' })
+    body: JSON.stringify({ ...common, name: `Événement manuel étape 2 ${marker}` })
   });
   createdIds.push(manual.id);
   await expectOk(`/api/v1/admin/events/${manual.id}`, {
@@ -52,13 +51,11 @@ try {
   expect(rejectedManualSync.response.status === 409, 'La synchronisation d’un événement manuel aurait dû être refusée.');
 
   const originalProviderName = 'Valeur fournisseur initiale';
-  const provider = await expectOk('/api/v1/admin/events', {
+  const provider = await expectOk('/api/v1/admin/provider-events', {
     method: 'POST',
     body: JSON.stringify({
       ...common,
       name: originalProviderName,
-      slug: `${marker}-provider`,
-      origin: 'provider',
       provider_key: 'step2-fixture',
       external_id: marker
     })
