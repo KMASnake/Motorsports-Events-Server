@@ -2,6 +2,11 @@
 
 Ce dépôt constitue le package de passation complet destiné à GitHub et Codex.
 
+> **Source de vérité permanente :** consultez le
+> [Project Handbook](PROJECT-HANDBOOK.md) avant toute modification du dépôt.
+> Les documents de `docs/handoff/` complètent le Handbook uniquement pour le
+> périmètre et l'état d'un lot donné.
+
 ## État du dépôt
 
 La racine contient le **lot 4 rev.1**, qui réunit le CRUD des événements, les

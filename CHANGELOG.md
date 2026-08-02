@@ -1,5 +1,14 @@
 # Changelog
 
+## Non publié — Intégration du Handbook et audit du Lot 4.2
+
+- intégration de `PROJECT-HANDBOOK.md` comme source de vérité permanente ;
+- séparation explicite entre le Lot 4.1 validé et le Lot 4.2 en développement ;
+- audit des fonctionnalités existantes et correction de l'avancement à 60 % ;
+- validation technique de l'étape documentaire : tests, builds Web/API et
+  trois services Docker isolés sains ;
+- aucune validation utilisateur du Lot 4.2 n'est revendiquée.
+
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 
 ### Calendrier interactif, corrections et données de test

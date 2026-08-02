@@ -1,5 +1,11 @@
 # Rapport d'implémentation — Lot 4.2
 
+> **Statut historique antérieur à l'audit du 2026-08-02.** Ce rapport décrit
+> l'intention et les validations techniques de la première candidate ; il ne
+> constitue pas une validation utilisateur et certaines affirmations restent à
+> consolider. `PROJECT-STATUS.json` et `docs/handoff/PROGRESS.json` portent
+> l'état canonique actuel : Lot 4.2 en développement, avancement audité à 60 %.
+
 Date : 2026-08-01
 
 Branche : `codex/lot-4.2-complete`

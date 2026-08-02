@@ -2,11 +2,15 @@
 
 ## Branches
 
-- `main` : versions validées ;
+- `main` : versions ayant déjà reçu une validation utilisateur explicite ;
 - `develop` : intégration ;
 - `feature/*` : fonctionnalités ;
 - `fix/*` : corrections ;
 - `release/*` : préparation de version.
+
+Une fusion, une CI verte, un build ou un déploiement ne constituent pas une
+validation utilisateur. Celle-ci doit être consignée dans
+`PROJECT-STATUS.json` et `docs/handoff/PROGRESS.json`.
 
 ## Avant une contribution
 

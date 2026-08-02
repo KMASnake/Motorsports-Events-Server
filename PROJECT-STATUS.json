@@ -1,109 +1,76 @@
 {
-  "generated_at": "2026-08-02T01:35:00+02:00",
+  "generated_at": "2026-08-02",
+  "documentation": {
+    "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
+    "current_lot_progress": "docs/handoff/PROGRESS.json",
+    "lot_specific_rules": "docs/handoff/",
+    "historical_handover": "docs/handover/"
+  },
   "repository_state": {
-    "root_source": "8.1.0-alpha.2-lot.4.2",
-    "status": "lot-4.2-championship-logos-locally-validated",
-    "reason": "Championships reuse the shared local and authorized logo registry with a safe fallback; API, Web, Docker and Chromium validation passed."
+    "branch": "codex/lot-4.2-complete",
+    "status": "lot-4.2-in-development-not-user-validated",
+    "reason": "The Handbook is integrated and the existing Lot 4.2 implementation has been audited. Several mandatory business, synchronization, interaction and hybrid-data requirements remain incomplete."
   },
-  "working_lot_4_2": {
-    "implemented": [
-      "Month, week, day and agenda calendar views",
-      "Optimistic move and resize with rollback",
-      "Quick creation, duplication and overlap warning",
-      "Field-level provider corrections and conflict resolution",
-      "Corrections administration page",
-      "Local branding, asset registry and documented fallbacks",
-      "Local country flags and sport identities with authorized logo URL support",
-      "Dynamic alpha-2 country resolution against 270 bundled local flags",
-      "Dynamic championship color legend below the month calendar",
-      "View-aware previous and next calendar navigation",
-      "Idempotent synthetic provider fixtures and end-to-end Corrections validation",
-      "Readable reference names in the Corrections administration page",
-      "Provider filters on Events and Corrections with consistent administration labels",
-      "Canonical provider source labels with local and manual fallback to Motorsports Events",
-      "Dynamic discovery and readable formatting of future provider keys",
-      "Sport identities and configured logos in the Championships table",
-      "Safe hybrid test-data workflow and deterministic generator"
-    ],
-    "local_validation": "passed-with-corrections-flow",
-    "vps_validation": "pending",
-    "graphics_vps_validation": "passed-2026-08-01",
-    "report": "docs/handoff/LOT-4.2-IMPLEMENTATION-REPORT.md"
-  },
-  "last_fully_validated_release": {
+  "last_fully_validated_lot": {
+    "lot": "4.1",
     "version": "v8.1.0-alpha.2-lot.4-rev.1",
+    "status": "user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "validated_features": [
-      "Docker Compose",
-      "PostgreSQL healthcheck",
-      "API healthcheck",
-      "Frontend healthcheck",
-      "Championship CRUD",
-      "Events calendar as default view",
-      "Events list view",
-      "Events create/update/delete flows",
-      "Events publishing and unpublishing",
-      "Events filters and month navigation",
-      "Public and administration Events APIs",
-      "No regression on Championships"
+    "validation_date": "2026-08-01",
+    "evidence": [
+      "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md",
+      "docs/handover/LOT-4-REV-1-ACCEPTANCE.md"
     ]
   },
-  "working_lot_4": {
-    "implemented": [
-      "Events administration CRUD",
-      "Public Events API",
-      "Admin Events API",
-      "Publishing and unpublishing",
-      "Calendar view selected by default",
-      "Secondary list view",
-      "Shared filters and selection",
-      "Event details panel",
-      "Create, edit, duplicate and delete flows",
-      "Unit and Chromium browser tests"
+  "working_lot": {
+    "lot": "4.2",
+    "target_version": "8.1.0-alpha.2-lot.4.2",
+    "status": "in-development-not-user-validated",
+    "implementation_percent": 60,
+    "validated_on_user_workstation": false,
+    "validated_on_vps": false,
+    "merged_to_main": false,
+    "implemented_or_partially_implemented": [
+      "Month, week, day and agenda calendar views",
+      "Optimistic event movement and basic resize action",
+      "Quick creation, duplication and overlap warning",
+      "Initial field-level provider corrections and administration page",
+      "Local branding, asset registry, flags and fallbacks",
+      "Deterministic synthetic sports-data generator",
+      "Provider filters and readable provider labels"
     ],
-    "accepted": true
+    "mandatory_gaps": [
+      "Remove Slug, Origin and editable Timezone from event administration forms",
+      "Separate provider source values from local overrides transactionally",
+      "Implement synchronization conflict detection without overwriting overrides",
+      "Complete correction resolution, filters and event navigation",
+      "Complete range creation, visual resize and interaction rollback tests",
+      "Harden binary snapshot restore, anonymization and blocking security checks",
+      "Complete local circuit and championship asset handling"
+    ],
+    "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
+    "progress": "docs/handoff/PROGRESS.json"
   },
-  "local_validation": {
+  "technical_validation": {
+    "audit_date": "2026-08-02",
+    "workspace_typecheck": "passed",
     "web_build": "passed",
     "api_build": "passed",
-    "workspace_typecheck": "passed",
     "unit_tests": "21 passed",
-    "playwright_chromium": "7 passed",
-    "docker_services": "3 healthy",
-    "lot4_api_validator": "passed",
-    "screenshots": [
-      "tests/ui/screenshots/events-calendar-1440x900.png",
-      "tests/ui/screenshots/events-list-1440x900.png",
-      "tests/ui/screenshots/events-month-1440x900.png",
-      "tests/ui/screenshots/events-week-1440x900.png",
-      "tests/ui/screenshots/events-day-1440x900.png",
-      "tests/ui/screenshots/events-agenda-1440x900.png",
-      "tests/ui/screenshots/championships-logos-1440x900.png",
-      "tests/ui/screenshots/corrections-conflict-1440x900.png"
-    ],
-    "known_tooling_issues": [
-      "ESLint 9 configuration is absent from the baseline repository.",
-      "npm audit reports the React Router RSC CSRF advisory; this SPA does not use RSC or Server Actions, and a major Router 8 migration is outside rev.1."
-    ]
-  },
-  "vps_validation": {
-    "date": "2026-08-01",
-    "host": "vps-855f6d7e",
-    "directory": "/home/debian/motorsports-events-server-lot4-test",
-    "deployment": "isolated Docker Compose project mse-lot4-test",
-    "commit": "dcbf76575a648082e98df9202f4b3b6506338515",
+    "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
     "api_health": "passed with database=true",
     "web_health": "passed",
-    "user_browser_acceptance": "passed",
-    "production_2_7_0_affected": false,
-    "report": "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md"
+    "playwright": "not rerun during initial audit",
+    "known_tooling_issues": [
+      "The local npm version is 9.2.0 while package.json requires npm >= 10.",
+      "npm audit reports two high-severity advisories requiring separate compatibility review."
+    ]
   },
-  "target": {
-    "next_version": "8.1.0-alpha.2-lot.4.2",
-    "owner": "Maintainer",
-    "specification": "docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md",
-    "visual_fidelity_target_percent": 95,
-    "next_action": "Publish the Lot 4.2 pull request, then validate its isolated package on the VPS."
-  }
+  "historical_production": {
+    "version": "2.7.0",
+    "status": "validated-production-history",
+    "details": "PROJECT_STATUS.md"
+  },
+  "next_action": "Commit Step 1, then implement the provider-source and correction data model in Step 2 after maintainer confirmation."
 }

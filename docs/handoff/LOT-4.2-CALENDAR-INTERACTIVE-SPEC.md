@@ -17,7 +17,7 @@ Transformer le calendrier en outil de planification :
 - duplication ;
 - mutations optimistes avec rollback ;
 - avertissement simple de conflit ;
-- conservation de la fidélité MEDS >= 95 %.
+- conservation de la fidélité MEDS >= 98 %.
 
 ## Règles fonctionnelles
 
@@ -162,4 +162,4 @@ events-conflict-warning-1440x900.png
 - [ ] Docker healthy
 - [ ] Tests automatiques
 - [ ] Captures
-- [ ] Fidélité >= 95 %
+- [ ] Fidélité >= 98 %

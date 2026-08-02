@@ -41,5 +41,5 @@
 - [ ] Validateur API étendu
 - [ ] Captures 1440×900
 - [ ] Test 1280×720
-- [ ] Fidélité >= 95 %
+- [ ] Fidélité >= 98 %
 - [ ] Documentation mise à jour

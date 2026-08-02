@@ -1,71 +1,66 @@
 {
-  "version": "8.1.0-alpha.2-lot.4.2",
-  "phase": "4.2",
-  "lot": 4,
-  "revision": 2,
-  "updated_at": "2026-08-02",
-  "status": "championship-logos-local-validation-passed",
-  "overall_percent": 98,
+  "canonical": true,
+  "canonical_path": "docs/handoff/PROGRESS.json",
+  "baseline": {
+    "lot": "4.1",
+    "version": "v8.1.0-alpha.2-lot.4-rev.1",
+    "status": "user-validated",
+    "validated_on_user_workstation": true,
+    "validated_on_vps": true,
+    "validation_date": "2026-08-01"
+  },
+  "current": {
+    "lot": "4.2",
+    "version": "8.1.0-alpha.2-lot.4.2",
+    "status": "in-development-not-user-validated",
+    "updated_at": "2026-08-02",
+    "implementation_percent": 60,
+    "documentation_readiness_percent": 100,
+    "validated_on_user_workstation": false,
+    "validated_on_vps": false,
+    "merged_to_main": false,
+    "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
+  },
   "areas": {
     "docker": 100,
-    "database": 98,
-    "api": 98,
+    "database_and_migrations": 45,
+    "api": 55,
     "design_system_foundations": 82,
     "design_system_components": 45,
-    "shell": 96,
-    "events_visual_fidelity": 98,
+    "windows_scripts": 60,
+    "events_visual_fidelity": 80,
     "championships_visual_fidelity": 95,
     "events_crud_list": 94,
-    "events_calendar_view": 98,
-    "events_tests": 98,
-    "visual_tests": 98,
-    "corrections": 98,
-    "hybrid_test_data": 98,
-    "accessibility": 86
+    "events_calendar_interactions": 65,
+    "automated_tests": 45,
+    "corrections": 45,
+    "hybrid_test_data": 50,
+    "accessibility": 55
   },
-  "validated_on_user_workstation": false,
-  "validated_on_vps": false,
+  "step_1": {
+    "status": "completed-technically-not-user-validation",
+    "scope": "Integrate the Project Handbook, align documentation governance and record the audited Lot 4.2 state.",
+    "technical_validation": {
+      "workspace_typecheck": "passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "unit_tests": "21 passed",
+      "docker": "3 isolated services healthy",
+      "api_health": "passed with database=true",
+      "web_health": "passed"
+    }
+  },
   "known_issues": [
-    "The baseline has no ESLint 9 configuration.",
-    "npm audit reports an RSC-only React Router advisory; the application is a BrowserRouter SPA without RSC or Server Actions."
-  ],
-  "revision_notes": [
-    "Calendar restored as the default Events view",
-    "List and CRUD retained",
-    "Shared filters, selection and details panel",
-    "Unit, Docker, API and Chromium validations passed",
-    "Isolated VPS deployment validated with database and web health checks",
-    "Calendar, list, CRUD, publishing and Championships non-regression accepted by the user",
-    "Legacy Python CI scoped to legacy server paths",
-    "Month, week, day and agenda views implemented",
-    "Interactive optimistic calendar mutations implemented",
-    "Field-level provider corrections implemented",
-    "Safe deterministic hybrid-data workflow implemented",
-    "Lot 4.2 local unit, Docker and Chromium validation passed"
-    ,"VPS feedback confirmed missing visual flags and sport identities",
-    "Eight local SVG flags and three original sport identities added",
-    "Authorized championship logo URLs now take precedence when configured",
-    "Web/API builds, Docker health and five Chromium scenarios passed after the graphics fix",
-    "User confirmed sport identities and country flags are visible on the isolated VPS"
-    ,"Limited flags replaced by 270 local flag-icons 7.2.3 SVG assets under MIT license",
-    "Country resolution no longer uses an application whitelist",
-    "Seventeen unit tests, both builds, Docker and five Chromium scenarios passed with the complete flag set",
-    "Dynamic championship color legend added below the month calendar following user feedback",
-    "Legend revalidation passed with seventeen unit tests, both builds, Docker and five Chromium scenarios",
-    "Previous and next navigation now uses one month, seven days, one day or thirty days according to the active view",
-    "View navigation revalidation passed with nineteen unit tests, both builds, three healthy Docker services and six Chromium scenarios",
-    "Synthetic generator now creates 32 identifiable provider events and upgrades rows from an existing seed idempotently",
-    "Lot 4 API validator and Chromium now verify creation, display and cleanup of a real provider correction",
-    "Corrections resolve championship and circuit identifiers to readable names and label known providers and fields",
-    "Events filter by Manual, Synchronized or Hybrid provider mode; Corrections filter by the concrete provider key with a readable label",
-    "Administrative Origin labels were renamed Provider in the event UI without changing internal API values",
-    "Provider selectors expose OC BlackTop, TheSportsDB and Motorsports Events; manual events map to Motorsports Events",
-    "Unknown future provider keys are discovered from API rows and added automatically with a readable generated label",
-    "Championships table now displays configured or local sport identities with a safe fallback; seven Chromium scenarios pass"
+    "The event form still exposes Slug, Origin and editable Timezone.",
+    "Provider source values and local overrides are not yet durably separated.",
+    "Provider synchronization conflict behavior is not implemented end to end.",
+    "Calendar interaction and hybrid-data security tests remain incomplete.",
+    "The local npm version is below the declared npm >= 10 engine requirement.",
+    "npm audit reports two high-severity advisories requiring compatibility review."
   ],
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Publish and validate the Lot 4.2 candidate on an isolated VPS before merge.",
+    "owner": "Codex",
+    "task": "Commit Step 1, then start the provider-source and correction model only after maintainer confirmation.",
     "target_visual_fidelity": 98
   }
 }
