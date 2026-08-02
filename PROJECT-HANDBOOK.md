@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.1
+## Version 1.2
 
 Ce document est la source de vérité permanente du projet.
 
@@ -44,6 +44,11 @@ Ils sont natifs au serveur. Leur modification est directe, ne crée aucune corre
 
 ## Événements fournisseur
 Une modification locale conserve la valeur fournisseur, crée un override, devient la valeur effective et ne peut pas être écrasée par une synchronisation.
+
+La valeur source et l'override sont réconciliés dans une transaction. Une
+synchronisation met à jour la source, conserve l'override et signale un conflit
+si la source évolue. Un retour de la valeur locale à la source supprime
+l'override actif.
 
 ## Page Corrections
 Uniquement pour les données fournisseur. Affichage champ par champ : valeur fournisseur, valeur locale, auteur, date, statut, conflit et compteur de champs corrigés.

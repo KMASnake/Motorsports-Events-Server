@@ -8,6 +8,10 @@
 - validation technique de l'étape documentaire : tests, builds Web/API et
   trois services Docker isolés sains ;
 - aucune validation utilisateur du Lot 4.2 n'est revendiquée.
+- réconciliation transactionnelle des valeurs fournisseur et overrides ;
+- synchronisation non destructive, conflit explicite et résolutions testées
+  sur PostgreSQL réel ;
+- ajout du validateur `npm run validate:step2`.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 

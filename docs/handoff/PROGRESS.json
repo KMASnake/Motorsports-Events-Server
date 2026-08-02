@@ -13,8 +13,8 @@
     "lot": "4.2",
     "version": "8.1.0-alpha.2-lot.4.2",
     "status": "in-development-not-user-validated",
-    "updated_at": "2026-08-02",
-    "implementation_percent": 60,
+    "updated_at": "2026-08-03",
+    "implementation_percent": 68,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -23,8 +23,8 @@
   },
   "areas": {
     "docker": 100,
-    "database_and_migrations": 45,
-    "api": 55,
+    "database_and_migrations": 75,
+    "api": 72,
     "design_system_foundations": 82,
     "design_system_components": 45,
     "windows_scripts": 60,
@@ -32,8 +32,8 @@
     "championships_visual_fidelity": 95,
     "events_crud_list": 94,
     "events_calendar_interactions": 65,
-    "automated_tests": 45,
-    "corrections": 45,
+    "automated_tests": 62,
+    "corrections": 68,
     "hybrid_test_data": 50,
     "accessibility": 55
   },
@@ -50,17 +50,30 @@
       "web_health": "passed"
     }
   },
+  "step_2": {
+    "status": "completed-technically-not-user-validation",
+    "scope": "Transactional provider-source and override model, non-destructive synchronization, conflicts and resolution.",
+    "technical_validation": {
+      "workspace_typecheck": "passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "unit_tests": "26 passed",
+      "step_2_api_postgresql_validator": "passed",
+      "lot_4_api_regression": "passed",
+      "docker": "3 isolated services healthy",
+      "api_health": "passed with database=true",
+      "web_health": "passed"
+    }
+  },
   "known_issues": [
     "The event form still exposes Slug, Origin and editable Timezone.",
-    "Provider source values and local overrides are not yet durably separated.",
-    "Provider synchronization conflict behavior is not implemented end to end.",
     "Calendar interaction and hybrid-data security tests remain incomplete.",
     "The local npm version is below the declared npm >= 10 engine requirement.",
     "npm audit reports two high-severity advisories requiring compatibility review."
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Commit Step 1, then start the provider-source and correction model only after maintainer confirmation.",
+    "task": "Start Step 3 only after maintainer confirmation: remove technical fields from administration inputs and derive slug, origin and timezone server-side.",
     "target_visual_fidelity": 98
   }
 }

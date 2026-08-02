@@ -9,3 +9,10 @@ Création du Handbook et formalisation des règles permanentes du projet.
 - formalisation de la hiérarchie entre Handbook, handoff courant et historique ;
 - distinction explicite entre Lot 4.1 validé et Lot 4.2 en développement ;
 - rappel qu'une fusion dans `main` ne vaut pas validation utilisateur.
+
+## 1.2 — 2026-08-03
+
+- formalisation de la réconciliation transactionnelle source/override ;
+- protection des overrides pendant une synchronisation fournisseur ;
+- suppression d'un override redevenu identique à la source ;
+- refus d'une synchronisation fournisseur sur un événement manuel.

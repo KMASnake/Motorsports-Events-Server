@@ -32,3 +32,15 @@ modifications sont directes et ne génèrent jamais de correction fournisseur.
 
 La page Corrections doit rendre chaque override identifiable individuellement,
 avec comparaison source/locale et statut de conflit.
+
+## Implémentation étape 2 — 2026-08-03
+
+- service unique : `apps/api/src/lib/eventCorrections.ts` ;
+- transaction et rollback : `withTransaction` dans `apps/api/src/lib/db.ts` ;
+- verrouillage uniforme de l'événement avant ses corrections ;
+- endpoint d'ingestion fournisseur isolé :
+  `POST /api/v1/admin/events/:id/provider-sync` ;
+- validateur réel : `npm run validate:step2`.
+
+La route d'ingestion est administrative et n'ajoute aucun champ à l'API
+publique.

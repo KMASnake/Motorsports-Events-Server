@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02",
+  "generated_at": "2026-08-03",
   "documentation": {
     "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
     "current_lot_progress": "docs/handoff/PROGRESS.json",
@@ -27,7 +27,7 @@
     "lot": "4.2",
     "target_version": "8.1.0-alpha.2-lot.4.2",
     "status": "in-development-not-user-validated",
-    "implementation_percent": 60,
+    "implementation_percent": 68,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -38,12 +38,13 @@
       "Initial field-level provider corrections and administration page",
       "Local branding, asset registry, flags and fallbacks",
       "Deterministic synthetic sports-data generator",
-      "Provider filters and readable provider labels"
+      "Provider filters and readable provider labels",
+      "Transactional provider-source and local-override reconciliation",
+      "Non-destructive provider synchronization with explicit conflicts",
+      "Local/provider resolution and automatic override removal on convergence"
     ],
     "mandatory_gaps": [
       "Remove Slug, Origin and editable Timezone from event administration forms",
-      "Separate provider source values from local overrides transactionally",
-      "Implement synchronization conflict detection without overwriting overrides",
       "Complete correction resolution, filters and event navigation",
       "Complete range creation, visual resize and interaction rollback tests",
       "Harden binary snapshot restore, anonymization and blocking security checks",
@@ -53,15 +54,17 @@
     "progress": "docs/handoff/PROGRESS.json"
   },
   "technical_validation": {
-    "audit_date": "2026-08-02",
+    "audit_date": "2026-08-03",
     "workspace_typecheck": "passed",
     "web_build": "passed",
     "api_build": "passed",
-    "unit_tests": "21 passed",
+    "unit_tests": "26 passed",
     "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
     "api_health": "passed with database=true",
     "web_health": "passed",
-    "playwright": "not rerun during initial audit",
+    "step_2_integration": "passed on isolated PostgreSQL through npm run validate:step2",
+    "lot_4_api_regression": "passed through npm run validate:lot4",
+    "playwright": "not required for the API-only Step 2; prior UI baseline unchanged",
     "known_tooling_issues": [
       "The local npm version is 9.2.0 while package.json requires npm >= 10.",
       "npm audit reports two high-severity advisories requiring separate compatibility review."
@@ -72,5 +75,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Commit Step 1, then implement the provider-source and correction data model in Step 2 after maintainer confirmation."
+  "next_action": "Complete Step 3: make the administration API business-oriented by generating technical metadata and deriving timezones automatically."
 }

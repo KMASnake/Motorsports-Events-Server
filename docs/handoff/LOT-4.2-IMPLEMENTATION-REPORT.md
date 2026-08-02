@@ -12,6 +12,19 @@ Branche : `codex/lot-4.2-complete`
 
 Version candidate : `8.1.0-alpha.2-lot.4.2`
 
+## Étape 2 — Réconciliation fournisseur transactionnelle
+
+Le 2026-08-03, la gestion des corrections a été centralisée dans un service
+transactionnel. Une deuxième édition locale conserve désormais la véritable
+valeur fournisseur. Une synchronisation actualise cette source sans écraser
+l'override, crée un conflit si nécessaire et supprime la correction lorsque la
+source et la valeur locale convergent.
+
+Le validateur `npm run validate:step2` couvre une base PostgreSQL réelle :
+événement manuel sans correction, deux éditions locales, synchronisation sous
+override, résolution locale, résolution fournisseur, retour à la source et
+nettoyage de l'API publique.
+
 ## Résultat
 
 Le calendrier propose les vues Mois, Semaine, Jour et Agenda. Les événements
