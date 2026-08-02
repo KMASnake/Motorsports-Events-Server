@@ -1,8 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { pool } from '../lib/db.js';
-import { isProviderEvent } from '../lib/correctionPolicy.js';
+import { pool, withTransaction } from '../lib/db.js';
+import {
+  applyProviderPatch,
+  lockEvent,
+  reconcileAdministrativePatch,
+  updateEventFields,
+  type CorrectableEventPatch
+} from '../lib/eventCorrections.js';
 
 const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
@@ -24,6 +30,19 @@ const eventBody = z.object({
   description: nullableText
 });
 const updateBody = eventBody.partial();
+const providerUpdateBody = eventBody.pick({
+  championship_id: true,
+  circuit_id: true,
+  name: true,
+  slug: true,
+  category: true,
+  starts_at: true,
+  ends_at: true,
+  timezone: true,
+  status: true,
+  published: true,
+  description: true
+}).partial().refine((value) => Object.keys(value).length > 0, 'Aucune valeur fournisseur à synchroniser.');
 
 const publicSelect = `
   select e.id,e.slug,e.name,e.category,e.starts_at,e.ends_at,e.timezone,e.status,e.description,
@@ -123,39 +142,55 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
     if (!parsed.success) return reply.code(400).send({ message: 'Données invalides.', issues: parsed.error.issues });
     const requested = request.body && typeof request.body === 'object' ? request.body as Record<string, unknown> : {};
     const patch = Object.fromEntries(Object.entries(parsed.data).filter(([field]) => field in requested));
-    const current = await pool.query('select * from events where id=$1', [id]);
-    if (!current.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
-    const merged = eventBody.parse({ ...current.rows[0], ...patch,
-      starts_at: new Date((patch.starts_at as string | undefined) ?? current.rows[0].starts_at).toISOString(),
-      ends_at: patch.ends_at === undefined ? (current.rows[0].ends_at ? new Date(current.rows[0].ends_at).toISOString() : null) : patch.ends_at
-    });
-    const dateError = validateDates(merged); if (dateError) return reply.code(400).send({ message: dateError });
     try {
-      if (isProviderEvent(current.rows[0]) && current.rows[0].provider_key) {
-        const corrections = ['championship_id','circuit_id','name','slug','category','starts_at','ends_at','timezone','status','published','description'] as const;
-        for (const field of corrections) {
-          if (!(field in patch)) continue;
-          const previous = normalizeComparable(current.rows[0][field]);
-          const next = normalizeComparable(patch[field]);
-          if (JSON.stringify(previous) === JSON.stringify(next)) continue;
-          await pool.query(`insert into event_corrections(
-            id,event_id,provider_key,external_id,field_name,provider_value,override_value,created_by
-          ) values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,'administrator')
-          on conflict(event_id,field_name) do update set override_value=excluded.override_value,
-            status='active',conflict_detected_at=null,updated_at=now()`, [
-            randomUUID(), id, current.rows[0].provider_key, current.rows[0].external_id, field,
-            JSON.stringify(previous), JSON.stringify(next)
-          ]);
-        }
-      }
-      const result = await pool.query(`update events set championship_id=$2,circuit_id=$3,name=$4,slug=$5,
-        category=$6,starts_at=$7,ends_at=$8,timezone=$9,status=$10,published=$11,origin=$12,
-        provider_key=$13,external_id=$14,description=$15,updated_at=now() where id=$1 returning *`, [id, ...values(merged)]);
-      return result.rows[0];
+      const updated = await withTransaction(async (client) => {
+        const current = await lockEvent(client, id);
+        if (!current) return null;
+        const merged = eventBody.parse({ ...current, ...patch,
+          starts_at: new Date((patch.starts_at as string | undefined) ?? current.starts_at as string | Date).toISOString(),
+          ends_at: patch.ends_at === undefined ? (current.ends_at ? new Date(current.ends_at as string | Date).toISOString() : null) : patch.ends_at
+        });
+        const dateError = validateDates(merged);
+        if (dateError) throw new EventValidationError(dateError);
+        await reconcileAdministrativePatch(client, current, patch as CorrectableEventPatch);
+        const result = await client.query(`update events set championship_id=$2,circuit_id=$3,name=$4,slug=$5,
+          category=$6,starts_at=$7,ends_at=$8,timezone=$9,status=$10,published=$11,origin=$12,
+          provider_key=$13,external_id=$14,description=$15,updated_at=now() where id=$1 returning *`, [id, ...values(merged)]);
+        return result.rows[0];
+      });
+      if (!updated) return reply.code(404).send({ message: 'Événement introuvable.' });
+      return updated;
     } catch (error: unknown) {
+      if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
       const code=(error as {code?:string}).code;
       if (code==='23505') return reply.code(409).send({ message: 'Ce slug existe déjà.' });
       if (code==='23503') return reply.code(400).send({ message: 'Le championnat ou le circuit sélectionné n’existe pas.' });
+      throw error;
+    }
+  });
+
+  app.post('/api/v1/admin/events/:id/provider-sync', async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const parsed = providerUpdateBody.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ message: 'Données fournisseur invalides.', issues: parsed.error.issues });
+    try {
+      const updated = await withTransaction(async (client) => {
+        const current = await lockEvent(client, id);
+        if (!current) return null;
+        const effectivePatch = await applyProviderPatch(client, current, parsed.data as CorrectableEventPatch);
+        const merged = eventBody.parse({ ...current, ...effectivePatch,
+          starts_at: new Date((effectivePatch.starts_at ?? current.starts_at) as string | Date).toISOString(),
+          ends_at: effectivePatch.ends_at === undefined ? (current.ends_at ? new Date(current.ends_at as string | Date).toISOString() : null) : effectivePatch.ends_at
+        });
+        const dateError = validateDates(merged);
+        if (dateError) throw new EventValidationError(dateError);
+        return updateEventFields(client, id, effectivePatch);
+      });
+      if (!updated) return reply.code(404).send({ message: 'Événement introuvable.' });
+      return updated;
+    } catch (error) {
+      if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
+      if ((error as Error).message.includes('événement manuel')) return reply.code(409).send({ message: (error as Error).message });
       throw error;
     }
   });
@@ -168,7 +203,9 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
   });
 }
 
-function normalizeComparable(value: unknown) {
-  if (value instanceof Date) return value.toISOString();
-  return value === undefined ? null : value;
+class EventValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'EventValidationError';
+  }
 }

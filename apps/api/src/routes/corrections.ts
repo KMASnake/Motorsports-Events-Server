@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { pool } from '../lib/db.js';
+import { pool, withTransaction } from '../lib/db.js';
+import { resolveCorrection } from '../lib/eventCorrections.js';
 
 const correctionSelect = `
   select ec.*,e.name event_name,e.slug event_slug,e.championship_id,
@@ -30,36 +31,33 @@ export async function correctionRoutes(app: FastifyInstance): Promise<void> {
 
   app.patch('/api/v1/admin/corrections/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
-    const parsed = z.object({ override_value: z.unknown() }).safeParse(request.body);
+    const parsed = z.object({ override_value: z.unknown() })
+      .refine((value) => Object.hasOwn(value, 'override_value'), 'Valeur locale absente.')
+      .safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ message: 'Valeur locale invalide.' });
-    const correction = await pool.query('select * from event_corrections where id=$1', [id]);
-    if (!correction.rowCount) return reply.code(404).send({ message: 'Correction introuvable.' });
-    const row = correction.rows[0];
-    await pool.query(`update events set ${safeField(row.field_name)}=$2,updated_at=now() where id=$1`, [row.event_id, parsed.data.override_value]);
-    return (await pool.query(`update event_corrections set override_value=$2::jsonb,status='active',conflict_detected_at=null,updated_at=now() where id=$1 returning *`, [id, JSON.stringify(parsed.data.override_value)])).rows[0];
+    try {
+      const result = await withTransaction((client) => resolveCorrection(client, id, 'set-override', parsed.data.override_value));
+      if (result.deleted) return reply.code(204).send();
+      return result.correction;
+    } catch (error) {
+      if ((error as Error).message === 'Correction introuvable.') return reply.code(404).send({ message: (error as Error).message });
+      throw error;
+    }
   });
 
-  app.post('/api/v1/admin/corrections/:id/accept-provider', async (request, reply) => resolve(request, reply, true));
-  app.post('/api/v1/admin/corrections/:id/keep-override', async (request, reply) => resolve(request, reply, false));
-  app.delete('/api/v1/admin/corrections/:id', async (request, reply) => resolve(request, reply, true, true));
+  app.post('/api/v1/admin/corrections/:id/accept-provider', async (request, reply) => correctionAction(request, reply, 'accept-provider'));
+  app.post('/api/v1/admin/corrections/:id/keep-override', async (request, reply) => correctionAction(request, reply, 'keep-override'));
+  app.delete('/api/v1/admin/corrections/:id', async (request, reply) => correctionAction(request, reply, 'delete-override'));
 }
 
-const allowedFields = new Set(['championship_id','circuit_id','name','slug','category','starts_at','ends_at','timezone','status','published','description']);
-function safeField(field: string) {
-  if (!allowedFields.has(field)) throw new Error(`Champ de correction interdit: ${field}`);
-  return field;
-}
-
-async function resolve(request: any, reply: any, acceptProvider: boolean, deleted = false) {
+async function correctionAction(request: any, reply: any, action: 'accept-provider' | 'keep-override' | 'delete-override') {
   const { id } = request.params as { id: string };
-  const correction = await pool.query('select * from event_corrections where id=$1', [id]);
-  if (!correction.rowCount) return reply.code(404).send({ message: 'Correction introuvable.' });
-  const row = correction.rows[0];
-  if (acceptProvider) await pool.query(`update events set ${safeField(row.field_name)}=$2,updated_at=now() where id=$1`, [row.event_id, row.provider_value]);
-  if (deleted) {
-    await pool.query('delete from event_corrections where id=$1', [id]);
-    return reply.code(204).send();
+  try {
+    const result = await withTransaction((client) => resolveCorrection(client, id, action));
+    if (result.deleted) return reply.code(204).send();
+    return result.correction;
+  } catch (error) {
+    if ((error as Error).message === 'Correction introuvable.') return reply.code(404).send({ message: (error as Error).message });
+    throw error;
   }
-  const status = acceptProvider ? 'resolved' : 'active';
-  return (await pool.query(`update event_corrections set status=$2,conflict_detected_at=null,updated_at=now() where id=$1 returning *`, [id, status])).rows[0];
 }
