@@ -1,7 +1,20 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.0
+## Version 1.1
 
 Ce document est la source de vérité permanente du projet.
+
+## Hiérarchie documentaire
+
+- `PROJECT-HANDBOOK.md` et `docs/handbook/` portent les règles permanentes ;
+- `docs/handoff/` porte le périmètre, l'avancement et les critères du lot
+  courant sans pouvoir contredire le Handbook ;
+- `docs/handover/` et la documentation historique restent conservés comme
+  preuves et contexte des lots terminés ;
+- `PROJECT-STATUS.json` distingue l'état validé de l'état en développement ;
+- `docs/handoff/PROGRESS.json` est le suivi canonique du lot courant.
+
+Une règle spécifique à un lot ne devient permanente qu'après mise à jour du
+Handbook, du journal des décisions, du changelog du Handbook et d'un ADR.
 
 ## Vision
 Motorsports Events Server centralise les données de sports mécaniques pour l'administration web, l'API publique, le plugin MyBB, l'application mobile et les clients tiers.
@@ -50,11 +63,21 @@ Données sportives réalistes, identités synthétiques, secrets supprimés, int
 ## Tests
 Unitaires, intégration, API, Docker, UI, sécurité et non-régression. Une fusion dans main ne vaut pas validation utilisateur.
 
+La validation utilisateur est explicite et consignée dans les fichiers d'état
+avec sa date et son périmètre. Une CI verte, un build réussi, une fusion ou un
+déploiement technique ne suffisent pas à déclarer un lot validé.
+
 ## Workflow Git
-main = validé ; develop = intégration ; codex/* = travaux Codex ; feature/* = fonctionnalités ; release/* = préparation.
+`main` reçoit uniquement des versions ayant déjà fait l'objet d'une validation
+utilisateur explicite ; `develop` sert à l'intégration ; `codex/*` aux travaux
+Codex ; `feature/*` aux fonctionnalités ; `release/*` à la préparation.
+Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
+validation utilisateur.
 
 ## État
 Lot 4.1 validé. Lot 4.2 en développement et non validé. Lot 4.3 non démarré.
 
 ## Règles Codex
-Avant toute modification : lire ce Handbook, CODEX.md, PROJECT-STATUS.json, PROGRESS.json, les ADR et les spécifications du lot.
+Avant toute modification : lire ce Handbook, `CODEX.md`,
+`PROJECT-STATUS.json`, `docs/handoff/PROGRESS.json`, tous les ADR du Handbook
+et les spécifications du lot dans `docs/handoff/`.

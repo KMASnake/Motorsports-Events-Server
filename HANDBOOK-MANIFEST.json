@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "file_count": 22,
+  "version": "1.1",
+  "file_count": 23,
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/handbook-change.md",
@@ -8,44 +8,44 @@
       "sha256": "9987252005f4d53936474f12ce4082378a5f36947fc863717cf5d76ef91648a5"
     },
     {
-      "path": ".github/PULL_REQUEST_TEMPLATE.md",
+      "path": ".github/pull_request_template.md",
       "bytes": 268,
       "sha256": "cd987bdc4f9e8626f140e13d2d9a8eb61b247d1c025d0daecd7c34a04b42643e"
     },
     {
       "path": "CODEX-HANDBOOK.md",
-      "bytes": 306,
-      "sha256": "213ef3d6ac731aad33037048a731811586702f49ba82f6e77e670a3f9311b03e"
+      "bytes": 530,
+      "sha256": "1c976832b2ecfd5d568fc4e166c2c9118453e23a44eed0d218b4092e2741af06"
     },
     {
       "path": "HANDBOOK-PACKAGE-INFO.json",
-      "bytes": 368,
-      "sha256": "dde606f179033ca9e7b5e83939556decd3ed3612c6c26e7619f2a720b53407a9"
+      "bytes": 340,
+      "sha256": "272a801a2a00535349c5dbfeb71785d006e06022b46e885ced828a72e315ae90"
     },
     {
       "path": "PROJECT-HANDBOOK.md",
-      "bytes": 2787,
-      "sha256": "ea06708f6426ec23c9c69bee1317cfe8347501a2f1014041b29cd3be486d8a17"
+      "bytes": 3944,
+      "sha256": "f52dc5e13e88324ae7bdf56c7f115952b9f984c39c31151bd76b4103a20be4f2"
     },
     {
       "path": "README-HANDBOOK.md",
-      "bytes": 206,
-      "sha256": "04b56709096f207988556daa249e08ce81e3d81775e143b9a6b5763769cf5473"
+      "bytes": 408,
+      "sha256": "34fc3f77ec04aca536a4454c0c5f05739fc3e82a3c95b2cb39750b8dd64fa795"
     },
     {
       "path": "docs/handbook/CHANGELOG.md",
-      "bytes": 118,
-      "sha256": "52b4d016fa3f268f17cad2377a8902df15878d1040f14389e61d14ef8e890cc0"
+      "bytes": 445,
+      "sha256": "b186ba191e168dc3f64b1a0a9f5e56aa1e05f88ed36afd10b5f9cbfadb0564d2"
     },
     {
       "path": "docs/handbook/CODEX-PROMPT.md",
-      "bytes": 833,
-      "sha256": "673a5fc9eeeaa87653e5c344d2a1cf869cc73fb7539ec3ce410d97bb4e65ae37"
+      "bytes": 880,
+      "sha256": "96df812ac45244d9ae7a2f63f26f369c01cd322e4736b50b20a8f3cb89e9456a"
     },
     {
       "path": "docs/handbook/DECISIONS.md",
-      "bytes": 225,
-      "sha256": "2a7c1236d4a01c8187a5282135ead0fc9a78e8282aef6836b3a7d398e63829d1"
+      "bytes": 576,
+      "sha256": "87fdc5521ed15a408dc99f2bb344d2b0ab269f9a1bb80535730e7511f7398527"
     },
     {
       "path": "docs/handbook/GITHUB-PUBLISH.md",
@@ -91,6 +91,11 @@
       "path": "docs/handbook/architecture/ADR-0007-CALENDAR.md",
       "bytes": 96,
       "sha256": "d51dced7fa05b32f9faa41c819f75dba8d47c7c25dd7ad08d83b044677e3ba53"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0008-DOCUMENTATION-GOVERNANCE.md",
+      "bytes": 1511,
+      "sha256": "04aeaa661d50b312e686da5c204942366faf22f664a1f88eb157b69692c99e4c"
     },
     {
       "path": "docs/handbook/calendar/CALENDAR-RULES.md",

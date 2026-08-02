@@ -1,78 +1,51 @@
 {
-  "generated_at": "2026-08-01",
-  "repository_state": {
-    "root_source": "v8.1.0-alpha.2-lot.4-rev.1",
-    "status": "user-validated-on-vps-pr-ready",
-    "reason": "The isolated VPS deployment, API/database health and complete browser acceptance checklist were confirmed by the user."
+  "generated_at": "2026-08-02",
+  "documentation": {
+    "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
+    "current_lot_progress": "docs/handoff/PROGRESS.json",
+    "lot_specific_rules": "docs/handoff/",
+    "historical_handover": "docs/handover/"
   },
-  "last_fully_validated_release": {
+  "repository_state": {
+    "branch": "docs/project-handbook-v1",
+    "status": "handbook-integration-candidate",
+    "reason": "The Project Handbook is being integrated as the permanent source of truth without changing the application baseline."
+  },
+  "last_fully_validated_lot": {
+    "lot": "4.1",
     "version": "v8.1.0-alpha.2-lot.4-rev.1",
+    "status": "user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
+    "validation_date": "2026-08-01",
+    "evidence": [
+      "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md",
+      "docs/handover/LOT-4-REV-1-ACCEPTANCE.md"
+    ],
     "validated_features": [
       "Docker Compose",
-      "PostgreSQL healthcheck",
-      "API healthcheck",
-      "Frontend healthcheck",
+      "PostgreSQL, API and Web health",
       "Championship CRUD",
-      "Events calendar as default view",
-      "Events list view",
-      "Events create/update/delete flows",
-      "Events publishing and unpublishing",
-      "Events filters and month navigation",
+      "Events calendar and list",
+      "Events administration CRUD",
       "Public and administration Events APIs",
       "No regression on Championships"
     ]
   },
-  "working_lot_4": {
-    "implemented": [
-      "Events administration CRUD",
-      "Public Events API",
-      "Admin Events API",
-      "Publishing and unpublishing",
-      "Calendar view selected by default",
-      "Secondary list view",
-      "Shared filters and selection",
-      "Event details panel",
-      "Create, edit, duplicate and delete flows",
-      "Unit and Chromium browser tests"
-    ],
-    "accepted": true
+  "working_lot": {
+    "lot": "4.2",
+    "target_version": "8.1.0-alpha.2-lot.4.2",
+    "status": "in-development-not-user-validated",
+    "validated_on_user_workstation": false,
+    "validated_on_vps": false,
+    "merged_to_main": false,
+    "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
+    "progress": "docs/handoff/PROGRESS.json"
   },
-  "local_validation": {
-    "web_build": "passed",
-    "api_build": "passed",
-    "workspace_typecheck": "passed",
-    "unit_tests": "4 passed",
-    "playwright_chromium": "2 passed",
-    "docker_services": "3 healthy",
-    "lot4_api_validator": "passed",
-    "screenshots": [
-      "tests/ui/screenshots/events-calendar-1440x900.png",
-      "tests/ui/screenshots/events-list-1440x900.png"
-    ],
-    "known_tooling_issues": [
-      "ESLint 9 configuration is absent from the baseline repository.",
-      "npm audit reports the React Router RSC CSRF advisory; this SPA does not use RSC or Server Actions, and a major Router 8 migration is outside rev.1."
-    ]
+  "historical_production": {
+    "version": "2.7.0",
+    "status": "validated-production-history",
+    "details": "PROJECT_STATUS.md"
   },
-  "vps_validation": {
-    "date": "2026-08-01",
-    "host": "vps-855f6d7e",
-    "directory": "/home/debian/motorsports-events-server-lot4-test",
-    "deployment": "isolated Docker Compose project mse-lot4-test",
-    "commit": "dcbf76575a648082e98df9202f4b3b6506338515",
-    "api_health": "passed with database=true",
-    "web_health": "passed",
-    "user_browser_acceptance": "passed",
-    "production_2_7_0_affected": false,
-    "report": "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md"
-  },
-  "target": {
-    "next_version": "to be selected after merge",
-    "owner": "Maintainer",
-    "specification": "docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md",
-    "visual_fidelity_target_percent": 95,
-    "next_action": "Review and merge pull request 24 into main."
-  }
+  "next_action": "Continue Lot 4.2 under docs/handoff rules, then obtain and record explicit user validation before declaring it validated."
 }

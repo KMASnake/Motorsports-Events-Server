@@ -12,7 +12,7 @@ Actions :
 - mettre à jour CODEX.md pour rendre le Handbook obligatoire ;
 - ajouter un lien vers PROJECT-HANDBOOK.md dans README.md ;
 - vérifier PROJECT-STATUS.json : Lot 4.1 validé, Lot 4.2 en développement et non validé ;
-- vérifier PROGRESS.json ;
+- vérifier `docs/handoff/PROGRESS.json`, suivi canonique du lot courant ;
 - ne pas modifier le code applicatif sauf nécessité explicite ;
 - ne pas réintroduire slug, origine ou fuseau dans les formulaires.
 

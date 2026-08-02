@@ -1,4 +1,9 @@
-# Package Project Handbook
+# Project Handbook
 
-Package additif destiné au dépôt existant `Motorsports-Events-Server`.
-Il ajoute le Handbook, les ADR, les règles permanentes, les modèles GitHub et les instructions Codex.
+Le [Project Handbook](PROJECT-HANDBOOK.md) est intégré au dépôt
+`Motorsports-Events-Server` et constitue sa source de vérité permanente.
+
+Les ADR et règles durables se trouvent dans `docs/handbook/`. Les consignes et
+critères propres au lot courant restent dans `docs/handoff/`; les documents de
+`docs/handover/` sont conservés comme historique et ne remplacent pas le
+Handbook.
