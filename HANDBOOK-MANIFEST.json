@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "file_count": 22,
+  "files": [
+    {
+      "path": ".github/ISSUE_TEMPLATE/handbook-change.md",
+      "bytes": 203,
+      "sha256": "9987252005f4d53936474f12ce4082378a5f36947fc863717cf5d76ef91648a5"
+    },
+    {
+      "path": ".github/PULL_REQUEST_TEMPLATE.md",
+      "bytes": 268,
+      "sha256": "cd987bdc4f9e8626f140e13d2d9a8eb61b247d1c025d0daecd7c34a04b42643e"
+    },
+    {
+      "path": "CODEX-HANDBOOK.md",
+      "bytes": 306,
+      "sha256": "213ef3d6ac731aad33037048a731811586702f49ba82f6e77e670a3f9311b03e"
+    },
+    {
+      "path": "HANDBOOK-PACKAGE-INFO.json",
+      "bytes": 368,
+      "sha256": "dde606f179033ca9e7b5e83939556decd3ed3612c6c26e7619f2a720b53407a9"
+    },
+    {
+      "path": "PROJECT-HANDBOOK.md",
+      "bytes": 2787,
+      "sha256": "ea06708f6426ec23c9c69bee1317cfe8347501a2f1014041b29cd3be486d8a17"
+    },
+    {
+      "path": "README-HANDBOOK.md",
+      "bytes": 206,
+      "sha256": "04b56709096f207988556daa249e08ce81e3d81775e143b9a6b5763769cf5473"
+    },
+    {
+      "path": "docs/handbook/CHANGELOG.md",
+      "bytes": 118,
+      "sha256": "52b4d016fa3f268f17cad2377a8902df15878d1040f14389e61d14ef8e890cc0"
+    },
+    {
+      "path": "docs/handbook/CODEX-PROMPT.md",
+      "bytes": 833,
+      "sha256": "673a5fc9eeeaa87653e5c344d2a1cf869cc73fb7539ec3ce410d97bb4e65ae37"
+    },
+    {
+      "path": "docs/handbook/DECISIONS.md",
+      "bytes": 225,
+      "sha256": "2a7c1236d4a01c8187a5282135ead0fc9a78e8282aef6836b3a7d398e63829d1"
+    },
+    {
+      "path": "docs/handbook/GITHUB-PUBLISH.md",
+      "bytes": 500,
+      "sha256": "55662f1669cbd68725cbf1c6921512ab19fc96270d332841e333c23051ca9a11"
+    },
+    {
+      "path": "docs/handbook/administration/FORM-DESIGN-GUIDELINES.md",
+      "bytes": 214,
+      "sha256": "c79039dd3a57f6c01bbced2b44497f2f8e26a4befc307ceb49e6803109a2ab70"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0001-ADMINISTRATION-PHILOSOPHY.md",
+      "bytes": 128,
+      "sha256": "7d82360c5ad3d67c36af4bd5b437620a56714b1e3feac22638c91d050e95ec35"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0002-REFERENCE-DATA.md",
+      "bytes": 107,
+      "sha256": "7d4cf8c157a831f677274ae6d5d814412d3320828873de75ad8481eae4e0761a"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0003-PROVIDER-CORRECTIONS.md",
+      "bytes": 136,
+      "sha256": "b2d4abab91c39207c488ecc7eedccfdaf633a6d2a0402b3f880586c1a308a264"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0004-TIMEZONES.md",
+      "bytes": 101,
+      "sha256": "ee0f0a737e6bfd726eae93e88847aa208333932af5e1ee91e8e345659651337d"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0005-UI-SIMPLICITY.md",
+      "bytes": 108,
+      "sha256": "c329b8fa1ef357109975318b147bdfeb1b3988c1d8c4eb2a294529f3ca17402f"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0006-HYBRID-TEST-DATA.md",
+      "bytes": 116,
+      "sha256": "ab9e9371f79581cf8f0cdf6ee57f909ad3ab0fe10c8ad052027b3d0c9d23316a"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0007-CALENDAR.md",
+      "bytes": 96,
+      "sha256": "d51dced7fa05b32f9faa41c819f75dba8d47c7c25dd7ad08d83b044677e3ba53"
+    },
+    {
+      "path": "docs/handbook/calendar/CALENDAR-RULES.md",
+      "bytes": 169,
+      "sha256": "9bdd213273c73dc5b4e2aa1e2bd4a2a80ee0f644bdb04fef449fb7d8c10da1be"
+    },
+    {
+      "path": "docs/handbook/corrections/CORRECTIONS-RULES.md",
+      "bytes": 197,
+      "sha256": "8c57c39b7e8f3d97afeda5456255278fa39bb294a2b6b94762bd308b99f14883"
+    },
+    {
+      "path": "docs/handbook/data/HYBRID-TEST-DATA.md",
+      "bytes": 204,
+      "sha256": "b34f3f4586f8d09043472b62151da1052abec4fc9caf3c7be1ec3762e69f6582"
+    },
+    {
+      "path": "docs/handbook/roadmap/ROADMAP.md",
+      "bytes": 109,
+      "sha256": "9da6a383e7e5aea3651a279592d29ef6f959736af9ddf9aea00f8724b11e8111"
+    }
+  ]
+}
