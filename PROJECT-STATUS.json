@@ -27,7 +27,7 @@
     "lot": "4.2",
     "target_version": "8.1.0-alpha.2-lot.4.2",
     "status": "in-development-not-user-validated",
-    "implementation_percent": 68,
+    "implementation_percent": 75,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -41,10 +41,13 @@
       "Provider filters and readable provider labels",
       "Transactional provider-source and local-override reconciliation",
       "Non-destructive provider synchronization with explicit conflicts",
-      "Local/provider resolution and automatic override removal on convergence"
+      "Local/provider resolution and automatic override removal on convergence",
+      "Business-only event administration form and mutations",
+      "Server-generated unique slugs and automatic origins",
+      "Circuit-derived timezones with deterministic UTC fallback",
+      "Dedicated provider ingestion endpoint"
     ],
     "mandatory_gaps": [
-      "Remove Slug, Origin and editable Timezone from event administration forms",
       "Complete correction resolution, filters and event navigation",
       "Complete range creation, visual resize and interaction rollback tests",
       "Harden binary snapshot restore, anonymization and blocking security checks",
@@ -58,13 +61,15 @@
     "workspace_typecheck": "passed",
     "web_build": "passed",
     "api_build": "passed",
-    "unit_tests": "26 passed",
+    "unit_tests": "30 passed",
     "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
     "api_health": "passed with database=true",
     "web_health": "passed",
     "step_2_integration": "passed on isolated PostgreSQL through npm run validate:step2",
+    "step_2_user_validation": "maintainer reported the isolated VPS test dataset and correction workflow looked correct on 2026-08-03",
+    "step_3_integration": "passed on isolated PostgreSQL through npm run validate:step3",
     "lot_4_api_regression": "passed through npm run validate:lot4",
-    "playwright": "not required for the API-only Step 2; prior UI baseline unchanged",
+    "playwright": "7 Chromium scenarios passed in the official Playwright container",
     "known_tooling_issues": [
       "The local npm version is 9.2.0 while package.json requires npm >= 10.",
       "npm audit reports two high-severity advisories requiring separate compatibility review."
@@ -75,5 +80,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Complete Step 3: make the administration API business-oriented by generating technical metadata and deriving timezones automatically."
+  "next_action": "Complete Step 4: finish correction filters, resolution navigation and remaining visual details without changing the public API."
 }

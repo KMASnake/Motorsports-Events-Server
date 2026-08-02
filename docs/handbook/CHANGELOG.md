@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.3 — 2026-08-03
+
+- précise la génération serveur des slugs et origines ;
+- isole l'ingestion fournisseur des mutations administratives métier ;
+- fixe UTC comme repli déterministe lorsque le fuseau ne peut pas être déduit.
+
 ## 1.0 — 2026-08-02
 Création du Handbook et formalisation des règles permanentes du projet.
 

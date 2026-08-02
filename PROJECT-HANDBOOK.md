@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.2
+## Version 1.3
 
 Ce document est la source de vérité permanente du projet.
 
@@ -28,13 +28,18 @@ API : REST JSON, versionnée, séparation stricte public/administration.
 Les formulaires ne doivent pas exposer UUID, slug, origin, provider ID, external ID, timestamps internes ou métadonnées techniques.
 
 ### Slug
-Généré automatiquement si nécessaire. Jamais visible ni modifiable.
+Généré automatiquement et rendu unique par le serveur. Jamais visible ni
+modifiable dans les mutations administratives métier.
 
 ### Origine
-Déterminée automatiquement : administration=manual, fournisseur=provider, import=import.
+Déterminée automatiquement : administration=manual, fournisseur=provider,
+import=import. L'ingestion fournisseur utilise une entrée séparée des mutations
+administratives ordinaires.
 
 ### Fuseau horaire
-Non éditable. Déduit dans l'ordre : fournisseur, circuit, ville, pays. Affichable en lecture seule.
+Non éditable. Déduit dans l'ordre : fournisseur, circuit, ville, pays, puis UTC
+si aucune information géographique n'est disponible. Affichable en lecture
+seule.
 
 ## Référentiels
 Toute valeur connue utilise une liste prédéfinie : sports, championnats, pays, fuseaux, langues, catégories, statuts, fournisseurs, types de session, rôles.

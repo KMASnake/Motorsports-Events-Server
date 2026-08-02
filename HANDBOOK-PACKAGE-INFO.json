@@ -1,10 +1,10 @@
 {
   "package": "Motorsports Events Server Project Handbook",
-  "version": "1.1",
-  "generated_at": "2026-08-02",
+  "version": "1.3",
+  "generated_at": "2026-08-03",
   "type": "integrated-repository-handbook",
   "target_repository": "KMASnake/Motorsports-Events-Server",
-  "target_branch": "docs/project-handbook-v1",
+  "target_branch": "codex/lot-4.2-complete",
   "codex_entrypoint": "CODEX.md",
   "includes_application_source": false
 }

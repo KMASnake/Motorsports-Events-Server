@@ -12,6 +12,11 @@
 - synchronisation non destructive, conflit explicite et résolutions testées
   sur PostgreSQL réel ;
 - ajout du validateur `npm run validate:step2`.
+- formulaire Événement limité aux données métier, sans Slug, Origine ni Fuseau
+  horaire éditable ;
+- génération serveur des slugs uniques, origine manuelle automatique et fuseau
+  déduit du circuit avec repli UTC ;
+- ingestion fournisseur isolée et ajout du validateur `npm run validate:step3`.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 

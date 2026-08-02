@@ -23,3 +23,16 @@ Voir `architecture/ADR-0008-DOCUMENTATION-GOVERNANCE.md`.
 - les événements manuels refusent toute synchronisation fournisseur.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
+
+## 2026-08-03 — Administration orientée métier
+
+- une création administrative ordinaire génère un slug unique et impose
+  l'origine `manual` côté serveur ;
+- le fuseau est déduit du circuit et utilise UTC lorsque aucune localisation
+  n'est disponible ;
+- les mutations administratives ordinaires refusent les métadonnées techniques ;
+- l'ingestion fournisseur possède une entrée dédiée et génère l'origine
+  `provider` sans réintroduire ces champs dans le formulaire.
+
+Voir `architecture/ADR-0001-ADMINISTRATION-PHILOSOPHY.md` et
+`architecture/ADR-0004-TIMEZONES.md`.

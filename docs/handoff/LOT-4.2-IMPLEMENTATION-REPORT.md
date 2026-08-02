@@ -25,6 +25,26 @@ Le validateur `npm run validate:step2` couvre une base PostgreSQL réelle :
 override, résolution locale, résolution fournisseur, retour à la source et
 nettoyage de l'API publique.
 
+La recette VPS isolée de l'étape 2 a été confirmée par le mainteneur le
+2026-08-03 après génération des données et contrôle du parcours Corrections.
+Cette confirmation ne valide pas le Lot 4.2 complet.
+
+## Étape 3 — Administration orientée métier
+
+Le formulaire Événement ne présente plus le slug, l'origine, le fuseau
+éditable ni l'identité fournisseur. Les mutations administratives ordinaires
+refusent ces métadonnées : le serveur génère un slug unique, impose l'origine
+`manual` et déduit le fuseau du circuit, avec repli UTC sans localisation.
+
+L'ingestion fournisseur est isolée dans
+`POST /api/v1/admin/provider-events`, génère l'origine `provider` et conserve
+la priorité du fuseau source. La duplication utilise la création métier et
+obtient donc sa propre identité technique.
+
+Le validateur `npm run validate:step3` couvre ces règles sur PostgreSQL réel.
+Les validateurs des étapes 2 et du Lot 4 restent verts, tout comme les sept
+scénarios Chromium exécutés dans l'image Playwright officielle.
+
 ## Résultat
 
 Le calendrier propose les vues Mois, Semaine, Jour et Agenda. Les événements
