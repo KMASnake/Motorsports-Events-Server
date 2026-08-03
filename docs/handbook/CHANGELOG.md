@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.4 — 2026-08-03
+
+- remplace la déduction des fuseaux par un stockage UTC uniforme ;
+- fixe la pagination de la liste Événements à 25 lignes ;
+- définit le tri par proximité avec la date courante.
+
 ## 1.3 — 2026-08-03
 
 - précise la génération serveur des slugs et origines ;

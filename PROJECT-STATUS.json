@@ -27,7 +27,7 @@
     "lot": "4.2",
     "target_version": "8.1.0-alpha.2-lot.4.2",
     "status": "in-development-not-user-validated",
-    "implementation_percent": 75,
+    "implementation_percent": 78,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -45,7 +45,9 @@
       "Business-only event administration form and mutations",
       "Server-generated unique slugs and automatic origins",
       "Circuit-derived timezones with deterministic UTC fallback",
-      "Dedicated provider ingestion endpoint"
+      "Dedicated provider ingestion endpoint",
+      "UTC-only event storage",
+      "25-event list pagination ordered by temporal proximity"
     ],
     "mandatory_gaps": [
       "Complete correction resolution, filters and event navigation",
@@ -61,13 +63,15 @@
     "workspace_typecheck": "passed",
     "web_build": "passed",
     "api_build": "passed",
-    "unit_tests": "30 passed",
+    "unit_tests": "31 passed",
     "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
     "api_health": "passed with database=true",
     "web_health": "passed",
     "step_2_integration": "passed on isolated PostgreSQL through npm run validate:step2",
     "step_2_user_validation": "maintainer reported the isolated VPS test dataset and correction workflow looked correct on 2026-08-03",
     "step_3_integration": "passed on isolated PostgreSQL through npm run validate:step3",
+    "step_3_user_validation": "maintainer confirmed the Step 3 VPS workflow on 2026-08-03",
+    "utc_and_pagination_adjustment": "98 generated events stored only in UTC; 25-row proximity ordering validated",
     "lot_4_api_regression": "passed through npm run validate:lot4",
     "playwright": "7 Chromium scenarios passed in the official Playwright container",
     "known_tooling_issues": [
@@ -80,5 +84,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Complete Step 4: finish correction filters, resolution navigation and remaining visual details without changing the public API."
+  "next_action": "Validate the UTC and list-pagination adjustment on the isolated VPS, then complete Step 4 correction filters and navigation."
 }

@@ -17,6 +17,9 @@
 - génération serveur des slugs uniques, origine manuelle automatique et fuseau
   déduit du circuit avec repli UTC ;
 - ingestion fournisseur isolée et ajout du validateur `npm run validate:step3`.
+- normalisation de tous les événements en UTC sans gestion de fuseau ;
+- pagination de la vue Liste par 25 et tri de l'événement le plus proche en
+  premier.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 

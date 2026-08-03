@@ -4,15 +4,14 @@ Statut : Accepté
 
 ## Décision
 
-Le fuseau n'est pas saisi. Le serveur le déduit dans l'ordre depuis la donnée
-fournisseur, le circuit, la ville puis le pays. En l'absence de toute donnée de
-localisation, le repli déterministe est `UTC`.
-
-Une création ou un changement de circuit recalcule le fuseau. Une ingestion
-fournisseur peut fournir explicitement le fuseau source, qui reste prioritaire.
+Le fuseau n'est ni saisi ni déduit. Le serveur normalise tous les événements en
+UTC et conserve `timezone="UTC"` uniquement pour la compatibilité du contrat
+existant. Une valeur fournisseur de fuseau n'est pas persistée comme donnée
+administrable.
 
 ## Conséquences
 
-Le formulaire peut afficher le fuseau en lecture seule mais ne le transmet pas
-comme choix administrateur. Les dates continuent d'être stockées sous forme
-normalisée et l'API publique conserve son champ `timezone` existant.
+Le formulaire ne présente aucun contrôle de fuseau. Au démarrage, les lignes
+historiques sont normalisées en UTC et les corrections de fuseau devenues sans
+objet sont supprimées. L'API publique conserve son champ `timezone` existant,
+toujours égal à `UTC`.

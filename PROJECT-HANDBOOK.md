@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.3
+## Version 1.4
 
 Ce document est la source de vérité permanente du projet.
 
@@ -37,9 +37,8 @@ import=import. L'ingestion fournisseur utilise une entrée séparée des mutatio
 administratives ordinaires.
 
 ### Fuseau horaire
-Non éditable. Déduit dans l'ordre : fournisseur, circuit, ville, pays, puis UTC
-si aucune information géographique n'est disponible. Affichable en lecture
-seule.
+Non éditable et non administré. Les dates et le champ de compatibilité
+`timezone` sont stockés exclusivement en UTC.
 
 ## Référentiels
 Toute valeur connue utilise une liste prédéfinie : sports, championnats, pays, fuseaux, langues, catégories, statuts, fournisseurs, types de session, rôles.
@@ -63,6 +62,9 @@ Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle nati
 
 ## Calendrier
 Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer, redimensionnement, création rapide, duplication et rollback.
+
+La vue Liste présente 25 événements par page et place en premier l'événement
+dont le début est le plus proche de la date courante.
 
 ## Graphismes
 Les maquettes sont un contrat. Logo officiel, logos championnats, drapeaux, logos circuits, fallbacks et fidélité cible >= 98 %.

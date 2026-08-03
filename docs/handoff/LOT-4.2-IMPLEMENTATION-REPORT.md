@@ -45,6 +45,17 @@ Le validateur `npm run validate:step3` couvre ces règles sur PostgreSQL réel.
 Les validateurs des étapes 2 et du Lot 4 restent verts, tout comme les sept
 scénarios Chromium exécutés dans l'image Playwright officielle.
 
+La recette VPS de l'étape 3 a été confirmée par le mainteneur le 2026-08-03.
+À sa demande, la déduction de fuseau a ensuite été remplacée par un stockage
+UTC uniforme : les lignes historiques sont normalisées au démarrage et les
+corrections de fuseau devenues sans objet sont supprimées.
+
+La vue Liste affiche désormais 25 événements par page. Son ordre par défaut
+place en tête l'événement dont la date de début est la plus proche de l'instant
+courant. Sur le jeu déterministe de recette, 98 événements sur 98 sont stockés
+en UTC et les sept scénarios Chromium, dont le contrôle des 25 lignes et du
+premier événement, réussissent.
+
 ## Résultat
 
 Le calendrier propose les vues Mois, Semaine, Jour et Agenda. Les événements

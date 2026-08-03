@@ -36,3 +36,15 @@ Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
 
 Voir `architecture/ADR-0001-ADMINISTRATION-PHILOSOPHY.md` et
 `architecture/ADR-0004-TIMEZONES.md`.
+
+## 2026-08-03 — UTC unique et pagination Événements
+
+- la gestion de fuseaux est supprimée du domaine administrable ; tous les
+  événements et leur champ de compatibilité `timezone` sont normalisés en UTC ;
+- les corrections historiques portant sur le fuseau sont supprimées ;
+- la vue Liste affiche 25 événements par page ;
+- son ordre par défaut utilise la proximité absolue entre le début de
+  l'événement et l'instant courant.
+
+Voir `architecture/ADR-0004-TIMEZONES.md` et
+`architecture/ADR-0007-CALENDAR.md`.
