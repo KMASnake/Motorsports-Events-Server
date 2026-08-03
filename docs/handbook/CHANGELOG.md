@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.7 — 2026-08-03
+
+- impose un jeu de données de recette adapté à chaque nouvelle version ;
+- exige une génération reproductible, idempotente et sans donnée sensible ;
+- rend obligatoires les commandes d'injection et résultats attendus.
+
 ## 1.6 — 2026-08-03
 
 - complète les filtres permanents de la page Corrections ;

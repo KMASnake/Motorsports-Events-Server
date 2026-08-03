@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.6
+## Version 1.7
 
 Ce document est la source de vérité permanente du projet.
 
@@ -81,6 +81,12 @@ Données sportives réalistes, identités synthétiques, secrets supprimés, int
 
 ## Tests
 Unitaires, intégration, API, Docker, UI, sécurité et non-régression. Une fusion dans main ne vaut pas validation utilisateur.
+
+Chaque version candidate inclut un jeu de données de recette reproductible et
+idempotent couvrant les nouvelles fonctions et leurs principaux états limites.
+La livraison documente systématiquement la commande d'injection, les données
+attendues et les contrôles manuels associés. Ces données restent synthétiques,
+sans secret ni copie d'une base de production.
 
 La validation utilisateur est explicite et consignée dans les fichiers d'état
 avec sa date et son périmètre. Une CI verte, un build réussi, une fusion ou un

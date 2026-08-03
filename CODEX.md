@@ -37,6 +37,8 @@ selon la procédure du Handbook.
 - les formulaires d'administration ne présentent pas les champs Slug, Origine
   ou Fuseau horaire ;
 - compilation, Docker et tests obligatoires.
+- jeu de données de recette adapté obligatoire pour chaque nouvelle version,
+  avec commandes d'injection, résultats attendus et nettoyage documentés.
 
 ## Documentation et décisions
 

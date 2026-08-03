@@ -52,9 +52,11 @@ Avant toute livraison :
 3. construire avec `./scripts/build-release.sh` ;
 4. réextraire l'archive et relancer les tests depuis son contenu ;
 5. vérifier le ZIP et son SHA-256 ;
-6. mettre à jour `CHANGELOG.md`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
-7. créer un commit explicite et publier par pull request ;
-8. après validation VPS, enregistrer les résultats et créer le tag de version.
+6. fournir le jeu de données reproductible utile à la recette, sa commande
+   d'injection, les résultats attendus et sa commande de nettoyage ;
+7. mettre à jour `CHANGELOG.md`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
+8. créer un commit explicite et publier par pull request ;
+9. après validation VPS, enregistrer les résultats et créer le tag de version.
 
 ## Passation
 

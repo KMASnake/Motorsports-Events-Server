@@ -24,6 +24,17 @@ Voir `architecture/ADR-0008-DOCUMENTATION-GOVERNANCE.md`.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
 
+## 2026-08-03 — Jeux de données de recette
+
+- chaque nouvelle version candidate fournit les données nécessaires pour
+  exercer ses nouvelles fonctions sans dépendre de la production ;
+- le générateur est reproductible, idempotent, synthétique et sans secret ;
+- les commandes d'injection, résultats attendus et tests manuels sont fournis
+  avec chaque demande de validation ;
+- les états nominaux, erreurs et conflits pertinents doivent être représentés.
+
+Voir `architecture/ADR-0006-HYBRID-TEST-DATA.md`.
+
 ## 2026-08-03 — Administration orientée métier
 
 - une création administrative ordinaire génère un slug unique et impose

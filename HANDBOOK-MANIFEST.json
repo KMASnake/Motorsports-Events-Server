@@ -1,5 +1,5 @@
 {
-  "version": "1.6",
+  "version": "1.7",
   "file_count": 23,
   "files": [
     {
@@ -20,12 +20,12 @@
     {
       "path": "HANDBOOK-PACKAGE-INFO.json",
       "bytes": 338,
-      "sha256": "69037fb2c607efef32ecd9cf01c50cc8e4354c2a214032158d767955734374da"
+      "sha256": "257a9118520262087d69979ae3fbbff43cf442f45fb0c28ecf2bf7574e998d2b"
     },
     {
       "path": "PROJECT-HANDBOOK.md",
-      "bytes": 4932,
-      "sha256": "7a01acc28b6302ffe720a456225ff744051287b6ad77c7bc6ffd2ba262666925"
+      "bytes": 5301,
+      "sha256": "0f526bfec4ac7c1bff20847b7cbb6a629267b1f28276ac757ec077f17023bb4f"
     },
     {
       "path": "README-HANDBOOK.md",
@@ -34,8 +34,8 @@
     },
     {
       "path": "docs/handbook/CHANGELOG.md",
-      "bytes": 1533,
-      "sha256": "699cc12798d872f809805809f817c80c2851172438d429a68400839be8c6f487"
+      "bytes": 1782,
+      "sha256": "57ad95f56075d94894ca0ae7931d618ad8812eb69b3f768e44bc1b43bd29ac98"
     },
     {
       "path": "docs/handbook/CODEX-PROMPT.md",
@@ -44,8 +44,8 @@
     },
     {
       "path": "docs/handbook/DECISIONS.md",
-      "bytes": 3098,
-      "sha256": "42dae41cda8ea99f625a1e00ff10f4a87c15556472274303ad9086707c304276"
+      "bytes": 3619,
+      "sha256": "f9e36d36bc790ac6cf12c0322c6e6fd465546bbfc060ceae639f72d178f15d23"
     },
     {
       "path": "docs/handbook/GITHUB-PUBLISH.md",
@@ -84,8 +84,8 @@
     },
     {
       "path": "docs/handbook/architecture/ADR-0006-HYBRID-TEST-DATA.md",
-      "bytes": 116,
-      "sha256": "ab9e9371f79581cf8f0cdf6ee57f909ad3ab0fe10c8ad052027b3d0c9d23316a"
+      "bytes": 1513,
+      "sha256": "645371b1285e5ed7ea8e1faf0a57bdfa4fe9cb6ea2a170f219e73e8613b59c54"
     },
     {
       "path": "docs/handbook/architecture/ADR-0007-CALENDAR.md",
@@ -109,8 +109,8 @@
     },
     {
       "path": "docs/handbook/data/HYBRID-TEST-DATA.md",
-      "bytes": 204,
-      "sha256": "b34f3f4586f8d09043472b62151da1052abec4fc9caf3c7be1ec3762e69f6582"
+      "bytes": 438,
+      "sha256": "c37f88a440e33dbd63c35d330e9994a940423d5adbbf3a35e8c89d970ac48383"
     },
     {
       "path": "docs/handbook/roadmap/ROADMAP.md",
