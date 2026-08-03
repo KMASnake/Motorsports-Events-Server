@@ -117,7 +117,8 @@
       "step_2_and_step_3_regressions": "passed",
       "lot_4_api_regression": "passed",
       "docker": "3 isolated services healthy",
-      "playwright": "7 Chromium scenarios passed with filters, editing and event navigation"
+      "playwright": "7 Chromium scenarios passed with filters, editing and event navigation",
+      "test_dataset": "12 deterministic corrections: 4 statuses, 3 providers, 8 fields, 5 authors and dated records"
     }
   },
   "known_issues": [

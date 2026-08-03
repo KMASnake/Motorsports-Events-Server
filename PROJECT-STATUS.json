@@ -76,6 +76,7 @@
     "list_sorting_adjustment": "date ascending/descending and alphabetical column sorting passed in Chromium",
     "step_3_adjustments_user_validation": "maintainer confirmed UTC storage, pagination and list sorting on the isolated VPS on 2026-08-03",
     "step_4_corrections": "combined filters, override editing and direct event navigation passed in Chromium",
+    "step_4_test_dataset": "12 deterministic corrections validated on isolated PostgreSQL across 4 statuses, 3 providers, 8 fields and 5 authors",
     "lot_4_api_regression": "passed through npm run validate:lot4",
     "playwright": "7 Chromium scenarios passed in the official Playwright container",
     "known_tooling_issues": [

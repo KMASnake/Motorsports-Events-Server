@@ -65,6 +65,12 @@ date et le tri alphabétique.
 
 ## Étape 4 — Exploitation des corrections
 
+Le générateur synthétique crée désormais 12 corrections persistantes et
+idempotentes. Le jeu couvre les statuts actif, conflit, résolu et ignoré, les
+fournisseurs OC BlackTop, TheSportsDB et une future source synthétique, ainsi
+que plusieurs champs, auteurs et anciennetés. Il permet de vérifier tous les
+filtres sans dépendre d'une synchronisation ou de données de production.
+
 La page Corrections propose désormais des filtres combinables par recherche,
 championnat, fournisseur, champ, statut, conflit, auteur, période et nombre de
 champs corrigés. Un résumé indique le nombre d'événements et de champs visibles.

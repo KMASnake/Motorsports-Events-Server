@@ -24,6 +24,8 @@
   API sur l'ensemble des pages.
 - page Corrections complétée avec filtres combinés, modification locale,
   synthèse des résultats et ouverture directe de l'événement.
+- générateur déterministe enrichi de 12 corrections couvrant les statuts,
+  conflits, fournisseurs, champs, auteurs et dates nécessaires à la recette.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 
