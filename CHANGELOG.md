@@ -26,6 +26,8 @@
   synthèse des résultats et ouverture directe de l'événement.
 - générateur déterministe enrichi de 12 corrections couvrant les statuts,
   conflits, fournisseurs, champs, auteurs et dates nécessaires à la recette.
+- édition locale typée dans Corrections : référentiels et énumérations en
+  listes contrôlées, dates via calendrier et heure avec conversion UTC.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 

@@ -71,6 +71,10 @@ fournisseurs OC BlackTop, TheSportsDB et une future source synthétique, ainsi
 que plusieurs champs, auteurs et anciennetés. Il permet de vérifier tous les
 filtres sans dépendre d'une synchronisation ou de données de production.
 
+L'édition locale propose les championnats, circuits, statuts et états de
+publication sous forme de listes contrôlées. Les champs de début et fin
+utilisent un contrôle date et heure natif, converti en UTC avant enregistrement.
+
 La page Corrections propose désormais des filtres combinables par recherche,
 championnat, fournisseur, champ, statut, conflit, auteur, période et nombre de
 champs corrigés. Un résumé indique le nombre d'événements et de champs visibles.

@@ -41,3 +41,8 @@ modification locale passe par la même résolution transactionnelle. L'ouverture
 de l'événement transmet son identifiant à la page Événements, qui sélectionne
 le panneau de détail correspondant sans exposer de métadonnée dans l'API
 publique.
+
+La saisie d'un override est typée par champ. Les identifiants de championnat
+et circuit sont choisis dans leurs référentiels, le statut et la publication
+dans leurs énumérations, et les horaires via un contrôle date et heure converti
+en UTC. Le texte libre est réservé aux champs métier réellement textuels.

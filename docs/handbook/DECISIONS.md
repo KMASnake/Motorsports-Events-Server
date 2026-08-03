@@ -24,6 +24,15 @@ Voir `architecture/ADR-0008-DOCUMENTATION-GOVERNANCE.md`.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
 
+## 2026-08-03 — Édition typée des corrections
+
+- une valeur référencée ou énumérée ne peut pas être modifiée par texte libre ;
+- championnat, circuit, statut et publication utilisent une liste contrôlée ;
+- début et fin utilisent un sélecteur date et heure ;
+- les dates choisies sont converties et persistées en UTC.
+
+Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
+
 ## 2026-08-03 — Jeux de données de recette
 
 - chaque nouvelle version candidate fournit les données nécessaires pour

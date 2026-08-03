@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.7
+## Version 1.8
 
 Ce document est la source de vérité permanente du projet.
 
@@ -60,6 +60,11 @@ Uniquement pour les données fournisseur. Affichage champ par champ : valeur fou
 Les filtres couvrent événement, championnat, fournisseur, champ, statut,
 conflit, auteur, période et nombre de champs. Chaque groupe permet d'ouvrir
 l'événement concerné et chaque override reste modifiable ou résoluble.
+
+La modification locale respecte le type métier du champ : championnat,
+circuit, statut et publication utilisent des listes prédéfinies ; les dates
+utilisent un contrôle calendrier avec heure et sont enregistrées en UTC. Seuls
+les champs textuels libres conservent une saisie textuelle.
 
 ## Valeur effective
 Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle native. L'API publique expose uniquement cette valeur.

@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.8 — 2026-08-03
+
+- impose des éditeurs de correction adaptés au type métier ;
+- remplace le texte libre par des listes pour les référentiels et énumérations ;
+- impose un contrôle date et heure avec persistance UTC.
+
 ## 1.7 — 2026-08-03
 
 - impose un jeu de données de recette adapté à chaque nouvelle version ;

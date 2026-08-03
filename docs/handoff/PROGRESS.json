@@ -33,7 +33,7 @@
     "events_crud_list": 100,
     "events_calendar_interactions": 65,
     "automated_tests": 85,
-    "corrections": 95,
+    "corrections": 98,
     "hybrid_test_data": 50,
     "accessibility": 55
   },
@@ -109,15 +109,15 @@
   },
   "step_4": {
     "status": "completed-technically-awaiting-user-validation",
-    "scope": "Complete correction filters, inline override editing, result summary and direct event navigation.",
+    "scope": "Complete correction filters, typed inline override editing, result summary and direct event navigation.",
     "technical_validation": {
-      "unit_tests": "34 passed",
+      "unit_tests": "37 passed",
       "web_build": "passed",
       "api_build": "passed",
       "step_2_and_step_3_regressions": "passed",
       "lot_4_api_regression": "passed",
       "docker": "3 isolated services healthy",
-      "playwright": "7 Chromium scenarios passed with filters, editing and event navigation",
+      "playwright": "7 Chromium scenarios passed with controlled lists, datetime editor, filters, editing and event navigation",
       "test_dataset": "12 deterministic corrections: 4 statuses, 3 providers, 8 fields, 5 authors and dated records"
     }
   },
