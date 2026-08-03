@@ -137,7 +137,7 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByRole('navigation',{name:'Pagination des corrections'})).toContainText('Page 1 sur 2');
     await expect(page.locator('.correction-field')).toHaveCount(10);
     await expect(page.getByRole('button',{name:'Restaurer fournisseur'}).first()).toBeVisible();
-    await expect(page.getByRole('button',{name:'Supprimer correction'}).first()).toBeVisible();
+    await expect(page.getByRole('button',{name:'Supprimer correction'})).toHaveCount(0);
     await expect(page.getByRole('button',{name:'Conserver local'})).toHaveCount(0);
     await expect(page.getByText('Reporté',{exact:true}).first()).toBeVisible();
     await expect(page.getByText(source.circuit_name,{exact:true}).first()).toBeVisible();
