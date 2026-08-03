@@ -53,6 +53,33 @@ export function nearestEventsFirst(events: EventRow[], reference = new Date()): 
   });
 }
 
+export type EventListSortKey = 'starts_at' | 'name' | 'championship' | 'circuit' | 'status' | 'publication';
+export type EventListSortDirection = 'nearest' | 'asc' | 'desc';
+
+export function sortEventList(
+  events: EventRow[],
+  key: EventListSortKey,
+  direction: EventListSortDirection,
+  reference = new Date()
+): EventRow[] {
+  if (key === 'starts_at' && direction === 'nearest') return nearestEventsFirst(events, reference);
+  const multiplier = direction === 'desc' ? -1 : 1;
+  const text = (event: EventRow): string => {
+    if (key === 'name') return event.name;
+    if (key === 'championship') return event.championship_name;
+    if (key === 'circuit') return event.circuit_name ?? '';
+    if (key === 'status') return event.status;
+    if (key === 'publication') return event.published ? 'publié' : 'privé';
+    return event.starts_at;
+  };
+  return [...events].sort((left, right) => {
+    const comparison = key === 'starts_at'
+      ? new Date(left.starts_at).getTime() - new Date(right.starts_at).getTime()
+      : text(left).localeCompare(text(right), 'fr', { sensitivity: 'base' });
+    return comparison * multiplier || left.name.localeCompare(right.name, 'fr');
+  });
+}
+
 export function eventPage(events: EventRow[], page: number, pageSize = 25): EventRow[] {
   const safePage = Math.max(1, Math.trunc(page));
   return events.slice((safePage - 1) * pageSize, safePage * pageSize);

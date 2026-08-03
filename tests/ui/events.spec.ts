@@ -27,6 +27,14 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.locator('.events-list article')).toHaveCount(Math.min(25, rows.length));
     await expect(page.locator('.events-list article').first()).toContainText(nearest.name);
     await expect(page.getByRole('navigation', { name: 'Pagination des événements' })).toContainText('Page 1');
+    const chronological = [...rows].sort((left, right) => new Date(left.starts_at).getTime() - new Date(right.starts_at).getTime());
+    await page.getByRole('button', { name: 'Trier par DATE ET HEURE' }).click();
+    await expect(page.locator('.events-list article').first()).toContainText(chronological[0].name);
+    await page.getByRole('button', { name: 'Trier par DATE ET HEURE' }).click();
+    await expect(page.locator('.events-list article').first()).toContainText(chronological.at(-1).name);
+    const alphabetical = [...rows].sort((left, right) => left.name.localeCompare(right.name, 'fr', { sensitivity: 'base' }));
+    await page.getByRole('button', { name: 'Trier par ÉVÉNEMENT' }).click();
+    await expect(page.locator('.events-list article').first()).toContainText(alphabetical[0].name);
     await page.screenshot({ path: 'tests/ui/screenshots/events-list-1440x900.png' });
 
     await page.reload();

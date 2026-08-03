@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, resizeEvent, slugify } from './eventUtils';
+import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, resizeEvent, slugify, sortEventList } from './eventUtils';
 import type { EventRow } from './eventTypes';
 import { availableProviderOptions, providerLabel } from './providerDisplay';
 
@@ -78,5 +78,17 @@ describe('eventUtils', () => {
     expect(eventPage(rows, 1)).toHaveLength(25);
     expect(eventPage(rows, 2)[0].id).toBe('event-26');
     expect(eventPage(rows, 3).map((row) => row.id)).toEqual(['event-51', 'event-52']);
+  });
+
+  it('trie toutes les pages par date ou par ordre alphabétique', () => {
+    const rows = [
+      event({ id: 'zolder', name: 'Zolder', championship_name: 'WEC', starts_at: '2026-08-01T12:00:00Z' }),
+      event({ id: 'assen', name: 'Assen', championship_name: 'MotoGP', starts_at: '2026-06-01T12:00:00Z' }),
+      event({ id: 'barcelone', name: 'Barcelone', championship_name: 'Formule 1', starts_at: '2026-07-01T12:00:00Z' })
+    ];
+    expect(sortEventList(rows, 'starts_at', 'asc').map((row) => row.id)).toEqual(['assen', 'barcelone', 'zolder']);
+    expect(sortEventList(rows, 'starts_at', 'desc').map((row) => row.id)).toEqual(['zolder', 'barcelone', 'assen']);
+    expect(sortEventList(rows, 'name', 'asc').map((row) => row.id)).toEqual(['assen', 'barcelone', 'zolder']);
+    expect(sortEventList(rows, 'championship', 'desc').map((row) => row.id)).toEqual(['zolder', 'assen', 'barcelone']);
   });
 });

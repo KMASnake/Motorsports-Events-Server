@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { StatusChip as Pill } from '../../design-system';
 import { eventColor } from './eventColors';
-import { eventPage, fullDate, nearestEventsFirst } from './eventUtils';
+import { eventPage, fullDate, sortEventList, type EventListSortDirection, type EventListSortKey } from './eventUtils';
 import type { Championship, EventRow } from './eventTypes';
 
 const statusMeta = {
@@ -22,13 +22,35 @@ interface Props {
 
 export function EventListView({ events, championships, selectedId, onSelect, onEdit, onDelete, onTogglePublication }: Props) {
   const [page, setPage] = useState(1);
-  const ordered = useMemo(() => nearestEventsFirst(events), [events]);
+  const [sort, setSort] = useState<{ key: EventListSortKey; direction: EventListSortDirection }>({ key: 'starts_at', direction: 'nearest' });
+  const ordered = useMemo(() => sortEventList(events, sort.key, sort.direction), [events, sort]);
   const pageCount = Math.max(1, Math.ceil(ordered.length / 25));
   const visible = eventPage(ordered, Math.min(page, pageCount));
   useEffect(() => setPage(1), [events]);
 
+  function changeSort(key: EventListSortKey) {
+    setSort((current) => ({
+      key,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+    }));
+    setPage(1);
+  }
+
+  function sortLabel(key: EventListSortKey) {
+    if (sort.key !== key) return '';
+    if (sort.direction === 'nearest') return ' ◉';
+    return sort.direction === 'asc' ? ' ↑' : ' ↓';
+  }
+
+  const header = (key: EventListSortKey, label: string) => <button
+    type="button"
+    className={sort.key === key ? 'active' : ''}
+    aria-label={`Trier par ${label}`}
+    onClick={() => changeSort(key)}
+  >{label}{sortLabel(key)}</button>;
+
   return <div className="events-list-wrap">
-    <div className="events-list-head"><b>DATE ET HEURE</b><b>ÉVÉNEMENT</b><b>CHAMPIONNAT</b><b>CIRCUIT</b><b>STATUT</b><b>API</b><b>ACTIONS</b></div>
+    <div className="events-list-head">{header('starts_at', 'DATE ET HEURE')}{header('name', 'ÉVÉNEMENT')}{header('championship', 'CHAMPIONNAT')}{header('circuit', 'CIRCUIT')}{header('status', 'STATUT')}{header('publication', 'API')}<b>ACTIONS</b></div>
     <div className="events-list">
       {visible.map((event) => <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
         <time><strong>{fullDate(event.starts_at)}</strong><small>{event.timezone}</small></time>
