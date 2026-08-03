@@ -75,6 +75,11 @@ L'édition locale propose les championnats, circuits, statuts et états de
 publication sous forme de listes contrôlées. Les champs de début et fin
 utilisent un contrôle date et heure natif, converti en UTC avant enregistrement.
 
+La liste affiche dix corrections par page avec navigation précédente/suivante.
+Les actions visibles sont limitées à la modification locale, la restauration
+fournisseur et la suppression de la correction. Les statuts techniques sont
+traduits, notamment `postponed` en « Reporté ».
+
 La page Corrections propose désormais des filtres combinables par recherche,
 championnat, fournisseur, champ, statut, conflit, auteur, période et nombre de
 champs corrigés. Un résumé indique le nombre d'événements et de champs visibles.

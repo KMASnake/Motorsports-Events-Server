@@ -24,6 +24,18 @@ Voir `architecture/ADR-0008-DOCUMENTATION-GOVERNANCE.md`.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
 
+## 2026-08-03 — Pagination et actions Corrections
+
+- la page Corrections affiche dix corrections au maximum par page ;
+- elle reprend la navigation précédente/suivante de la liste Événements ;
+- « Accepter fournisseur » devient « Restaurer fournisseur » ;
+- l'action redondante « Conserver local » est supprimée de l'interface ;
+- « Supprimer l'override » devient « Supprimer correction » ;
+- les valeurs de statut techniques sont traduites, dont `postponed` en
+  « Reporté ».
+
+Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
+
 ## 2026-08-03 — Édition typée des corrections
 
 - une valeur référencée ou énumérée ne peut pas être modifiée par texte libre ;

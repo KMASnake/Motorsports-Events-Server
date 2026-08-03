@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.9 — 2026-08-03
+
+- limite Corrections à dix lignes par page avec navigation ;
+- simplifie et renomme les actions de résolution visibles ;
+- impose la traduction française des statuts fournisseur.
+
 ## 1.8 — 2026-08-03
 
 - impose des éditeurs de correction adaptés au type métier ;

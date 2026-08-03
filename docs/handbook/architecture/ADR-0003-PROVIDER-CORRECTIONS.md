@@ -46,3 +46,9 @@ La saisie d'un override est typée par champ. Les identifiants de championnat
 et circuit sont choisis dans leurs référentiels, le statut et la publication
 dans leurs énumérations, et les horaires via un contrôle date et heure converti
 en UTC. Le texte libre est réservé aux champs métier réellement textuels.
+
+La consultation est paginée par blocs de dix corrections. L'interface expose
+uniquement les actions métier nécessaires : modifier localement, restaurer la
+valeur fournisseur ou supprimer la correction. Le maintien de l'override est
+implicite et ne requiert pas de bouton. Les valeurs techniques affichées sont
+traduites en libellés métier français.
