@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../../design-system';
 import { deleteEvent, loadEventWorkspace, patchEvent, saveEvent, setEventPublication } from './eventApi';
 import { EventCalendarView } from './EventCalendarView';
@@ -17,6 +18,8 @@ const defaultFilters: EventFiltersState = { search: '', championship: 'all', sta
 const initialView = (): EventView => ['month','week','day','agenda','list'].includes(sessionStorage.getItem('mse-events-view') ?? '') ? sessionStorage.getItem('mse-events-view') as EventView : 'month';
 
 export function EventsPage() {
+  const [searchParams] = useSearchParams();
+  const requestedEventId = searchParams.get('event_id');
   const [rows, setRows] = useState<EventRow[]>([]);
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [circuits, setCircuits] = useState<Circuit[]>([]);
@@ -37,7 +40,9 @@ export function EventsPage() {
     try {
       const workspace = await loadEventWorkspace();
       setRows(workspace.events); setChampionships(workspace.championships); setCircuits(workspace.circuits);
-      setSelectedId((current) => current && workspace.events.some((event) => event.id === current) ? current : workspace.events[0]?.id ?? null);
+      setSelectedId((current) => requestedEventId && workspace.events.some((event) => event.id === requestedEventId)
+        ? requestedEventId
+        : current && workspace.events.some((event) => event.id === current) ? current : workspace.events[0]?.id ?? null);
     } catch (error) { setMessage({ text: (error as Error).message, error: true }); }
     finally { setLoading(false); }
   }

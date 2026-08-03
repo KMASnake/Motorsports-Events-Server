@@ -1,59 +1,86 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../design-system';
+import { filterCorrections, type CorrectionFilters, type CorrectionRow } from '../features/corrections/correctionFilters';
 import type { Championship, Circuit } from '../features/events/eventTypes';
 import { availableProviderOptions, providerLabel, providerSource } from '../features/events/providerDisplay';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
-type Correction = { id:string;event_id:string;event_name:string;championship_name:string;provider_key:string;field_name:string;provider_value:unknown;override_value:unknown;status:'active'|'conflict'|'resolved'|'ignored';created_by:string;updated_at:string };
 type References = { championships: Map<string, string>; circuits: Map<string, string> };
 
 async function call<T>(path:string,init?:RequestInit):Promise<T>{
-  const response=await fetch(API+path,init);
+  const headers=new Headers(init?.headers);if(init?.body)headers.set('content-type','application/json');
+  const response=await fetch(API+path,{...init,headers});
   if(!response.ok)throw new Error((await response.json().catch(()=>({}))).message??response.statusText);
   return response.status===204?null as T:response.json();
 }
 
 const fieldLabels:Record<string,string>={
-  championship_id:'Championnat',circuit_id:'Circuit',name:'Nom',slug:'Identifiant URL',
-  category:'Catégorie',starts_at:'Début',ends_at:'Fin',timezone:'Fuseau horaire',
-  status:'Statut',published:'Publication',description:'Description'
+  championship_id:'Championnat',circuit_id:'Circuit',name:'Nom',category:'Catégorie',
+  starts_at:'Début',ends_at:'Fin',status:'Statut',published:'Publication',description:'Description'
 };
+const initialFilters:CorrectionFilters={query:'',championship:'all',provider:'all',field:'all',status:'all',conflict:'all',author:'all',updatedFrom:'',updatedTo:'',minimumFields:1};
 
-function displayValue(row:Correction,value:unknown,references:References){
+function displayValue(row:CorrectionRow,value:unknown,references:References){
   if(value===null)return '—';
   if(typeof value==='string'&&row.field_name==='championship_id')return references.championships.get(value)??'Championnat supprimé';
   if(typeof value==='string'&&row.field_name==='circuit_id')return references.circuits.get(value)??'Circuit supprimé';
   if(typeof value==='boolean')return value?'Publié':'Non publié';
-  if(typeof value==='string'&&(row.field_name==='starts_at'||row.field_name==='ends_at'))return new Date(value).toLocaleString('fr-FR');
+  if(typeof value==='string'&&(row.field_name==='starts_at'||row.field_name==='ends_at'))return new Date(value).toLocaleString('fr-FR',{timeZone:'UTC'});
   return typeof value==='string'?value:JSON.stringify(value);
 }
 
+function editableValue(value:unknown){return typeof value==='string'?value:JSON.stringify(value)}
+function parseEditableValue(value:string,reference:unknown){
+  if(typeof reference==='boolean')return value.trim().toLowerCase()==='true';
+  if(typeof reference==='number')return Number(value);
+  if(reference===null&&value.trim()==='')return null;
+  return value;
+}
+
 export function CorrectionsPage(){
-  const [rows,setRows]=useState<Correction[]>([]);
+  const navigate=useNavigate();
+  const [rows,setRows]=useState<CorrectionRow[]>([]);
   const [references,setReferences]=useState<References>({championships:new Map(),circuits:new Map()});
-  const [query,setQuery]=useState('');const [provider,setProvider]=useState('all');const [conflicts,setConflicts]=useState(false);const [error,setError]=useState('');
+  const [filters,setFilters]=useState(initialFilters);
+  const [editingId,setEditingId]=useState<string|null>(null);const [draft,setDraft]=useState('');const [error,setError]=useState('');
+  const setFilter=<K extends keyof CorrectionFilters>(key:K,value:CorrectionFilters[K])=>setFilters((current)=>({...current,[key]:value}));
   const load=()=>Promise.all([
-    call<Correction[]>('/api/v1/admin/corrections'),
-    call<Championship[]>('/api/v1/championships'),
-    call<Circuit[]>('/api/v1/circuits')
+    call<CorrectionRow[]>('/api/v1/admin/corrections'),call<Championship[]>('/api/v1/championships'),call<Circuit[]>('/api/v1/circuits')
   ]).then(([corrections,championships,circuits])=>{
-    setRows(corrections);
-    setReferences({
-      championships:new Map(championships.map((item)=>[item.id,item.name])),
-      circuits:new Map(circuits.map((item)=>[item.id,item.name]))
-    });
-    setError('');
+    setRows(corrections);setReferences({championships:new Map(championships.map((item)=>[item.id,item.name])),circuits:new Map(circuits.map((item)=>[item.id,item.name]))});setError('');
   }).catch((reason:Error)=>setError(reason.message));
   useEffect(()=>{void load()},[]);
   const providers=useMemo(()=>availableProviderOptions(rows.map((row)=>({provider_key:row.provider_key}))),[rows]);
-  const filtered=useMemo(()=>rows.filter((row)=>(provider==='all'||providerSource(undefined,row.provider_key)===provider)&&(!conflicts||row.status==='conflict')&&`${row.event_name} ${row.championship_name} ${row.provider_key} ${fieldLabels[row.field_name]??row.field_name}`.toLowerCase().includes(query.toLowerCase())),[rows,query,provider,conflicts]);
-  async function action(id:string,name:'accept-provider'|'keep-override'|'delete'){await call(`/api/v1/admin/corrections/${id}${name==='delete'?'':`/${name}`}`,{method:name==='delete'?'DELETE':'POST'});await load()}
-  const groups=Object.values(filtered.reduce<Record<string,Correction[]>>((acc,row)=>{(acc[row.event_id]??=[]).push(row);return acc},{}));
+  const championships=useMemo(()=>[...new Map(rows.map((row)=>[row.championship_id,row.championship_name])).entries()].sort((a,b)=>a[1].localeCompare(b[1],'fr')),[rows]);
+  const fields=useMemo(()=>[...new Set(rows.map((row)=>row.field_name))].sort((a,b)=>(fieldLabels[a]??a).localeCompare(fieldLabels[b]??b,'fr')),[rows]);
+  const authors=useMemo(()=>[...new Set(rows.map((row)=>row.created_by))].sort((a,b)=>a.localeCompare(b,'fr')),[rows]);
+  const filtered=useMemo(()=>filterCorrections(rows,filters,(key)=>providerSource(undefined,key),(field)=>fieldLabels[field]??field),[rows,filters]);
+  const groups=Object.values(filtered.reduce<Record<string,CorrectionRow[]>>((acc,row)=>{(acc[row.event_id]??=[]).push(row);return acc},{}));
+  async function action(id:string,name:'accept-provider'|'keep-override'|'delete'){
+    try{await call(`/api/v1/admin/corrections/${id}${name==='delete'?'':`/${name}`}`,{method:name==='delete'?'DELETE':'POST'});await load()}catch(reason){setError((reason as Error).message)}
+  }
+  async function save(row:CorrectionRow){
+    try{await call(`/api/v1/admin/corrections/${row.id}`,{method:'PATCH',body:JSON.stringify({override_value:parseEditableValue(draft,row.override_value)})});setEditingId(null);await load()}catch(reason){setError((reason as Error).message)}
+  }
   return <><PageHeader title="CORRECTIONS" subtitle="Overrides locaux appliqués aux données fournisseur"/>
     {error&&<div className="lot3-notice error">{error}</div>}
-    <div className="corrections-toolbar"><input aria-label="Rechercher une correction" placeholder="Événement, championnat, champ…" value={query} onChange={(event)=>setQuery(event.target.value)}/><select aria-label="Fournisseur" value={provider} onChange={(event)=>setProvider(event.target.value)}><option value="all">Tous les fournisseurs</option>{providers.map((option)=><option key={option.value} value={option.value}>{option.label}</option>)}</select><label><input type="checkbox" checked={conflicts} onChange={(event)=>setConflicts(event.target.checked)}/> Conflits uniquement</label><button onClick={()=>void load()}>Actualiser</button></div>
-    <section className="corrections-list">{groups.length?groups.map((group)=><article key={group[0].event_id}><header><div><h2>{group[0].event_name}</h2><span>{group[0].championship_name} · {providerLabel(undefined,group[0].provider_key)}</span></div><b>{group.length} champ(s) corrigé(s)</b></header>
-      {group.map((row)=><div className={`correction-field ${row.status}`} key={row.id}><strong>{fieldLabels[row.field_name]??row.field_name}</strong><span><small>Fournisseur</small><del>{displayValue(row,row.provider_value,references)}</del></span><span><small>Valeur locale effective</small><ins>{displayValue(row,row.override_value,references)}</ins></span><em>{row.status==='conflict'?'Conflit':'Corrigé'}</em><small>{row.created_by} · {new Date(row.updated_at).toLocaleString('fr-FR')}</small><div><button onClick={()=>void action(row.id,'keep-override')}>Conserver local</button><button onClick={()=>void action(row.id,'accept-provider')}>Accepter fournisseur</button><button onClick={()=>void action(row.id,'delete')}>Supprimer</button></div></div>)}
-    </article>):<p className="events-loading">Aucune correction fournisseur active.</p>}</section>
+    <div className="corrections-toolbar">
+      <input aria-label="Rechercher une correction" placeholder="Événement, championnat, champ, auteur…" value={filters.query} onChange={(event)=>setFilter('query',event.target.value)}/>
+      <select aria-label="Championnat" value={filters.championship} onChange={(event)=>setFilter('championship',event.target.value)}><option value="all">Tous les championnats</option>{championships.map(([id,name])=><option key={id} value={id}>{name}</option>)}</select>
+      <select aria-label="Fournisseur" value={filters.provider} onChange={(event)=>setFilter('provider',event.target.value)}><option value="all">Tous les fournisseurs</option>{providers.map((option)=><option key={option.value} value={option.value}>{option.label}</option>)}</select>
+      <select aria-label="Champ corrigé" value={filters.field} onChange={(event)=>setFilter('field',event.target.value)}><option value="all">Tous les champs</option>{fields.map((field)=><option key={field} value={field}>{fieldLabels[field]??field}</option>)}</select>
+      <select aria-label="Statut de correction" value={filters.status} onChange={(event)=>setFilter('status',event.target.value)}><option value="all">Tous les statuts</option><option value="active">Corrigé</option><option value="conflict">Conflit</option><option value="resolved">Résolu</option><option value="ignored">Ignoré</option></select>
+      <select aria-label="Présence d’un conflit" value={filters.conflict} onChange={(event)=>setFilter('conflict',event.target.value)}><option value="all">Tous les conflits</option><option value="yes">Avec conflit</option><option value="no">Sans conflit</option></select>
+      <select aria-label="Auteur" value={filters.author} onChange={(event)=>setFilter('author',event.target.value)}><option value="all">Tous les auteurs</option>{authors.map((author)=><option key={author}>{author}</option>)}</select>
+      <select aria-label="Nombre de champs" value={filters.minimumFields} onChange={(event)=>setFilter('minimumFields',Number(event.target.value))}><option value={1}>1 champ ou plus</option><option value={2}>2 champs ou plus</option><option value={3}>3 champs ou plus</option></select>
+      <label>Du <input aria-label="Corrections modifiées depuis" type="date" value={filters.updatedFrom} onChange={(event)=>setFilter('updatedFrom',event.target.value)}/></label>
+      <label>Au <input aria-label="Corrections modifiées jusqu’au" type="date" value={filters.updatedTo} onChange={(event)=>setFilter('updatedTo',event.target.value)}/></label>
+      <button onClick={()=>setFilters(initialFilters)}>Réinitialiser</button><button onClick={()=>void load()}>Actualiser</button>
+    </div>
+    <div className="corrections-summary"><b>{groups.length}</b> événement(s) · <b>{filtered.length}</b> champ(s) affiché(s)</div>
+    <section className="corrections-list">{groups.length?groups.map((group)=><article key={group[0].event_id}><header><div><h2>{group[0].event_name}</h2><span>{group[0].championship_name} · {providerLabel(undefined,group[0].provider_key)}</span></div><div><b>{group.length} champ(s) corrigé(s)</b><button onClick={()=>navigate(`/events?event_id=${encodeURIComponent(group[0].event_id)}`)}>Ouvrir l’événement</button></div></header>
+      {group.map((row)=><div className={`correction-field ${row.status}`} key={row.id}><strong>{fieldLabels[row.field_name]??row.field_name}<small>Valeur modifiée</small></strong><span><small>Fournisseur</small><del>{displayValue(row,row.provider_value,references)}</del></span><span><small>Valeur locale effective</small>{editingId===row.id?<input aria-label={`Nouvelle valeur ${fieldLabels[row.field_name]??row.field_name}`} value={draft} onChange={(event)=>setDraft(event.target.value)}/>:<ins>{displayValue(row,row.override_value,references)}</ins>}</span><em>{row.status==='conflict'?'Conflit':row.status==='active'?'Corrigé':row.status}</em><small>{row.created_by} · {new Date(row.updated_at).toLocaleString('fr-FR')}<br/>Dernière source : {row.last_provider_seen_at?new Date(row.last_provider_seen_at).toLocaleString('fr-FR'):'—'}</small><div>{editingId===row.id?<><button onClick={()=>void save(row)}>Enregistrer</button><button onClick={()=>setEditingId(null)}>Annuler</button></>:<button onClick={()=>{setEditingId(row.id);setDraft(editableValue(row.override_value))}}>Modifier local</button>}<button onClick={()=>void action(row.id,'keep-override')}>Conserver local</button><button onClick={()=>void action(row.id,'accept-provider')}>Accepter fournisseur</button><button onClick={()=>void action(row.id,'delete')}>Supprimer l’override</button></div></div>)}
+    </article>):<p className="events-loading">Aucune correction fournisseur ne correspond aux filtres.</p>}</section>
   </>;
 }
