@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../design-system';
-import { filterCorrections, type CorrectionFilters, type CorrectionRow } from '../features/corrections/correctionFilters';
+import { CORRECTIONS_PER_PAGE, correctionPage, filterCorrections, type CorrectionFilters, type CorrectionRow } from '../features/corrections/correctionFilters';
 import { correctionEditorKind, editableCorrectionValue, parsedCorrectionValue } from '../features/corrections/correctionEditor';
 import type { Championship, Circuit } from '../features/events/eventTypes';
 import { availableProviderOptions, providerLabel, providerSource } from '../features/events/providerDisplay';
@@ -28,6 +28,7 @@ function displayValue(row:CorrectionRow,value:unknown,references:References){
   if(typeof value==='string'&&row.field_name==='circuit_id')return references.circuits.get(value)??'Circuit supprimé';
   if(typeof value==='boolean')return value?'Publié':'Non publié';
   if(typeof value==='string'&&(row.field_name==='starts_at'||row.field_name==='ends_at'))return new Date(value).toLocaleString('fr-FR',{timeZone:'UTC'});
+  if(row.field_name==='status'&&value==='postponed')return 'Reporté';
   return typeof value==='string'?value:JSON.stringify(value);
 }
 
@@ -47,8 +48,9 @@ export function CorrectionsPage(){
   const [rows,setRows]=useState<CorrectionRow[]>([]);
   const [references,setReferences]=useState<References>({championships:new Map(),circuits:new Map()});
   const [filters,setFilters]=useState(initialFilters);
+  const [page,setPage]=useState(1);
   const [editingId,setEditingId]=useState<string|null>(null);const [draft,setDraft]=useState('');const [error,setError]=useState('');
-  const setFilter=<K extends keyof CorrectionFilters>(key:K,value:CorrectionFilters[K])=>setFilters((current)=>({...current,[key]:value}));
+  const setFilter=<K extends keyof CorrectionFilters>(key:K,value:CorrectionFilters[K])=>{setFilters((current)=>({...current,[key]:value}));setPage(1)};
   const load=()=>Promise.all([
     call<CorrectionRow[]>('/api/v1/admin/corrections'),call<Championship[]>('/api/v1/championships'),call<Circuit[]>('/api/v1/circuits')
   ]).then(([corrections,championships,circuits])=>{
@@ -60,8 +62,12 @@ export function CorrectionsPage(){
   const fields=useMemo(()=>[...new Set(rows.map((row)=>row.field_name))].sort((a,b)=>(fieldLabels[a]??a).localeCompare(fieldLabels[b]??b,'fr')),[rows]);
   const authors=useMemo(()=>[...new Set(rows.map((row)=>row.created_by))].sort((a,b)=>a.localeCompare(b,'fr')),[rows]);
   const filtered=useMemo(()=>filterCorrections(rows,filters,(key)=>providerSource(undefined,key),(field)=>fieldLabels[field]??field),[rows,filters]);
-  const groups=Object.values(filtered.reduce<Record<string,CorrectionRow[]>>((acc,row)=>{(acc[row.event_id]??=[]).push(row);return acc},{}));
-  async function action(id:string,name:'accept-provider'|'keep-override'|'delete'){
+  const pageCount=Math.max(1,Math.ceil(filtered.length/CORRECTIONS_PER_PAGE));
+  const currentPage=Math.min(page,pageCount);
+  const visible=correctionPage(filtered,currentPage);
+  const allGroups=Object.values(filtered.reduce<Record<string,CorrectionRow[]>>((acc,row)=>{(acc[row.event_id]??=[]).push(row);return acc},{}));
+  const groups=Object.values(visible.reduce<Record<string,CorrectionRow[]>>((acc,row)=>{(acc[row.event_id]??=[]).push(row);return acc},{}));
+  async function action(id:string,name:'accept-provider'|'delete'){
     try{await call(`/api/v1/admin/corrections/${id}${name==='delete'?'':`/${name}`}`,{method:name==='delete'?'DELETE':'POST'});await load()}catch(reason){setError((reason as Error).message)}
   }
   async function save(row:CorrectionRow){
@@ -80,11 +86,12 @@ export function CorrectionsPage(){
       <select aria-label="Nombre de champs" value={filters.minimumFields} onChange={(event)=>setFilter('minimumFields',Number(event.target.value))}><option value={1}>1 champ ou plus</option><option value={2}>2 champs ou plus</option><option value={3}>3 champs ou plus</option></select>
       <label>Du <input aria-label="Corrections modifiées depuis" type="date" value={filters.updatedFrom} onChange={(event)=>setFilter('updatedFrom',event.target.value)}/></label>
       <label>Au <input aria-label="Corrections modifiées jusqu’au" type="date" value={filters.updatedTo} onChange={(event)=>setFilter('updatedTo',event.target.value)}/></label>
-      <button onClick={()=>setFilters(initialFilters)}>Réinitialiser</button><button onClick={()=>void load()}>Actualiser</button>
+      <button onClick={()=>{setFilters(initialFilters);setPage(1)}}>Réinitialiser</button><button onClick={()=>void load()}>Actualiser</button>
     </div>
-    <div className="corrections-summary"><b>{groups.length}</b> événement(s) · <b>{filtered.length}</b> champ(s) affiché(s)</div>
+    <div className="corrections-summary"><b>{allGroups.length}</b> événement(s) · <b>{filtered.length}</b> correction(s)</div>
     <section className="corrections-list">{groups.length?groups.map((group)=><article key={group[0].event_id}><header><div><h2>{group[0].event_name}</h2><span>{group[0].championship_name} · {providerLabel(undefined,group[0].provider_key)}</span></div><div><b>{group.length} champ(s) corrigé(s)</b><button onClick={()=>navigate(`/events?event_id=${encodeURIComponent(group[0].event_id)}`)}>Ouvrir l’événement</button></div></header>
-      {group.map((row)=><div className={`correction-field ${row.status}`} key={row.id}><strong>{fieldLabels[row.field_name]??row.field_name}<small>Valeur modifiée</small></strong><span><small>Fournisseur</small><del>{displayValue(row,row.provider_value,references)}</del></span><span><small>Valeur locale effective</small>{editingId===row.id?<CorrectionValueEditor row={row} value={draft} onChange={setDraft} references={references}/>:<ins>{displayValue(row,row.override_value,references)}</ins>}</span><em>{row.status==='conflict'?'Conflit':row.status==='active'?'Corrigé':row.status}</em><small>{row.created_by} · {new Date(row.updated_at).toLocaleString('fr-FR')}<br/>Dernière source : {row.last_provider_seen_at?new Date(row.last_provider_seen_at).toLocaleString('fr-FR'):'—'}</small><div>{editingId===row.id?<><button onClick={()=>void save(row)}>Enregistrer</button><button onClick={()=>setEditingId(null)}>Annuler</button></>:<button onClick={()=>{setEditingId(row.id);setDraft(editableCorrectionValue(row.field_name,row.override_value))}}>Modifier local</button>}<button onClick={()=>void action(row.id,'keep-override')}>Conserver local</button><button onClick={()=>void action(row.id,'accept-provider')}>Accepter fournisseur</button><button onClick={()=>void action(row.id,'delete')}>Supprimer l’override</button></div></div>)}
+      {group.map((row)=><div className={`correction-field ${row.status}`} key={row.id}><strong>{fieldLabels[row.field_name]??row.field_name}<small>Valeur modifiée</small></strong><span><small>Fournisseur</small><del>{displayValue(row,row.provider_value,references)}</del></span><span><small>Valeur locale effective</small>{editingId===row.id?<CorrectionValueEditor row={row} value={draft} onChange={setDraft} references={references}/>:<ins>{displayValue(row,row.override_value,references)}</ins>}</span><em>{row.status==='conflict'?'Conflit':row.status==='active'?'Corrigé':row.status}</em><small>{row.created_by} · {new Date(row.updated_at).toLocaleString('fr-FR')}<br/>Dernière source : {row.last_provider_seen_at?new Date(row.last_provider_seen_at).toLocaleString('fr-FR'):'—'}</small><div>{editingId===row.id?<><button onClick={()=>void save(row)}>Enregistrer</button><button onClick={()=>setEditingId(null)}>Annuler</button></>:<button onClick={()=>{setEditingId(row.id);setDraft(editableCorrectionValue(row.field_name,row.override_value))}}>Modifier local</button>}<button onClick={()=>void action(row.id,'accept-provider')}>Restaurer fournisseur</button><button onClick={()=>void action(row.id,'delete')}>Supprimer correction</button></div></div>)}
     </article>):<p className="events-loading">Aucune correction fournisseur ne correspond aux filtres.</p>}</section>
+    {filtered.length>0&&<nav className="events-pagination" aria-label="Pagination des corrections"><button disabled={currentPage<=1} onClick={()=>setPage((current)=>Math.max(1,current-1))}>‹ Précédente</button><span>Page <b>{currentPage}</b> sur <b>{pageCount}</b> · {filtered.length} corrections</span><button disabled={currentPage>=pageCount} onClick={()=>setPage((current)=>Math.min(pageCount,current+1))}>Suivante ›</button></nav>}
   </>;
 }

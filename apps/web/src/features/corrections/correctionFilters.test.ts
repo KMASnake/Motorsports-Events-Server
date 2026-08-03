@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filterCorrections, type CorrectionFilters, type CorrectionRow } from './correctionFilters';
+import { CORRECTIONS_PER_PAGE, correctionPage, filterCorrections, type CorrectionFilters, type CorrectionRow } from './correctionFilters';
 
 const row = (overrides: Partial<CorrectionRow> = {}): CorrectionRow => ({
   id: 'correction-1', event_id: 'event-1', event_name: 'Grand Prix', championship_id: 'f1',
@@ -21,5 +21,15 @@ describe('filtres Corrections', () => {
   it('filtre auteur, période et nombre de champs par événement', () => {
     const rows = [row(), row({ id: 'correction-2', field_name: 'status' }), row({ id: 'correction-3', event_id: 'event-2', created_by: 'other', updated_at: '2026-07-01T10:00:00Z' })];
     expect(filter(rows, { author: 'admin', updatedFrom: '2026-08-01', minimumFields: 2 })).toHaveLength(2);
+  });
+});
+
+describe('pagination Corrections', () => {
+  it('limite chaque page à dix corrections', () => {
+    const rows = Array.from({ length: 23 }, (_, index) => row({ id: `correction-${index}` }));
+    expect(CORRECTIONS_PER_PAGE).toBe(10);
+    expect(correctionPage(rows, 1)).toHaveLength(10);
+    expect(correctionPage(rows, 2)[0].id).toBe('correction-10');
+    expect(correctionPage(rows, 3)).toHaveLength(3);
   });
 });

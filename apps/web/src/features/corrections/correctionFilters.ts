@@ -30,6 +30,13 @@ export interface CorrectionFilters {
   minimumFields: number;
 }
 
+export const CORRECTIONS_PER_PAGE = 10;
+
+export function correctionPage(rows: CorrectionRow[], page: number): CorrectionRow[] {
+  const offset = (Math.max(1, page) - 1) * CORRECTIONS_PER_PAGE;
+  return rows.slice(offset, offset + CORRECTIONS_PER_PAGE);
+}
+
 export function filterCorrections(
   rows: CorrectionRow[],
   filters: CorrectionFilters,
