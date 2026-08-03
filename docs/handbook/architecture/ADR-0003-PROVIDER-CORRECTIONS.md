@@ -48,7 +48,7 @@ dans leurs énumérations, et les horaires via un contrôle date et heure conver
 en UTC. Le texte libre est réservé aux champs métier réellement textuels.
 
 La consultation est paginée par blocs de dix corrections. L'interface expose
-uniquement les actions métier nécessaires : modifier localement, restaurer la
-valeur fournisseur ou supprimer la correction. Le maintien de l'override est
-implicite et ne requiert pas de bouton. Les valeurs techniques affichées sont
+uniquement les actions métier nécessaires : modifier localement ou restaurer la
+valeur fournisseur. La suppression redondante et le maintien de l'override
+sont implicites et ne requièrent pas de bouton. Les valeurs techniques affichées sont
 traduites en libellés métier français.

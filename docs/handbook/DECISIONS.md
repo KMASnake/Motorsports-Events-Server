@@ -30,7 +30,8 @@ Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
 - elle reprend la navigation précédente/suivante de la liste Événements ;
 - « Accepter fournisseur » devient « Restaurer fournisseur » ;
 - l'action redondante « Conserver local » est supprimée de l'interface ;
-- « Supprimer l'override » devient « Supprimer correction » ;
+- l'action redondante de suppression de correction n'est pas exposée dans
+  l'interface, car elle produit le même résultat que restaurer fournisseur ;
 - les valeurs de statut techniques sont traduites, dont `postponed` en
   « Reporté ».
 

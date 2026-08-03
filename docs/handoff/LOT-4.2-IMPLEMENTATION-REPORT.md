@@ -80,6 +80,9 @@ Les actions visibles sont limitées à la modification locale, la restauration
 fournisseur et la suppression de la correction. Les statuts techniques sont
 traduits, notamment `postponed` en « Reporté ».
 
+L'action « Supprimer correction », identique techniquement à la restauration
+fournisseur, a été retirée de l'interface afin d'éviter toute ambiguïté.
+
 La page Corrections propose désormais des filtres combinables par recherche,
 championnat, fournisseur, champ, statut, conflit, auteur, période et nombre de
 champs corrigés. Un résumé indique le nombre d'événements et de champs visibles.

@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.9
+## Version 1.10
 
 Ce document est la source de vérité permanente du projet.
 
@@ -67,9 +67,9 @@ utilisent un contrôle calendrier avec heure et sont enregistrées en UTC. Seuls
 les champs textuels libres conservent une saisie textuelle.
 
 La page affiche au maximum dix corrections par page et utilise une navigation
-précédente/suivante. Les actions visibles sont « Modifier local », « Restaurer
-fournisseur » et « Supprimer correction » ; conserver la valeur locale ne
-nécessite aucune action supplémentaire. Les statuts métier sont toujours
+précédente/suivante. Les seules actions visibles sont « Modifier local » et
+« Restaurer fournisseur » ; conserver la valeur locale ne nécessite aucune
+action supplémentaire. Les statuts métier sont toujours
 traduits dans l'interface, notamment `postponed` en « Reporté ».
 
 ## Valeur effective

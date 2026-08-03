@@ -79,6 +79,7 @@
     "step_4_test_dataset": "12 deterministic corrections validated on isolated PostgreSQL across 4 statuses, 3 providers, 8 fields and 5 authors",
     "step_4_typed_editors": "reference and enum corrections use controlled lists; dates use datetime-local and persist UTC",
     "step_4_pagination_and_labels": "10 corrections per page, simplified resolution actions and postponed translated as Reporté",
+    "step_4_resolution_action": "Restaurer fournisseur is the sole visible override-removal action; redundant delete action remains API-compatible but is hidden",
     "lot_4_api_regression": "passed through npm run validate:lot4",
     "playwright": "7 Chromium scenarios passed in the official Playwright container",
     "known_tooling_issues": [

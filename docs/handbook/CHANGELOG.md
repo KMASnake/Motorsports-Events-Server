@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.10 — 2026-08-03
+
+- retire de l'interface l'action redondante « Supprimer correction » ;
+- conserve « Restaurer fournisseur » comme seule suppression visible d'un
+  override.
+
 ## 1.9 — 2026-08-03
 
 - limite Corrections à dix lignes par page avec navigation ;
