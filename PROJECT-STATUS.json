@@ -4,12 +4,39 @@
     "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
     "current_lot_progress": "docs/handoff/PROGRESS.json",
     "lot_specific_rules": "docs/handoff/",
-    "historical_handover": "docs/handover/"
+    "historical_handover": "docs/handover/",
+    "blocking_audit": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
+    "audit_action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md"
   },
   "repository_state": {
     "branch": "codex/lot-4.2-complete",
-    "status": "lot-4.2-in-development-not-user-validated",
-    "reason": "The Handbook is integrated and the existing Lot 4.2 implementation has been audited. Several mandatory business, synchronization, interaction and hybrid-data requirements remain incomplete."
+    "status": "lot-4.2-changes-requested-after-independent-audit",
+    "reason": "An independent audit identified four blocking P1 findings. Merge remains forbidden until remediation, final-SHA CI and explicit user validation."
+  },
+  "independent_audit": {
+    "date": "2026-08-03",
+    "document": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
+    "action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
+    "decision": "changes-requested",
+    "merge_authorized": false,
+    "new_features_authorized_before_p1_closure": false,
+    "blocking_findings": [
+      "Replace destructive startup SQL with a versioned, idempotent and reversible migration.",
+      "Publish green CI attached to the exact final branch SHA using Node >= 22 and npm >= 10.",
+      "Prove authentication and authorization for every administrative route.",
+      "Validate correction override values according to the corrected business field type."
+    ],
+    "required_sequence": [
+      "database migration safety",
+      "typed correction validation",
+      "administrative route security tests",
+      "server pagination, filter validation and mutation audit logging",
+      "concurrency, rollback and calendar interaction tests",
+      "npm high-severity advisory review",
+      "complete CI on the final SHA",
+      "Windows and isolated VPS validation",
+      "explicit user validation"
+    ]
   },
   "last_fully_validated_lot": {
     "lot": "4.1",
@@ -26,8 +53,9 @@
   "working_lot": {
     "lot": "4.2",
     "target_version": "8.1.0-alpha.2-lot.4.2",
-    "status": "in-development-not-user-validated",
+    "status": "changes-requested-after-independent-audit",
     "implementation_percent": 89,
+    "audit_remediation_percent": 0,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -52,6 +80,7 @@
       "Complete correction filters, typed local editing and event navigation"
     ],
     "mandatory_gaps": [
+      "Resolve all four blocking P1 audit findings",
       "Complete range creation, visual resize and interaction rollback tests",
       "Harden binary snapshot restore, anonymization and blocking security checks",
       "Complete local circuit and championship asset handling"
@@ -61,10 +90,10 @@
   },
   "technical_validation": {
     "audit_date": "2026-08-03",
-    "workspace_typecheck": "passed",
-    "web_build": "passed",
-    "api_build": "passed",
-    "unit_tests": "38 passed",
+    "workspace_typecheck": "passed before independent audit remediation",
+    "web_build": "passed before independent audit remediation",
+    "api_build": "passed before independent audit remediation",
+    "unit_tests": "38 passed before independent audit remediation",
     "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
     "api_health": "passed with database=true",
     "web_health": "passed",
@@ -81,8 +110,9 @@
     "step_4_pagination_and_labels": "10 corrections per page, simplified resolution actions and postponed translated as Reporté",
     "step_4_resolution_action": "Restaurer fournisseur is the sole visible override-removal action; redundant delete action remains API-compatible but is hidden",
     "step_4_user_validation": "maintainer validated the complete Corrections step on the isolated VPS on 2026-08-03",
-    "lot_4_api_regression": "passed through npm run validate:lot4",
-    "playwright": "7 Chromium scenarios passed in the official Playwright container",
+    "lot_4_api_regression": "passed through npm run validate:lot4 before independent audit remediation",
+    "playwright": "7 Chromium scenarios passed in the official Playwright container before independent audit remediation",
+    "final_sha_ci_after_audit": "pending",
     "known_tooling_issues": [
       "The local npm version is 9.2.0 while package.json requires npm >= 10.",
       "npm audit reports two high-severity advisories requiring separate compatibility review."
@@ -93,5 +123,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Continue with calendar interaction rollback and hybrid-data security work after the user-validated Step 4 Corrections milestone."
+  "next_action": "Codex must resolve the independent audit P1 findings in the prescribed order before any new feature, pull request publication or merge."
 }
