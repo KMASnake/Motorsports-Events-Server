@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, calendarPeriodLabel, eventDuration, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent, slugify } from './eventUtils';
+import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, resizeEvent, slugify } from './eventUtils';
 import type { EventRow } from './eventTypes';
 import { availableProviderOptions, providerLabel } from './providerDisplay';
 
@@ -8,7 +8,7 @@ const event = (overrides: Partial<EventRow> = {}): EventRow => ({
   championship_slug: 'formula-1', circuit_id: null, circuit_name: null,
   circuit_city: null, country_code: null, name: 'Grand Prix de France',
   slug: 'grand-prix-france', category: 'Course', starts_at: '2026-06-11T14:00:00.000Z',
-  ends_at: '2026-06-11T16:00:00.000Z', timezone: 'Europe/Paris', status: 'scheduled',
+  ends_at: '2026-06-11T16:00:00.000Z', timezone: 'UTC', status: 'scheduled',
   published: true, origin: 'manual', description: null, ...overrides
 });
 
@@ -61,5 +61,22 @@ describe('eventUtils', () => {
     expect(calendarPeriodLabel(date, 'month')).toContain('Juin 2026');
     expect(calendarPeriodLabel(date, 'week')).toContain('8 juin');
     expect(calendarPeriodLabel(date, 'day')).toContain('10 juin 2026');
+  });
+
+  it('place en premier l’événement le plus proche de la date de référence', () => {
+    const reference = new Date('2026-06-10T12:00:00Z');
+    const rows = [
+      event({ id: 'far', starts_at: '2026-07-01T12:00:00Z' }),
+      event({ id: 'nearest', starts_at: '2026-06-10T13:00:00Z' }),
+      event({ id: 'past', starts_at: '2026-06-09T12:00:00Z' })
+    ];
+    expect(nearestEventsFirst(rows, reference).map((row) => row.id)).toEqual(['nearest', 'past', 'far']);
+  });
+
+  it('pagine la liste par blocs de 25 événements', () => {
+    const rows = Array.from({ length: 52 }, (_, index) => event({ id: `event-${index + 1}` }));
+    expect(eventPage(rows, 1)).toHaveLength(25);
+    expect(eventPage(rows, 2)[0].id).toBe('event-26');
+    expect(eventPage(rows, 3).map((row) => row.id)).toEqual(['event-51', 'event-52']);
   });
 });

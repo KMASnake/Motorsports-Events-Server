@@ -41,4 +41,6 @@ export async function ensureApplicationSchema(): Promise<void> {
     conflict_detected_at timestamptz,unique(event_id,field_name))`);
   await pool.query('create index if not exists event_corrections_event_idx on event_corrections(event_id)');
   await pool.query('create index if not exists event_corrections_status_idx on event_corrections(status)');
+  await pool.query("delete from event_corrections where field_name='timezone'");
+  await pool.query("update events set timezone='UTC' where timezone is distinct from 'UTC'");
 }

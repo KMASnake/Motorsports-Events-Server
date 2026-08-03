@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { pool, withTransaction } from '../lib/db.js';
-import { deriveEventTimezone, EventMetadataError, uniqueEventSlug } from '../lib/eventMetadata.js';
+import { EVENT_STORAGE_TIMEZONE, uniqueEventSlug } from '../lib/eventMetadata.js';
 import {
   applyProviderPatch,
   lockEvent,
@@ -35,8 +35,7 @@ const eventBody = businessEventBody.extend({
 const updateBody = businessEventBody.partial();
 const providerCreateBody = businessEventBody.extend({
   provider_key: z.string().trim().min(1).max(120),
-  external_id: z.string().trim().min(1).max(300),
-  timezone: z.string().trim().min(1).max(80).optional()
+  external_id: z.string().trim().min(1).max(300)
 });
 const providerUpdateBody = eventBody.pick({
   championship_id: true,
@@ -46,7 +45,6 @@ const providerUpdateBody = eventBody.pick({
   category: true,
   starts_at: true,
   ends_at: true,
-  timezone: true,
   status: true,
   published: true,
   description: true
@@ -145,7 +143,7 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         const complete = eventBody.parse({
           ...parsed.data,
           slug: await uniqueEventSlug(client, parsed.data.name),
-          timezone: await deriveEventTimezone(client, clean(parsed.data.circuit_id)),
+          timezone: EVENT_STORAGE_TIMEZONE,
           origin: 'manual',
           provider_key: null,
           external_id: null
@@ -158,7 +156,6 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
       });
       return reply.code(201).send(created);
     } catch (error: unknown) {
-      if (error instanceof EventMetadataError) return reply.code(400).send({ message: error.message });
       const code=(error as {code?:string}).code;
       if (code==='23505') return reply.code(409).send({ message: 'Ce slug existe déjà.' });
       if (code==='23503') return reply.code(400).send({ message: 'Le championnat ou le circuit sélectionné n’existe pas.' });
@@ -180,10 +177,8 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
       const updated = await withTransaction(async (client) => {
         const current = await lockEvent(client, id);
         if (!current) return null;
-        if ('circuit_id' in patch) {
-          patch.timezone = await deriveEventTimezone(client, clean(patch.circuit_id));
-        }
         const merged = eventBody.parse({ ...current, ...patch,
+          timezone: EVENT_STORAGE_TIMEZONE,
           starts_at: new Date((patch.starts_at as string | undefined) ?? current.starts_at as string | Date).toISOString(),
           ends_at: patch.ends_at === undefined ? (current.ends_at ? new Date(current.ends_at as string | Date).toISOString() : null) : patch.ends_at
         });
@@ -199,7 +194,6 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
       return updated;
     } catch (error: unknown) {
       if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
-      if (error instanceof EventMetadataError) return reply.code(400).send({ message: error.message });
       const code=(error as {code?:string}).code;
       if (code==='23505') return reply.code(409).send({ message: 'Ce slug existe déjà.' });
       if (code==='23503') return reply.code(400).send({ message: 'Le championnat ou le circuit sélectionné n’existe pas.' });
@@ -217,7 +211,7 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         const complete = eventBody.parse({
           ...parsed.data,
           slug: await uniqueEventSlug(client, parsed.data.name),
-          timezone: parsed.data.timezone ?? await deriveEventTimezone(client, clean(parsed.data.circuit_id)),
+          timezone: EVENT_STORAGE_TIMEZONE,
           origin: 'provider'
         });
         const result = await client.query(`insert into events(
@@ -228,7 +222,6 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
       });
       return reply.code(201).send(created);
     } catch (error: unknown) {
-      if (error instanceof EventMetadataError) return reply.code(400).send({ message: error.message });
       const code=(error as {code?:string}).code;
       if (code==='23505') return reply.code(409).send({ message: 'Cet événement fournisseur existe déjà.' });
       if (code==='23503') return reply.code(400).send({ message: 'Le championnat ou le circuit sélectionné n’existe pas.' });
@@ -246,6 +239,7 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         if (!current) return null;
         const effectivePatch = await applyProviderPatch(client, current, parsed.data as CorrectableEventPatch);
         const merged = eventBody.parse({ ...current, ...effectivePatch,
+          timezone: EVENT_STORAGE_TIMEZONE,
           starts_at: new Date((effectivePatch.starts_at ?? current.starts_at) as string | Date).toISOString(),
           ends_at: effectivePatch.ends_at === undefined ? (current.ends_at ? new Date(current.ends_at as string | Date).toISOString() : null) : effectivePatch.ends_at
         });

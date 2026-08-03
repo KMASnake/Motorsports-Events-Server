@@ -42,6 +42,22 @@ export function filterEvents(events: EventRow[], filters: EventFiltersState) {
   });
 }
 
+export function nearestEventsFirst(events: EventRow[], reference = new Date()): EventRow[] {
+  const referenceTime = reference.getTime();
+  return [...events].sort((left, right) => {
+    const proximity = Math.abs(new Date(left.starts_at).getTime() - referenceTime)
+      - Math.abs(new Date(right.starts_at).getTime() - referenceTime);
+    if (proximity !== 0) return proximity;
+    const chronological = new Date(left.starts_at).getTime() - new Date(right.starts_at).getTime();
+    return chronological || left.name.localeCompare(right.name, 'fr');
+  });
+}
+
+export function eventPage(events: EventRow[], page: number, pageSize = 25): EventRow[] {
+  const safePage = Math.max(1, Math.trunc(page));
+  return events.slice((safePage - 1) * pageSize, safePage * pageSize);
+}
+
 export interface CalendarDay { date: Date; key: string; inMonth: boolean; events: EventRow[] }
 
 export function buildCalendarDays(month: Date, events: EventRow[]): CalendarDay[] {

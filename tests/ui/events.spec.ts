@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const apiUrl = process.env.API_URL ?? 'http://localhost:3001';
 
 test.describe('Événements lot 4 rev.1', () => {
-  test('affiche le calendrier par défaut et conserve la liste secondaire', async ({ page }) => {
+  test('affiche le calendrier par défaut et conserve la liste secondaire', async ({ page, request }) => {
     await page.clock.setFixedTime(new Date('2026-07-01T10:00:00+02:00'));
     await page.goto('/events');
     const calendarTab = page.getByRole('tab', { name: 'Mois' });
@@ -21,6 +21,12 @@ test.describe('Événements lot 4 rev.1', () => {
     await listTab.click();
     await expect(listTab).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByText('DATE ET HEURE')).toBeVisible();
+    const rows = await (await request.get(`${apiUrl}/api/v1/admin/events`)).json();
+    const reference = new Date('2026-07-01T08:00:00.000Z').getTime();
+    const nearest = [...rows].sort((left, right) => Math.abs(new Date(left.starts_at).getTime() - reference) - Math.abs(new Date(right.starts_at).getTime() - reference))[0];
+    await expect(page.locator('.events-list article')).toHaveCount(Math.min(25, rows.length));
+    await expect(page.locator('.events-list article').first()).toContainText(nearest.name);
+    await expect(page.getByRole('navigation', { name: 'Pagination des événements' })).toContainText('Page 1');
     await page.screenshot({ path: 'tests/ui/screenshots/events-list-1440x900.png' });
 
     await page.reload();
@@ -87,7 +93,7 @@ test.describe('Événements lot 4 rev.1', () => {
       championship_id: source.championship_id, circuit_id: source.circuit_id,
       name: 'Événement fournisseur test', category: null,
       starts_at: '2026-12-22T10:00:00.000Z', ends_at: '2026-12-22T12:00:00.000Z',
-      timezone: 'Europe/Paris', status: 'scheduled', published: true,
+      status: 'scheduled', published: true,
       provider_key: 'playwright-fixture', external_id: marker,
       description: 'Valeur fournisseur.'
     }});

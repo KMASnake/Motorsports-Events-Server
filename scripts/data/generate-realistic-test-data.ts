@@ -23,7 +23,7 @@ async function main() {
       await pool.query(
         `insert into circuits(id,name,city,country_code,timezone)
          values($1,$2,$3,$4,$5) on conflict(id) do nothing`,
-        [id('circuit', index), `Circuit test ${index + 1}`, `Ville ${index + 1}`, countries[index % countries.length], index % 2 ? 'Europe/Paris' : 'UTC']
+        [id('circuit', index), `Circuit test ${index + 1}`, `Ville ${index + 1}`, countries[index % countries.length], 'UTC']
       );
     }
     for (let index = 0; index < 96; index += 1) {
@@ -33,7 +33,7 @@ async function main() {
         `insert into events(
            id,championship_id,circuit_id,name,slug,starts_at,ends_at,timezone,status,published,
            origin,provider_key,external_id,description
-         ) values($1,$2,$3,$4,$5,$6,$7,'Europe/Paris',$8,$9,$10,$11,$12,$13)
+         ) values($1,$2,$3,$4,$5,$6,$7,'UTC',$8,$9,$10,$11,$12,$13)
          on conflict(id) do update set
            origin=excluded.origin,
            provider_key=excluded.provider_key,

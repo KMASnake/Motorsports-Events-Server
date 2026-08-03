@@ -1,6 +1,7 @@
+import { useEffect, useMemo, useState } from 'react';
 import { StatusChip as Pill } from '../../design-system';
 import { eventColor } from './eventColors';
-import { fullDate } from './eventUtils';
+import { eventPage, fullDate, nearestEventsFirst } from './eventUtils';
 import type { Championship, EventRow } from './eventTypes';
 
 const statusMeta = {
@@ -20,10 +21,16 @@ interface Props {
 }
 
 export function EventListView({ events, championships, selectedId, onSelect, onEdit, onDelete, onTogglePublication }: Props) {
+  const [page, setPage] = useState(1);
+  const ordered = useMemo(() => nearestEventsFirst(events), [events]);
+  const pageCount = Math.max(1, Math.ceil(ordered.length / 25));
+  const visible = eventPage(ordered, Math.min(page, pageCount));
+  useEffect(() => setPage(1), [events]);
+
   return <div className="events-list-wrap">
     <div className="events-list-head"><b>DATE ET HEURE</b><b>ÉVÉNEMENT</b><b>CHAMPIONNAT</b><b>CIRCUIT</b><b>STATUT</b><b>API</b><b>ACTIONS</b></div>
     <div className="events-list">
-      {events.map((event) => <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
+      {visible.map((event) => <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
         <time><strong>{fullDate(event.starts_at)}</strong><small>{event.timezone}</small></time>
         <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.name}</strong><small>{event.category || event.slug}</small></span></div>
         <div><strong>{event.championship_name}</strong><small>{event.origin === 'manual' ? 'Gestion manuelle' : event.origin === 'mixed' ? 'Gestion hybride' : 'Synchronisé'}</small></div>
@@ -34,5 +41,10 @@ export function EventListView({ events, championships, selectedId, onSelect, onE
       </article>)}
       {!events.length && <div className="events-empty">Aucun événement ne correspond aux filtres.</div>}
     </div>
+    {events.length > 0 && <nav className="events-pagination" aria-label="Pagination des événements">
+      <button disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>‹ Précédente</button>
+      <span>Page <b>{Math.min(page, pageCount)}</b> sur <b>{pageCount}</b> · {events.length} événements</span>
+      <button disabled={page >= pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}>Suivante ›</button>
+    </nav>}
   </div>;
 }

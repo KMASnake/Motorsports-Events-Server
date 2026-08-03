@@ -28,24 +28,4 @@ export async function uniqueEventSlug(
   return `${base}-${suffix}`;
 }
 
-export async function deriveEventTimezone(
-  client: PoolClient,
-  circuitId: string | null | undefined,
-  fallback = 'UTC'
-): Promise<string> {
-  if (!circuitId) return fallback;
-  const result = await client.query<{ timezone: string | null }>(
-    'select timezone from circuits where id=$1',
-    [circuitId]
-  );
-  if (!result.rowCount) throw new EventMetadataError('Le circuit sélectionné n’existe pas.');
-  const timezone = result.rows[0].timezone?.trim();
-  return timezone || fallback;
-}
-
-export class EventMetadataError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'EventMetadataError';
-  }
-}
+export const EVENT_STORAGE_TIMEZONE = 'UTC';

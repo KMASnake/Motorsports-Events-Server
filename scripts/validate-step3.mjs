@@ -46,7 +46,7 @@ try {
   expect(first.slug === 'grand-prix-etape-trois', `Slug inattendu : ${first.slug}`);
   expect(first.origin === 'manual', `Origine inattendue : ${first.origin}`);
   expect(first.provider_key === null && first.external_id === null, 'Une création manuelle contient une identité fournisseur.');
-  expect(first.timezone === circuits[0].timezone, `Fuseau non déduit du circuit : ${first.timezone}`);
+  expect(first.timezone === 'UTC', `Le fuseau de stockage doit être UTC : ${first.timezone}`);
 
   const second = await expectOk('/api/v1/admin/events', { method: 'POST', body: JSON.stringify({ ...common, starts_at: '2026-12-28T10:00:00.000Z', ends_at: null }) });
   createdIds.push(second.id);
@@ -56,7 +56,7 @@ try {
     method: 'POST', body: JSON.stringify({ ...common, name: 'Événement sans circuit', circuit_id: null, starts_at: '2026-12-29T10:00:00.000Z', ends_at: null })
   });
   createdIds.push(withoutCircuit.id);
-  expect(withoutCircuit.timezone === 'UTC', `Le repli sans circuit doit être UTC : ${withoutCircuit.timezone}`);
+  expect(withoutCircuit.timezone === 'UTC', `Le fuseau sans circuit doit être UTC : ${withoutCircuit.timezone}`);
 
   const patchTechnical = await call(`/api/v1/admin/events/${first.id}`, {
     method: 'PATCH', body: JSON.stringify({ origin: 'provider', timezone: 'UTC', slug: 'modification-interdite' })
@@ -78,7 +78,7 @@ try {
   console.log('Étape 3 API/PostgreSQL : OK');
   console.log('Slug automatique et unique : OK');
   console.log('Origine manuelle automatique : OK');
-  console.log('Fuseau circuit avec repli UTC : OK');
+  console.log('Stockage uniforme des fuseaux en UTC : OK');
   console.log('Métadonnées techniques refusées dans les mutations admin : OK');
   console.log('Ingestion fournisseur séparée et API publique inchangée : OK');
 } finally {
