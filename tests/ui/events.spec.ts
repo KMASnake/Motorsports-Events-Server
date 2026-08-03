@@ -107,7 +107,7 @@ test.describe('Événements lot 4 rev.1', () => {
     }});
     expect(created.ok()).toBeTruthy();
     const providerEvent = await created.json();
-    const patched = await page.request.patch(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`, { data: { name: 'Événement fournisseur corrigé', circuit_id: targetCircuit.id }});
+    const patched = await page.request.patch(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`, { data: { name: 'Événement fournisseur corrigé', circuit_id: targetCircuit.id, starts_at: '2026-12-22T11:30:00.000Z' }});
     expect(patched.ok()).toBeTruthy();
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
@@ -135,6 +135,16 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByText(targetCircuit.name,{exact:true})).toBeVisible();
     await expect(page.getByText(source.circuit_id,{exact:true})).toHaveCount(0);
     await expect(page.getByText(targetCircuit.id,{exact:true})).toHaveCount(0);
+    const circuitCorrection=page.locator('.correction-field').filter({hasText:'Circuit'});
+    await circuitCorrection.getByRole('button',{name:'Modifier local'}).click();
+    await expect(circuitCorrection.getByLabel('Nouvelle valeur Circuit')).toHaveValue(targetCircuit.id);
+    await expect(circuitCorrection.getByLabel('Nouvelle valeur Circuit')).toContainText(targetCircuit.name);
+    await circuitCorrection.getByRole('button',{name:'Annuler'}).click();
+    const dateCorrection=page.locator('.correction-field').filter({hasText:'Début'});
+    await dateCorrection.getByRole('button',{name:'Modifier local'}).click();
+    await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveAttribute('type','datetime-local');
+    await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveValue('2026-12-22T11:30');
+    await dateCorrection.getByRole('button',{name:'Annuler'}).click();
     await page.screenshot({path:'tests/ui/screenshots/corrections-list-1440x900.png'});
     await page.screenshot({path:'tests/ui/screenshots/corrections-conflict-1440x900.png'});
     await expect(page.getByAltText('Motorsports Events Server')).toBeVisible();

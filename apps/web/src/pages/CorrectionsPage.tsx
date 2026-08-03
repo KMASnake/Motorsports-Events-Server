@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../design-system';
 import { filterCorrections, type CorrectionFilters, type CorrectionRow } from '../features/corrections/correctionFilters';
+import { correctionEditorKind, editableCorrectionValue, parsedCorrectionValue } from '../features/corrections/correctionEditor';
 import type { Championship, Circuit } from '../features/events/eventTypes';
 import { availableProviderOptions, providerLabel, providerSource } from '../features/events/providerDisplay';
 
@@ -30,12 +31,15 @@ function displayValue(row:CorrectionRow,value:unknown,references:References){
   return typeof value==='string'?value:JSON.stringify(value);
 }
 
-function editableValue(value:unknown){return typeof value==='string'?value:JSON.stringify(value)}
-function parseEditableValue(value:string,reference:unknown){
-  if(typeof reference==='boolean')return value.trim().toLowerCase()==='true';
-  if(typeof reference==='number')return Number(value);
-  if(reference===null&&value.trim()==='')return null;
-  return value;
+function CorrectionValueEditor({row,value,onChange,references}:{row:CorrectionRow;value:string;onChange:(value:string)=>void;references:References}){
+  const label=`Nouvelle valeur ${fieldLabels[row.field_name]??row.field_name}`;
+  const kind=correctionEditorKind(row.field_name);
+  if(kind==='championship')return <select aria-label={label} value={value} onChange={(event)=>onChange(event.target.value)}>{[...references.championships].sort((a,b)=>a[1].localeCompare(b[1],'fr')).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select>;
+  if(kind==='circuit')return <select aria-label={label} value={value} onChange={(event)=>onChange(event.target.value)}><option value="">Aucun circuit</option>{[...references.circuits].sort((a,b)=>a[1].localeCompare(b[1],'fr')).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select>;
+  if(kind==='status')return <select aria-label={label} value={value} onChange={(event)=>onChange(event.target.value)}><option value="draft">Brouillon</option><option value="scheduled">Planifié</option><option value="completed">Terminé</option><option value="cancelled">Annulé</option><option value="postponed">Reporté</option></select>;
+  if(kind==='published')return <select aria-label={label} value={value} onChange={(event)=>onChange(event.target.value)}><option value="true">Publié</option><option value="false">Non publié</option></select>;
+  if(kind==='datetime')return <input aria-label={label} type="datetime-local" step="60" value={value} onChange={(event)=>onChange(event.target.value)}/>;
+  return <input aria-label={label} value={value} onChange={(event)=>onChange(event.target.value)}/>;
 }
 
 export function CorrectionsPage(){
@@ -61,7 +65,7 @@ export function CorrectionsPage(){
     try{await call(`/api/v1/admin/corrections/${id}${name==='delete'?'':`/${name}`}`,{method:name==='delete'?'DELETE':'POST'});await load()}catch(reason){setError((reason as Error).message)}
   }
   async function save(row:CorrectionRow){
-    try{await call(`/api/v1/admin/corrections/${row.id}`,{method:'PATCH',body:JSON.stringify({override_value:parseEditableValue(draft,row.override_value)})});setEditingId(null);await load()}catch(reason){setError((reason as Error).message)}
+    try{await call(`/api/v1/admin/corrections/${row.id}`,{method:'PATCH',body:JSON.stringify({override_value:parsedCorrectionValue(row.field_name,draft)})});setEditingId(null);await load()}catch(reason){setError((reason as Error).message)}
   }
   return <><PageHeader title="CORRECTIONS" subtitle="Overrides locaux appliqués aux données fournisseur"/>
     {error&&<div className="lot3-notice error">{error}</div>}
@@ -80,7 +84,7 @@ export function CorrectionsPage(){
     </div>
     <div className="corrections-summary"><b>{groups.length}</b> événement(s) · <b>{filtered.length}</b> champ(s) affiché(s)</div>
     <section className="corrections-list">{groups.length?groups.map((group)=><article key={group[0].event_id}><header><div><h2>{group[0].event_name}</h2><span>{group[0].championship_name} · {providerLabel(undefined,group[0].provider_key)}</span></div><div><b>{group.length} champ(s) corrigé(s)</b><button onClick={()=>navigate(`/events?event_id=${encodeURIComponent(group[0].event_id)}`)}>Ouvrir l’événement</button></div></header>
-      {group.map((row)=><div className={`correction-field ${row.status}`} key={row.id}><strong>{fieldLabels[row.field_name]??row.field_name}<small>Valeur modifiée</small></strong><span><small>Fournisseur</small><del>{displayValue(row,row.provider_value,references)}</del></span><span><small>Valeur locale effective</small>{editingId===row.id?<input aria-label={`Nouvelle valeur ${fieldLabels[row.field_name]??row.field_name}`} value={draft} onChange={(event)=>setDraft(event.target.value)}/>:<ins>{displayValue(row,row.override_value,references)}</ins>}</span><em>{row.status==='conflict'?'Conflit':row.status==='active'?'Corrigé':row.status}</em><small>{row.created_by} · {new Date(row.updated_at).toLocaleString('fr-FR')}<br/>Dernière source : {row.last_provider_seen_at?new Date(row.last_provider_seen_at).toLocaleString('fr-FR'):'—'}</small><div>{editingId===row.id?<><button onClick={()=>void save(row)}>Enregistrer</button><button onClick={()=>setEditingId(null)}>Annuler</button></>:<button onClick={()=>{setEditingId(row.id);setDraft(editableValue(row.override_value))}}>Modifier local</button>}<button onClick={()=>void action(row.id,'keep-override')}>Conserver local</button><button onClick={()=>void action(row.id,'accept-provider')}>Accepter fournisseur</button><button onClick={()=>void action(row.id,'delete')}>Supprimer l’override</button></div></div>)}
+      {group.map((row)=><div className={`correction-field ${row.status}`} key={row.id}><strong>{fieldLabels[row.field_name]??row.field_name}<small>Valeur modifiée</small></strong><span><small>Fournisseur</small><del>{displayValue(row,row.provider_value,references)}</del></span><span><small>Valeur locale effective</small>{editingId===row.id?<CorrectionValueEditor row={row} value={draft} onChange={setDraft} references={references}/>:<ins>{displayValue(row,row.override_value,references)}</ins>}</span><em>{row.status==='conflict'?'Conflit':row.status==='active'?'Corrigé':row.status}</em><small>{row.created_by} · {new Date(row.updated_at).toLocaleString('fr-FR')}<br/>Dernière source : {row.last_provider_seen_at?new Date(row.last_provider_seen_at).toLocaleString('fr-FR'):'—'}</small><div>{editingId===row.id?<><button onClick={()=>void save(row)}>Enregistrer</button><button onClick={()=>setEditingId(null)}>Annuler</button></>:<button onClick={()=>{setEditingId(row.id);setDraft(editableCorrectionValue(row.field_name,row.override_value))}}>Modifier local</button>}<button onClick={()=>void action(row.id,'keep-override')}>Conserver local</button><button onClick={()=>void action(row.id,'accept-provider')}>Accepter fournisseur</button><button onClick={()=>void action(row.id,'delete')}>Supprimer l’override</button></div></div>)}
     </article>):<p className="events-loading">Aucune correction fournisseur ne correspond aux filtres.</p>}</section>
   </>;
 }
