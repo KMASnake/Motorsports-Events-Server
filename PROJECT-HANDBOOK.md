@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.5
+## Version 1.6
 
 Ce document est la source de vérité permanente du projet.
 
@@ -56,6 +56,10 @@ l'override actif.
 
 ## Page Corrections
 Uniquement pour les données fournisseur. Affichage champ par champ : valeur fournisseur, valeur locale, auteur, date, statut, conflit et compteur de champs corrigés.
+
+Les filtres couvrent événement, championnat, fournisseur, champ, statut,
+conflit, auteur, période et nombre de champs. Chaque groupe permet d'ouvrir
+l'événement concerné et chaque override reste modifiable ou résoluble.
 
 ## Valeur effective
 Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle native. L'API publique expose uniquement cette valeur.

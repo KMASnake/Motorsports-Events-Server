@@ -22,6 +22,8 @@
   premier.
 - tri interactif des colonnes Date, Événement, Championnat, Circuit, Statut et
   API sur l'ensemble des pages.
+- page Corrections complétée avec filtres combinés, modification locale,
+  synthèse des résultats et ouverture directe de l'événement.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 

@@ -59,3 +59,15 @@ Voir `architecture/ADR-0004-TIMEZONES.md` et
 - tout changement de tri revient à la première page.
 
 Voir `architecture/ADR-0007-CALENDAR.md`.
+
+## 2026-08-03 — Exploitation des corrections
+
+- les filtres de Corrections sont combinables et portent sur l'ensemble des
+  dimensions métier prévues par le contrat ;
+- un override peut être modifié sans altérer sa valeur fournisseur ;
+- l'événement concerné est ouvert directement avec son panneau de détail
+  sélectionné ;
+- les actions accepter fournisseur, conserver local et supprimer l'override
+  continuent d'utiliser le service transactionnel unique.
+
+Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.

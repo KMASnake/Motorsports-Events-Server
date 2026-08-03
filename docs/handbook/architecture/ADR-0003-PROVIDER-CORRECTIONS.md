@@ -34,3 +34,10 @@ Toutes les mutations de corrections passent par le même service transactionnel.
 L'ordre de verrouillage événement puis correction est constant pour limiter les
 interblocages. Les anciennes lignes résolues peuvent être réactivées proprement
 sans migration destructive.
+
+La page d'exploitation combine les filtres événement, championnat,
+fournisseur, champ, statut, conflit, auteur, période et nombre de champs. Une
+modification locale passe par la même résolution transactionnelle. L'ouverture
+de l'événement transmet son identifiant à la page Événements, qui sélectionne
+le panneau de détail correspondant sans exposer de métadonnée dans l'API
+publique.

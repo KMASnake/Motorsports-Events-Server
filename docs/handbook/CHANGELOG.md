@@ -1,5 +1,10 @@
 # Handbook Changelog
 
+## 1.6 — 2026-08-03
+
+- complète les filtres permanents de la page Corrections ;
+- formalise la modification d'override et la navigation vers l'événement.
+
 ## 1.5 — 2026-08-03
 
 - rend les colonnes de la liste Événements triables ;

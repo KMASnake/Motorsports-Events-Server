@@ -63,6 +63,18 @@ décroissante ; les autres colonnes alternent entre ordre alphabétique croissan
 et décroissant. La recette Chromium contrôle l'ordre initial, les deux sens de
 date et le tri alphabétique.
 
+## Étape 4 — Exploitation des corrections
+
+La page Corrections propose désormais des filtres combinables par recherche,
+championnat, fournisseur, champ, statut, conflit, auteur, période et nombre de
+champs corrigés. Un résumé indique le nombre d'événements et de champs visibles.
+
+Chaque override peut être modifié en ligne, conservé, remplacé par la valeur
+fournisseur ou supprimé. Le bouton Ouvrir l'événement conduit à la page
+Événements avec le bon panneau de détail sélectionné. Deux tests unitaires
+couvrent les combinaisons de filtres et la recette Chromium couvre édition,
+réinitialisation, libellés métier et navigation.
+
 ## Résultat
 
 Le calendrier propose les vues Mois, Semaine, Jour et Agenda. Les événements

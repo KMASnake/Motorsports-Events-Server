@@ -27,7 +27,7 @@
     "lot": "4.2",
     "target_version": "8.1.0-alpha.2-lot.4.2",
     "status": "in-development-not-user-validated",
-    "implementation_percent": 80,
+    "implementation_percent": 88,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -48,10 +48,10 @@
       "Dedicated provider ingestion endpoint",
       "UTC-only event storage",
       "25-event list pagination ordered by temporal proximity",
-      "Ascending and descending list-column sorting before pagination"
+      "Ascending and descending list-column sorting before pagination",
+      "Complete correction filters, local editing and event navigation"
     ],
     "mandatory_gaps": [
-      "Complete correction resolution, filters and event navigation",
       "Complete range creation, visual resize and interaction rollback tests",
       "Harden binary snapshot restore, anonymization and blocking security checks",
       "Complete local circuit and championship asset handling"
@@ -64,7 +64,7 @@
     "workspace_typecheck": "passed",
     "web_build": "passed",
     "api_build": "passed",
-    "unit_tests": "32 passed",
+    "unit_tests": "34 passed",
     "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
     "api_health": "passed with database=true",
     "web_health": "passed",
@@ -74,6 +74,8 @@
     "step_3_user_validation": "maintainer confirmed the Step 3 VPS workflow on 2026-08-03",
     "utc_and_pagination_adjustment": "98 generated events stored only in UTC; 25-row proximity ordering validated",
     "list_sorting_adjustment": "date ascending/descending and alphabetical column sorting passed in Chromium",
+    "step_3_adjustments_user_validation": "maintainer confirmed UTC storage, pagination and list sorting on the isolated VPS on 2026-08-03",
+    "step_4_corrections": "combined filters, override editing and direct event navigation passed in Chromium",
     "lot_4_api_regression": "passed through npm run validate:lot4",
     "playwright": "7 Chromium scenarios passed in the official Playwright container",
     "known_tooling_issues": [
@@ -86,5 +88,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Validate the UTC and list-pagination adjustment on the isolated VPS, then complete Step 4 correction filters and navigation."
+  "next_action": "Validate Step 4 Corrections on the isolated VPS, then complete calendar interaction rollback and hybrid-data security work."
 }

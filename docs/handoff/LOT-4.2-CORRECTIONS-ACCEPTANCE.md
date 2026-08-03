@@ -2,62 +2,62 @@
 
 ## Édition
 
-- [ ] Événement manuel modifié directement
-- [ ] Événement fournisseur crée un override
-- [ ] Diff champ par champ
-- [ ] Valeur fournisseur conservée
-- [ ] Valeur effective appliquée
+- [x] Événement manuel modifié directement
+- [x] Événement fournisseur crée un override
+- [x] Diff champ par champ
+- [x] Valeur fournisseur conservée
+- [x] Valeur effective appliquée
 
 ## Page Corrections
 
-- [ ] Liste des corrections
-- [ ] Valeur fournisseur
-- [ ] Valeur locale
-- [ ] Événement et championnat
-- [ ] Fournisseur
-- [ ] Auteur et date
-- [ ] Statut
-- [ ] Conflit
-- [ ] Filtres
-- [ ] Actions de résolution
+- [x] Liste des corrections
+- [x] Valeur fournisseur
+- [x] Valeur locale
+- [x] Événement et championnat
+- [x] Fournisseur
+- [x] Auteur et date
+- [x] Statut
+- [x] Conflit
+- [x] Filtres
+- [x] Actions de résolution
 
 ## Synchronisation
 
-- [ ] Override jamais écrasé
-- [ ] Nouvelle valeur fournisseur mémorisée
-- [ ] Conflit détecté
-- [ ] Conserver la valeur locale
-- [ ] Accepter la valeur fournisseur
-- [ ] Retour à la valeur fournisseur résout l'override
+- [x] Override jamais écrasé
+- [x] Nouvelle valeur fournisseur mémorisée
+- [x] Conflit détecté
+- [x] Conserver la valeur locale
+- [x] Accepter la valeur fournisseur
+- [x] Retour à la valeur fournisseur résout l'override
 
 ## API
 
-- [ ] Admin expose les corrections
-- [ ] API publique expose uniquement la valeur effective
-- [ ] Métadonnées internes absentes de l'API publique
+- [x] Admin expose les corrections
+- [x] API publique expose uniquement la valeur effective
+- [x] Métadonnées internes absentes de l'API publique
 
 ## Calendrier
 
-- [ ] Valeur effective affichée
-- [ ] Indicateur de correction
-- [ ] Détail accessible dans le panneau latéral
+- [x] Valeur effective affichée
+- [x] Indicateur de correction
+- [x] Détail accessible dans le panneau latéral
 
 
 ## Mise en évidence
 
-- [ ] Champ corrigé clairement surligné
-- [ ] Valeur fournisseur visible
-- [ ] Valeur locale visible
-- [ ] Badge Corrigé
-- [ ] Badge Conflit
-- [ ] Compteur de champs corrigés
-- [ ] Regroupement par événement
-- [ ] Comparatif détail champ par champ
+- [x] Champ corrigé clairement surligné
+- [x] Valeur fournisseur visible
+- [x] Valeur locale visible
+- [x] Badge Corrigé
+- [x] Badge Conflit
+- [x] Compteur de champs corrigés
+- [x] Regroupement par événement
+- [x] Comparatif détail champ par champ
 
 ## Source manuelle
 
-- [ ] Événement manuel absent des Corrections
-- [ ] Édition manuelle sans override
-- [ ] Aucun enregistrement de correction fournisseur
-- [ ] Aucun conflit fournisseur possible
+- [x] Événement manuel absent des Corrections
+- [x] Édition manuelle sans override
+- [x] Aucun enregistrement de correction fournisseur
+- [x] Aucun conflit fournisseur possible
 - [ ] Rattachement futur sans correction rétroactive automatique

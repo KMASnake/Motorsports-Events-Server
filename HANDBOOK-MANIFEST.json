@@ -1,5 +1,5 @@
 {
-  "version": "1.5",
+  "version": "1.6",
   "file_count": 23,
   "files": [
     {
@@ -20,12 +20,12 @@
     {
       "path": "HANDBOOK-PACKAGE-INFO.json",
       "bytes": 338,
-      "sha256": "8b0766212cb2b2593c0cdb24c3d22f875921df49a706563767e5f5a12652b101"
+      "sha256": "69037fb2c607efef32ecd9cf01c50cc8e4354c2a214032158d767955734374da"
     },
     {
       "path": "PROJECT-HANDBOOK.md",
-      "bytes": 4704,
-      "sha256": "cbe9622f626586ebaaba028bc4f8bdb886f398450c9d2713337a506487982eb6"
+      "bytes": 4932,
+      "sha256": "7a01acc28b6302ffe720a456225ff744051287b6ad77c7bc6ffd2ba262666925"
     },
     {
       "path": "README-HANDBOOK.md",
@@ -34,8 +34,8 @@
     },
     {
       "path": "docs/handbook/CHANGELOG.md",
-      "bytes": 1373,
-      "sha256": "960ea34df27ce7a7f4f62869b577b9a2c724b307640e7b02a935a5e162705c1d"
+      "bytes": 1533,
+      "sha256": "699cc12798d872f809805809f817c80c2851172438d429a68400839be8c6f487"
     },
     {
       "path": "docs/handbook/CODEX-PROMPT.md",
@@ -44,8 +44,8 @@
     },
     {
       "path": "docs/handbook/DECISIONS.md",
-      "bytes": 2570,
-      "sha256": "092a96feedb1e0acde4a4d5e6fec986de9c0cfc70daec2e6f3cc6501c91caf7f"
+      "bytes": 3098,
+      "sha256": "42dae41cda8ea99f625a1e00ff10f4a87c15556472274303ad9086707c304276"
     },
     {
       "path": "docs/handbook/GITHUB-PUBLISH.md",
@@ -69,8 +69,8 @@
     },
     {
       "path": "docs/handbook/architecture/ADR-0003-PROVIDER-CORRECTIONS.md",
-      "bytes": 1439,
-      "sha256": "77d4769f9faec760816a806a99c8bf4a4f779acfea871906a6b3b4dab6f95b73"
+      "bytes": 1839,
+      "sha256": "df7419e1c9358a4b9ff0fb479fb5c18df09789a2f6419f84a50da4e4788efcce"
     },
     {
       "path": "docs/handbook/architecture/ADR-0004-TIMEZONES.md",
