@@ -17,15 +17,15 @@
 - [ ] valider sur VPS la légende dynamique sous le calendrier mensuel ;
 - [ ] valider sur VPS que les flèches avancent d'un jour en vue Jour et de sept
   jours en vue Semaine ;
-- [ ] régénérer les données VPS puis valider qu'une modification d'un événement
+- [x] régénérer les données VPS puis valider qu'une modification d'un événement
   fournisseur apparaît dans la page Corrections ;
-- [ ] vérifier sur VPS qu'une correction de circuit affiche les deux noms de
+- [x] vérifier sur VPS qu'une correction de circuit affiche les deux noms de
   circuits et non leurs identifiants techniques ;
-- [ ] valider sur VPS les filtres Fournisseur des pages Événements et
+- [x] valider sur VPS les filtres Fournisseur des pages Événements et
   Corrections ainsi que leur réinitialisation ;
-- [ ] confirmer sur VPS que les trois libellés sont OC BlackTop, TheSportsDB et
+- [x] confirmer sur VPS que les trois libellés sont OC BlackTop, TheSportsDB et
   Motorsports Events, notamment pour un ajout manuel ;
-- [ ] injecter sur VPS une source synthétique supplémentaire et confirmer son
+- [x] injecter sur VPS une source synthétique supplémentaire et confirmer son
   apparition automatique dans les deux filtres Fournisseur ;
 - [ ] vérifier sur VPS les logos locaux et configurés dans la page Championnats ;
 - [ ] exécuter la recette manuelle Windows et consigner le résultat ;

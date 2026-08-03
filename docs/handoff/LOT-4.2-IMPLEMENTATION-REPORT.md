@@ -83,6 +83,11 @@ traduits, notamment `postponed` en « Reporté ».
 L'action « Supprimer correction », identique techniquement à la restauration
 fournisseur, a été retirée de l'interface afin d'éviter toute ambiguïté.
 
+L'utilisateur a explicitement validé l'étape 4 sur l'environnement VPS isolé
+le 3 août 2026. Cette validation couvre les filtres, la pagination par dix,
+l'édition typée, la restauration fournisseur, les libellés français et la
+navigation vers l'événement. Elle ne vaut pas validation globale du Lot 4.2.
+
 La page Corrections propose désormais des filtres combinables par recherche,
 championnat, fournisseur, champ, statut, conflit, auteur, période et nombre de
 champs corrigés. Un résumé indique le nombre d'événements et de champs visibles.

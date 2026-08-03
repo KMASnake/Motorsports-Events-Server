@@ -31,6 +31,8 @@
 - pagination de Corrections par dix, libellés d'actions simplifiés et traduction
   de `postponed` en « Reporté ».
 - suppression de l'action redondante « Supprimer correction » dans l'interface.
+- étape 4 Corrections validée explicitement par l'utilisateur sur VPS isolé le
+  3 août 2026.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 

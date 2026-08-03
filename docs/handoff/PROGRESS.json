@@ -108,7 +108,7 @@
     }
   },
   "step_4": {
-    "status": "completed-technically-awaiting-user-validation",
+    "status": "user-validated-on-isolated-vps",
     "scope": "Complete correction filters, ten-row pagination, typed inline editing, simplified actions and direct event navigation.",
     "technical_validation": {
       "unit_tests": "38 passed",
@@ -119,6 +119,11 @@
       "docker": "3 isolated services healthy",
       "playwright": "7 Chromium scenarios passed with controlled lists, datetime editor, filters, editing and event navigation",
       "test_dataset": "12 deterministic corrections: 4 statuses, 3 providers, 8 fields, 5 authors and dated records"
+    },
+    "user_validation": {
+      "date": "2026-08-03",
+      "scope": "Corrections filters, ten-row pagination, typed editing, provider restoration, French labels and direct event navigation",
+      "result": "maintainer explicitly validated the step"
     }
   },
   "known_issues": [
@@ -128,7 +133,7 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Validate Step 4 Corrections on the isolated VPS, then complete calendar rollback and hybrid-data security requirements.",
+    "task": "Complete calendar rollback and hybrid-data security requirements after the validated Corrections step.",
     "target_visual_fidelity": 98
   }
 }
