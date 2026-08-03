@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.4
+## Version 1.5
 
 Ce document est la source de vérité permanente du projet.
 
@@ -64,7 +64,10 @@ Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle nati
 Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer, redimensionnement, création rapide, duplication et rollback.
 
 La vue Liste présente 25 événements par page et place en premier l'événement
-dont le début est le plus proche de la date courante.
+dont le début est le plus proche de la date courante. Ses colonnes métier sont
+triables sur l'ensemble des résultats, avant pagination : dates en ordre
+chronologique croissant ou décroissant, textes en ordre alphabétique croissant
+ou décroissant.
 
 ## Graphismes
 Les maquettes sont un contrat. Logo officiel, logos championnats, drapeaux, logos circuits, fallbacks et fidélité cible >= 98 %.

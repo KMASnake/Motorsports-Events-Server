@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.5 — 2026-08-03
+
+- rend les colonnes de la liste Événements triables ;
+- précise que le tri précède la pagination ;
+- conserve la proximité temporelle comme ordre initial.
+
 ## 1.4 — 2026-08-03
 
 - remplace la déduction des fuseaux par un stockage UTC uniforme ;

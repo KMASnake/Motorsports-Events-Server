@@ -48,3 +48,14 @@ Voir `architecture/ADR-0001-ADMINISTRATION-PHILOSOPHY.md` et
 
 Voir `architecture/ADR-0004-TIMEZONES.md` et
 `architecture/ADR-0007-CALENDAR.md`.
+
+## 2026-08-03 — Tri des listes
+
+- le tri s'applique à l'ensemble des événements filtrés avant pagination ;
+- le premier affichage conserve l'événement le plus proche de maintenant ;
+- un clic sur Date bascule entre ordre chronologique croissant et décroissant ;
+- un clic sur une colonne métier bascule entre ordre alphabétique croissant et
+  décroissant ;
+- tout changement de tri revient à la première page.
+
+Voir `architecture/ADR-0007-CALENDAR.md`.

@@ -56,6 +56,13 @@ courant. Sur le jeu déterministe de recette, 98 événements sur 98 sont stock�
 en UTC et les sept scénarios Chromium, dont le contrôle des 25 lignes et du
 premier événement, réussissent.
 
+Les en-têtes Date, Événement, Championnat, Circuit, Statut et API sont ensuite
+devenus triables. Le tri concerne les données filtrées complètes avant leur
+découpage en pages. La date alterne entre chronologie croissante et
+décroissante ; les autres colonnes alternent entre ordre alphabétique croissant
+et décroissant. La recette Chromium contrôle l'ordre initial, les deux sens de
+date et le tri alphabétique.
+
 ## Résultat
 
 Le calendrier propose les vues Mois, Semaine, Jour et Agenda. Les événements

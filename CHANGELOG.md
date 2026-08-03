@@ -20,6 +20,8 @@
 - normalisation de tous les événements en UTC sans gestion de fuseau ;
 - pagination de la vue Liste par 25 et tri de l'événement le plus proche en
   premier.
+- tri interactif des colonnes Date, Événement, Championnat, Circuit, Statut et
+  API sur l'ensemble des pages.
 
 ## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
 
