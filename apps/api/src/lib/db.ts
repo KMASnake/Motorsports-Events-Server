@@ -35,11 +35,11 @@ export async function verifyApplicationSchema(): Promise<void> {
     select
       to_regclass('public.event_corrections')::text as correction_table,
       (select count(*)::int from schema_migrations
-       where version in ('0001_event_corrections', '0002_utc_storage')) as applied_migrations
+       where version in ('0001_event_corrections', '0002_utc_storage', '0003_admin_audit_and_provider_identity')) as applied_migrations
   `);
 
   const schema = result.rows[0];
-  if (!schema?.correction_table || schema.applied_migrations !== 2) {
+  if (!schema?.correction_table || schema.applied_migrations !== 3) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }
 }

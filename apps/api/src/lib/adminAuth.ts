@@ -35,5 +35,6 @@ export function registerAdminAuth(app: FastifyInstance, secret = process.env.ADM
     let principal: AdminPrincipal;
     try { principal = verifyAdminToken(token, secret); } catch { return reply.code(401).send({ message: 'Jeton invalide ou expiré.' }); }
     if (principal.role !== 'admin') return reply.code(403).send({ message: 'Droits administrateur requis.' });
+    (request as FastifyRequest & { adminPrincipal?: AdminPrincipal }).adminPrincipal = principal;
   });
 }

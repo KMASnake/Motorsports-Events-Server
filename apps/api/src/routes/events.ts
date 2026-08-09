@@ -10,6 +10,7 @@ import {
   updateEventFields,
   type CorrectableEventPatch
 } from '../lib/eventCorrections.js';
+import { adminEventQuery, paginated, publicEventQuery } from '../lib/adminQuery.js';
 
 const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
@@ -91,12 +92,14 @@ function technicalFieldsIn(body: unknown): string[] {
 }
 
 export async function eventRoutes(app: FastifyInstance): Promise<void> {
-  app.get('/api/v1/events', async (request) => {
-    const query = request.query as { championship_id?: string; status?: string; from?: string; to?: string };
+  app.get('/api/v1/events', async (request, reply) => {
+    const parsedQuery = publicEventQuery.safeParse(request.query);
+    if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
+    const query = parsedQuery.data;
     const where = ['e.published=true', 'c.active=true', `e.status <> 'draft'`];
     const params: unknown[] = [];
     if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
-    if (query.status && eventStatus.safeParse(query.status).success) { params.push(query.status); where.push(`e.status=$${params.length}`); }
+    if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
     if (query.from) { params.push(query.from); where.push(`e.starts_at >= $${params.length}::timestamptz`); }
     if (query.to) { params.push(query.to); where.push(`e.starts_at <= $${params.length}::timestamptz`); }
     return (await pool.query(`${publicSelect} where ${where.join(' and ')} order by e.starts_at,e.name`, params)).rows;
@@ -109,16 +112,25 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
     return result.rows[0];
   });
 
-  app.get('/api/v1/admin/events', async (request) => {
-    const query = request.query as { search?: string; championship_id?: string; status?: string; published?: string; from?: string; to?: string };
+  app.get('/api/v1/admin/events', async (request, reply) => {
+    const parsedQuery = adminEventQuery.safeParse(request.query);
+    if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
+    const query = parsedQuery.data;
     const where: string[] = []; const params: unknown[] = [];
     if (query.search?.trim()) { params.push(`%${query.search.trim()}%`); where.push(`(e.name ilike $${params.length} or e.slug ilike $${params.length} or coalesce(ci.name,'') ilike $${params.length})`); }
     if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
-    if (query.status && eventStatus.safeParse(query.status).success) { params.push(query.status); where.push(`e.status=$${params.length}`); }
+    if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
     if (query.published === 'true' || query.published === 'false') { params.push(query.published === 'true'); where.push(`e.published=$${params.length}`); }
     if (query.from) { params.push(query.from); where.push(`e.starts_at >= $${params.length}::timestamptz`); }
     if (query.to) { params.push(query.to); where.push(`e.starts_at <= $${params.length}::timestamptz`); }
-    return (await pool.query(`${adminSelect}${where.length ? ` where ${where.join(' and ')}` : ''} order by e.starts_at,e.name`, params)).rows;
+    const whereSql = where.length ? ` where ${where.join(' and ')}` : '';
+    const sortColumns = { starts_at: 'e.starts_at', name: 'e.name', championship: 'c.name', status: 'e.status', updated_at: 'e.updated_at' } as const;
+    const order = `${sortColumns[query.sort]} ${query.direction},e.id asc`;
+    if (!query.page) return (await pool.query(`${adminSelect}${whereSql} order by ${order}`, params)).rows;
+    const total = Number((await pool.query(`select count(*)::int total from events e join championships c on c.id=e.championship_id left join circuits ci on ci.id=e.circuit_id${whereSql}`, params)).rows[0].total);
+    params.push(query.page_size, (query.page - 1) * query.page_size);
+    const items = (await pool.query(`${adminSelect}${whereSql} order by ${order} limit $${params.length - 1} offset $${params.length}`, params)).rows;
+    return paginated(items, total, query.page, query.page_size);
   });
 
   app.get('/api/v1/admin/events/:id', async (request, reply) => {

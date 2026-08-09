@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { pool, withTransaction } from '../lib/db.js';
 import { resolveCorrection } from '../lib/eventCorrections.js';
 import { correctionOverrideBody, correctionReference } from '../lib/correctionValue.js';
+import { correctionQuery, paginated } from '../lib/adminQuery.js';
 
 const correctionSelect = `
   select ec.*,e.name event_name,e.slug event_slug,e.championship_id,
@@ -12,14 +13,25 @@ const correctionSelect = `
 `;
 
 export async function correctionRoutes(app: FastifyInstance): Promise<void> {
-  app.get('/api/v1/admin/corrections', async (request) => {
-    const query = request.query as { status?: string; conflict?: string; event_id?: string; field?: string };
+  app.get('/api/v1/admin/corrections', async (request, reply) => {
+    const parsedQuery = correctionQuery.safeParse(request.query);
+    if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
+    const query = parsedQuery.data;
     const where: string[] = []; const params: unknown[] = [];
     if (query.status) { params.push(query.status); where.push(`ec.status=$${params.length}`); }
     if (query.conflict === 'true') where.push(`ec.status='conflict'`);
     if (query.event_id) { params.push(query.event_id); where.push(`ec.event_id=$${params.length}`); }
     if (query.field) { params.push(query.field); where.push(`ec.field_name=$${params.length}`); }
-    return (await pool.query(`${correctionSelect}${where.length ? ` where ${where.join(' and ')}` : ''} order by ec.updated_at desc`, params)).rows;
+    if (query.provider) { params.push(query.provider); where.push(`ec.provider_key=$${params.length}`); }
+    if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
+    const whereSql = where.length ? ` where ${where.join(' and ')}` : '';
+    const sortColumns = { updated_at: 'ec.updated_at', event_name: 'e.name', field_name: 'ec.field_name', status: 'ec.status' } as const;
+    const order = `${sortColumns[query.sort]} ${query.direction},ec.id asc`;
+    if (!query.page) return (await pool.query(`${correctionSelect}${whereSql} order by ${order}`, params)).rows;
+    const total = Number((await pool.query(`select count(*)::int total from event_corrections ec join events e on e.id=ec.event_id join championships c on c.id=e.championship_id${whereSql}`, params)).rows[0].total);
+    params.push(query.page_size, (query.page - 1) * query.page_size);
+    const items = (await pool.query(`${correctionSelect}${whereSql} order by ${order} limit $${params.length - 1} offset $${params.length}`, params)).rows;
+    return paginated(items, total, query.page, query.page_size);
   });
 
   app.get('/api/v1/admin/corrections/:id', async (request, reply) => {

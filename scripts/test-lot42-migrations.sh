@@ -31,12 +31,12 @@ cleanup
 docker compose up --build -d
 
 versions=$(sql "select string_agg(version, ',' order by version) from schema_migrations")
-[ "$versions" = "0001_event_corrections,0002_utc_storage" ]
+[ "$versions" = "0001_event_corrections,0002_utc_storage,0003_admin_audit_and_provider_identity" ]
 [ "$(sql "select count(*) from events where timezone <> 'UTC'")" = "0" ]
 echo "Versions : $versions"
 
 docker compose run --rm migrate >/dev/null
-[ "$(sql "select count(*) from schema_migrations")" = "2" ]
+[ "$(sql "select count(*) from schema_migrations")" = "3" ]
 
 docker compose run --rm migrate sh /migrations/migrate.sh down 0002_utc_storage >/dev/null
 sql "insert into event_corrections(id,event_id,provider_key,field_name,provider_value,override_value,status) values ('migration-timezone-probe','evt-002','legacy','timezone','\"Europe/London\"','\"UTC\"','active')"
