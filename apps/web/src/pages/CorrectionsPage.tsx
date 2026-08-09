@@ -71,7 +71,7 @@ export function CorrectionsPage(){
     try{await call(`/api/v1/admin/corrections/${id}/accept-provider`,{method:'POST'});await load()}catch(reason){setError((reason as Error).message)}
   }
   async function save(row:CorrectionRow){
-    try{await call(`/api/v1/admin/corrections/${row.id}`,{method:'PATCH',body:JSON.stringify({override_value:parsedCorrectionValue(row.field_name,draft)})});setEditingId(null);await load()}catch(reason){setError((reason as Error).message)}
+    try{await call(`/api/v1/admin/corrections/${row.id}`,{method:'PATCH',body:JSON.stringify({field_name:row.field_name,override_value:parsedCorrectionValue(row.field_name,draft)})});setEditingId(null);await load()}catch(reason){setError((reason as Error).message)}
   }
   return <><PageHeader title="CORRECTIONS" subtitle="Overrides locaux appliqués aux données fournisseur"/>
     {error&&<div className="lot3-notice error">{error}</div>}

@@ -28,7 +28,8 @@
     "test:lot4": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot4.ps1",
     "data:generate": "tsx scripts/data/generate-realistic-test-data.ts",
     "data:verify": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/data/verify-sanitized-data.ps1",
-    "test:migrations": "./scripts/test-lot42-migrations.sh"
+    "test:migrations": "./scripts/test-lot42-migrations.sh",
+    "validate:audit-step2": "node scripts/validate-audit-step2.mjs"
   },
   "engines": {
     "node": ">=22.0.0",

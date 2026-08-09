@@ -156,7 +156,8 @@ export async function resolveCorrection(
   client: PoolClient,
   correctionId: string,
   action: 'accept-provider' | 'keep-override' | 'delete-override' | 'set-override',
-  overrideValue?: unknown
+  overrideValue?: unknown,
+  expectedField?: CorrectableEventField
 ): Promise<{ deleted: boolean; correction?: CorrectionRow }> {
   const identity = await client.query(
     'select event_id from event_corrections where id=$1',
@@ -172,6 +173,9 @@ export async function resolveCorrection(
   if (!result.rowCount) throw new Error('Correction introuvable.');
   const row = result.rows[0] as CorrectionRow;
   const field = assertCorrectableField(row.field_name);
+  if (expectedField && field !== expectedField) {
+    throw new Error('Le champ de correction ne correspond pas à la correction demandée.');
+  }
 
   if (action === 'keep-override') {
     await updateEventFields(client, row.event_id, { [field]: row.override_value });
