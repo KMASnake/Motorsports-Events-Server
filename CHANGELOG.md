@@ -1,5 +1,12 @@
 # Changelog
 
+## Lot 4.2 — remédiation audit, étape 2
+
+- remplace `z.unknown()` par un schéma discriminé selon le champ corrigé ;
+- valide textes, booléens, statuts, dates UTC, valeurs nulles et références ;
+- exige `field_name` dans la mutation de correction et vérifie sa concordance ;
+- ajoute 23 tests unitaires et une recette API/PostgreSQL synthétique.
+
 ## Lot 4.2 — remédiation audit, étape 1
 
 - remplace les transformations SQL au démarrage API par deux migrations

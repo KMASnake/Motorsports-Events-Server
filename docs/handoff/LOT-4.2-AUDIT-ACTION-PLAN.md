@@ -29,12 +29,16 @@ montrant qu'un second démarrage ne modifie aucune donnée.
 
 ### Étape 2 — typage des corrections
 
-- [ ] remplacer `z.unknown()` par une validation dépendant de `field_name` ;
-- [ ] couvrir chaînes, booléens, dates UTC, statuts, références et valeurs
+- [x] remplacer `z.unknown()` par une validation dépendant de `field_name` ;
+- [x] couvrir chaînes, booléens, dates UTC, statuts, références et valeurs
   nulles autorisées ;
-- [ ] vérifier les références championnat et circuit ;
-- [ ] retourner `400` avant tout accès SQL pour une valeur incompatible ;
-- [ ] ajouter les tests de chaque type et de chaque rejet.
+- [x] vérifier les références championnat et circuit ;
+- [x] retourner `400` avant tout accès SQL pour une valeur incompatible ;
+- [x] ajouter les tests de chaque type et de chaque rejet.
+
+Statut : implémentation, 23 tests de valeurs et recette Docker PostgreSQL
+réussis localement ; confirmation VPS isolée en attente. Voir
+`LOT-4.2-AUDIT-STEP-2-ACCEPTANCE.md`.
 
 ### Étape 3 — sécurité des routes administratives
 

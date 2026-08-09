@@ -6,10 +6,13 @@
 - [x] archiver et restaurer les anciennes corrections de fuseau ;
 - [x] ajouter le validateur Docker reproductible de l'étape 1 ;
 - [x] valider l'étape 1 sur le VPS isolé ;
-- [ ] commencer ensuite le typage serveur des valeurs de correction.
+- [x] implémenter le typage serveur des valeurs de correction ;
+- [ ] valider l'étape 2 sur le VPS isolé ;
+- [ ] commencer ensuite les preuves de sécurité des routes administratives.
 
 Critère d'acceptation atteint le 2026-08-09 : le validateur de l'étape 1 a
-réussi sur le VPS. Prochaine tâche : étape 2, typage serveur des corrections.
+réussi sur le VPS. L'étape 2 est techniquement terminée et attend sa recette
+VPS avant de commencer l'étape 3.
 
 ## Lot 4.2 — validation et publication
 
