@@ -17,3 +17,4 @@ create table if not exists event_corrections (
 
 create index if not exists event_corrections_event_idx on event_corrections(event_id);
 create index if not exists event_corrections_status_idx on event_corrections(status);
+insert into schema_migrations(version) values ('0001_event_corrections') on conflict do nothing;

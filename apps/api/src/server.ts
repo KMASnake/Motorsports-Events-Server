@@ -6,10 +6,10 @@ import { catalogRoutes } from './routes/catalog.js';
 import { championshipRoutes } from './routes/championships.js';
 import { eventRoutes } from './routes/events.js';
 import { correctionRoutes } from './routes/corrections.js';
-import { ensureApplicationSchema } from './lib/db.js';
+import { verifyApplicationSchema } from './lib/db.js';
 
 const app = Fastify({ logger: true });
-await ensureApplicationSchema();
+await verifyApplicationSchema();
 await app.register(cors, { origin: true });
 
 app.addHook('onRequest', async (request) => {
