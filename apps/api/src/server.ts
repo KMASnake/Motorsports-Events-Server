@@ -7,10 +7,12 @@ import { championshipRoutes } from './routes/championships.js';
 import { eventRoutes } from './routes/events.js';
 import { correctionRoutes } from './routes/corrections.js';
 import { verifyApplicationSchema } from './lib/db.js';
+import { registerAdminAuth } from './lib/adminAuth.js';
 
 const app = Fastify({ logger: true });
 await verifyApplicationSchema();
 await app.register(cors, { origin: true });
+registerAdminAuth(app);
 
 app.addHook('onRequest', async (request) => {
   const methodHasNoExpectedBody =

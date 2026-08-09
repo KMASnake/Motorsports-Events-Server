@@ -24,6 +24,7 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql://mse:change-me@postgres:5432/motorsports_events}
       API_PORT: 3001
       NODE_ENV: development
+      ADMIN_AUTH_SECRET: ${ADMIN_AUTH_SECRET:-development-only-admin-auth-secret-change-me}
     ports:
       - "${API_HOST_PORT:-3001}:3001"
     depends_on:

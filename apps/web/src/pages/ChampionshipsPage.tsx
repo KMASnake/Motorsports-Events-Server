@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { PageHeader, Panel, StatusChip as Pill } from '../design-system';
 import { assetRegistry } from '../assets/assetRegistry';
+import { adminAuthorization } from '../lib/adminAuth';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
@@ -32,6 +33,7 @@ const emptyForm = (): FormState => ({
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
+  for (const [name, value] of Object.entries(adminAuthorization())) headers.set(name, value);
 
   if (init.body !== undefined && init.body !== null) {
     if (!headers.has('Content-Type')) {

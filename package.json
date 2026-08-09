@@ -29,7 +29,8 @@
     "data:generate": "tsx scripts/data/generate-realistic-test-data.ts",
     "data:verify": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/data/verify-sanitized-data.ps1",
     "test:migrations": "./scripts/test-lot42-migrations.sh",
-    "validate:audit-step2": "node scripts/validate-audit-step2.mjs"
+    "validate:audit-step2": "node scripts/validate-audit-step2.mjs",
+    "validate:audit-step3": "node scripts/validate-audit-step3.mjs"
   },
   "engines": {
     "node": ">=22.0.0",

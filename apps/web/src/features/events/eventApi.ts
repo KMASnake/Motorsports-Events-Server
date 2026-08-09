@@ -1,9 +1,11 @@
 import type { Championship, Circuit, EventFormState, EventRow } from './eventTypes';
+import { adminAuthorization } from '../../lib/adminAuth';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
+  for (const [name, value] of Object.entries(adminAuthorization())) headers.set(name, value);
   if (init.body !== undefined && init.body !== null) headers.set('Content-Type', 'application/json');
   const response = await fetch(`${API}${path}`, { ...init, headers });
   if (!response.ok) {

@@ -2,6 +2,7 @@ const api = process.env.API_URL ?? 'http://127.0.0.1:3001';
 
 async function call(path, options = {}) {
   const headers = new Headers(options.headers);
+  if (process.env.ADMIN_TOKEN && path.startsWith('/api/v1/admin/')) headers.set('authorization', `Bearer ${process.env.ADMIN_TOKEN}`);
   if (options.body !== undefined) headers.set('content-type', 'application/json');
   const response = await fetch(`${api}${path}`, { ...options, headers });
   const body = response.status === 204 ? null : await response.json().catch(() => null);
