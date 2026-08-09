@@ -11,8 +11,11 @@
 - [x] implémenter et tester la sécurité des routes administratives ;
 - [x] valider l'étape 3 sur le VPS isolé ;
 - [x] implémenter pagination, validation des filtres et journal d'audit ;
-- [ ] valider l'étape 4 sur le VPS isolé ;
+- [x] valider l'étape 4 sur le VPS isolé ;
 - [ ] commencer ensuite les tests de concurrence, rollback et calendrier.
+
+L'étape 4 a été validée sur VPS le 2026-08-09 : pagination/tri, filtres `400`,
+unicité fournisseur et journal sans secret ont tous réussi.
 
 L'étape 3 a été validée sur VPS le 2026-08-09 : `401`, `403`, jetons
 invalides/expirés, administrateur autorisé et API publique ont tous réussi.

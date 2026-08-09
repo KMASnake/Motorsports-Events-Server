@@ -64,8 +64,8 @@ sur VPS isolé le 2026-08-09. Voir
 - [x] vérifier ou ajouter l'unicité `(provider_key, external_id)` ;
 - [x] séparer clairement ingestion technique et création administrative.
 
-Statut : 3 tests de requêtes, migration/rollback et recette Docker PostgreSQL
-réussis localement ; confirmation VPS isolée en attente. Voir
+Statut : 3 tests de requêtes, migration/rollback et recettes Docker PostgreSQL
+réussis localement et sur VPS isolé le 2026-08-09. Voir
 `LOT-4.2-AUDIT-STEP-4-ACCEPTANCE.md`.
 
 ### Étape 5 — concurrence et interactions calendrier

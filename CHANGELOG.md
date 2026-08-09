@@ -7,6 +7,7 @@
 - ajoute la migration `0003` pour journal et unicité fournisseur ;
 - journalise les mutations avec acteur, avant/après et identifiant de requête ;
 - ajoute une fixture reproductible de 27 événements et quatre corrections.
+- consigne la réussite de la recette étape 4 sur VPS isolé le 2026-08-09.
 
 ## Lot 4.2 — remédiation audit, étape 3
 
