@@ -123,7 +123,7 @@
     "final_sha_ci_after_audit": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
-      "Step 8 Windows acceptance and explicit global Lot 4.2 validation remain pending.",
+      "The Step 8 Windows recipe is ready; its execution and explicit global Lot 4.2 validation remain pending.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
     ]
   },
@@ -132,5 +132,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Prepare Step 8 Windows acceptance and request explicit global Lot 4.2 validation only after its completion."
+  "next_action": "Run docs/handoff/LOT-4.2-AUDIT-STEP-8-ACCEPTANCE.md on Windows and request explicit global Lot 4.2 validation only after completion."
 }

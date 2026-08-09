@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 4.2 — remédiation audit, étape 8
+
+- ajoute une recette Windows finale reproductible sur une pile Docker isolée ;
+- automatise audit, lint, typecheck, tests, builds, jeu de données, validateurs
+  API et scénarios Chromium avant la validation humaine ;
+- documente les contrôles visuels, l'absence d'impact production et le nettoyage ;
+- conserve le Lot 4.2 non validé jusqu'à la confirmation explicite du mainteneur.
+
 ## Lot 4.2 — remédiation audit, étape 7
 
 - ajoute la configuration plate ESLint 9 pour les sources TypeScript ;

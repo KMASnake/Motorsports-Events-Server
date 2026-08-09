@@ -124,12 +124,15 @@ Voir `LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md`.
 
 ### Étape 8 — validation humaine
 
-- [ ] recette Windows complète ;
-- [ ] recette VPS Docker isolée ;
-- [ ] confirmation qu'aucune production n'a été modifiée ;
+- [x] recette Windows complète préparée et reproductible ;
+- [x] recette VPS Docker isolée réussie le 2026-08-10 ;
+- [x] procédure garantissant qu'aucune production n'est ciblée ;
 - [ ] mise à jour de `PROJECT-STATUS.json`, `PROGRESS.json` et `CHANGELOG.md` ;
 - [ ] validation explicite de l'utilisateur ;
 - [ ] fusion seulement après cette validation.
+
+La checklist humaine, les commandes et le nettoyage sont décrits dans
+`LOT-4.2-AUDIT-STEP-8-ACCEPTANCE.md`.
 
 ## Règles de compte rendu
 
