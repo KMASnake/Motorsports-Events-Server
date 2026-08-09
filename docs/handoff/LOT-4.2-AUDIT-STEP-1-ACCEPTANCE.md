@@ -20,7 +20,7 @@ sudo env \
 ## Résultat attendu
 
 ```text
-Versions : 0001_event_corrections,0002_utc_storage
+Versions : 0001_event_corrections,0002_utc_storage,0003_admin_audit_and_provider_identity
 Rollback et restauration : OK
 Empreinte inchangée après deux redémarrages API : <empreinte>
 Tests des migrations Lot 4.2 étape 1 : OK

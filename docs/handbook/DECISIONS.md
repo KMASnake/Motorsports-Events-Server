@@ -125,3 +125,11 @@ Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
   chemin public existant.
 
 Voir `architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.
+## 2026-08-09 — Pagination et audit administratifs
+
+- filtres et tris sont validés et exécutés avant la pagination serveur ;
+- les colonnes de tri et tailles de page sont bornées par liste blanche ;
+- chaque mutation conserve acteur, avant/après et identifiant de requête ;
+- les secrets sont retirés du journal et l'identité fournisseur est unique.
+
+Voir `architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.

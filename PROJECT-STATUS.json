@@ -55,7 +55,7 @@
     "target_version": "8.1.0-alpha.2-lot.4.2",
     "status": "changes-requested-after-independent-audit",
     "implementation_percent": 89,
-    "audit_remediation_percent": 45,
+    "audit_remediation_percent": 60,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -115,6 +115,7 @@
     "audit_step_1_migrations": "validated on 2026-08-09: typecheck, 38 unit tests, Web/API builds, isolated WSL Docker migration/rollback test and isolated VPS validator passed",
     "audit_step_2_typed_corrections": "validated on 2026-08-09: typecheck, 61 unit tests, Web/API builds and isolated Docker API/PostgreSQL validator passed locally and on VPS",
     "audit_step_3_admin_security": "validated on 2026-08-09: 69 unit tests, Web/API builds and isolated Docker security validator passed locally and on VPS; 401, 403, invalid/expired tokens, admin success and public API confirmed",
+    "audit_step_4_pagination_and_audit": "72 unit tests, Web/API builds, migration/rollback and isolated Docker validator passed; isolated VPS validation pending",
     "lint_after_audit_step_2": "blocked by pre-existing missing ESLint 9 flat configuration; no eslint.config file exists",
     "final_sha_ci_after_audit": "pending",
     "known_tooling_issues": [
@@ -127,5 +128,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Implement audit remediation Step 4: server pagination, filter validation and mutation audit logging."
+  "next_action": "Validate audit remediation Step 4 on isolated VPS, then implement concurrency, rollback and calendar interaction tests."
 }

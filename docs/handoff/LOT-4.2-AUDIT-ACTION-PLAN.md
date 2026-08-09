@@ -55,14 +55,18 @@ sur VPS isolé le 2026-08-09. Voir
 
 ### Étape 4 — API, pagination et audit
 
-- [ ] ajouter une pagination serveur aux événements et corrections ;
-- [ ] appliquer tri et filtres avant pagination ;
-- [ ] valider tous les paramètres de requête avec Zod ;
-- [ ] raccorder toutes les mutations au journal d'administration ;
-- [ ] préserver acteur, ancienne valeur, nouvelle valeur et identifiant de
+- [x] ajouter une pagination serveur aux événements et corrections ;
+- [x] appliquer tri et filtres avant pagination ;
+- [x] valider tous les paramètres de requête avec Zod ;
+- [x] raccorder toutes les mutations au journal d'administration ;
+- [x] préserver acteur, ancienne valeur, nouvelle valeur et identifiant de
   requête sans enregistrer de secret ;
-- [ ] vérifier ou ajouter l'unicité `(provider_key, external_id)` ;
-- [ ] séparer clairement ingestion technique et création administrative.
+- [x] vérifier ou ajouter l'unicité `(provider_key, external_id)` ;
+- [x] séparer clairement ingestion technique et création administrative.
+
+Statut : 3 tests de requêtes, migration/rollback et recette Docker PostgreSQL
+réussis localement ; confirmation VPS isolée en attente. Voir
+`LOT-4.2-AUDIT-STEP-4-ACCEPTANCE.md`.
 
 ### Étape 5 — concurrence et interactions calendrier
 

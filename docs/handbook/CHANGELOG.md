@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.13 — 2026-08-09
+
+- impose pagination, filtres et tris serveur validés pour l'administration ;
+- impose un journal de mutation avec acteur, avant/après et requête ;
+- rend unique l'identité fournisseur d'un événement.
+
 ## 1.12 — 2026-08-09
 
 - protège uniformément toutes les routes `/api/v1/admin/` ;

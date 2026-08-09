@@ -15,7 +15,7 @@
     "status": "changes-requested-after-independent-audit",
     "updated_at": "2026-08-09",
     "implementation_percent": 89,
-    "audit_remediation_percent": 45,
+    "audit_remediation_percent": 60,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -60,7 +60,7 @@
   "areas": {
     "docker": 100,
     "database_and_migrations": 100,
-    "api": 92,
+    "api": 96,
     "design_system_foundations": 82,
     "design_system_components": 45,
     "windows_scripts": 60,
@@ -68,7 +68,7 @@
     "championships_visual_fidelity": 95,
     "events_crud_list": 100,
     "events_calendar_interactions": 65,
-    "automated_tests": 94,
+    "automated_tests": 96,
     "corrections": 99,
     "hybrid_test_data": 50,
     "accessibility": 55
@@ -167,11 +167,12 @@
     "owner": "Codex",
     "completed_p1": 3,
     "total_p1": 4,
-    "completed_p2": 0,
+    "completed_p2": 4,
     "total_p2": 7,
     "step_1_evidence": "Validated 2026-08-09: WSL Docker migrations 0001/0002, rollback and two API restarts preserved fingerprint d9e88f61cb0d0eae6993427362356e4a; user confirmed isolated VPS validator OK",
     "step_2_evidence": "Validated 2026-08-09: 23 typed-value tests and isolated Docker API/PostgreSQL validator passed locally and on VPS; invalid types and references return 400 and offset dates normalize to UTC",
     "step_3_evidence": "Validated 2026-08-09: 8 Fastify tests and Docker validator passed locally and on VPS for 401, 403, invalid/expired tokens, admin success, legacy championship mutations and public API",
+    "step_4_evidence": "3 query tests, migration 0003 rollback and isolated Docker validator passed for pagination, filters, provider uniqueness and mutation audit; VPS confirmation pending",
     "final_sha": null,
     "final_sha_ci": "pending",
     "windows_validation": "pending",
@@ -187,7 +188,7 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Implement server pagination, filter validation and mutation audit logging for audit remediation Step 4.",
+    "task": "Validate Step 4 on isolated VPS, then implement concurrency, rollback and calendar interaction tests.",
     "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
     "target_visual_fidelity": 98
   }

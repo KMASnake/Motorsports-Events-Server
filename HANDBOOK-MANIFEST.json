@@ -1,6 +1,6 @@
 {
-  "version": "1.12",
-  "file_count": 25,
+  "version": "1.13",
+  "file_count": 26,
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/handbook-change.md",
@@ -20,12 +20,12 @@
     {
       "path": "HANDBOOK-PACKAGE-INFO.json",
       "bytes": 339,
-      "sha256": "088980ac5babf41ca3946c5edf917f923535c24089d61eca074f5cbb23ad90c7"
+      "sha256": "5a10b13bc44c64093015a005710104785e94eb03802c60ee89ac72abb2eaf2b8"
     },
     {
       "path": "PROJECT-HANDBOOK.md",
-      "bytes": 6660,
-      "sha256": "b3f0feb795031ea667f3cc122ccc8db29b9fcd915bd04ad854e35025a284fc7c"
+      "bytes": 6956,
+      "sha256": "8e4759b7032094e08e500957c9ea00418d21962225d2e2d8f20c2ed572359fe4"
     },
     {
       "path": "README-HANDBOOK.md",
@@ -34,8 +34,8 @@
     },
     {
       "path": "docs/handbook/CHANGELOG.md",
-      "bytes": 2863,
-      "sha256": "2d987a87347eb63c41fa802486864c4b02ba83d559749eab5c035e8dde8af004"
+      "bytes": 3094,
+      "sha256": "463631932fc081c899f335128780de4c176e38177f45ed1c27383f1998d0240f"
     },
     {
       "path": "docs/handbook/CODEX-PROMPT.md",
@@ -44,8 +44,8 @@
     },
     {
       "path": "docs/handbook/DECISIONS.md",
-      "bytes": 5635,
-      "sha256": "2163d7cbc0072594d343a592c12589c1a8cfd090f4667d7b482169777ff522ac"
+      "bytes": 6056,
+      "sha256": "af9e1894742761509fe8bd71818d096570e5728954ecaa134d67e95552302d72"
     },
     {
       "path": "docs/handbook/GITHUB-PUBLISH.md",
@@ -106,6 +106,11 @@
       "path": "docs/handbook/architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md",
       "bytes": 1183,
       "sha256": "8c7f43eec4bed7ee26f453859e942324ae43f499c3be8e9940a084774278850b"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md",
+      "bytes": 1000,
+      "sha256": "c75c65e9d744e9c22b7374b91df5fbb116d66c5087a2f046af5d208ab7377670"
     },
     {
       "path": "docs/handbook/calendar/CALENDAR-RULES.md",

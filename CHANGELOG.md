@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 4.2 — remédiation audit, étape 4
+
+- ajoute pagination et tri serveur validés aux événements et corrections ;
+- rejette les filtres inconnus ou incompatibles en `400` ;
+- ajoute la migration `0003` pour journal et unicité fournisseur ;
+- journalise les mutations avec acteur, avant/après et identifiant de requête ;
+- ajoute une fixture reproductible de 27 événements et quatre corrections.
+
 ## Lot 4.2 — remédiation audit, étape 3
 
 - protège toutes les routes `/api/v1/admin/` par Bearer HMAC expirant ;

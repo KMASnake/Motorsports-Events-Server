@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.12
+## Version 1.13
 
 Ce document est la source de vérité permanente du projet.
 
@@ -30,6 +30,11 @@ aucun jeton n'est embarqué dans le bundle Web. Voir
 `docs/handbook/architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.
 Les mutations historiques de championnats suivent la même protection tandis
 que leur lecture reste publique.
+
+Les listes administratives sont paginées côté serveur après validation,
+filtrage et tri. Toute mutation sensible est journalisée avec son acteur, son
+identifiant de requête et ses valeurs avant/après, sans secret. Voir
+`docs/handbook/architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.
 
 Toute évolution du schéma ou transformation de données utilise une migration
 versionnée exécutée avant l'API. Le démarrage applicatif vérifie le schéma en
