@@ -80,3 +80,18 @@ Nettoyage :
 ```bash
 sudo -E docker compose down --volumes --remove-orphans
 ```
+
+## Résultat GitHub du candidat
+
+SHA applicatif validé :
+`a5f716cc0b216e49fde9a58eb7515f8489fee2a7`.
+
+Checks réussis le 2026-08-10 :
+
+- CI complète, y compris audit, lint, 75 tests, trois builds, trois validateurs,
+  jeu de données déterministe et sept scénarios Chromium ;
+- Docker build ;
+- validation historique : 68 tests Python, quatre intégrations PostgreSQL,
+  archive de livraison, SHA-256 et publication de l'artefact.
+
+La recette VPS ci-dessus reste nécessaire avant de fermer l'étape 7.
