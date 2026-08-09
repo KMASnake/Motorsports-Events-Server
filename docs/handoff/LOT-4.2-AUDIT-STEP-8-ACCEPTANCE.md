@@ -30,6 +30,10 @@ reproductible et exécute audit, lint, typecheck, 75 tests unitaires, builds,
 contrôle bloquant des données synthétiques, validateurs API et sept scénarios
 Chromium. Il ne contacte ni ne modifie la production.
 
+Le jeton administrateur temporaire est copié dans le presse-papiers sans être
+affiché. Le coller dans l'écran d'authentification de l'interface ; il expire
+après quatre heures.
+
 Résultat de données attendu : 12 championnats, 40 circuits, 96 événements,
 32 événements fournisseur et 12 corrections.
 

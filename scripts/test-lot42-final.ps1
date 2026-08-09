@@ -53,8 +53,10 @@ try {
     docker compose down --volumes --remove-orphans 2>$null
     Invoke-Checked { docker compose up --build -d } "Le démarrage Docker a échoué."
 
+    $env:ADMIN_TOKEN_LIFETIME_SECONDS = "14400"
     $env:ADMIN_TOKEN = (node scripts/generate-admin-token.mjs).Trim()
     if (-not $env:ADMIN_TOKEN) { throw "La génération du jeton administrateur a échoué." }
+    Set-Clipboard -Value $env:ADMIN_TOKEN
 
     $env:DATABASE_URL = "postgresql://mse:lot42-final-password@127.0.0.1:55436/motorsports_events"
     Invoke-Checked { npm run data:generate -- --seed=windows-final-acceptance } "La génération des données a échoué."
@@ -69,6 +71,7 @@ try {
     Write-Host "Recette automatisée Lot 4.2 : OK" -ForegroundColor Green
     Write-Host "Interface : http://localhost:3600"
     Write-Host "API       : http://localhost:3601/health"
+    Write-Host "Le jeton administrateur temporaire a été copié dans le presse-papiers."
     Write-Host "La pile reste active pour la validation humaine."
     Write-Host "Nettoyage : .\scripts\test-lot42-final.ps1 -Cleanup"
 } finally {
