@@ -5,11 +5,11 @@
 - [x] remplacer le SQL destructif au démarrage par des migrations versionnées ;
 - [x] archiver et restaurer les anciennes corrections de fuseau ;
 - [x] ajouter le validateur Docker reproductible de l'étape 1 ;
-- [ ] valider l'étape 1 sur le VPS isolé ;
+- [x] valider l'étape 1 sur le VPS isolé ;
 - [ ] commencer ensuite le typage serveur des valeurs de correction.
 
-Critère d'acceptation : le validateur de l'étape 1 réussit sur le VPS et son
-résultat est consigné avant de commencer l'étape 2.
+Critère d'acceptation atteint le 2026-08-09 : le validateur de l'étape 1 a
+réussi sur le VPS. Prochaine tâche : étape 2, typage serveur des corrections.
 
 ## Lot 4.2 — validation et publication
 

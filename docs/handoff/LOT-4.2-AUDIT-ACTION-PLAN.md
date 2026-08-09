@@ -20,8 +20,8 @@
 - [x] fournir et tester le rollback ;
 - [x] tester localement base vierge, base existante et redémarrages successifs.
 
-Statut : implémentation et tests automatisés terminés ; recette VPS isolée en
-attente de confirmation utilisateur. Voir
+Statut : étape validée techniquement sur WSL et confirmée par l'utilisateur sur
+un VPS Docker isolé le 2026-08-09. Voir
 `LOT-4.2-AUDIT-STEP-1-ACCEPTANCE.md`.
 
 Preuves attendues : migration, tests PostgreSQL, commandes exécutées et résultat

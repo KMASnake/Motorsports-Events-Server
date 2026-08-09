@@ -9,6 +9,7 @@
 - transmet explicitement le mot de passe au client PostgreSQL du service de
   migration ;
 - ajoute un test Docker isolé couvrant idempotence, rollback et redémarrages.
+- consigne la réussite de cette recette sur le VPS isolé le 2026-08-09.
 
 ## Non publié — Intégration du Handbook et audit du Lot 4.2
 
