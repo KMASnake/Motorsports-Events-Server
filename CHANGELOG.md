@@ -6,6 +6,8 @@
   PostgreSQL versionnées ;
 - archive les anciennes corrections de fuseau et fournit leur rollback ;
 - impose l'exécution du service de migration avant l'API ;
+- transmet explicitement le mot de passe au client PostgreSQL du service de
+  migration ;
 - ajoute un test Docker isolé couvrant idempotence, rollback et redémarrages.
 
 ## Non publié — Intégration du Handbook et audit du Lot 4.2

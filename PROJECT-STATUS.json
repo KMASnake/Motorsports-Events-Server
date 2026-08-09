@@ -112,7 +112,7 @@
     "step_4_user_validation": "maintainer validated the complete Corrections step on the isolated VPS on 2026-08-03",
     "lot_4_api_regression": "passed through npm run validate:lot4 before independent audit remediation",
     "playwright": "7 Chromium scenarios passed in the official Playwright container before independent audit remediation",
-    "audit_step_1_migrations": "typecheck, 38 unit tests and Web/API builds passed; isolated VPS Docker validation pending",
+    "audit_step_1_migrations": "typecheck, 38 unit tests, Web/API builds and isolated WSL Docker migration/rollback test passed (fingerprint d9e88f61cb0d0eae6993427362356e4a); isolated VPS validation pending",
     "final_sha_ci_after_audit": "pending",
     "known_tooling_issues": [
       "The local npm version is 9.2.0 while package.json requires npm >= 10.",

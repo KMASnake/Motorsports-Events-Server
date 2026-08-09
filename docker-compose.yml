@@ -41,6 +41,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-motorsports_events}
       POSTGRES_USER: ${POSTGRES_USER:-mse}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-change-me}
       PGHOST: postgres
       PGPORT: 5432
     depends_on:

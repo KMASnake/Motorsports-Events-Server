@@ -169,6 +169,7 @@
     "total_p1": 4,
     "completed_p2": 0,
     "total_p2": 7,
+    "step_1_evidence": "WSL Docker validator passed; migrations 0001/0002, rollback and two API restarts preserved fingerprint d9e88f61cb0d0eae6993427362356e4a",
     "final_sha": null,
     "final_sha_ci": "pending",
     "windows_validation": "pending",
