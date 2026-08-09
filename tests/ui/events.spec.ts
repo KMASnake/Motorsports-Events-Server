@@ -1,8 +1,14 @@
 import { expect, test } from '@playwright/test';
 
 const apiUrl = process.env.API_URL ?? 'http://localhost:3001';
+const adminToken = process.env.ADMIN_TOKEN;
 
 test.describe('Événements lot 4 rev.1', () => {
+  test.use({ extraHTTPHeaders: adminToken ? { authorization: `Bearer ${adminToken}` } : {} });
+  test.beforeEach(async ({ page }) => {
+    if (!adminToken) throw new Error('ADMIN_TOKEN est requis pour la recette UI administrative.');
+    await page.addInitScript((token) => sessionStorage.setItem('mse_admin_token', token), adminToken);
+  });
   test('affiche le calendrier par défaut et conserve la liste secondaire', async ({ page, request }) => {
     await page.clock.setFixedTime(new Date('2026-07-01T10:00:00+02:00'));
     await page.goto('/events');

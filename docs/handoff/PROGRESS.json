@@ -13,9 +13,9 @@
     "lot": "4.2",
     "version": "8.1.0-alpha.2-lot.4.2",
     "status": "changes-requested-after-independent-audit",
-    "updated_at": "2026-08-09",
+    "updated_at": "2026-08-10",
     "implementation_percent": 92,
-    "audit_remediation_percent": 85,
+    "audit_remediation_percent": 95,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -194,22 +194,21 @@
     "step_5_evidence": "Validated 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS for concurrent resolutions, provider/admin serialization, transactional/visual rollback, ranges, midnight and DST",
     "step_6_evidence": "Validated 2026-08-09: current audit reproduced nanoid GHSA-2v37-7h3g-55p8 only; lock upgraded 3.3.16 to 3.3.18; npm audit zero; 75 tests, typecheck and API/Web/Types builds passed locally and under Node 22/npm 10 on isolated VPS",
     "final_sha": null,
-    "final_sha_ci": "pending",
+    "final_sha_ci": "candidate-prepared-local-suite-passed-github-checks-pending",
     "windows_validation": "pending",
     "isolated_vps_validation": "steps-1-through-6-passed-2026-08-09; final-lot-validation-pending",
     "explicit_user_validation": "pending"
   },
   "known_issues": [
     "The final SHA CI P1 remains open; Steps 1 through 3 are validated on isolated VPS.",
-    "Final-SHA CI remains open and must include a working ESLint 9 configuration.",
+    "The Step 7 candidate passed the complete local suite; exact-SHA GitHub checks and isolated VPS confirmation remain pending.",
     "The Agenda view works as a 30-day chronological presentation, but its purpose is not sufficiently clear to the maintainer and requires a later UX clarification.",
     "The local npm version is below the declared npm >= 10 engine requirement.",
-    "ESLint 9 cannot run because the repository has no eslint.config flat configuration.",
-    "ESLint 9 flat configuration remains required before final-SHA CI can pass."
+    "Global Lot 4.2 validation remains pending after technical Step 7 checks."
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Implement Step 7 final-SHA CI, beginning with the missing ESLint 9 flat configuration.",
+    "task": "Confirm green GitHub checks and run the Step 7 acceptance recipe on the exact candidate SHA.",
     "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
     "target_visual_fidelity": 98
   }

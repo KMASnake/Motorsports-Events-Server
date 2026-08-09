@@ -1,5 +1,5 @@
 const api=process.env.API_URL??'http://localhost:3001';const marker=`lot4-test-${Date.now()}`;
-async function call(path,options={}){const headers={...(options.headers??{})};if(options.body!==undefined&&options.body!==null)headers['content-type']??='application/json';else delete headers['content-type'];const r=await fetch(api+path,{...options,headers});const body=r.status===204?null:await r.json().catch(()=>null);if(!r.ok)throw new Error(`${options.method??'GET'} ${path} -> ${r.status}: ${JSON.stringify(body)}`);return body}
+async function call(path,options={}){const headers={...(options.headers??{})};if(process.env.ADMIN_TOKEN&&path.startsWith('/api/v1/admin/'))headers.authorization=`Bearer ${process.env.ADMIN_TOKEN}`;if(options.body!==undefined&&options.body!==null)headers['content-type']??='application/json';else delete headers['content-type'];const r=await fetch(api+path,{...options,headers});const body=r.status===204?null:await r.json().catch(()=>null);if(!r.ok)throw new Error(`${options.method??'GET'} ${path} -> ${r.status}: ${JSON.stringify(body)}`);return body}
 console.log('=== API health ===');console.log(await call('/health'));
 console.log('\n=== CRUD événements ===');
 const championships=await call('/api/v1/championships');const circuits=await call('/api/v1/circuits');if(!championships.length)throw new Error('Aucun championnat disponible.');

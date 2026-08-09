@@ -18,10 +18,11 @@ async function securedApp() {
 }
 
 describe('administrative route authentication', () => {
-  it.each(['/api/v1/admin/events', '/api/v1/admin/provider-events', '/api/v1/admin/corrections'])
-    ('returns 401 without authentication for %s', async (url) => {
+  it.each(['/api/v1/admin/events', '/api/v1/admin/provider-events', '/api/v1/admin/corrections'])(
+    'returns 401 without authentication for %s', async (url) => {
       const app = await securedApp(); expect((await app.inject({ url })).statusCode).toBe(401); await app.close();
-    });
+    }
+  );
   it('returns 401 for invalid and expired tokens', async () => {
     const app = await securedApp();
     expect((await app.inject({ url: '/api/v1/admin/events', headers: { authorization: 'Bearer invalid' } })).statusCode).toBe(401);

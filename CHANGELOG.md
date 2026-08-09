@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 4.2 — remédiation audit, étape 7
+
+- ajoute la configuration plate ESLint 9 pour les sources TypeScript ;
+- impose Node 22, npm 10, `npm ci`, audit, lint, tests et builds dans la CI ;
+- démarre une pile Docker/PostgreSQL isolée pour les validateurs obligatoires ;
+- génère le jeu de données déterministe avant les sept scénarios Chromium ;
+- transmet l'authentification administrative aux recettes historiques.
+
 ## Lot 4.2 — remédiation audit, étape 6
 
 - identifie `nanoid` comme dépendance transitive de PostCSS/Vite concernée par

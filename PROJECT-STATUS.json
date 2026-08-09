@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-09",
+  "generated_at": "2026-08-10",
   "documentation": {
     "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
     "current_lot_progress": "docs/handoff/PROGRESS.json",
@@ -55,7 +55,7 @@
     "target_version": "8.1.0-alpha.2-lot.4.2",
     "status": "changes-requested-after-independent-audit",
     "implementation_percent": 92,
-    "audit_remediation_percent": 85,
+    "audit_remediation_percent": 95,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -118,11 +118,12 @@
     "audit_step_4_pagination_and_audit": "validated on 2026-08-09: 72 unit tests, Web/API builds, migration/rollback and isolated Docker validator passed locally and on VPS; pagination, invalid filters, provider uniqueness and secret-free audit confirmed",
     "audit_step_5_concurrency_and_calendar": "validated on 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS; graphical range creation, movement, resize and persistence confirmed by maintainer; Agenda UX clarification noted",
     "audit_step_6_dependencies": "validated on 2026-08-09: nanoid GHSA-2v37-7h3g-55p8 identified as transitive PostCSS/Vite build dependency, lock upgraded from 3.3.16 to 3.3.18, npm audit zero; 75 tests, typecheck and API/Web/Types builds passed locally and under Node 22/npm 10 on isolated VPS",
-    "lint_after_audit_step_2": "blocked by pre-existing missing ESLint 9 flat configuration; no eslint.config file exists",
-    "final_sha_ci_after_audit": "pending",
+    "lint_after_audit_step_2": "resolved in Step 7 with eslint.config.mjs; Web and API lint pass locally",
+    "audit_step_7_final_sha_ci": "candidate prepared on 2026-08-10: npm audit zero, ESLint 9, 75 tests, typecheck, API/Web/Types builds, Lot 4/Step 2/Step 3 validators, Docker and 7 Chromium scenarios passed locally; exact-SHA GitHub checks and VPS confirmation pending",
+    "final_sha_ci_after_audit": "candidate-prepared-github-checks-pending",
     "known_tooling_issues": [
-      "The local npm version is 9.2.0 while package.json requires npm >= 10.",
-      "Final-SHA CI remains pending and requires a working ESLint 9 flat configuration.",
+      "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
+      "Exact-SHA GitHub checks and isolated VPS Step 7 confirmation remain pending.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
     ]
   },
@@ -131,5 +132,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Implement Step 7 final-SHA CI, including ESLint 9 flat configuration and every mandatory validation command on the exact branch SHA."
+  "next_action": "Publish the Step 7 candidate, confirm every GitHub check on its exact SHA and run the isolated VPS acceptance recipe."
 }
