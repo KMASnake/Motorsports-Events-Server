@@ -50,3 +50,18 @@ Le lint reste un contrôle distinct : ESLint 9 ne peut pas démarrer tant que le
 dépôt ne contient pas de fichier `eslint.config.*`. Ce défaut préexistant n'est
 ni causé ni masqué par la correction de `nanoid` et devra être résolu avant la
 validation finale du SHA.
+
+## Résultat VPS
+
+Validation confirmée par le mainteneur le 2026-08-09 dans l'image officielle
+`node:22-alpine` avec npm 10.9.8 :
+
+- installation verrouillée : 270 paquets, zéro vulnérabilité ;
+- `npm audit` : zéro vulnérabilité ;
+- typecheck API, Web et Types : réussi ;
+- tests API : 48 réussis ;
+- tests Web : 27 réussis ;
+- builds API, Web et Types : réussis.
+
+Cette validation ferme l'étape 6. Elle ne constitue pas la validation globale
+du Lot 4.2 ni celle du SHA final.

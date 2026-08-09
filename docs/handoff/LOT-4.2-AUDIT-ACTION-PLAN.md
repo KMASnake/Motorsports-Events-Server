@@ -91,8 +91,8 @@ confirmées par l'utilisateur sur VPS isolé le 2026-08-09. Voir
 
 Statut : l'audit courant reproduit un seul avis, `nanoid`
 `GHSA-2v37-7h3g-55p8`. Le verrou passe de `3.3.16` à `3.3.18` et `npm audit`
-retourne zéro vulnérabilité. Tests, builds et Docker réussis localement le
-2026-08-09 ; confirmation VPS requise. Voir
+retourne zéro vulnérabilité. Tests, builds et Docker réussis localement puis
+confirmés par l'utilisateur sous Node 22/npm 10 sur VPS isolé le 2026-08-09. Voir
 `LOT-4.2-AUDIT-STEP-6-ACCEPTANCE.md`.
 
 ### Étape 7 — validation finale du SHA

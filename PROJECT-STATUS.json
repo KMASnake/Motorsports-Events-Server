@@ -117,12 +117,12 @@
     "audit_step_3_admin_security": "validated on 2026-08-09: 69 unit tests, Web/API builds and isolated Docker security validator passed locally and on VPS; 401, 403, invalid/expired tokens, admin success and public API confirmed",
     "audit_step_4_pagination_and_audit": "validated on 2026-08-09: 72 unit tests, Web/API builds, migration/rollback and isolated Docker validator passed locally and on VPS; pagination, invalid filters, provider uniqueness and secret-free audit confirmed",
     "audit_step_5_concurrency_and_calendar": "validated on 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS; graphical range creation, movement, resize and persistence confirmed by maintainer; Agenda UX clarification noted",
-    "audit_step_6_dependencies": "implemented on 2026-08-09: nanoid GHSA-2v37-7h3g-55p8 identified as transitive PostCSS/Vite build dependency, lock upgraded from 3.3.16 to 3.3.18, npm audit zero; 75 tests, Web/API builds and isolated Docker passed locally; VPS confirmation pending",
+    "audit_step_6_dependencies": "validated on 2026-08-09: nanoid GHSA-2v37-7h3g-55p8 identified as transitive PostCSS/Vite build dependency, lock upgraded from 3.3.16 to 3.3.18, npm audit zero; 75 tests, typecheck and API/Web/Types builds passed locally and under Node 22/npm 10 on isolated VPS",
     "lint_after_audit_step_2": "blocked by pre-existing missing ESLint 9 flat configuration; no eslint.config file exists",
     "final_sha_ci_after_audit": "pending",
     "known_tooling_issues": [
       "The local npm version is 9.2.0 while package.json requires npm >= 10.",
-      "The npm dependency correction requires isolated VPS confirmation.",
+      "Final-SHA CI remains pending and requires a working ESLint 9 flat configuration.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
     ]
   },
@@ -131,5 +131,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Validate audit remediation Step 6 on the isolated VPS; then prepare Step 7 final-SHA CI, including the missing ESLint 9 flat configuration."
+  "next_action": "Implement Step 7 final-SHA CI, including ESLint 9 flat configuration and every mandatory validation command on the exact branch SHA."
 }
