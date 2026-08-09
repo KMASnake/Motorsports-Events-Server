@@ -117,8 +117,9 @@ Statut : tous les contrôles ont réussi localement le 2026-08-10, dont ESLint 9
 75 tests, les trois validateurs API/PostgreSQL, les builds Docker, sept scénarios
 Chromium dans l'image officielle et l'archive historique réextraite avec son
 SHA-256. Les workflows GitHub CI, Docker et validation historique sont verts
-sur `a5f716cc0b216e49fde9a58eb7515f8489fee2a7`. Recette VPS requise avant
-fermeture.
+sur `a5f716cc0b216e49fde9a58eb7515f8489fee2a7`. La recette VPS complète,
+incluant les sept scénarios Chromium, a été confirmée par l'utilisateur le
+2026-08-10 : étape fermée techniquement.
 Voir `LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md`.
 
 ### Étape 8 — validation humaine

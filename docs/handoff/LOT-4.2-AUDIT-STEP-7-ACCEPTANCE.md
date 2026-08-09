@@ -94,4 +94,20 @@ Checks réussis le 2026-08-10 :
 - validation historique : 68 tests Python, quatre intégrations PostgreSQL,
   archive de livraison, SHA-256 et publication de l'artefact.
 
-La recette VPS ci-dessus reste nécessaire avant de fermer l'étape 7.
+## Résultat VPS
+
+Validation confirmée par le mainteneur le 2026-08-10 :
+
+- installation de 289 paquets et `npm audit` à zéro vulnérabilité ;
+- typecheck et lint API/Web réussis ;
+- 48 tests API et 27 tests Web réussis ;
+- builds API, Web et Types réussis ;
+- jeu déterministe : 12 championnats, 40 circuits, 96 événements, 32 événements
+  fournisseur et 12 corrections ;
+- validateurs Lot 4, Étape 2 et Étape 3 réussis ;
+- sept scénarios Chromium réussis dans l'image Playwright officielle.
+
+L'avertissement npm `allow-scripts` concernant le postinstall d'`esbuild` est
+informatif : l'installation, le build Vite et la recette Chromium ont réussi.
+L'étape 7 est fermée techniquement. La validation globale du Lot 4.2 relève de
+l'étape 8.

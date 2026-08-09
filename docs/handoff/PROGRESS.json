@@ -196,18 +196,18 @@
     "final_sha": "a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
     "final_sha_ci": "green",
     "windows_validation": "pending",
-    "isolated_vps_validation": "steps-1-through-6-passed-2026-08-09; final-lot-validation-pending",
+    "isolated_vps_validation": "steps-1-through-7-passed; step-7-confirmed-2026-08-10; final-lot-validation-pending",
     "explicit_user_validation": "pending"
   },
   "known_issues": [
-    "The Step 7 candidate passed the complete local suite and exact-SHA GitHub checks; isolated VPS confirmation remains pending.",
+    "The Step 7 candidate passed the complete local suite, exact-SHA GitHub checks and isolated VPS confirmation.",
     "The Agenda view works as a 30-day chronological presentation, but its purpose is not sufficiently clear to the maintainer and requires a later UX clarification.",
     "The local npm version is below the declared npm >= 10 engine requirement.",
     "Global Lot 4.2 validation remains pending after technical Step 7 checks."
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Run the Step 7 acceptance recipe on the exact candidate SHA in the isolated VPS environment.",
+    "task": "Prepare Step 8 Windows and final human acceptance without treating technical success as global Lot 4.2 validation.",
     "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
     "target_visual_fidelity": 98
   }

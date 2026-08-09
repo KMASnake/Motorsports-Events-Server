@@ -119,11 +119,11 @@
     "audit_step_5_concurrency_and_calendar": "validated on 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS; graphical range creation, movement, resize and persistence confirmed by maintainer; Agenda UX clarification noted",
     "audit_step_6_dependencies": "validated on 2026-08-09: nanoid GHSA-2v37-7h3g-55p8 identified as transitive PostCSS/Vite build dependency, lock upgraded from 3.3.16 to 3.3.18, npm audit zero; 75 tests, typecheck and API/Web/Types builds passed locally and under Node 22/npm 10 on isolated VPS",
     "lint_after_audit_step_2": "resolved in Step 7 with eslint.config.mjs; Web and API lint pass locally",
-    "audit_step_7_final_sha_ci": "green on a5f716cc0b216e49fde9a58eb7515f8489fee2a7: local and GitHub audit, ESLint 9, 75 tests, typecheck, API/Web/Types builds, Lot 4/Step 2/Step 3 validators, Docker, 7 Chromium scenarios, 68 Python tests, 4 PostgreSQL integrations and release artifact passed; VPS confirmation pending",
+    "audit_step_7_final_sha_ci": "validated on 2026-08-10: green on a5f716cc0b216e49fde9a58eb7515f8489fee2a7; local, GitHub and isolated VPS audit, ESLint 9, 75 tests, typecheck, API/Web/Types builds, Lot 4/Step 2/Step 3 validators, Docker and 7 Chromium scenarios passed; GitHub also passed 68 Python tests, 4 PostgreSQL integrations and release artifact",
     "final_sha_ci_after_audit": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
-      "Isolated VPS Step 7 confirmation remains pending.",
+      "Step 8 Windows acceptance and explicit global Lot 4.2 validation remain pending.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
     ]
   },
@@ -132,5 +132,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Run the Step 7 acceptance recipe for validated code SHA a5f716cc0b216e49fde9a58eb7515f8489fee2a7 on the isolated VPS."
+  "next_action": "Prepare Step 8 Windows acceptance and request explicit global Lot 4.2 validation only after its completion."
 }
