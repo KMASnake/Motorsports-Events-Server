@@ -12,13 +12,17 @@
 
 ### Étape 1 — migration et sécurité du démarrage
 
-- [ ] retirer de `ensureApplicationSchema()` toute suppression ou réécriture de
+- [x] retirer de `ensureApplicationSchema()` toute suppression ou réécriture de
   données métier ;
-- [ ] créer une migration versionnée pour `event_corrections` et l'UTC ;
-- [ ] définir une stratégie non destructive pour les anciennes corrections de
+- [x] créer une migration versionnée pour `event_corrections` et l'UTC ;
+- [x] définir une stratégie non destructive pour les anciennes corrections de
   fuseau horaire ;
-- [ ] fournir et tester le rollback ;
-- [ ] tester base vierge, base existante et redémarrages successifs.
+- [x] fournir et tester le rollback ;
+- [x] tester localement base vierge, base existante et redémarrages successifs.
+
+Statut : implémentation et tests automatisés terminés ; recette VPS isolée en
+attente de confirmation utilisateur. Voir
+`LOT-4.2-AUDIT-STEP-1-ACCEPTANCE.md`.
 
 Preuves attendues : migration, tests PostgreSQL, commandes exécutées et résultat
 montrant qu'un second démarrage ne modifie aucune donnée.

@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.11 — 2026-08-09
+
+- impose des migrations PostgreSQL versionnées avant le démarrage API ;
+- interdit toute transformation de données métier au démarrage ;
+- exige un rollback et l'archivage restaurable des données incompatibles.
+
 ## 1.10 — 2026-08-03
 
 - retire de l'interface l'action redondante « Supprimer correction » ;

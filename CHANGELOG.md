@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 4.2 — remédiation audit, étape 1
+
+- remplace les transformations SQL au démarrage API par deux migrations
+  PostgreSQL versionnées ;
+- archive les anciennes corrections de fuseau et fournit leur rollback ;
+- impose l'exécution du service de migration avant l'API ;
+- ajoute un test Docker isolé couvrant idempotence, rollback et redémarrages.
+
 ## Non publié — Intégration du Handbook et audit du Lot 4.2
 
 - intégration de `PROJECT-HANDBOOK.md` comme source de vérité permanente ;

@@ -13,9 +13,9 @@
     "lot": "4.2",
     "version": "8.1.0-alpha.2-lot.4.2",
     "status": "changes-requested-after-independent-audit",
-    "updated_at": "2026-08-03",
+    "updated_at": "2026-08-09",
     "implementation_percent": 89,
-    "audit_remediation_percent": 0,
+    "audit_remediation_percent": 15,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -31,7 +31,7 @@
     "merge_authorized": false,
     "new_features_authorized_before_p1_closure": false,
     "p1": {
-      "destructive_startup_sql": "open",
+      "destructive_startup_sql": "completed-technically-awaiting-user-validation",
       "final_sha_ci": "open",
       "admin_route_security_proof": "open",
       "typed_correction_values": "open"
@@ -59,7 +59,7 @@
   },
   "areas": {
     "docker": 100,
-    "database_and_migrations": 75,
+    "database_and_migrations": 100,
     "api": 85,
     "design_system_foundations": 82,
     "design_system_components": 45,
@@ -68,7 +68,7 @@
     "championships_visual_fidelity": 95,
     "events_crud_list": 100,
     "events_calendar_interactions": 65,
-    "automated_tests": 85,
+    "automated_tests": 88,
     "corrections": 99,
     "hybrid_test_data": 50,
     "accessibility": 55
@@ -163,9 +163,9 @@
     }
   },
   "audit_remediation": {
-    "status": "not-started",
+    "status": "in-progress",
     "owner": "Codex",
-    "completed_p1": 0,
+    "completed_p1": 1,
     "total_p1": 4,
     "completed_p2": 0,
     "total_p2": 7,
@@ -176,14 +176,14 @@
     "explicit_user_validation": "pending"
   },
   "known_issues": [
-    "Independent audit P1 findings remain open.",
+    "Three independent audit P1 findings remain open; migration Step 1 awaits isolated VPS validation.",
     "Calendar interaction and hybrid-data security tests remain incomplete.",
     "The local npm version is below the declared npm >= 10 engine requirement.",
     "npm audit reports two high-severity advisories requiring compatibility review."
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Resolve the independent audit P1 findings in the prescribed order before any new feature or merge.",
+    "task": "Validate migration Step 1 on the isolated VPS, then implement typed correction validation.",
     "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
     "target_visual_fidelity": 98
   }

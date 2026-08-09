@@ -11,7 +11,8 @@ administrable.
 
 ## Conséquences
 
-Le formulaire ne présente aucun contrôle de fuseau. Au démarrage, les lignes
-historiques sont normalisées en UTC et les corrections de fuseau devenues sans
-objet sont supprimées. L'API publique conserve son champ `timezone` existant,
-toujours égal à `UTC`.
+Le formulaire ne présente aucun contrôle de fuseau. Une migration versionnée
+normalise les lignes historiques en UTC et archive intégralement les
+corrections de fuseau devenues sans objet. Son rollback restaure les fuseaux et
+les corrections archivées. Le démarrage API ne modifie aucune donnée. L'API
+publique conserve son champ `timezone` existant, toujours égal à `UTC`.

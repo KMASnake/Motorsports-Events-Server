@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.10
+## Version 1.11
 
 Ce document est la source de vérité permanente du projet.
 
@@ -23,6 +23,11 @@ Motorsports Events Server centralise les données de sports mécaniques pour l'a
 Backend : Fastify, TypeScript, PostgreSQL, Docker.
 Frontend : React, TypeScript, Vite.
 API : REST JSON, versionnée, séparation stricte public/administration.
+
+Toute évolution du schéma ou transformation de données utilise une migration
+versionnée exécutée avant l'API. Le démarrage applicatif vérifie le schéma en
+lecture seule et ne supprime ni ne réécrit aucune donnée métier. Voir
+`docs/handbook/architecture/ADR-0009-VERSIONED-DATABASE-MIGRATIONS.md`.
 
 ## Administration orientée métier
 Les formulaires ne doivent pas exposer UUID, slug, origin, provider ID, external ID, timestamps internes ou métadonnées techniques.

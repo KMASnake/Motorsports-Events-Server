@@ -74,13 +74,24 @@ Voir `architecture/ADR-0001-ADMINISTRATION-PHILOSOPHY.md` et
 
 - la gestion de fuseaux est supprimée du domaine administrable ; tous les
   événements et leur champ de compatibilité `timezone` sont normalisés en UTC ;
-- les corrections historiques portant sur le fuseau sont supprimées ;
+- les corrections historiques portant sur le fuseau sont archivées et restent
+  restaurables par rollback ;
 - la vue Liste affiche 25 événements par page ;
 - son ordre par défaut utilise la proximité absolue entre le début de
   l'événement et l'instant courant.
 
 Voir `architecture/ADR-0004-TIMEZONES.md` et
 `architecture/ADR-0007-CALENDAR.md`.
+
+## 2026-08-09 — Migrations PostgreSQL versionnées
+
+- les migrations s'exécutent avant l'API et sont enregistrées dans
+  `schema_migrations` ;
+- le démarrage de l'API ne transforme jamais le schéma ou les données métier ;
+- les transformations sont idempotentes et accompagnées d'un rollback ;
+- toute donnée incompatible est archivée intégralement avant retrait.
+
+Voir `architecture/ADR-0009-VERSIONED-DATABASE-MIGRATIONS.md`.
 
 ## 2026-08-03 — Tri des listes
 

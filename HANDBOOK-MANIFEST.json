@@ -1,6 +1,6 @@
 {
-  "version": "1.10",
-  "file_count": 23,
+  "version": "1.11",
+  "file_count": 24,
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/handbook-change.md",
@@ -20,12 +20,12 @@
     {
       "path": "HANDBOOK-PACKAGE-INFO.json",
       "bytes": 339,
-      "sha256": "5c3c20a627ef2e20d69bd8c60f31c97b80f6d146a7a2bc4d2ea290da8a195952"
+      "sha256": "ffdd65016db8ddde33f10a76f88ed7a9ea93a8142bae8970feb24c2389b08543"
     },
     {
       "path": "PROJECT-HANDBOOK.md",
-      "bytes": 5957,
-      "sha256": "27afc5d3d1c5efce8ab462e45cca3a394436630c67bdd9c17e65412594569f4f"
+      "bytes": 6268,
+      "sha256": "449e2171c86ab867d919b3bc015e6edf0d5216ba3d723e313de342b3a2e48613"
     },
     {
       "path": "README-HANDBOOK.md",
@@ -34,8 +34,8 @@
     },
     {
       "path": "docs/handbook/CHANGELOG.md",
-      "bytes": 2405,
-      "sha256": "9a2350b4800e5cd70687a22a772f2d10ea3b51376db2950daf7fb540a48f49dc"
+      "bytes": 2647,
+      "sha256": "b3b8c458dbe402d5b0d8e88cf9f91ee4d763b39f0750e51548ba55b90057a580"
     },
     {
       "path": "docs/handbook/CODEX-PROMPT.md",
@@ -44,8 +44,8 @@
     },
     {
       "path": "docs/handbook/DECISIONS.md",
-      "bytes": 4651,
-      "sha256": "bfc62fab3c99fd682acec05ce3f471ab13bf78ef3a2caa19c91969a029f7751d"
+      "bytes": 5130,
+      "sha256": "a10ebf405b14379f1b47f3846422de95f0131224969dfeb27f23e18a4925b717"
     },
     {
       "path": "docs/handbook/GITHUB-PUBLISH.md",
@@ -74,8 +74,8 @@
     },
     {
       "path": "docs/handbook/architecture/ADR-0004-TIMEZONES.md",
-      "bytes": 592,
-      "sha256": "019ea938d1043a6152b2e05ee307c025b83d25cae6a98ba9d37a0cd3d5b92186"
+      "bytes": 711,
+      "sha256": "554695d41150f6c9daddd6c4dc9e248d093570a9101ae8e35eff5c56fc714f5f"
     },
     {
       "path": "docs/handbook/architecture/ADR-0005-UI-SIMPLICITY.md",
@@ -96,6 +96,11 @@
       "path": "docs/handbook/architecture/ADR-0008-DOCUMENTATION-GOVERNANCE.md",
       "bytes": 1511,
       "sha256": "04aeaa661d50b312e686da5c204942366faf22f664a1f88eb157b69692c99e4c"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0009-VERSIONED-DATABASE-MIGRATIONS.md",
+      "bytes": 1119,
+      "sha256": "96962e91a54e8e8e64358c54163a07deabecf531b0a76aa1e2cfa459678df84d"
     },
     {
       "path": "docs/handbook/calendar/CALENDAR-RULES.md",
