@@ -1,4 +1,5 @@
-import { buildCalendarDays } from './eventUtils';
+import { useState } from 'react';
+import { buildCalendarDays, dateKey } from './eventUtils';
 import { eventColor } from './eventColors';
 import type { Championship, EventRow } from './eventTypes';
 import { assetRegistry } from '../../assets/assetRegistry';
@@ -10,18 +11,22 @@ interface Props {
   selectedId: string | null;
   onSelect: (event: EventRow) => void;
   onCreateAt: (date: Date) => void;
+  onCreateRange: (start: Date, end: Date) => void;
   onMove: (event: EventRow, date: Date) => void;
 }
 
 const week = ['LUN.', 'MAR.', 'MER.', 'JEU.', 'VEN.', 'SAM.', 'DIM.'];
 
-export function EventCalendarView({ month, events, championships, selectedId, onSelect, onCreateAt, onMove }: Props) {
+export function EventCalendarView({ month, events, championships, selectedId, onSelect, onCreateAt, onCreateRange, onMove }: Props) {
   const days = buildCalendarDays(month, events);
+  const [rangeStart, setRangeStart] = useState<Date | null>(null);
+  function selectRange(date: Date) { if (!rangeStart) setRangeStart(date); else { onCreateRange(rangeStart, date); setRangeStart(null); } }
   return <section className="events-calendar" aria-label="Calendrier mensuel des événements">
+    <p className="events-range-help">Maj + clic sur deux dates pour créer une plage{rangeStart ? ` · début : ${rangeStart.toLocaleDateString('fr-FR')}` : ''}</p>
     <div className="events-calendar-week">{week.map((day) => <b key={day}>{day}</b>)}</div>
     <div className="events-calendar-grid">
-      {days.map((day) => <div key={day.key} className={day.inMonth ? '' : 'outside'} onDoubleClick={() => onCreateAt(day.date)} onDragOver={(e)=>e.preventDefault()} onDrop={(e)=>{const found=events.find(x=>x.id===e.dataTransfer.getData('text/event-id'));if(found)onMove(found,day.date)}}>
-        <button className="events-day-number" onClick={() => onCreateAt(day.date)} aria-label={`Créer un événement le ${day.date.toLocaleDateString('fr-FR')}`}>{day.date.getDate()}</button>
+      {days.map((day) => <div key={day.key} className={`${day.inMonth ? '' : 'outside'}${rangeStart && dateKey(rangeStart) === day.key ? ' range-start' : ''}`} onDoubleClick={() => onCreateAt(day.date)} onDragOver={(e)=>e.preventDefault()} onDrop={(e)=>{const found=events.find(x=>x.id===e.dataTransfer.getData('text/event-id'));if(found)onMove(found,day.date)}}>
+        <button className="events-day-number" onClick={(click) => click.shiftKey ? selectRange(day.date) : onCreateAt(day.date)} aria-label={`Créer un événement le ${day.date.toLocaleDateString('fr-FR')}`}>{day.date.getDate()}</button>
         {day.events.slice(0, 3).map((event) => <button
           key={event.id}
           draggable

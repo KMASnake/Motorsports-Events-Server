@@ -31,7 +31,8 @@
     "test:migrations": "./scripts/test-lot42-migrations.sh",
     "validate:audit-step2": "node scripts/validate-audit-step2.mjs",
     "validate:audit-step3": "node scripts/validate-audit-step3.mjs",
-    "validate:audit-step4": "node scripts/validate-audit-step4.mjs"
+    "validate:audit-step4": "node scripts/validate-audit-step4.mjs",
+    "validate:audit-step5": "node scripts/validate-audit-step5.mjs"
   },
   "engines": {
     "node": ">=22.0.0",

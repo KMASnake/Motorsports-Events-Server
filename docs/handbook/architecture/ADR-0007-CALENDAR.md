@@ -19,3 +19,9 @@ changement de filtre revient à la première page. En cas d'égalité de proximi
 la date chronologique puis le nom assurent un ordre déterministe. Le tri est
 effectué avant la pagination et un changement de tri revient à la première
 page.
+
+La création d'une plage utilise deux dates explicites et préremplit début et
+fin. Les déplacements et redimensionnements sont optimistes, mais l'interface
+restaure obligatoirement l'état antérieur si la persistance échoue. Les durées
+sont calculées entre instants UTC pour rester stables lors d'un passage à
+minuit ou d'un changement d'heure civile.

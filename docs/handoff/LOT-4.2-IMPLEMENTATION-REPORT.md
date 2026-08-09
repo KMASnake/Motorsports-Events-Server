@@ -105,6 +105,13 @@ peuvent être créés rapidement, dupliqués, déplacés et prolongés. Les muta
 sont optimistes et restaurent l'état précédent si l'API refuse l'opération. Un
 chevauchement simple entre événements publiés sur un même circuit est signalé.
 
+La vue mensuelle permet désormais de choisir une plage avec `Maj + clic` sur
+deux dates ; l'éditeur reçoit un début à 09 h et une fin à 18 h. Le panneau de
+détail redimensionne la fin par pas de 30 minutes. Déplacements et
+redimensionnements partagent un rollback visuel testé. Les durées sont calculées
+sur les instants UTC afin de rester exactes à minuit et pendant les changements
+d'heure.
+
 Les modifications d'un événement fournisseur créent une correction locale par
 champ. La valeur fournisseur et la valeur locale sont conservées séparément.
 La page Corrections les regroupe par événement et permet d'accepter la valeur

@@ -70,13 +70,17 @@ réussis localement et sur VPS isolé le 2026-08-09. Voir
 
 ### Étape 5 — concurrence et interactions calendrier
 
-- [ ] tester deux résolutions simultanées ;
-- [ ] tester synchronisation fournisseur et modification administrateur
+- [x] tester deux résolutions simultanées ;
+- [x] tester synchronisation fournisseur et modification administrateur
   simultanées ;
-- [ ] vérifier le rollback transactionnel après erreur ;
-- [ ] compléter création par plage et redimensionnement visuel ;
-- [ ] tester le rollback visuel des déplacements et redimensionnements ;
-- [ ] couvrir événements traversant minuit et changements heure d'été/hiver.
+- [x] vérifier le rollback transactionnel après erreur ;
+- [x] compléter création par plage et redimensionnement visuel ;
+- [x] tester le rollback visuel des déplacements et redimensionnements ;
+- [x] couvrir événements traversant minuit et changements heure d'été/hiver.
+
+Statut : implémentation et recette Docker PostgreSQL réussies localement le
+2026-08-09. Validation VPS utilisateur requise. Voir
+`LOT-4.2-AUDIT-STEP-5-ACCEPTANCE.md`.
 
 ### Étape 6 — dépendances
 

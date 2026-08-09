@@ -133,3 +133,12 @@ Voir `architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.
 - les secrets sont retirés du journal et l'identité fournisseur est unique.
 
 Voir `architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.
+
+## 2026-08-09 — Interactions calendrier fiables
+
+- une plage se crée à partir de deux dates explicites ;
+- un déplacement ou redimensionnement optimiste refusé restaure l'affichage ;
+- les durées sont calculées entre instants UTC, y compris à minuit et pendant
+  les changements d'heure civile.
+
+Voir `architecture/ADR-0007-CALENDAR.md`.

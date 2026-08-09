@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, resizeEvent, slugify, sortEventList } from './eventUtils';
+import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, persistOptimisticEvent, resizeEvent, slugify, sortEventList } from './eventUtils';
 import type { EventRow } from './eventTypes';
 import { availableProviderOptions, providerLabel } from './providerDisplay';
 
@@ -42,9 +42,25 @@ describe('eventUtils', () => {
     expect(formDateForDay(new Date(2026, 5, 7))).toBe('2026-06-07T09:00');
     expect(slugify('Grand Prix d’Été')).toBe('grand-prix-d-ete');
   });
+  it('prépare une création par plage dans les deux sens', () => {
+    expect(formDatesForRange(new Date(2026, 5, 9), new Date(2026, 5, 11))).toEqual({ starts_at: '2026-06-09T09:00', ends_at: '2026-06-11T18:00' });
+    expect(formDatesForRange(new Date(2026, 5, 11), new Date(2026, 5, 9))).toEqual({ starts_at: '2026-06-09T09:00', ends_at: '2026-06-11T18:00' });
+  });
 
   it('conserve la durée pendant un déplacement',()=>{const moved=moveEvent(event(),new Date('2026-06-12T10:00:00Z'));expect(moved.starts_at).toBe('2026-06-12T10:00:00.000Z');expect(eventDuration(moved)).toBe(eventDuration(event()))});
   it('redimensionne uniquement la fin et refuse une durée négative',()=>{const row=event();expect(resizeEvent(row,new Date('2026-06-11T17:00:00Z')).starts_at).toBe(row.starts_at);expect(()=>resizeEvent(row,new Date('2026-06-10T00:00:00Z'))).toThrow()});
+  it('restaure visuellement un déplacement ou redimensionnement rejeté', async () => {
+    const original = event(); const optimistic = moveEvent(original, new Date('2026-06-12T10:00:00Z'));
+    const result = await persistOptimisticEvent(original, optimistic, async () => { throw new Error('API indisponible'); });
+    expect(result.rolledBack).toBe(true); expect(result.event).toEqual(original);
+  });
+  it('conserve la durée absolue à travers minuit et les changements d’heure', () => {
+    const midnight = event({ starts_at: '2026-06-11T23:30:00Z', ends_at: '2026-06-12T01:00:00Z' });
+    expect(eventDuration(moveEvent(midnight, new Date('2026-06-13T23:30:00Z')))).toBe(90 * 60_000);
+    for (const row of [event({ starts_at: '2026-03-29T00:30:00Z', ends_at: '2026-03-29T02:30:00Z' }), event({ starts_at: '2026-10-25T00:30:00Z', ends_at: '2026-10-25T02:30:00Z' })]) {
+      expect(eventDuration(moveEvent(row, new Date('2026-11-01T00:30:00Z')))).toBe(2 * 60 * 60_000);
+    }
+  });
   it('détecte les chevauchements publiés sur le même circuit',()=>{const first=event({circuit_id:'track'});const second=event({id:'event-2',circuit_id:'track',starts_at:'2026-06-11T15:00:00Z',ends_at:'2026-06-11T17:00:00Z'});expect(overlappingEvents([first,second])).toHaveLength(2)});
 
   it('navigue selon la granularité de chaque vue', () => {

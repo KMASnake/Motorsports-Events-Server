@@ -116,6 +116,12 @@ export function formDateForDay(date: Date) {
   return `${dateKey(date)}T09:00`;
 }
 
+export function formDatesForRange(first: Date, last: Date) {
+  const start = first <= last ? first : last;
+  const end = first <= last ? last : first;
+  return { starts_at: `${dateKey(start)}T09:00`, ends_at: `${dateKey(end)}T18:00` };
+}
+
 export const monthLabel = (date: Date) => new Intl.DateTimeFormat('fr-FR', {
   month: 'long', year: 'numeric'
 }).format(date).replace(/^./, (letter) => letter.toUpperCase());
@@ -156,6 +162,11 @@ export function resizeEvent(event: EventRow, nextEnd: Date): EventRow {
 
 export function eventDuration(event: EventRow) {
   return event.ends_at ? Math.max(0, new Date(event.ends_at).getTime() - new Date(event.starts_at).getTime()) : 0;
+}
+
+export async function persistOptimisticEvent(previous: EventRow, optimistic: EventRow, persist: (event: EventRow) => Promise<unknown>) {
+  try { await persist(optimistic); return { event: optimistic, rolledBack: false }; }
+  catch (error) { return { event: previous, rolledBack: true, error }; }
 }
 
 export function overlappingEvents(events: EventRow[]) {

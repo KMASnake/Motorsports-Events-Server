@@ -10,7 +10,7 @@ import { EventsFilters } from './EventsFilters';
 import { EventsViewSwitcher } from './EventsViewSwitcher';
 import { EventCalendarAlternativeViews } from './EventCalendarAlternativeViews';
 import { EventLegend } from './EventLegend';
-import { calendarPeriodLabel, emptyEventForm, eventToForm, filterEvents, formDateForDay, moveEvent, navigateCalendarDate, overlappingEvents, resizeEvent } from './eventUtils';
+import { calendarPeriodLabel, emptyEventForm, eventToForm, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, overlappingEvents, persistOptimisticEvent, resizeEvent } from './eventUtils';
 import type { Championship, Circuit, EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 import { availableProviderOptions } from './providerDisplay';
 
@@ -59,6 +59,10 @@ export function EventsPage() {
     setForm({ ...emptyEventForm(), championship_id: championships.find((item) => item.active)?.id ?? '', starts_at: date ? formDateForDay(date) : '' });
     setFormError(null); setEditorOpen(true);
   }
+  function startCreateRange(start: Date, end: Date) {
+    setEditing(null); setForm({ ...emptyEventForm(), championship_id: championships.find((item) => item.active)?.id ?? '', ...formDatesForRange(start, end) });
+    setFormError(null); setEditorOpen(true);
+  }
   function startEdit(event: EventRow) { setEditing(event); setForm(eventToForm(event)); setFormError(null); setEditorOpen(true); }
   function startDuplicate(event: EventRow) {
     const copy = eventToForm(event);
@@ -80,10 +84,10 @@ export function EventsPage() {
   async function move(event: EventRow, day: Date) {
     const previous = rows; const source = new Date(event.starts_at); const next = new Date(day); next.setHours(source.getHours(), source.getMinutes(), 0, 0);
     const optimistic = moveEvent(event, next); setRows((current)=>current.map((row)=>row.id===event.id?optimistic:row));
-    try { await patchEvent(event.id,optimistic.ends_at ? { starts_at: optimistic.starts_at, ends_at: optimistic.ends_at } : { starts_at: optimistic.starts_at }); setMessage({text:'Événement déplacé.'}); }
-    catch(error){ setRows(previous); setMessage({text:`Déplacement annulé : ${(error as Error).message}`,error:true}); }
+    const result = await persistOptimisticEvent(event, optimistic, (nextEvent) => patchEvent(event.id,nextEvent.ends_at ? { starts_at: nextEvent.starts_at, ends_at: nextEvent.ends_at } : { starts_at: nextEvent.starts_at }));
+    if (!result.rolledBack) setMessage({text:'Événement déplacé.'}); else { setRows(previous); setMessage({text:`Déplacement annulé : ${(result.error as Error).message}`,error:true}); }
   }
-  async function resize(event:EventRow,end:Date){const previous=rows;const optimistic=resizeEvent(event,end);setRows((current)=>current.map((row)=>row.id===event.id?optimistic:row));try{await patchEvent(event.id,{ends_at:optimistic.ends_at??''});setMessage({text:'Durée mise à jour.'})}catch(error){setRows(previous);setMessage({text:`Redimensionnement annulé : ${(error as Error).message}`,error:true})}}
+  async function resize(event:EventRow,end:Date){const previous=rows;const optimistic=resizeEvent(event,end);setRows((current)=>current.map((row)=>row.id===event.id?optimistic:row));const result=await persistOptimisticEvent(event,optimistic,(nextEvent)=>patchEvent(event.id,{ends_at:nextEvent.ends_at??''}));if(!result.rolledBack)setMessage({text:'Durée mise à jour.'});else{setRows(previous);setMessage({text:`Redimensionnement annulé : ${(result.error as Error).message}`,error:true})}}
   async function remove(event: EventRow) {
     if (!confirm(`Supprimer définitivement « ${event.name} » ?`)) return;
     try { await deleteEvent(event.id); await load(); setMessage({ text: 'Événement supprimé.' }); }
@@ -102,7 +106,7 @@ export function EventsPage() {
     <EventsFilters value={filters} championships={championships} providers={providers} onChange={setFilters} onRefresh={() => void load()} />
     {loading ? <div className="events-loading">Chargement des événements…</div> : <div className="events-workspace">
       <main>{view === 'month'
-        ? <><EventCalendarView month={month} events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onCreateAt={startCreate} onMove={(event,date)=>void move(event,date)} /><EventLegend events={filtered} championships={championships} /></>
+        ? <><EventCalendarView month={month} events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onCreateAt={startCreate} onCreateRange={startCreateRange} onMove={(event,date)=>void move(event,date)} /><EventLegend events={filtered} championships={championships} /></>
         : view === 'list' ? <EventListView events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onEdit={startEdit} onDelete={(event) => void remove(event)} onTogglePublication={(event) => void togglePublication(event)} />
         : <EventCalendarAlternativeViews view={view} date={month} events={filtered} selectedId={selectedId} onSelect={(event)=>setSelectedId(event.id)} onMove={(event,date)=>void move(event,date)} onCreateAt={startCreate}/>}
       </main>

@@ -14,8 +14,8 @@
     "version": "8.1.0-alpha.2-lot.4.2",
     "status": "changes-requested-after-independent-audit",
     "updated_at": "2026-08-09",
-    "implementation_percent": 89,
-    "audit_remediation_percent": 60,
+    "implementation_percent": 92,
+    "audit_remediation_percent": 75,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -41,8 +41,8 @@
       "filter_validation": "open",
       "mutation_audit_logging": "open",
       "provider_ingestion_separation": "open",
-      "concurrency_and_rollback_tests": "open",
-      "calendar_interaction_tests": "open",
+      "concurrency_and_rollback_tests": "implemented-local-validation-passed-vps-required",
+      "calendar_interaction_tests": "implemented-local-validation-passed-vps-required",
       "npm_high_severity_review": "open"
     },
     "required_order": [
@@ -67,8 +67,8 @@
     "events_visual_fidelity": 80,
     "championships_visual_fidelity": 95,
     "events_crud_list": 100,
-    "events_calendar_interactions": 65,
-    "automated_tests": 96,
+    "events_calendar_interactions": 95,
+    "automated_tests": 98,
     "corrections": 99,
     "hybrid_test_data": 50,
     "accessibility": 55
@@ -162,33 +162,47 @@
       "result": "maintainer explicitly validated the step"
     }
   },
+  "audit_step_5": {
+    "status": "completed-locally-vps-validation-required",
+    "scope": "Concurrent correction resolution, provider/admin serialization, transactional and visual rollback, range creation, visual resize, midnight and DST boundaries.",
+    "technical_validation": {
+      "workspace_typecheck": "passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "unit_tests": "75 passed",
+      "postgresql_concurrency_validator": "passed locally",
+      "docker": "isolated PostgreSQL, API and Web built and started",
+      "test_dataset": "self-cleaning provider fixture spanning the daylight-saving transition"
+    }
+  },
   "audit_remediation": {
     "status": "in-progress",
     "owner": "Codex",
     "completed_p1": 3,
     "total_p1": 4,
-    "completed_p2": 4,
+    "completed_p2": 6,
     "total_p2": 7,
     "step_1_evidence": "Validated 2026-08-09: WSL Docker migrations 0001/0002, rollback and two API restarts preserved fingerprint d9e88f61cb0d0eae6993427362356e4a; user confirmed isolated VPS validator OK",
     "step_2_evidence": "Validated 2026-08-09: 23 typed-value tests and isolated Docker API/PostgreSQL validator passed locally and on VPS; invalid types and references return 400 and offset dates normalize to UTC",
     "step_3_evidence": "Validated 2026-08-09: 8 Fastify tests and Docker validator passed locally and on VPS for 401, 403, invalid/expired tokens, admin success, legacy championship mutations and public API",
     "step_4_evidence": "Validated 2026-08-09: 3 query tests, migration 0003 rollback and Docker validator passed locally and on VPS for pagination, filters, provider uniqueness and secret-free mutation audit",
+    "step_5_evidence": "Implemented 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally for concurrent resolutions, provider/admin serialization, transactional/visual rollback, ranges, midnight and DST; VPS validation required",
     "final_sha": null,
     "final_sha_ci": "pending",
     "windows_validation": "pending",
-    "isolated_vps_validation": "steps-1-through-4-passed-2026-08-09; final-lot-validation-pending",
+    "isolated_vps_validation": "steps-1-through-4-passed-2026-08-09; step-5-pending; final-lot-validation-pending",
     "explicit_user_validation": "pending"
   },
   "known_issues": [
     "The final SHA CI P1 remains open; Steps 1 through 3 are validated on isolated VPS.",
-    "Calendar interaction and hybrid-data security tests remain incomplete.",
+    "Step 5 concurrency and calendar interaction tests passed locally but still require isolated VPS confirmation.",
     "The local npm version is below the declared npm >= 10 engine requirement.",
     "ESLint 9 cannot run because the repository has no eslint.config flat configuration.",
     "npm audit reports two high-severity advisories requiring compatibility review."
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Implement concurrency, transactional rollback and calendar interaction tests for audit remediation Step 5.",
+    "task": "Run and confirm audit remediation Step 5 on the isolated VPS before dependency review Step 6.",
     "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
     "target_visual_fidelity": 98
   }

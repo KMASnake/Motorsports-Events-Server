@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.14 — 2026-08-09
+
+- précise la création d'événement par plage ;
+- impose le rollback visuel des mutations optimistes refusées ;
+- rend le calcul de durée indépendant de minuit et des changements d'heure.
+
 ## 1.13 — 2026-08-09
 
 - impose pagination, filtres et tris serveur validés pour l'administration ;

@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.13
+## Version 1.14
 
 Ce document est la source de vérité permanente du projet.
 
@@ -93,7 +93,10 @@ traduits dans l'interface, notamment `postponed` en « Reporté ».
 Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle native. L'API publique expose uniquement cette valeur.
 
 ## Calendrier
-Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer, redimensionnement, création rapide, duplication et rollback.
+Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer,
+redimensionnement, création rapide ou par plage, duplication et rollback. Une
+mutation optimiste refusée restaure l'état affiché. Les durées reposent sur les
+instants UTC et restent stables à minuit et lors des changements d'heure.
 
 La vue Liste présente 25 événements par page et place en premier l'événement
 dont le début est le plus proche de la date courante. Ses colonnes métier sont
