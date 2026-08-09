@@ -7,6 +7,7 @@
 - conserve les routes publiques sans authentification ;
 - protège aussi les mutations historiques de championnats sans changer leurs routes ;
 - ajoute 8 tests Fastify, un générateur de jetons et une recette Docker.
+- consigne la réussite de la recette de sécurité sur VPS isolé le 2026-08-09.
 
 ## Lot 4.2 — remédiation audit, étape 2
 

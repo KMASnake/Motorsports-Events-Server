@@ -49,8 +49,8 @@ réussis localement et sur VPS isolé le 2026-08-09. Voir
 - [x] tester les jetons invalides et expirés ;
 - [x] couvrir événements, ingestion fournisseur et corrections.
 
-Statut : 8 tests Fastify et recette Docker PostgreSQL réussis localement ;
-confirmation VPS isolée en attente. Voir
+Statut : 8 tests Fastify et recettes Docker PostgreSQL réussis localement et
+sur VPS isolé le 2026-08-09. Voir
 `LOT-4.2-AUDIT-STEP-3-ACCEPTANCE.md`.
 
 ### Étape 4 — API, pagination et audit
