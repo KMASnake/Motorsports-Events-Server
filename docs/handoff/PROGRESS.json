@@ -15,7 +15,7 @@
     "status": "changes-requested-after-independent-audit",
     "updated_at": "2026-08-09",
     "implementation_percent": 92,
-    "audit_remediation_percent": 75,
+    "audit_remediation_percent": 85,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -43,7 +43,7 @@
       "provider_ingestion_separation": "open",
       "concurrency_and_rollback_tests": "implemented-local-validation-passed-vps-required",
       "calendar_interaction_tests": "implemented-local-validation-passed-vps-required",
-      "npm_high_severity_review": "open"
+      "npm_high_severity_review": "fixed-local-validation-passed-vps-required"
     },
     "required_order": [
       "destructive_startup_sql",
@@ -185,13 +185,14 @@
     "owner": "Codex",
     "completed_p1": 3,
     "total_p1": 4,
-    "completed_p2": 6,
+    "completed_p2": 7,
     "total_p2": 7,
     "step_1_evidence": "Validated 2026-08-09: WSL Docker migrations 0001/0002, rollback and two API restarts preserved fingerprint d9e88f61cb0d0eae6993427362356e4a; user confirmed isolated VPS validator OK",
     "step_2_evidence": "Validated 2026-08-09: 23 typed-value tests and isolated Docker API/PostgreSQL validator passed locally and on VPS; invalid types and references return 400 and offset dates normalize to UTC",
     "step_3_evidence": "Validated 2026-08-09: 8 Fastify tests and Docker validator passed locally and on VPS for 401, 403, invalid/expired tokens, admin success, legacy championship mutations and public API",
     "step_4_evidence": "Validated 2026-08-09: 3 query tests, migration 0003 rollback and Docker validator passed locally and on VPS for pagination, filters, provider uniqueness and secret-free mutation audit",
     "step_5_evidence": "Validated 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS for concurrent resolutions, provider/admin serialization, transactional/visual rollback, ranges, midnight and DST",
+    "step_6_evidence": "Implemented 2026-08-09: current audit reproduced nanoid GHSA-2v37-7h3g-55p8 only; lock upgraded 3.3.16 to 3.3.18; npm audit reports zero vulnerabilities; 75 tests, Web/API builds and isolated Docker passed locally; VPS confirmation required",
     "final_sha": null,
     "final_sha_ci": "pending",
     "windows_validation": "pending",
@@ -200,15 +201,15 @@
   },
   "known_issues": [
     "The final SHA CI P1 remains open; Steps 1 through 3 are validated on isolated VPS.",
-    "The npm high-severity dependency review remains open as audit remediation Step 6.",
+    "Step 6 dependency correction passed locally but still requires isolated VPS confirmation.",
     "The Agenda view works as a 30-day chronological presentation, but its purpose is not sufficiently clear to the maintainer and requires a later UX clarification.",
     "The local npm version is below the declared npm >= 10 engine requirement.",
     "ESLint 9 cannot run because the repository has no eslint.config flat configuration.",
-    "npm audit reports two high-severity advisories requiring compatibility review."
+    "ESLint 9 flat configuration remains required before final-SHA CI can pass."
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Review the two high-severity npm advisories as audit remediation Step 6.",
+    "task": "Run and confirm audit remediation Step 6 on the isolated VPS before final-SHA CI work.",
     "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
     "target_visual_fidelity": 98
   }

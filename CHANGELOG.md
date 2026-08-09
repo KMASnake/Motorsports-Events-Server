@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 4.2 — remédiation audit, étape 6
+
+- identifie `nanoid` comme dépendance transitive de PostCSS/Vite concernée par
+  `GHSA-2v37-7h3g-55p8` ;
+- met à jour le verrou compatible de `nanoid 3.3.16` à `3.3.18` ;
+- ramène `npm audit` à zéro vulnérabilité sans changement applicatif ;
+- documente l'exposition et l'absence d'exception de sécurité temporaire.
+
 ## Lot 4.2 — remédiation audit, étape 4
 
 - ajoute pagination et tri serveur validés aux événements et corrections ;

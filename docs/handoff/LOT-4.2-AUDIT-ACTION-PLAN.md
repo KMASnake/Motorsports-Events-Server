@@ -84,10 +84,16 @@ confirmées par l'utilisateur sur VPS isolé le 2026-08-09. Voir
 
 ### Étape 6 — dépendances
 
-- [ ] identifier les deux avis npm de sévérité élevée ;
-- [ ] consigner paquet, GHSA/CVE, dépendance directe ou transitive, exposition,
+- [x] identifier les avis npm de sévérité élevée reproductibles ;
+- [x] consigner paquet, GHSA/CVE, dépendance directe ou transitive, exposition,
   version corrigée et impact de mise à niveau ;
-- [ ] corriger ou documenter une exception temporaire datée et justifiée.
+- [x] corriger ou documenter une exception temporaire datée et justifiée.
+
+Statut : l'audit courant reproduit un seul avis, `nanoid`
+`GHSA-2v37-7h3g-55p8`. Le verrou passe de `3.3.16` à `3.3.18` et `npm audit`
+retourne zéro vulnérabilité. Tests, builds et Docker réussis localement le
+2026-08-09 ; confirmation VPS requise. Voir
+`LOT-4.2-AUDIT-STEP-6-ACCEPTANCE.md`.
 
 ### Étape 7 — validation finale du SHA
 
