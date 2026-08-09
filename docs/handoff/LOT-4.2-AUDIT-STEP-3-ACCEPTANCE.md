@@ -11,9 +11,9 @@ en fin de recette.
 
 ```bash
 export ADMIN_AUTH_SECRET="$(openssl rand -hex 32)"
-export ADMIN_TOKEN="$(sudo docker run --rm -e ADMIN_AUTH_SECRET -e ADMIN_ROLE=admin -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs)"
-export VIEWER_TOKEN="$(sudo docker run --rm -e ADMIN_AUTH_SECRET -e ADMIN_ROLE=viewer -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs)"
-export EXPIRED_TOKEN="$(sudo docker run --rm -e ADMIN_AUTH_SECRET -e ADMIN_ROLE=admin -e ADMIN_TOKEN_LIFETIME_SECONDS=-1 -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs)"
+export ADMIN_TOKEN="$(sudo -E docker run --rm -e ADMIN_AUTH_SECRET -e ADMIN_ROLE=admin -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs)"
+export VIEWER_TOKEN="$(sudo -E docker run --rm -e ADMIN_AUTH_SECRET -e ADMIN_ROLE=viewer -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs)"
+export EXPIRED_TOKEN="$(sudo -E docker run --rm -e ADMIN_AUTH_SECRET -e ADMIN_ROLE=admin -e ADMIN_TOKEN_LIFETIME_SECONDS=-1 -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs)"
 ```
 
 ## Démarrage isolé
@@ -30,7 +30,7 @@ sudo -E docker compose up --build -d
 ## Validation
 
 ```bash
-sudo docker run --rm --network host \
+sudo -E docker run --rm --network host \
   -e API_URL=http://127.0.0.1:3481 \
   -e ADMIN_TOKEN -e VIEWER_TOKEN -e EXPIRED_TOKEN \
   -v "$PWD/scripts:/scripts:ro" \
