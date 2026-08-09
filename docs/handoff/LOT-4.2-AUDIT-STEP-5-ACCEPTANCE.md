@@ -62,3 +62,17 @@ Nettoyage systématique :
 ```bash
 sudo -E docker compose down --volumes --remove-orphans
 ```
+
+## Résultat VPS
+
+Validation confirmée par le mainteneur le 2026-08-09 :
+
+```text
+Deux résolutions simultanées sérialisées sans corruption : OK
+Synchronisation fournisseur et modification administrateur sérialisées : OK
+Rollback transactionnel événement/corrections après erreur : OK
+Fixture UTC traversant le changement d’heure conservée : OK
+```
+
+Cette validation ferme l'étape 5 de remédiation. Elle ne constitue pas la
+validation globale du Lot 4.2.

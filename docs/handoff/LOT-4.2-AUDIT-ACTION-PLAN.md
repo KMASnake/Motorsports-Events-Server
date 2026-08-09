@@ -78,8 +78,8 @@ réussis localement et sur VPS isolé le 2026-08-09. Voir
 - [x] tester le rollback visuel des déplacements et redimensionnements ;
 - [x] couvrir événements traversant minuit et changements heure d'été/hiver.
 
-Statut : implémentation et recette Docker PostgreSQL réussies localement le
-2026-08-09. Validation VPS utilisateur requise. Voir
+Statut : implémentation et recette Docker PostgreSQL réussies localement puis
+confirmées par l'utilisateur sur VPS isolé le 2026-08-09. Voir
 `LOT-4.2-AUDIT-STEP-5-ACCEPTANCE.md`.
 
 ### Étape 6 — dépendances
