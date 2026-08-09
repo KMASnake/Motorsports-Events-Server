@@ -36,8 +36,8 @@ montrant qu'un second démarrage ne modifie aucune donnée.
 - [x] retourner `400` avant tout accès SQL pour une valeur incompatible ;
 - [x] ajouter les tests de chaque type et de chaque rejet.
 
-Statut : implémentation, 23 tests de valeurs et recette Docker PostgreSQL
-réussis localement ; confirmation VPS isolée en attente. Voir
+Statut : implémentation, 23 tests de valeurs et recettes Docker PostgreSQL
+réussis localement et sur VPS isolé le 2026-08-09. Voir
 `LOT-4.2-AUDIT-STEP-2-ACCEPTANCE.md`.
 
 ### Étape 3 — sécurité des routes administratives
