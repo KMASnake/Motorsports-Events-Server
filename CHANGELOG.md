@@ -7,6 +7,7 @@
 - démarre une pile Docker/PostgreSQL isolée pour les validateurs obligatoires ;
 - génère le jeu de données déterministe avant les sept scénarios Chromium ;
 - transmet l'authentification administrative aux recettes historiques.
+- aligne les contrôles historiques de logs et de version sur la pile 8.1.0.
 
 ## Lot 4.2 — remédiation audit, étape 6
 

@@ -1,3 +1,10 @@
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+    compress: "true"
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -15,6 +22,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    logging: *default-logging
 
   api:
     build:
@@ -35,6 +43,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    logging: *default-logging
 
   migrate:
     image: postgres:17-alpine
@@ -71,6 +80,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    logging: *default-logging
 
 volumes:
   postgres_data:

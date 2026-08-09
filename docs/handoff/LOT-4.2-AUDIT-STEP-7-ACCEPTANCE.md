@@ -17,6 +17,9 @@ checks GitHub du SHA exact et la recette VPS ne sont pas confirmés.
 - démarrage et nettoyage automatiques d'une pile Docker/PostgreSQL isolée ;
 - génération systématique du jeu de données `ci-final-sha` ;
 - authentification des validateurs API et des sept scénarios Chromium.
+- rotation Docker bornée sur les trois services persistants ;
+- remplacement des assertions historiques `2.7.0` par la cohérence entre
+  `VERSION.json` et les quatre packages du workspace 8.1.0.
 
 ## Recette VPS
 

@@ -12,4 +12,6 @@ def test_all_production_services_use_bounded_log_rotation():
     assert 'max-size: "10m"' in compose
     assert 'max-file: "5"' in compose
     assert 'compress: "true"' in compose
-    assert compose.count("logging: *default-logging") == 5
+    # PostgreSQL, API and Web are persistent services. The migration container
+    # is one-shot and does not need its own rotated log files.
+    assert compose.count("logging: *default-logging") == 3
