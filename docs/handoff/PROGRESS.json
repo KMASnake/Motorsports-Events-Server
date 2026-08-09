@@ -176,8 +176,8 @@
     },
     "user_validation": {
       "date": "2026-08-09",
-      "scope": "Concurrent resolutions, provider/admin serialization, transactional rollback and UTC daylight-saving fixture",
-      "result": "maintainer reported all four isolated VPS checks OK"
+      "scope": "Concurrent resolutions, provider/admin serialization, transactional rollback, UTC daylight-saving fixture and graphical calendar interactions",
+      "result": "maintainer reported all automated and graphical checks OK; Agenda purpose requires later UX clarification"
     }
   },
   "audit_remediation": {
@@ -201,6 +201,7 @@
   "known_issues": [
     "The final SHA CI P1 remains open; Steps 1 through 3 are validated on isolated VPS.",
     "The npm high-severity dependency review remains open as audit remediation Step 6.",
+    "The Agenda view works as a 30-day chronological presentation, but its purpose is not sufficiently clear to the maintainer and requires a later UX clarification.",
     "The local npm version is below the declared npm >= 10 engine requirement.",
     "ESLint 9 cannot run because the repository has no eslint.config flat configuration.",
     "npm audit reports two high-severity advisories requiring compatibility review."

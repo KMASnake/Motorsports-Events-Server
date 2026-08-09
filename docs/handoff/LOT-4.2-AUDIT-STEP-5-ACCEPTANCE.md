@@ -76,3 +76,9 @@ Fixture UTC traversant le changement d’heure conservée : OK
 
 Cette validation ferme l'étape 5 de remédiation. Elle ne constitue pas la
 validation globale du Lot 4.2.
+
+La recette graphique a également été confirmée par le mainteneur le
+2026-08-09 : création par plage, déplacement, redimensionnement et persistance
+après rechargement sont conformes. La finalité de la vue Agenda a été jugée peu
+claire ; ce point d'ergonomie est conservé comme amélioration ultérieure et ne
+remet pas en cause les contrôles techniques de cette étape.
