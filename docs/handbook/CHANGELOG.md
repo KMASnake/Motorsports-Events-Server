@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.12 — 2026-08-09
+
+- protège uniformément toutes les routes `/api/v1/admin/` ;
+- impose des jetons Bearer signés, expirants et dotés d'un rôle ;
+- interdit d'intégrer le secret ou un jeton au bundle Web.
+
 ## 1.11 — 2026-08-09
 
 - impose des migrations PostgreSQL versionnées avant le démarrage API ;

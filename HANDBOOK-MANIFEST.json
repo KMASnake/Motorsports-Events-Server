@@ -1,6 +1,6 @@
 {
-  "version": "1.11",
-  "file_count": 24,
+  "version": "1.12",
+  "file_count": 25,
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/handbook-change.md",
@@ -20,12 +20,12 @@
     {
       "path": "HANDBOOK-PACKAGE-INFO.json",
       "bytes": 339,
-      "sha256": "ffdd65016db8ddde33f10a76f88ed7a9ea93a8142bae8970feb24c2389b08543"
+      "sha256": "088980ac5babf41ca3946c5edf917f923535c24089d61eca074f5cbb23ad90c7"
     },
     {
       "path": "PROJECT-HANDBOOK.md",
-      "bytes": 6268,
-      "sha256": "449e2171c86ab867d919b3bc015e6edf0d5216ba3d723e313de342b3a2e48613"
+      "bytes": 6660,
+      "sha256": "b3f0feb795031ea667f3cc122ccc8db29b9fcd915bd04ad854e35025a284fc7c"
     },
     {
       "path": "README-HANDBOOK.md",
@@ -34,8 +34,8 @@
     },
     {
       "path": "docs/handbook/CHANGELOG.md",
-      "bytes": 2647,
-      "sha256": "b3b8c458dbe402d5b0d8e88cf9f91ee4d763b39f0750e51548ba55b90057a580"
+      "bytes": 2863,
+      "sha256": "2d987a87347eb63c41fa802486864c4b02ba83d559749eab5c035e8dde8af004"
     },
     {
       "path": "docs/handbook/CODEX-PROMPT.md",
@@ -44,8 +44,8 @@
     },
     {
       "path": "docs/handbook/DECISIONS.md",
-      "bytes": 5130,
-      "sha256": "a10ebf405b14379f1b47f3846422de95f0131224969dfeb27f23e18a4925b717"
+      "bytes": 5635,
+      "sha256": "2163d7cbc0072594d343a592c12589c1a8cfd090f4667d7b482169777ff522ac"
     },
     {
       "path": "docs/handbook/GITHUB-PUBLISH.md",
@@ -101,6 +101,11 @@
       "path": "docs/handbook/architecture/ADR-0009-VERSIONED-DATABASE-MIGRATIONS.md",
       "bytes": 1119,
       "sha256": "96962e91a54e8e8e64358c54163a07deabecf531b0a76aa1e2cfa459678df84d"
+    },
+    {
+      "path": "docs/handbook/architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md",
+      "bytes": 1183,
+      "sha256": "8c7f43eec4bed7ee26f453859e942324ae43f499c3be8e9940a084774278850b"
     },
     {
       "path": "docs/handbook/calendar/CALENDAR-RULES.md",

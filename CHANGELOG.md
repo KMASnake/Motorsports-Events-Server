@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 4.2 — remédiation audit, étape 3
+
+- protège toutes les routes `/api/v1/admin/` par Bearer HMAC expirant ;
+- distingue `401` d'authentification et `403` d'autorisation ;
+- conserve les routes publiques sans authentification ;
+- protège aussi les mutations historiques de championnats sans changer leurs routes ;
+- ajoute 8 tests Fastify, un générateur de jetons et une recette Docker.
+
 ## Lot 4.2 — remédiation audit, étape 2
 
 - remplace `z.unknown()` par un schéma discriminé selon le champ corrigé ;

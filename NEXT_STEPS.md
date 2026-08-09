@@ -8,7 +8,9 @@
 - [x] valider l'étape 1 sur le VPS isolé ;
 - [x] implémenter le typage serveur des valeurs de correction ;
 - [x] valider l'étape 2 sur le VPS isolé ;
-- [ ] commencer ensuite les preuves de sécurité des routes administratives.
+- [x] implémenter et tester la sécurité des routes administratives ;
+- [ ] valider l'étape 3 sur le VPS isolé ;
+- [ ] commencer ensuite pagination, validation des filtres et journal d'audit.
 
 Critère d'acceptation atteint le 2026-08-09 : le validateur de l'étape 1 a
 réussi sur le VPS. L'étape 2 a également été validée sur VPS le 2026-08-09.

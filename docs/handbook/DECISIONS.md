@@ -115,3 +115,13 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
   continuent d'utiliser le service transactionnel unique.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
+## 2026-08-09 — Protection de l'API d'administration
+
+- toute route `/api/v1/admin/` exige un Bearer HMAC valide et non expiré ;
+- seul le rôle `admin` est autorisé, un autre rôle reçoit `403` ;
+- le secret reste côté API et le jeton Web reste limité à la session ;
+- les routes publiques ne nécessitent aucune authentification.
+- les mutations historiques de championnats sont protégées sans modifier leur
+  chemin public existant.
+
+Voir `architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.

@@ -55,7 +55,7 @@
     "target_version": "8.1.0-alpha.2-lot.4.2",
     "status": "changes-requested-after-independent-audit",
     "implementation_percent": 89,
-    "audit_remediation_percent": 30,
+    "audit_remediation_percent": 45,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -80,7 +80,7 @@
       "Complete correction filters, typed local editing and event navigation"
     ],
     "mandatory_gaps": [
-      "Resolve the two remaining blocking P1 audit findings",
+      "Resolve the final remaining blocking P1 finding and all P2 findings",
       "Complete range creation, visual resize and interaction rollback tests",
       "Harden binary snapshot restore, anonymization and blocking security checks",
       "Complete local circuit and championship asset handling"
@@ -114,6 +114,7 @@
     "playwright": "7 Chromium scenarios passed in the official Playwright container before independent audit remediation",
     "audit_step_1_migrations": "validated on 2026-08-09: typecheck, 38 unit tests, Web/API builds, isolated WSL Docker migration/rollback test and isolated VPS validator passed",
     "audit_step_2_typed_corrections": "validated on 2026-08-09: typecheck, 61 unit tests, Web/API builds and isolated Docker API/PostgreSQL validator passed locally and on VPS",
+    "audit_step_3_admin_security": "69 unit tests, Web/API builds and isolated Docker security validator passed; isolated VPS validation pending",
     "lint_after_audit_step_2": "blocked by pre-existing missing ESLint 9 flat configuration; no eslint.config file exists",
     "final_sha_ci_after_audit": "pending",
     "known_tooling_issues": [
@@ -126,5 +127,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Implement audit remediation Step 3: prove authentication and authorization for every administrative route family."
+  "next_action": "Validate administrative security Step 3 on isolated VPS, then implement server pagination, filter validation and mutation audit logging."
 }

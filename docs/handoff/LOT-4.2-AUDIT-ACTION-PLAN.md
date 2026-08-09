@@ -42,12 +42,16 @@ réussis localement et sur VPS isolé le 2026-08-09. Voir
 
 ### Étape 3 — sécurité des routes administratives
 
-- [ ] vérifier l'ordre d'enregistrement du hook d'authentification ;
-- [ ] tester `401` sans authentification ;
-- [ ] tester `403` sans rôle administrateur ;
-- [ ] tester le succès avec un administrateur ;
-- [ ] tester les jetons invalides et expirés ;
-- [ ] couvrir événements, ingestion fournisseur et corrections.
+- [x] vérifier l'ordre d'enregistrement du hook d'authentification ;
+- [x] tester `401` sans authentification ;
+- [x] tester `403` sans rôle administrateur ;
+- [x] tester le succès avec un administrateur ;
+- [x] tester les jetons invalides et expirés ;
+- [x] couvrir événements, ingestion fournisseur et corrections.
+
+Statut : 8 tests Fastify et recette Docker PostgreSQL réussis localement ;
+confirmation VPS isolée en attente. Voir
+`LOT-4.2-AUDIT-STEP-3-ACCEPTANCE.md`.
 
 ### Étape 4 — API, pagination et audit
 
