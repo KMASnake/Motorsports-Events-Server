@@ -6,7 +6,10 @@
 - automatise audit, lint, typecheck, tests, builds, jeu de données, validateurs
   API et scénarios Chromium avant la validation humaine ;
 - documente les contrôles visuels, l'absence d'impact production et le nettoyage ;
-- conserve le Lot 4.2 non validé jusqu'à la confirmation explicite du mainteneur.
+- a conservé le Lot 4.2 non validé jusqu'à la confirmation explicite du
+  mainteneur ;
+- consigne la réussite de la recette Windows et la validation utilisateur
+  explicite du Lot 4.2 le 2026-08-10 sur le SHA `70e78ec`.
 
 ## Lot 4.2 — remédiation audit, étape 7
 

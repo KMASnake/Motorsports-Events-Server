@@ -127,8 +127,8 @@ Voir `LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md`.
 - [x] recette Windows complète préparée et reproductible ;
 - [x] recette VPS Docker isolée réussie le 2026-08-10 ;
 - [x] procédure garantissant qu'aucune production n'est ciblée ;
-- [ ] mise à jour de `PROJECT-STATUS.json`, `PROGRESS.json` et `CHANGELOG.md` ;
-- [ ] validation explicite de l'utilisateur ;
+- [x] mise à jour de `PROJECT-STATUS.json`, `PROGRESS.json` et `CHANGELOG.md` ;
+- [x] validation explicite de l'utilisateur le 2026-08-10 ;
 - [ ] fusion seulement après cette validation.
 
 La checklist humaine, les commandes et le nettoyage sont décrits dans

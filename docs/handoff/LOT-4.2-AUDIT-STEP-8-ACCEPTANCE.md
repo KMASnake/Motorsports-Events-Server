@@ -2,9 +2,9 @@
 
 ## État
 
-La recette technique VPS de l'étape 7 est validée. Cette étape 8 prépare la
-validation humaine finale sur Windows. Le Lot 4.2 reste non validé tant que le
-mainteneur n'a pas confirmé explicitement la checklist ci-dessous.
+La recette technique VPS de l'étape 7 est validée. Le mainteneur a confirmé la
+réussite de la recette humaine Windows et la validation globale du Lot 4.2 le
+2026-08-10, sur le SHA `70e78ecb0a23ea5521a1f92c378a3f7a26153810`.
 
 ## Préconditions Windows
 
@@ -41,25 +41,25 @@ Résultat de données attendu : 12 championnats, 40 circuits, 96 événements,
 
 Ouvrir <http://localhost:3600> puis confirmer :
 
-- [ ] Tableau de bord et Championnats s'affichent, avec logos et fallbacks ;
-- [ ] Événements s'ouvre en vue Mois avec légende des championnats visibles ;
-- [ ] les vues Mois, Semaine, Jour, Agenda et Liste s'affichent correctement ;
-- [ ] précédent/suivant avance selon la vue active, et Aujourd'hui recentre ;
-- [ ] les drapeaux sont locaux, lisibles et sans image cassée ;
-- [ ] le filtre Fournisseur propose OC BlackTop, TheSportsDB, Motorsports Events
+- [x] Tableau de bord et Championnats s'affichent, avec logos et fallbacks ;
+- [x] Événements s'ouvre en vue Mois avec légende des championnats visibles ;
+- [x] les vues Mois, Semaine, Jour, Agenda et Liste s'affichent correctement ;
+- [x] précédent/suivant avance selon la vue active, et Aujourd'hui recentre ;
+- [x] les drapeaux sont locaux, lisibles et sans image cassée ;
+- [x] le filtre Fournisseur propose OC BlackTop, TheSportsDB, Motorsports Events
   et toute source synthétique supplémentaire ;
-- [ ] la vue Liste affiche 25 éléments par page et trie avant pagination ;
-- [ ] création, modification, duplication, déplacement et redimensionnement
+- [x] la vue Liste affiche 25 éléments par page et trie avant pagination ;
+- [x] création, modification, duplication, déplacement et redimensionnement
   persistent après actualisation ;
-- [ ] un refus de mutation restaure visuellement la valeur précédente ;
-- [ ] Corrections affiche dix lignes par page, les vrais noms et les filtres ;
-- [ ] Modifier local utilise une liste métier ou un sélecteur date/heure adapté ;
-- [ ] Restaurer fournisseur retire la correction locale ;
-- [ ] `postponed` apparaît comme « Reporté » ;
-- [ ] aucun champ Slug, Origine ou Fuseau horaire n'apparaît dans les formulaires ;
-- [ ] l'API publique reste accessible sans jeton et n'expose pas les métadonnées
+- [x] un refus de mutation restaure visuellement la valeur précédente ;
+- [x] Corrections affiche dix lignes par page, les vrais noms et les filtres ;
+- [x] Modifier local utilise une liste métier ou un sélecteur date/heure adapté ;
+- [x] Restaurer fournisseur retire la correction locale ;
+- [x] `postponed` apparaît comme « Reporté » ;
+- [x] aucun champ Slug, Origine ou Fuseau horaire n'apparaît dans les formulaires ;
+- [x] l'API publique reste accessible sans jeton et n'expose pas les métadonnées
   fournisseur ;
-- [ ] aucun service, port ou volume de production n'a été utilisé.
+- [x] aucun service, port ou volume de production n'a été utilisé.
 
 Tester également à 1440×900 et 1280×720. Noter séparément l'écart UX connu :
 la vue Agenda fonctionne comme une liste chronologique sur trente jours, mais
@@ -76,7 +76,6 @@ projet Docker `mse-lot42-final`. La production n'est jamais ciblée.
 
 ## Clôture
 
-Après réussite, le mainteneur doit confirmer explicitement la validation du Lot
-4.2. Codex consignera alors la date, le périmètre, le SHA testé et les résultats
-dans `PROJECT-STATUS.json`, `docs/handoff/PROGRESS.json` et `CHANGELOG.md` avant
-toute autorisation de fusion.
+Le mainteneur a répondu « tout est ok » après la recette du 2026-08-10. Cette
+confirmation vaut validation utilisateur explicite du Lot 4.2. La fusion reste
+une opération distincte et n'est pas exécutée par cette consignation.
