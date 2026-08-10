@@ -27,10 +27,36 @@ doit pas commencer par modifier l'interface. L'ordre recommandé est :
 2. API et contrats de types ;
 3. tests PostgreSQL et sécurité ;
 4. API publique ;
-5. interface d'administration ;
+5. interface d'administration intégrée à l'événement ;
 6. scénarios Chromium et non-régression Lot 4.2 ;
 7. recette VPS isolée ;
 8. recette Windows et validation utilisateur.
+
+## Décision fonctionnelle mainteneur — 2026-08-10
+
+La gestion des Sessions doit être centrée sur l'Événement, et non sur une page
+Sessions autonome comme workflow principal.
+
+Le formulaire métier utilise **un seul champ visible `Intitulé de session`**.
+Il ne doit pas demander séparément un type et un nom de session.
+
+Ce champ sera une combobox éditable/créable :
+
+- suggestions issues des intitulés découverts chez les fournisseurs ;
+- suggestions issues des intitulés déjà créés/utilisés localement ;
+- sélection d'une suggestion existante ;
+- possibilité de saisir immédiatement un nouvel intitulé absent de la liste ;
+- nouvel intitulé ensuite réutilisable dans les suggestions.
+
+Cette décision reflète les API fournisseurs, qui exposent un intitulé unique.
+Une distinction `name`/`type` peut subsister techniquement si nécessaire pour
+préserver la migration `0004_sessions`, mais elle ne doit pas être imposée au
+workflow utilisateur. Toute adaptation du modèle ou des contrats doit rester
+rétrocompatible avec la migration validée ou faire l'objet d'une nouvelle
+validation migration/rollback.
+
+L'API Sessions en cours doit être conçue pour supporter ce workflow avant le
+développement de l'interface.
 
 ## Contraintes héritées du Lot 4.2
 
@@ -69,6 +95,6 @@ L'ADR `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`, le plan détaill�
 et la migration `0004_sessions` sont validés explicitement. La recette VPS a
 conservé l'empreinte Lot 4.2 `cb816e2a25fc9cb3d11f0604b3506c03`.
 
-Avancement réel : 20 %. La prochaine étape est l'API Sessions et les contrats
-de types partagés. Aucun code API Sessions ni changement d'interface n'a encore
-été produit.
+Avancement réel documenté : 20 %. La prochaine étape est l'API Sessions et les
+contrats de types partagés. Avant toute interface, l'API doit être vérifiée
+contre la décision fonctionnelle d'intitulé unique ci-dessus.
