@@ -5,6 +5,14 @@ on:
     paths:
       - 'apps/**'
       - 'docker-compose.yml'
+  push:
+    branches:
+      - codex/lot-4.2-complete
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'package*.json'
+      - 'docker-compose.yml'
 jobs:
   docker:
     runs-on: ubuntu-latest

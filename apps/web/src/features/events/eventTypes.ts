@@ -1,6 +1,6 @@
 export type EventStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'postponed';
 export type EventOrigin = 'manual' | 'provider' | 'mixed';
-export type EventView = 'calendar' | 'list';
+export type EventView = 'month' | 'week' | 'day' | 'agenda' | 'list';
 
 export interface Championship {
   id: string;
@@ -24,6 +24,7 @@ export interface EventRow {
   championship_id: string;
   championship_name: string;
   championship_slug: string;
+  championship_logo_url?: string | null;
   circuit_id: string | null;
   circuit_name: string | null;
   circuit_city: string | null;
@@ -38,20 +39,20 @@ export interface EventRow {
   published: boolean;
   origin: EventOrigin;
   description: string | null;
+  provider_key?: string | null;
+  external_id?: string | null;
+  correction_count?: number;
 }
 
 export interface EventFormState {
   championship_id: string;
   circuit_id: string;
   name: string;
-  slug: string;
   category: string;
   starts_at: string;
   ends_at: string;
-  timezone: string;
   status: EventStatus;
   published: boolean;
-  origin: EventOrigin;
   description: string;
 }
 
@@ -60,4 +61,5 @@ export interface EventFiltersState {
   championship: string;
   status: string;
   publication: string;
+  provider: string;
 }

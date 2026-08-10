@@ -1,5 +1,63 @@
 # Prochaines étapes
 
+## Remédiation de l'audit Lot 4.2
+
+- [x] remplacer le SQL destructif au démarrage par des migrations versionnées ;
+- [x] archiver et restaurer les anciennes corrections de fuseau ;
+- [x] ajouter le validateur Docker reproductible de l'étape 1 ;
+- [x] valider l'étape 1 sur le VPS isolé ;
+- [x] implémenter le typage serveur des valeurs de correction ;
+- [x] valider l'étape 2 sur le VPS isolé ;
+- [x] implémenter et tester la sécurité des routes administratives ;
+- [x] valider l'étape 3 sur le VPS isolé ;
+- [x] implémenter pagination, validation des filtres et journal d'audit ;
+- [x] valider l'étape 4 sur le VPS isolé ;
+- [ ] commencer ensuite les tests de concurrence, rollback et calendrier.
+
+L'étape 4 a été validée sur VPS le 2026-08-09 : pagination/tri, filtres `400`,
+unicité fournisseur et journal sans secret ont tous réussi.
+
+L'étape 3 a été validée sur VPS le 2026-08-09 : `401`, `403`, jetons
+invalides/expirés, administrateur autorisé et API publique ont tous réussi.
+
+Critère d'acceptation atteint le 2026-08-09 : le validateur de l'étape 1 a
+réussi sur le VPS. L'étape 2 a également été validée sur VPS le 2026-08-09.
+Prochaine tâche : étape 3, preuves de sécurité des routes administratives.
+
+## Lot 4.2 — validation et publication
+
+- [x] implémenter les vues Mois, Semaine, Jour et Agenda ;
+- [x] implémenter déplacement, redimensionnement, création rapide,
+  duplication, rollback et avertissement de conflit ;
+- [x] implémenter les corrections fournisseur champ par champ ;
+- [x] ajouter l'identité locale, le registre d'assets et les fallbacks ;
+- [x] ajouter la chaîne hybride sécurisée et le générateur déterministe ;
+- [x] valider unités, builds, PostgreSQL, Docker et Chromium localement ;
+- [ ] publier la pull request Lot 4.2 ;
+- [x] installer le package dans un projet Docker VPS isolé ;
+- [x] valider sur VPS l'affichage des identités sportives et des drapeaux ;
+- [x] embarquer le jeu complet de drapeaux et supprimer la whitelist pays ;
+- [ ] valider sur VPS un pays absent de l'ancien jeu limité ;
+- [ ] valider sur VPS la légende dynamique sous le calendrier mensuel ;
+- [ ] valider sur VPS que les flèches avancent d'un jour en vue Jour et de sept
+  jours en vue Semaine ;
+- [x] régénérer les données VPS puis valider qu'une modification d'un événement
+  fournisseur apparaît dans la page Corrections ;
+- [x] vérifier sur VPS qu'une correction de circuit affiche les deux noms de
+  circuits et non leurs identifiants techniques ;
+- [x] valider sur VPS les filtres Fournisseur des pages Événements et
+  Corrections ainsi que leur réinitialisation ;
+- [x] confirmer sur VPS que les trois libellés sont OC BlackTop, TheSportsDB et
+  Motorsports Events, notamment pour un ajout manuel ;
+- [x] injecter sur VPS une source synthétique supplémentaire et confirmer son
+  apparition automatique dans les deux filtres Fournisseur ;
+- [ ] vérifier sur VPS les logos locaux et configurés dans la page Championnats ;
+- [ ] exécuter la recette manuelle Windows et consigner le résultat ;
+- [ ] fusionner seulement après validation utilisateur.
+
+Critère d'acceptation : toutes les checklists Lot 4.2 sont validées sans secret
+ni écriture vers la production, avec une API publique inchangée.
+
 Les tâches sont classées par priorité. Ne commencer une tâche que lorsque la
 précédente est terminée ou explicitement différée.
 

@@ -1,78 +1,130 @@
 {
-  "generated_at": "2026-08-01",
-  "repository_state": {
-    "root_source": "v8.1.0-alpha.2-lot.4-rev.1",
-    "status": "user-validated-on-vps-pr-ready",
-    "reason": "The isolated VPS deployment, API/database health and complete browser acceptance checklist were confirmed by the user."
+  "generated_at": "2026-08-10",
+  "documentation": {
+    "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
+    "current_lot_progress": "docs/handoff/PROGRESS.json",
+    "lot_specific_rules": "docs/handoff/",
+    "historical_handover": "docs/handover/",
+    "blocking_audit": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
+    "audit_action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md"
   },
-  "last_fully_validated_release": {
-    "version": "v8.1.0-alpha.2-lot.4-rev.1",
+  "repository_state": {
+    "branch": "codex/lot-4.2-complete",
+    "status": "lot-4.2-user-validated-awaiting-merge",
+    "reason": "Audit remediation is complete and the maintainer confirmed the final Dashboard logo correction on 2026-08-10."
+  },
+  "independent_audit": {
+    "date": "2026-08-03",
+    "document": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
+    "action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
+    "decision": "changes-requested",
+    "merge_authorized": true,
+    "new_features_authorized_before_p1_closure": false,
+    "blocking_findings": [
+      "Replace destructive startup SQL with a versioned, idempotent and reversible migration.",
+      "Publish green CI attached to the exact final branch SHA using Node >= 22 and npm >= 10.",
+      "Prove authentication and authorization for every administrative route.",
+      "Validate correction override values according to the corrected business field type."
+    ],
+    "required_sequence": [
+      "database migration safety",
+      "typed correction validation",
+      "administrative route security tests",
+      "server pagination, filter validation and mutation audit logging",
+      "concurrency, rollback and calendar interaction tests",
+      "npm high-severity advisory review",
+      "complete CI on the final SHA",
+      "Windows and isolated VPS validation",
+      "explicit user validation"
+    ]
+  },
+  "last_fully_validated_lot": {
+    "lot": "4.2",
+    "version": "8.1.0-alpha.2-lot.4.2",
+    "status": "user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "validated_features": [
-      "Docker Compose",
-      "PostgreSQL healthcheck",
-      "API healthcheck",
-      "Frontend healthcheck",
-      "Championship CRUD",
-      "Events calendar as default view",
-      "Events list view",
-      "Events create/update/delete flows",
-      "Events publishing and unpublishing",
-      "Events filters and month navigation",
-      "Public and administration Events APIs",
-      "No regression on Championships"
+    "validation_date": "2026-08-10",
+    "evidence": [
+      "docs/handoff/LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md",
+      "docs/handoff/LOT-4.2-AUDIT-STEP-8-ACCEPTANCE.md"
     ]
   },
-  "working_lot_4": {
-    "implemented": [
-      "Events administration CRUD",
-      "Public Events API",
-      "Admin Events API",
-      "Publishing and unpublishing",
-      "Calendar view selected by default",
-      "Secondary list view",
-      "Shared filters and selection",
-      "Event details panel",
-      "Create, edit, duplicate and delete flows",
-      "Unit and Chromium browser tests"
+  "working_lot": {
+    "lot": "4.2",
+    "target_version": "8.1.0-alpha.2-lot.4.2",
+    "status": "user-validated-awaiting-merge",
+    "implementation_percent": 100,
+    "audit_remediation_percent": 100,
+    "validated_on_user_workstation": true,
+    "validated_on_vps": true,
+    "merged_to_main": false,
+    "implemented_or_partially_implemented": [
+      "Month, week, day and agenda calendar views",
+      "Optimistic event movement and basic resize action",
+      "Quick creation, duplication and overlap warning",
+      "Initial field-level provider corrections and administration page",
+      "Local branding, asset registry, flags and fallbacks",
+      "Deterministic synthetic sports-data generator",
+      "Provider filters and readable provider labels",
+      "Transactional provider-source and local-override reconciliation",
+      "Non-destructive provider synchronization with explicit conflicts",
+      "Local/provider resolution and automatic override removal on convergence",
+      "Business-only event administration form and mutations",
+      "Server-generated unique slugs and automatic origins",
+      "Circuit-derived timezones with deterministic UTC fallback",
+      "Dedicated provider ingestion endpoint",
+      "UTC-only event storage",
+      "25-event list pagination ordered by temporal proximity",
+      "Ascending and descending list-column sorting before pagination",
+      "Complete correction filters, typed local editing and event navigation"
     ],
-    "accepted": true
+    "mandatory_gaps": [],
+    "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
+    "progress": "docs/handoff/PROGRESS.json"
   },
-  "local_validation": {
-    "web_build": "passed",
-    "api_build": "passed",
-    "workspace_typecheck": "passed",
-    "unit_tests": "4 passed",
-    "playwright_chromium": "2 passed",
-    "docker_services": "3 healthy",
-    "lot4_api_validator": "passed",
-    "screenshots": [
-      "tests/ui/screenshots/events-calendar-1440x900.png",
-      "tests/ui/screenshots/events-list-1440x900.png"
-    ],
-    "known_tooling_issues": [
-      "ESLint 9 configuration is absent from the baseline repository.",
-      "npm audit reports the React Router RSC CSRF advisory; this SPA does not use RSC or Server Actions, and a major Router 8 migration is outside rev.1."
-    ]
-  },
-  "vps_validation": {
-    "date": "2026-08-01",
-    "host": "vps-855f6d7e",
-    "directory": "/home/debian/motorsports-events-server-lot4-test",
-    "deployment": "isolated Docker Compose project mse-lot4-test",
-    "commit": "dcbf76575a648082e98df9202f4b3b6506338515",
+  "technical_validation": {
+    "audit_date": "2026-08-03",
+    "workspace_typecheck": "passed before independent audit remediation",
+    "web_build": "passed before independent audit remediation",
+    "api_build": "passed before independent audit remediation",
+    "unit_tests": "38 passed before independent audit remediation",
+    "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
     "api_health": "passed with database=true",
     "web_health": "passed",
-    "user_browser_acceptance": "passed",
-    "production_2_7_0_affected": false,
-    "report": "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md"
+    "step_2_integration": "passed on isolated PostgreSQL through npm run validate:step2",
+    "step_2_user_validation": "maintainer reported the isolated VPS test dataset and correction workflow looked correct on 2026-08-03",
+    "step_3_integration": "passed on isolated PostgreSQL through npm run validate:step3",
+    "step_3_user_validation": "maintainer confirmed the Step 3 VPS workflow on 2026-08-03",
+    "utc_and_pagination_adjustment": "98 generated events stored only in UTC; 25-row proximity ordering validated",
+    "list_sorting_adjustment": "date ascending/descending and alphabetical column sorting passed in Chromium",
+    "step_3_adjustments_user_validation": "maintainer confirmed UTC storage, pagination and list sorting on the isolated VPS on 2026-08-03",
+    "step_4_corrections": "combined filters, override editing and direct event navigation passed in Chromium",
+    "step_4_test_dataset": "12 deterministic corrections validated on isolated PostgreSQL across 4 statuses, 3 providers, 8 fields and 5 authors",
+    "step_4_typed_editors": "reference and enum corrections use controlled lists; dates use datetime-local and persist UTC",
+    "step_4_pagination_and_labels": "10 corrections per page, simplified resolution actions and postponed translated as Reporté",
+    "step_4_resolution_action": "Restaurer fournisseur is the sole visible override-removal action; redundant delete action remains API-compatible but is hidden",
+    "step_4_user_validation": "maintainer validated the complete Corrections step on the isolated VPS on 2026-08-03",
+    "lot_4_api_regression": "passed through npm run validate:lot4 before independent audit remediation",
+    "playwright": "7 Chromium scenarios passed in the official Playwright container before independent audit remediation",
+    "audit_step_1_migrations": "validated on 2026-08-09: typecheck, 38 unit tests, Web/API builds, isolated WSL Docker migration/rollback test and isolated VPS validator passed",
+    "audit_step_2_typed_corrections": "validated on 2026-08-09: typecheck, 61 unit tests, Web/API builds and isolated Docker API/PostgreSQL validator passed locally and on VPS",
+    "audit_step_3_admin_security": "validated on 2026-08-09: 69 unit tests, Web/API builds and isolated Docker security validator passed locally and on VPS; 401, 403, invalid/expired tokens, admin success and public API confirmed",
+    "audit_step_4_pagination_and_audit": "validated on 2026-08-09: 72 unit tests, Web/API builds, migration/rollback and isolated Docker validator passed locally and on VPS; pagination, invalid filters, provider uniqueness and secret-free audit confirmed",
+    "audit_step_5_concurrency_and_calendar": "validated on 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS; graphical range creation, movement, resize and persistence confirmed by maintainer; Agenda UX clarification noted",
+    "audit_step_6_dependencies": "validated on 2026-08-09: nanoid GHSA-2v37-7h3g-55p8 identified as transitive PostCSS/Vite build dependency, lock upgraded from 3.3.16 to 3.3.18, npm audit zero; 75 tests, typecheck and API/Web/Types builds passed locally and under Node 22/npm 10 on isolated VPS",
+    "lint_after_audit_step_2": "resolved in Step 7 with eslint.config.mjs; Web and API lint pass locally",
+    "audit_step_7_final_sha_ci": "validated on 2026-08-10: green on a5f716cc0b216e49fde9a58eb7515f8489fee2a7; local, GitHub and isolated VPS audit, ESLint 9, 75 tests, typecheck, API/Web/Types builds, Lot 4/Step 2/Step 3 validators, Docker and 7 Chromium scenarios passed; GitHub also passed 68 Python tests, 4 PostgreSQL integrations and release artifact",
+    "final_sha_ci_after_audit": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
+    "known_tooling_issues": [
+      "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
+      "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
+    ]
   },
-  "target": {
-    "next_version": "to be selected after merge",
-    "owner": "Maintainer",
-    "specification": "docs/handover/LOT-4-REV-1-CALENDAR-SPEC.md",
-    "visual_fidelity_target_percent": 95,
-    "next_action": "Review and merge pull request 24 into main."
-  }
+  "historical_production": {
+    "version": "2.7.0",
+    "status": "validated-production-history",
+    "details": "PROJECT_STATUS.md"
+  },
+  "next_action": "Merge codex/lot-4.2-complete only on explicit maintainer request, then prepare Lot 4.3."
 }

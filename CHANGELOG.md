@@ -1,5 +1,150 @@
 # Changelog
 
+## Lot 4.2 — correctif de recette Tableau de bord
+
+- affiche dans les prochaines séances les identités championnat issues du
+  registre local d'assets ;
+- utilise le fallback local lorsqu'aucun logo spécifique n'est disponible ;
+- ajoute un scénario Chromium contrôlant six images chargées et visibles ;
+- rouvre la validation globale jusqu'au contrôle graphique du mainteneur.
+- consigne la revalidation graphique réussie du mainteneur le 2026-08-10 sur
+  le SHA `7d67672`.
+
+## Lot 4.2 — remédiation audit, étape 8
+
+- ajoute une recette Windows finale reproductible sur une pile Docker isolée ;
+- automatise audit, lint, typecheck, tests, builds, jeu de données, validateurs
+  API et scénarios Chromium avant la validation humaine ;
+- documente les contrôles visuels, l'absence d'impact production et le nettoyage ;
+- a conservé le Lot 4.2 non validé jusqu'à la confirmation explicite du
+  mainteneur ;
+- consigne la réussite de la recette Windows et la validation utilisateur
+  explicite du Lot 4.2 le 2026-08-10 sur le SHA `70e78ec`.
+
+## Lot 4.2 — remédiation audit, étape 7
+
+- ajoute la configuration plate ESLint 9 pour les sources TypeScript ;
+- impose Node 22, npm 10, `npm ci`, audit, lint, tests et builds dans la CI ;
+- démarre une pile Docker/PostgreSQL isolée pour les validateurs obligatoires ;
+- génère le jeu de données déterministe avant les sept scénarios Chromium ;
+- transmet l'authentification administrative aux recettes historiques.
+- aligne les contrôles historiques de logs et de version sur la pile 8.1.0.
+
+## Lot 4.2 — remédiation audit, étape 6
+
+- identifie `nanoid` comme dépendance transitive de PostCSS/Vite concernée par
+  `GHSA-2v37-7h3g-55p8` ;
+- met à jour le verrou compatible de `nanoid 3.3.16` à `3.3.18` ;
+- ramène `npm audit` à zéro vulnérabilité sans changement applicatif ;
+- documente l'exposition et l'absence d'exception de sécurité temporaire.
+
+## Lot 4.2 — remédiation audit, étape 4
+
+- ajoute pagination et tri serveur validés aux événements et corrections ;
+- rejette les filtres inconnus ou incompatibles en `400` ;
+- ajoute la migration `0003` pour journal et unicité fournisseur ;
+- journalise les mutations avec acteur, avant/après et identifiant de requête ;
+- ajoute une fixture reproductible de 27 événements et quatre corrections.
+- consigne la réussite de la recette étape 4 sur VPS isolé le 2026-08-09.
+
+## Lot 4.2 — remédiation audit, étape 3
+
+- protège toutes les routes `/api/v1/admin/` par Bearer HMAC expirant ;
+- distingue `401` d'authentification et `403` d'autorisation ;
+- conserve les routes publiques sans authentification ;
+- protège aussi les mutations historiques de championnats sans changer leurs routes ;
+- ajoute 8 tests Fastify, un générateur de jetons et une recette Docker.
+- consigne la réussite de la recette de sécurité sur VPS isolé le 2026-08-09.
+
+## Lot 4.2 — remédiation audit, étape 2
+
+- remplace `z.unknown()` par un schéma discriminé selon le champ corrigé ;
+- valide textes, booléens, statuts, dates UTC, valeurs nulles et références ;
+- exige `field_name` dans la mutation de correction et vérifie sa concordance ;
+- ajoute 23 tests unitaires et une recette API/PostgreSQL synthétique.
+- consigne la réussite de la recette typée sur VPS isolé le 2026-08-09.
+
+## Lot 4.2 — remédiation audit, étape 1
+
+- remplace les transformations SQL au démarrage API par deux migrations
+  PostgreSQL versionnées ;
+- archive les anciennes corrections de fuseau et fournit leur rollback ;
+- impose l'exécution du service de migration avant l'API ;
+- transmet explicitement le mot de passe au client PostgreSQL du service de
+  migration ;
+- ajoute un test Docker isolé couvrant idempotence, rollback et redémarrages.
+- consigne la réussite de cette recette sur le VPS isolé le 2026-08-09.
+
+## Non publié — Intégration du Handbook et audit du Lot 4.2
+
+- intégration de `PROJECT-HANDBOOK.md` comme source de vérité permanente ;
+- séparation explicite entre le Lot 4.1 validé et le Lot 4.2 en développement ;
+- audit des fonctionnalités existantes et correction de l'avancement à 60 % ;
+- validation technique de l'étape documentaire : tests, builds Web/API et
+  trois services Docker isolés sains ;
+- aucune validation utilisateur du Lot 4.2 n'est revendiquée.
+- réconciliation transactionnelle des valeurs fournisseur et overrides ;
+- synchronisation non destructive, conflit explicite et résolutions testées
+  sur PostgreSQL réel ;
+- ajout du validateur `npm run validate:step2`.
+- formulaire Événement limité aux données métier, sans Slug, Origine ni Fuseau
+  horaire éditable ;
+- génération serveur des slugs uniques, origine manuelle automatique et fuseau
+  déduit du circuit avec repli UTC ;
+- ingestion fournisseur isolée et ajout du validateur `npm run validate:step3`.
+- normalisation de tous les événements en UTC sans gestion de fuseau ;
+- pagination de la vue Liste par 25 et tri de l'événement le plus proche en
+  premier.
+- tri interactif des colonnes Date, Événement, Championnat, Circuit, Statut et
+  API sur l'ensemble des pages.
+- page Corrections complétée avec filtres combinés, modification locale,
+  synthèse des résultats et ouverture directe de l'événement.
+- générateur déterministe enrichi de 12 corrections couvrant les statuts,
+  conflits, fournisseurs, champs, auteurs et dates nécessaires à la recette.
+- édition locale typée dans Corrections : référentiels et énumérations en
+  listes contrôlées, dates via calendrier et heure avec conversion UTC.
+- pagination de Corrections par dix, libellés d'actions simplifiés et traduction
+  de `postponed` en « Reporté ».
+- suppression de l'action redondante « Supprimer correction » dans l'interface.
+- étape 4 Corrections validée explicitement par l'utilisateur sur VPS isolé le
+  3 août 2026.
+
+## 8.1.0-alpha.2-lot.4.2 — 2026-08-01
+
+### Calendrier interactif, corrections et données de test
+
+- vues Mois, Semaine, Jour et Agenda avec navigation et filtres communs ;
+- déplacement, redimensionnement accessible, création rapide, duplication,
+  mutations optimistes avec rollback et avertissement de chevauchement ;
+- corrections fournisseur champ par champ avec comparaison, conflit et actions
+  de résolution, sans exposition des métadonnées dans l'API publique ;
+- identité Motorsports Events locale, registre d'assets, codes pays accessibles
+  et fallbacks documentés ;
+- chaîne hybride sécurisée d'export, import isolé, anonymisation, vérification
+  bloquante et génération déterministe de données réalistes ;
+- tests unitaires, intégration PostgreSQL, Docker et captures Chromium étendus.
+- ajout après recette VPS des drapeaux locaux AU, DE, ES, FR, GB, IT, JP et US ;
+- remplacement du jeu limité par les 270 SVG locaux `flag-icons` 7.2.3 sous
+  licence MIT, avec résolution automatique de tout code pays alpha-2 ;
+- ajout d'une légende dynamique sous le calendrier mensuel, limitée aux
+  championnats actuellement visibles et synchronisée avec les filtres existants ;
+- navigation précédent/suivant adaptée à la vue active : mois, semaine, jour
+  ou fenêtre Agenda de trente jours, avec libellé de période correspondant ;
+- génération idempotente de 32 événements fournisseur synthétiques et
+  validation de bout en bout de leur affichage dans la page Corrections ;
+- remplacement des identifiants de champs, championnats, circuits et
+  fournisseurs connus par des libellés lisibles dans la page Corrections ;
+- ajout d'un filtre Fournisseur sur Événements et Corrections, et renommage des
+  libellés visibles « Origine administrative » sans changement du contrat API ;
+- normalisation des sources visibles en `OC BlackTop`, `TheSportsDB` et
+  `Motorsports Events`, ce dernier couvrant les ajouts manuels ;
+- découverte automatique des futures clés fournisseur et génération d'un
+  libellé lisible dans les filtres Événements et Corrections ;
+- affichage des logos configurés ou des identités sportives locales dans la
+  page Championnats, avec fallback en cas d'asset absent ou invalide ;
+- ajout d'identités sportives locales F1, MotoGP et WRC et priorité aux URLs de
+  logos autorisées configurées dans l'administration.
+
 ## 8.1.0-alpha.2-lot.4-rev.1 — 2026-08-01
 
 ### Restauration du calendrier Événements

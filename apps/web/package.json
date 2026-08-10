@@ -1,6 +1,6 @@
 {
   "name": "@mse/web",
-  "version": "8.1.0-alpha.2-lot.4-rev.1",
+  "version": "8.1.0-alpha.2-lot.4.2",
   "private": true,
   "type": "module",
   "scripts": {

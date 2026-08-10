@@ -5,9 +5,17 @@ import { dashboardRoutes } from './routes/dashboard.js';
 import { catalogRoutes } from './routes/catalog.js';
 import { championshipRoutes } from './routes/championships.js';
 import { eventRoutes } from './routes/events.js';
+import { correctionRoutes } from './routes/corrections.js';
+import { verifyApplicationSchema } from './lib/db.js';
+import { registerAdminAuth } from './lib/adminAuth.js';
+import { registerAdminAudit } from './lib/adminAudit.js';
+import { auditRoutes } from './routes/audit.js';
 
 const app = Fastify({ logger: true });
+await verifyApplicationSchema();
 await app.register(cors, { origin: true });
+registerAdminAuth(app);
+registerAdminAudit(app);
 
 app.addHook('onRequest', async (request) => {
   const methodHasNoExpectedBody =
@@ -29,6 +37,8 @@ await app.register(dashboardRoutes);
 await app.register(catalogRoutes);
 await app.register(championshipRoutes);
 await app.register(eventRoutes);
+await app.register(correctionRoutes);
+await app.register(auditRoutes);
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';

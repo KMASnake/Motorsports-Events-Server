@@ -31,7 +31,17 @@ do
   fi
 done
 
-if find "${ROOT}" -type f \( -name '.env' -o -path '*/data/*' \) | grep -q .; then
+runtime_data_found=false
+if [[ -d "${ROOT}/data" ]] &&
+  find "${ROOT}/data" -type f -print -quit | grep -q .
+then
+  runtime_data_found=true
+fi
+
+if find "${ROOT}" -type f -name '.env' \
+    -not -path "${ROOT}/.git/*" -print -quit | grep -q . ||
+  [[ "${runtime_data_found}" == true ]]
+then
   echo "Un secret ou une donnée d’exécution est présent dans le dépôt."
   exit 1
 fi

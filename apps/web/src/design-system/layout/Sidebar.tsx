@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { MedsIcon } from './icons';
 import { NAVIGATION_SECTIONS } from './navigation';
+import { MotorsportsEventsLogo } from '../branding/MotorsportsEventsLogo';
 
 export function Sidebar({
   open,
@@ -12,8 +13,7 @@ export function Sidebar({
   return (
     <aside className={`sidebar ${open ? 'is-open' : ''}`} aria-label="Navigation principale">
       <div className="logo">
-        <div className="gauge"><MedsIcon name="gauge" size={31} /></div>
-        <strong>MOTORSPORTS<br/><em>EVENTS</em> <small>SERVER</small></strong>
+        <MotorsportsEventsLogo />
       </div>
 
       <nav>
@@ -39,7 +39,7 @@ export function Sidebar({
 
       <footer>
         <div className="exit"><MedsIcon name="logout" size={18} /></div>
-        <span>8.1.0-alpha.2-lot.4-rev.1<br/><small>© 2026 Motorsports Events</small></span>
+        <span>8.1.0-alpha.2-lot.4.2<br/><small>© 2026 Motorsports Events</small></span>
       </footer>
     </aside>
   );

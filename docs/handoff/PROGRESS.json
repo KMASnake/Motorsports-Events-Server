@@ -1,44 +1,212 @@
 {
-  "version": "8.1.0-alpha.2-lot.4-rev.1",
-  "phase": "1.1",
-  "lot": 4,
-  "revision": 1,
-  "updated_at": "2026-08-01",
-  "status": "user-validated-pr-ready",
-  "overall_percent": 95,
+  "canonical": true,
+  "canonical_path": "docs/handoff/PROGRESS.json",
+  "baseline": {
+    "lot": "4.2",
+    "version": "8.1.0-alpha.2-lot.4.2",
+    "status": "user-validated",
+    "validated_on_user_workstation": true,
+    "validated_on_vps": true,
+    "validation_date": "2026-08-10"
+  },
+  "current": {
+    "lot": "4.2",
+    "version": "8.1.0-alpha.2-lot.4.2",
+    "status": "user-validated",
+    "updated_at": "2026-08-10",
+    "implementation_percent": 100,
+    "audit_remediation_percent": 100,
+    "documentation_readiness_percent": 100,
+    "validated_on_user_workstation": true,
+    "validated_on_vps": true,
+    "merged_to_main": false,
+    "merge_authorized": true,
+    "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
+  },
+  "independent_audit": {
+    "status": "remediated-and-user-validated",
+    "date": "2026-08-03",
+    "document": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
+    "action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
+    "merge_authorized": true,
+    "new_features_authorized_before_p1_closure": false,
+    "p1": {
+      "destructive_startup_sql": "validated-on-isolated-vps-2026-08-09",
+      "final_sha_ci": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
+      "admin_route_security_proof": "validated-on-isolated-vps-2026-08-09",
+      "typed_correction_values": "validated-on-isolated-vps-2026-08-09"
+    },
+    "p2": {
+      "server_side_pagination": "validated-on-isolated-vps-2026-08-09",
+      "filter_validation": "validated-on-isolated-vps-2026-08-09",
+      "mutation_audit_logging": "validated-on-isolated-vps-2026-08-09",
+      "provider_ingestion_separation": "validated-on-isolated-vps-2026-08-09",
+      "concurrency_and_rollback_tests": "validated-on-isolated-vps-2026-08-09",
+      "calendar_interaction_tests": "validated-on-isolated-vps-2026-08-09",
+      "npm_high_severity_review": "validated-on-isolated-vps-2026-08-09"
+    },
+    "required_order": [
+      "destructive_startup_sql",
+      "typed_correction_values",
+      "admin_route_security_proof",
+      "server_side_pagination_filter_validation_and_audit",
+      "concurrency_rollback_and_calendar_tests",
+      "npm_high_severity_review",
+      "final_sha_ci",
+      "windows_and_isolated_vps_validation",
+      "explicit_user_validation"
+    ]
+  },
   "areas": {
     "docker": 100,
-    "database": 95,
-    "api": 92,
+    "database_and_migrations": 100,
+    "api": 96,
     "design_system_foundations": 82,
     "design_system_components": 45,
-    "shell": 96,
-    "events_visual_fidelity": 95,
+    "windows_scripts": 60,
+    "events_visual_fidelity": 80,
     "championships_visual_fidelity": 95,
-    "events_crud_list": 94,
-    "events_calendar_view": 92,
-    "events_tests": 95,
-    "visual_tests": 95,
-    "accessibility": 72
+    "events_crud_list": 100,
+    "events_calendar_interactions": 95,
+    "automated_tests": 98,
+    "corrections": 99,
+    "hybrid_test_data": 50,
+    "accessibility": 55
   },
-  "validated_on_user_workstation": true,
-  "validated_on_vps": true,
+  "step_1": {
+    "status": "completed-technically-not-user-validation",
+    "scope": "Integrate the Project Handbook, align documentation governance and record the audited Lot 4.2 state.",
+    "technical_validation": {
+      "workspace_typecheck": "passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "unit_tests": "21 passed",
+      "docker": "3 isolated services healthy",
+      "api_health": "passed with database=true",
+      "web_health": "passed"
+    }
+  },
+  "step_2": {
+    "status": "user-validated-on-isolated-vps",
+    "scope": "Transactional provider-source and override model, non-destructive synchronization, conflicts and resolution.",
+    "technical_validation": {
+      "workspace_typecheck": "passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "unit_tests": "26 passed",
+      "step_2_api_postgresql_validator": "passed",
+      "lot_4_api_regression": "passed",
+      "docker": "3 isolated services healthy",
+      "api_health": "passed with database=true",
+      "web_health": "passed"
+    },
+    "user_validation": {
+      "date": "2026-08-03",
+      "scope": "Step 2 dataset, provider corrections and isolated VPS workflow",
+      "result": "maintainer reported everything looked correct"
+    }
+  },
+  "step_3": {
+    "status": "user-validated-on-isolated-vps",
+    "scope": "Business-only event form and admin mutations, server-generated slug/origin and derived timezone.",
+    "technical_validation": {
+      "workspace_typecheck": "passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "unit_tests": "30 passed",
+      "step_3_api_postgresql_validator": "passed",
+      "step_2_api_regression": "passed",
+      "lot_4_api_regression": "passed",
+      "docker": "3 isolated services healthy",
+      "playwright": "7 Chromium scenarios passed in official container"
+    },
+    "user_validation": {
+      "date": "2026-08-03",
+      "scope": "Business-only event administration, generated metadata and VPS workflow",
+      "result": "maintainer confirmed everything was correct"
+    }
+  },
+  "step_3_adjustments": {
+    "status": "user-validated-on-isolated-vps",
+    "scope": "UTC-only storage, 25-row event-list pagination and sortable columns ordered before pagination.",
+    "technical_validation": {
+      "unit_tests": "32 passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "docker": "3 isolated services healthy",
+      "utc_rows": "98 of 98 generated events stored as UTC",
+      "playwright": "7 Chromium scenarios passed, including 25-row list, nearest-event default and date/alphabetical sorting"
+    },
+    "user_validation": {
+      "date": "2026-08-03",
+      "scope": "UTC-only storage, pagination and sortable event-list columns",
+      "result": "maintainer confirmed everything was correct"
+    }
+  },
+  "step_4": {
+    "status": "user-validated-on-isolated-vps",
+    "scope": "Complete correction filters, ten-row pagination, typed inline editing, simplified actions and direct event navigation.",
+    "technical_validation": {
+      "unit_tests": "38 passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "step_2_and_step_3_regressions": "passed",
+      "lot_4_api_regression": "passed",
+      "docker": "3 isolated services healthy",
+      "playwright": "7 Chromium scenarios passed with controlled lists, datetime editor, filters, editing and event navigation",
+      "test_dataset": "12 deterministic corrections: 4 statuses, 3 providers, 8 fields, 5 authors and dated records"
+    },
+    "user_validation": {
+      "date": "2026-08-03",
+      "scope": "Corrections filters, ten-row pagination, typed editing, provider restoration, French labels and direct event navigation",
+      "result": "maintainer explicitly validated the step"
+    }
+  },
+  "audit_step_5": {
+    "status": "user-validated-on-isolated-vps",
+    "scope": "Concurrent correction resolution, provider/admin serialization, transactional and visual rollback, range creation, visual resize, midnight and DST boundaries.",
+    "technical_validation": {
+      "workspace_typecheck": "passed",
+      "web_build": "passed",
+      "api_build": "passed",
+      "unit_tests": "75 passed",
+      "postgresql_concurrency_validator": "passed locally and on isolated VPS",
+      "docker": "isolated PostgreSQL, API and Web built and started",
+      "test_dataset": "self-cleaning provider fixture spanning the daylight-saving transition"
+    },
+    "user_validation": {
+      "date": "2026-08-09",
+      "scope": "Concurrent resolutions, provider/admin serialization, transactional rollback, UTC daylight-saving fixture and graphical calendar interactions",
+      "result": "maintainer reported all automated and graphical checks OK; Agenda purpose requires later UX clarification"
+    }
+  },
+  "audit_remediation": {
+    "status": "completed-user-validated",
+    "owner": "Codex",
+    "completed_p1": 4,
+    "total_p1": 4,
+    "completed_p2": 7,
+    "total_p2": 7,
+    "step_1_evidence": "Validated 2026-08-09: WSL Docker migrations 0001/0002, rollback and two API restarts preserved fingerprint d9e88f61cb0d0eae6993427362356e4a; user confirmed isolated VPS validator OK",
+    "step_2_evidence": "Validated 2026-08-09: 23 typed-value tests and isolated Docker API/PostgreSQL validator passed locally and on VPS; invalid types and references return 400 and offset dates normalize to UTC",
+    "step_3_evidence": "Validated 2026-08-09: 8 Fastify tests and Docker validator passed locally and on VPS for 401, 403, invalid/expired tokens, admin success, legacy championship mutations and public API",
+    "step_4_evidence": "Validated 2026-08-09: 3 query tests, migration 0003 rollback and Docker validator passed locally and on VPS for pagination, filters, provider uniqueness and secret-free mutation audit",
+    "step_5_evidence": "Validated 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS for concurrent resolutions, provider/admin serialization, transactional/visual rollback, ranges, midnight and DST",
+    "step_6_evidence": "Validated 2026-08-09: current audit reproduced nanoid GHSA-2v37-7h3g-55p8 only; lock upgraded 3.3.16 to 3.3.18; npm audit zero; 75 tests, typecheck and API/Web/Types builds passed locally and under Node 22/npm 10 on isolated VPS",
+    "final_sha": "a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
+    "final_sha_ci": "green",
+    "windows_validation": "passed-and-confirmed-2026-08-10-on-70e78ecb0a23ea5521a1f92c378a3f7a26153810",
+    "isolated_vps_validation": "steps-1-through-7-passed-and-confirmed-2026-08-10",
+    "explicit_user_validation": "confirmed-2026-08-10-after-dashboard-logo-recheck-on-7d67672a6a7a067ca4f4594284a917fd78afc6d4"
+  },
   "known_issues": [
-    "The baseline has no ESLint 9 configuration.",
-    "npm audit reports an RSC-only React Router advisory; the application is a BrowserRouter SPA without RSC or Server Actions."
-  ],
-  "revision_notes": [
-    "Calendar restored as the default Events view",
-    "List and CRUD retained",
-    "Shared filters, selection and details panel",
-    "Unit, Docker, API and Chromium validations passed",
-    "Isolated VPS deployment validated with database and web health checks",
-    "Calendar, list, CRUD, publishing and Championships non-regression accepted by the user",
-    "Legacy Python CI scoped to legacy server paths"
+    "The Agenda view works as a 30-day chronological presentation, but its purpose is not sufficiently clear to the maintainer and requires a later UX clarification.",
+    "The local npm version is below the declared npm >= 10 engine requirement; CI, VPS and Windows acceptance used the required versions."
   ],
   "next_action": {
     "owner": "Maintainer",
-    "task": "Review and merge pull request 24 into main, then select the next lot.",
-    "target_visual_fidelity": 95
+    "task": "Merge the validated Lot 4.2 branch only when explicitly requested, then begin Lot 4.3 planning.",
+    "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
+    "target_visual_fidelity": 98
   }
 }

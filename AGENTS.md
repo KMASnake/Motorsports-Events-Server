@@ -7,11 +7,15 @@ Codex ne remplace jamais le code, les tests et les documents versionnés.
 
 Avant toute modification :
 
-1. lire `AGENTS.md`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
-2. lire `DECISIONS.md` et les ADR concernés ;
-3. vérifier l'état Git et les changements non commités ;
-4. exécuter `./scripts/validate-repository.sh` ;
-5. reprendre la première tâche non terminée sans élargir son périmètre.
+1. lire `PROJECT-HANDBOOK.md`, source de vérité permanente officielle ;
+2. lire `AGENTS.md`, `CODEX-HANDBOOK.md`, `PROJECT-STATUS.json`,
+   `docs/handoff/PROGRESS.json`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
+3. lire `docs/handbook/DECISIONS.md`, tous les ADR permanents et les ADR
+   historiques concernés ;
+4. lire les spécifications du lot dans `docs/handoff/` ;
+5. vérifier l'état Git et les changements non commités ;
+6. exécuter `./scripts/validate-repository.sh` ;
+7. reprendre la première tâche non terminée sans élargir son périmètre.
 
 ## Architecture obligatoire
 
@@ -48,9 +52,11 @@ Avant toute livraison :
 3. construire avec `./scripts/build-release.sh` ;
 4. réextraire l'archive et relancer les tests depuis son contenu ;
 5. vérifier le ZIP et son SHA-256 ;
-6. mettre à jour `CHANGELOG.md`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
-7. créer un commit explicite et publier par pull request ;
-8. après validation VPS, enregistrer les résultats et créer le tag de version.
+6. fournir le jeu de données reproductible utile à la recette, sa commande
+   d'injection, les résultats attendus et sa commande de nettoyage ;
+7. mettre à jour `CHANGELOG.md`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
+8. créer un commit explicite et publier par pull request ;
+9. après validation VPS, enregistrer les résultats et créer le tag de version.
 
 ## Passation
 
@@ -61,3 +67,7 @@ L'assistant sortant met à jour au minimum :
 
 L'assistant entrant ne doit pas supposer qu'une étape décrite uniquement dans
 une conversation a été réalisée.
+
+Les règles permanentes appartiennent au Handbook. Les documents de
+`docs/handoff/` restent spécifiques aux lots et ne peuvent pas remplacer ou
+contredire `PROJECT-HANDBOOK.md`.

@@ -1,3 +1,10 @@
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+    compress: "true"
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -15,6 +22,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    logging: *default-logging
 
   api:
     build:
@@ -24,16 +32,35 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql://mse:change-me@postgres:5432/motorsports_events}
       API_PORT: 3001
       NODE_ENV: development
+      ADMIN_AUTH_SECRET: ${ADMIN_AUTH_SECRET:-development-only-admin-auth-secret-change-me}
     ports:
       - "${API_HOST_PORT:-3001}:3001"
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/health"]
       interval: 10s
       timeout: 5s
       retries: 10
+    logging: *default-logging
+
+  migrate:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-motorsports_events}
+      POSTGRES_USER: ${POSTGRES_USER:-mse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      PGHOST: postgres
+      PGPORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./infra/postgres/migrations:/migrations:ro
+    command: ["sh", "/migrations/migrate.sh", "up"]
+    restart: "no"
 
   web:
     build:
@@ -53,6 +80,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    logging: *default-logging
 
 volumes:
   postgres_data:

@@ -1,9 +1,9 @@
 {
-  "version": "8.1.0-alpha.2-lot.4-rev.1",
+  "version": "8.1.0-alpha.2-lot.4.2",
   "series": "8.1.0-alpha.2",
   "lot": 4,
-  "revision": 1,
-  "status": "user-validated-pr-ready",
+  "revision": 2,
+  "status": "user-validated",
   "scope": [
     "event CRUD",
     "public events API",
@@ -12,5 +12,5 @@
   ],
   "validated_on_user_workstation": true,
   "validated_on_vps": true,
-  "validation_date": "2026-08-01"
+  "validation_date": "2026-08-10"
 }

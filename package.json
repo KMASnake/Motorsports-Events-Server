@@ -1,6 +1,6 @@
 {
   "name": "motorsports-events-server",
-  "version": "8.1.0-alpha.2-lot.4-rev.1",
+  "version": "8.1.0-alpha.2-lot.4.2",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -23,10 +23,23 @@
     "validate:lot3": "node scripts/validate-lot3.mjs",
     "test:lot3": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot3.ps1",
     "validate:lot4": "node scripts/validate-lot4.mjs",
-    "test:lot4": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot4.ps1"
+    "validate:step2": "node scripts/validate-step2.mjs",
+    "validate:step3": "node scripts/validate-step3.mjs",
+    "test:lot4": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test-lot4.ps1",
+    "data:generate": "tsx scripts/data/generate-realistic-test-data.ts",
+    "data:verify": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/data/verify-sanitized-data.ps1",
+    "test:migrations": "./scripts/test-lot42-migrations.sh",
+    "validate:audit-step2": "node scripts/validate-audit-step2.mjs",
+    "validate:audit-step3": "node scripts/validate-audit-step3.mjs",
+    "validate:audit-step4": "node scripts/validate-audit-step4.mjs",
+    "validate:audit-step5": "node scripts/validate-audit-step5.mjs"
   },
   "engines": {
     "node": ">=22.0.0",
     "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.66.0"
   }
 }

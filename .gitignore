@@ -9,3 +9,11 @@ coverage
 .idea/
 playwright-report/
 test-results/
+*.dump
+*.dump.gz
+backups/
+snapshots/
+sanitized-snapshots/
+.env.production
+__pycache__/
+*.py[cod]
