@@ -12,9 +12,9 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "architecture-awaiting-user-validation",
+    "status": "migration-technically-validated-awaiting-maintainer-validation",
     "updated_at": "2026-08-10",
-    "implementation_percent": 0,
+    "implementation_percent": 20,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -22,6 +22,27 @@
     "merged_to_main": false,
     "merge_authorized": false,
     "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
+  },
+  "lot_4_3_migration": {
+    "status": "completed-technically-awaiting-maintainer-validation",
+    "scope": "Versioned 0004_sessions migration, guarded rollback, read-only API schema verification and isolated PostgreSQL recipe only.",
+    "architecture_validation": "approved-by-maintainer-2026-08-10",
+    "technical_validation": {
+      "lot_4_2_fingerprint": "e58eebe637f26159764123d7cf019e77-preserved-across-up-rollback-reapply",
+      "migration_up_and_idempotence": "passed",
+      "api_read_only_restarts": "two-passed-with-database-role-read-only",
+      "utc_midnight_dst_overlap": "passed",
+      "constraints_and_cascade": "passed",
+      "guarded_rollback": "passed-for-sessions-corrections-custom-and-modified-types",
+      "rollback_and_reapply": "passed",
+      "npm_audit": "zero-vulnerabilities",
+      "lint_and_typecheck": "passed",
+      "unit_tests": "75-passed-48-api-27-web",
+      "workspace_builds": "api-web-types-passed",
+      "docker_builds": "api-web-passed"
+    },
+    "functional_scope_started": false,
+    "acceptance": "docs/handoff/LOT-4.3-MIGRATION-ACCEPTANCE.md"
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",
@@ -205,8 +226,8 @@
   ],
   "next_action": {
     "owner": "Maintainer",
-    "task": "Validate ADR-0012 and the reversible 0004_sessions migration plan before implementation.",
-    "reference": "docs/handoff/LOT-4.3-SESSIONS-MIGRATION-PLAN.md",
+    "task": "Validate the completed 0004_sessions migration step before any Sessions API or UI implementation.",
+    "reference": "docs/handoff/LOT-4.3-MIGRATION-ACCEPTANCE.md",
     "target_visual_fidelity": 98
   }
 }

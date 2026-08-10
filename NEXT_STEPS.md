@@ -5,14 +5,18 @@
 - [x] spécifier le périmètre et les critères d'acceptation ;
 - [x] proposer l'ADR du modèle Sessions ;
 - [x] proposer le plan réversible de migration `0004_sessions` ;
-- [ ] obtenir la validation explicite de l'ADR et du plan ;
-- [ ] seulement ensuite écrire et tester la migration PostgreSQL ;
+- [x] obtenir la validation explicite de l'ADR et du plan ;
+- [x] écrire et tester la migration PostgreSQL `0004_sessions` ;
+- [x] vérifier deux démarrages API avec une base forcée en lecture seule ;
+- [ ] obtenir la validation explicite de la recette migration par le mainteneur ;
+- [ ] seulement ensuite commencer l'API Sessions ;
 - [ ] poursuivre dans l'ordre défini par
   `docs/handoff/LOT-4.3-SESSIONS-HANDOFF.md`.
 
-Critère de passage : aucune implémentation fonctionnelle, migration SQL ou
-interface ne commence avant validation de la conception. Les sections suivantes
-sont conservées comme historique des jalons précédents.
+Critère de passage : aucune API, logique CRUD/corrections ou interface Sessions
+ne commence avant validation explicite de la recette
+`docs/handoff/LOT-4.3-MIGRATION-ACCEPTANCE.md`. Les sections suivantes sont
+conservées comme historique des jalons précédents.
 
 ## Remédiation de l'audit Lot 4.2
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## Lot 4.3 — migration Sessions
+
+- consigne la validation mainteneur de l'ADR-0012 et du plan de migration ;
+- ajoute la migration versionnée et idempotente `0004_sessions` ;
+- crée les référentiels, sessions et corrections Sessions sans transformer les
+  données Lot 4.2 ;
+- refuse tout rollback contenant une session, une correction ou un type
+  personnalisé ou modifié ;
+- étend la vérification de schéma au démarrage par des lectures uniquement ;
+- ajoute une recette PostgreSQL isolée couvrant intégrité, UTC, minuit, DST,
+  chevauchement, contraintes, cascade, rollback et réapplication ;
+- ne crée aucune route, logique CRUD, ingestion ou interface Sessions.
+
 ## Lot 4.3 — conception Sessions
 
 - propose l'ADR permanent du modèle Sessions et des types extensibles ;

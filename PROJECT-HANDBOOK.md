@@ -145,8 +145,9 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
 validation utilisateur.
 
 ## État
-Lots 4.1 et 4.2 validés par l'utilisateur. Lot 4.3 en conception, ADR et plan
-de migration en attente de validation avant toute implémentation.
+Lots 4.1 et 4.2 validés par l'utilisateur. Pour le Lot 4.3, l'ADR Sessions et
+le plan de migration ont été validés par le mainteneur ; la migration reste
+une étape technique distincte à valider avant toute API ou interface Sessions.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

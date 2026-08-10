@@ -9,12 +9,12 @@
 
 ## Données et migrations
 
-- [ ] migration de création des sessions versionnée ;
-- [ ] migration idempotente ;
-- [ ] rollback réussi sur PostgreSQL isolé ;
-- [ ] base Lot 4.2 migrée sans perte ;
-- [ ] aucun SQL métier destructif exécuté au démarrage de l'API ;
-- [ ] stockage UTC vérifié.
+- [x] migration de création des sessions versionnée ;
+- [x] migration idempotente ;
+- [x] rollback réussi sur PostgreSQL isolé ;
+- [x] base Lot 4.2 migrée sans perte ;
+- [x] aucun SQL métier destructif exécuté au démarrage de l'API ;
+- [x] stockage UTC vérifié.
 
 ## API administration
 
@@ -39,11 +39,11 @@
 
 ## Règles métier
 
-- [ ] types contrôlés : practice, qualifying, sprint, warmup, race, other ;
-- [ ] fin >= début ;
-- [ ] session traversant minuit acceptée ;
-- [ ] passage DST couvert ;
-- [ ] chevauchement autorisé par défaut ;
+- [x] types contrôlés : practice, qualifying, sprint, warmup, race, other ;
+- [x] fin >= début ;
+- [x] session traversant minuit acceptée ;
+- [x] passage DST couvert ;
+- [x] chevauchement autorisé par défaut ;
 - [ ] création manuelle sans fournisseur.
 
 ## Interface
@@ -57,14 +57,14 @@
 
 ## Tests et qualité
 
-- [ ] lint ;
-- [ ] typecheck ;
-- [ ] tests unitaires ;
-- [ ] builds API/Web/Types ;
-- [ ] tests PostgreSQL ;
-- [ ] migration + rollback ;
+- [x] lint ;
+- [x] typecheck ;
+- [x] tests unitaires ;
+- [x] builds API/Web/Types ;
+- [x] tests PostgreSQL ;
+- [x] migration + rollback ;
 - [ ] scénarios Chromium ;
-- [ ] `npm audit --audit-level=high` sans vulnérabilité bloquante ;
+- [x] `npm audit --audit-level=high` sans vulnérabilité bloquante ;
 - [ ] CI verte sur le SHA candidat exact ;
 - [ ] recette VPS Docker isolée ;
 - [ ] recette Windows ;
@@ -72,10 +72,9 @@
 
 ## Dette technique Lot 4.2
 
-- [ ] décision proposée sur l'atomicité du journal d'audit dans l'ADR-0012,
-  en attente de validation ;
-- [ ] décision proposée sur l'identité et l'authentification de l'ingestion
-  fournisseur automatisée dans l'ADR-0012, en attente de validation.
+- [x] décision validée sur l'atomicité du journal d'audit dans l'ADR-0012 ;
+- [x] décision validée sur l'identité et l'authentification de l'ingestion
+  fournisseur automatisée dans l'ADR-0012.
 
 ## Sortie du lot
 
