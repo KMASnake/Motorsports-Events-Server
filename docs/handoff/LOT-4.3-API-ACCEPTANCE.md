@@ -2,7 +2,9 @@
 
 Date : 2026-08-10
 
-Statut : techniquement validée, validation explicite du mainteneur requise
+Statut : validée explicitement par le mainteneur sur VPS isolé
+
+Validation mainteneur : 2026-08-10
 
 Avancement réel du Lot 4.3 : **60 %**
 
@@ -114,10 +116,10 @@ La chaîne complète a aussi été rejouée sous `node:22-alpine` avec `npm ci` 
 
 ## Risques résiduels et point d'arrêt
 
-- la validation VPS mainteneur de cette étape n'est pas encore consignée ;
 - les Sessions fournisseur attendent le workflow de corrections ;
 - aucun écran Sessions n'existe encore ;
 - la CI du SHA candidat, Chromium et Windows appartiennent aux étapes suivantes.
 
-Ne pas commencer Corrections, l'ingestion automatisée ou l'interface avant
-validation explicite de cette recette.
+La recette API est validée. La prochaine étape fonctionnelle doit rester dans
+le Lot 4.3 et attendre une instruction explicite ; l'ingestion automatisée et
+l'interface n'ont pas été commencées par cette validation.

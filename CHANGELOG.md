@@ -2,6 +2,8 @@
 
 ## Lot 4.3 — API Sessions administrative et publique
 
+- consigne la validation explicite de la recette complète sur VPS isolé par le
+  mainteneur le 2026-08-10 ;
 - ajoute les contrats TypeScript Session avec un intitulé métier unique ;
 - ajoute le référentiel, la liste paginée par événement et le CRUD administratif
   protégé des Sessions ;

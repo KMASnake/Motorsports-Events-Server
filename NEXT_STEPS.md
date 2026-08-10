@@ -12,14 +12,14 @@
 - [x] implémenter l'API Sessions administrative et les contrats partagés ;
 - [x] valider localement l'étape API sur PostgreSQL/Docker isolé ;
 - [x] implémenter et valider l'API publique Sessions ;
-- [ ] obtenir la validation mainteneur de l'étape API ;
+- [x] obtenir la validation mainteneur de l'étape API sur VPS isolé ;
 - [ ] seulement ensuite commencer le workflow de corrections Sessions ;
 - [ ] poursuivre dans l'ordre défini par
   `docs/handoff/LOT-4.3-SESSIONS-HANDOFF.md`.
 
-Critère de passage : les API administrative et publique et les contrats sont
-techniquement prêts. Les corrections applicatives, l'ingestion automatisée et
-l'interface attendent la validation explicite de cette recette. Les sections
+Critère de passage atteint le 2026-08-10 : les API administrative et publique
+et les contrats ont été validés explicitement par le mainteneur sur VPS isolé.
+La prochaine implémentation attend une instruction explicite. Les sections
 suivantes sont conservées comme historique des jalons précédents.
 
 ## Remédiation de l'audit Lot 4.2

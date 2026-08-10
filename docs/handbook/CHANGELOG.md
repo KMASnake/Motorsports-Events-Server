@@ -2,6 +2,8 @@
 
 ## 1.17 — 2026-08-10
 
+- consigne la validation mainteneur des API Sessions administrative et publique
+  sur VPS isolé ;
 - fixe les routes publiques Sessions imbriquées par Événement et par
   identifiant ;
 - limite la projection publique aux champs métier et aux Sessions publiées

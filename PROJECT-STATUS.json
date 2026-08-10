@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-api-technically-validated",
-    "reason": "Lot 4.2 remains the validated baseline and migration 0004_sessions is user-validated. The Sessions administrative and public APIs and shared contracts passed local isolated validation and now await maintainer validation. No Sessions corrections workflow or UI has started."
+    "status": "lot-4.3-api-user-validated",
+    "reason": "Lot 4.2 remains the validated baseline and migration 0004_sessions is user-validated. The maintainer explicitly validated the Sessions administrative and public APIs on an isolated VPS on 2026-08-10. No Sessions corrections workflow or UI has started."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,7 +53,7 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "api-technically-validated-awaiting-maintainer",
+    "status": "api-user-validated-on-isolated-vps",
     "implementation_percent": 60,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
@@ -71,7 +71,6 @@
       "Public Session projection with parent visibility and technical metadata redaction"
     ],
     "mandatory_gaps": [
-      "Obtain explicit maintainer validation of the Sessions administrative API step",
       "Implement and validate the Sessions correction workflow",
       "Implement and validate the Sessions administration UI",
       "Implement and validate all remaining Lot 4.3 acceptance criteria"
@@ -116,6 +115,7 @@
     "lot_4_3_migration_user_validation": "maintainer explicitly validated the Lot 4.3 migration step on 2026-08-10 after isolated VPS fingerprint cb816e2a25fc9cb3d11f0604b3506c03 remained unchanged",
     "lot_4_3_admin_api": "passed locally on isolated PostgreSQL: 401 missing/invalid/expired, 403, admin, references, UTC, midnight, DST, overlaps, CRUD, pagination/filter/sort, provider protection, unique secret-free audit and rollback when audit fails",
     "lot_4_3_public_api": "passed locally on isolated PostgreSQL: published Session and parent visibility, stable ordering, strict filters, business title and complete technical metadata redaction",
+    "lot_4_3_api_user_validation": "maintainer explicitly validated the complete isolated VPS API recipe on 2026-08-10: authentication, contracts, UTC, pagination, CRUD, provider protection, atomic audit and public redaction all passed",
     "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
     "lot_4_3_quality": "npm audit zero; lint and typecheck passed; 48 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed",
     "known_tooling_issues": [
@@ -128,5 +128,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Obtain explicit maintainer validation of docs/handoff/LOT-4.3-API-ACCEPTANCE.md before starting the Sessions corrections workflow, provider automation or UI."
+  "next_action": "Prepare the next Lot 4.3 implementation step from the validated API baseline; do not start provider automation or UI without the next explicit instruction."
 }

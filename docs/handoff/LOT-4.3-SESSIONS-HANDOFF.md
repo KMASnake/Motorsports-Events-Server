@@ -96,8 +96,8 @@ et la migration `0004_sessions` sont validés explicitement. La recette VPS a
 conservé l'empreinte Lot 4.2 `cb816e2a25fc9cb3d11f0604b3506c03`.
 
 Avancement réel : 60 %. Les API administrative et publique Sessions et les
-contrats partagés sont techniquement validés localement et attendent la recette
-mainteneur `docs/handoff/LOT-4.3-API-ACCEPTANCE.md`. Les corrections
+contrats partagés ont été validés explicitement par le mainteneur sur VPS isolé
+le 2026-08-10 selon `docs/handoff/LOT-4.3-API-ACCEPTANCE.md`. Les corrections
 applicatives, l'ingestion automatisée et l'interface n'ont pas été commencées.
 
 L'API respecte la décision fonctionnelle ci-dessus : son contrat d'écriture

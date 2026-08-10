@@ -169,8 +169,8 @@ validation utilisateur.
 Lots 4.1 et 4.2 validés par l'utilisateur. Pour le Lot 4.3, l'ADR Sessions et
 le plan de migration ont été validés par le mainteneur ; la migration a ensuite
 été validée sur un VPS isolé. Les API administrative et publique Sessions
-sont techniquement prêtes pour leur recette mainteneur. Le Lot 4.3 complet
-reste en développement.
+ont été validées explicitement par le mainteneur sur VPS isolé le 2026-08-10.
+Le Lot 4.3 complet reste en développement.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,
