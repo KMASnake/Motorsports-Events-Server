@@ -1,8 +1,10 @@
 # ADR-0012 — Modèle Sessions, audit atomique et ingestion séparée
 
-Statut : Proposé pour validation
+Statut : Validé par le mainteneur
 
 Date : 2026-08-10
+
+Validation explicite : 2026-08-10. L'implémentation de la migration `0004_sessions` est autorisée conformément à cet ADR et au plan `docs/handoff/LOT-4.3-SESSIONS-MIGRATION-PLAN.md`. Toute évolution du modèle doit faire l'objet d'une nouvelle décision documentée avant implémentation.
 
 ## Contexte
 
