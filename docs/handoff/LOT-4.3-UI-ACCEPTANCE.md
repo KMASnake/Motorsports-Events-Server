@@ -2,9 +2,14 @@
 
 Date : 2026-08-11
 
-Statut : candidat techniquement validé, validation utilisateur finale non acquise
+Statut : preuve technique historique, modèle cible refusé le 2026-08-11
 
-Avancement réel du Lot 4.3 : **95 %**
+Avancement réel révisé du Lot 4.3 : **80 %**
+
+> Cette recette prouve le fonctionnement de l'ancienne interface
+> multi-sessions, mais ne constitue plus l'acceptation UI cible. Le mainteneur
+> a validé « un Événement = une Session » avec un unique champ dans le
+> formulaire Événement. Voir ADR-0013.
 
 ## Périmètre
 

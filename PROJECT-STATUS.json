@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-10",
+  "generated_at": "2026-08-11",
   "documentation": {
     "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
     "current_lot_progress": "docs/handoff/PROGRESS.json",
@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-ui-technically-validated",
-    "reason": "Lot 4.2 remains the validated baseline. Migration, Sessions APIs and corrections are user-validated. The integrated Sessions UI is technically validated and awaits final audit, exact-SHA CI, VPS/Windows recipes and final user validation."
+    "status": "lot-4.3-event-session-redesign-documented",
+    "reason": "Lot 4.2 remains the validated baseline. The maintainer replaced the multi-session UI model with one Event representing one Session. ADR-0013 and the reversible 0005 plan are documented; application changes have not started."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,8 +53,8 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "ui-technically-validated-awaiting-final-audit",
-    "implementation_percent": 95,
+    "status": "event-session-redesign-documented-awaiting-document-review",
+    "implementation_percent": 80,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -75,9 +75,11 @@
       "Deterministic UI dataset, visual rollback and desktop/mobile Chromium coverage"
     ],
     "mandatory_gaps": [
-      "Run the Lot 4.3 final audit and exact-SHA CI",
-      "Run isolated VPS and Windows acceptance",
-      "Obtain final explicit maintainer validation"
+      "Validate ADR-0013 and the 0005_event_session_title migration plan as written",
+      "Implement and validate migration 0005_event_session_title",
+      "Move the single editable session title combobox into the Event form",
+      "Replace obsolete multi-session UI tests and rerun regressions",
+      "Run final audit, exact-SHA CI, isolated VPS and Windows acceptance"
     ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
     "progress": "docs/handoff/PROGRESS.json"
@@ -137,5 +139,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Stop feature development. Run the Lot 4.3 final audit next; do not merge main or start Lot 4.4."
+  "next_action": "Await explicit maintainer validation of ADR-0013 and the 0005 migration plan before changing migrations or application code."
 }

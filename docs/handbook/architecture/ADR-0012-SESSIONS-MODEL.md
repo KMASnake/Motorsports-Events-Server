@@ -2,6 +2,11 @@
 
 Statut : Validé par le mainteneur
 
+Révision : le modèle principal et l'interface multi-sessions sont remplacés le
+2026-08-11 par l'ADR-0013. Les tables, migrations et routes définies ici
+restent compatibles et ne sont pas supprimées, mais l'Événement porte désormais
+l'intitulé de l'unique Session métier du workflow officiel.
+
 Date : 2026-08-10
 
 Validation explicite : 2026-08-10. L'implémentation de la migration `0004_sessions` est autorisée conformément à cet ADR et au plan `docs/handoff/LOT-4.3-SESSIONS-MIGRATION-PLAN.md`. Toute évolution du modèle doit faire l'objet d'une nouvelle décision documentée avant implémentation.

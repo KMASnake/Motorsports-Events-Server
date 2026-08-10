@@ -1,5 +1,12 @@
 # Changelog
 
+## Lot 4.3 — Révision du modèle Événement/Session
+
+- consigne la décision mainteneur « un Événement = une Session » ;
+- planifie `events.session_title` et sa combobox éditable/créable ;
+- conserve sans suppression les composants multi-sessions comme compatibilité
+  technique jusqu'à l'implémentation de la révision.
+
 ## Lot 4.3 — Correctif du validateur UI Sessions
 
 - rend `scripts/test-lot43-ui.sh` autonome sur un hôte Docker sans installation

@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.19
+## Version 1.20
 
 Ce document est la source de vérité permanente du projet.
 
@@ -99,40 +99,27 @@ traduits dans l'interface, notamment `postponed` en « Reporté ».
 ## Valeur effective
 Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle native. L'API publique expose uniquement cette valeur.
 
-## Sessions
+## Événement et intitulé de session
 
-Une session appartient à un événement. L'utilisateur manipule un seul intitulé
-métier dans une liste extensible alimentée par les fournisseurs et les valeurs
-locales ; il peut saisir immédiatement un nouvel intitulé. La distinction
-technique historique entre nom et type n'est pas imposée au contrat d'écriture
-ni à l'interface. Ses horaires sont stockés en UTC ; une fin facultative ne
-précède jamais le début. Les chevauchements, passages à minuit et changements
-d'heure sont autorisés. L'ordre public est stable par début puis identifiant.
+Un Événement représente directement une Session métier. Il n'existe pas de
+collection de Sessions dans le workflow officiel et l'interface ne propose
+jamais plusieurs Sessions sous un Événement.
 
-Les créations humaines restent sans fournisseur. Les corrections fournisseur
-séparent source, override et valeur effective comme pour les événements.
-L'audit d'une mutation Session appartient à la même transaction PostgreSQL que
-la mutation : un échec d'audit annule l'ensemble. Une ingestion automatisée
-future utilise une identité de service et des routes distinctes des actions
-humaines. Voir `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`.
+L'Événement conserve ses champs métier et possède un `session_title`
+facultatif. L'utilisateur le manipule dans une combobox éditable et créable :
+les suggestions agrègent les valeurs découvertes chez tous les fournisseurs et
+les valeurs déjà enregistrées, sans afficher leur origine. Une valeur inédite
+peut être saisie immédiatement et devient ensuite réutilisable.
 
-L'administration des Sessions utilise les routes imbriquées d'un événement
-pour la liste et la création, puis une route par identifiant pour consulter,
-modifier ou supprimer. Les mutations humaines créent uniquement des Sessions
-manuelles. Une Session fournisseur n'est pas modifiée silencieusement avant le
-workflow de corrections prévu. Chaque mutation Session et son audit sont
-atomiques.
+Les tables, routes et corrections Sessions introduites avec `0004_sessions`
+restent temporairement disponibles pour compatibilité, mais ne constituent
+plus le modèle principal ni l'interface cible. Toute suppression ultérieure
+fera l'objet d'une décision et d'une migration séparées.
 
-Les suggestions d'intitulés sont disponibles par
-`GET /api/v1/admin/session-titles`. Le référentiel `session_types` et sa route
-restent uniquement pour la compatibilité de la migration `0004`.
-
-L'API publique expose les Sessions publiées d'un Événement visible par
-`GET /api/v1/events/:eventId/sessions` et une Session visible par
-`GET /api/v1/sessions/:id`. Sa projection contient uniquement l'identifiant,
-l'événement parent, l'intitulé, les horaires, le statut et la description ;
-elle est ordonnée par début puis identifiant et exclut toute métadonnée
-technique ou administrative.
+Le stockage temporel, le statut, la publication et la description sont ceux de
+l'Événement. Les métadonnées fournisseur restent techniques et l'API publique
+n'expose que la valeur effective. Voir
+`docs/handbook/architecture/ADR-0013-EVENT-AS-SESSION.md`.
 
 ## Calendrier
 Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer,

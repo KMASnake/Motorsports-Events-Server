@@ -7,6 +7,22 @@ est `docs/handoff/LOT-4.2-FINAL-HANDOFF.md`.
 
 Branche de travail du nouveau lot : `codex/lot-4.3-sessions`.
 
+## Révision mainteneur — 2026-08-11
+
+Le modèle multi-sessions décrit plus bas est conservé comme historique mais ne
+constitue plus la cible UI. Le mainteneur a validé :
+
+- un Événement représente une Session métier ;
+- il porte un seul `session_title` facultatif ;
+- le formulaire Événement ajoute une combobox éditable/créable ;
+- les suggestions réunissent tous les fournisseurs et les valeurs enregistrées
+  sans afficher leur origine ;
+- aucun CRUD ou sous-panneau multi-sessions n'est présenté.
+
+Lire en priorité `docs/handbook/architecture/ADR-0013-EVENT-AS-SESSION.md` et
+`docs/handoff/LOT-4.3-EVENT-SESSION-MIGRATION-PLAN.md`. Aucun code de cette
+révision n'est encore implémenté.
+
 ## Ordre de lecture obligatoire
 
 1. `PROJECT-HANDBOOK.md` ;

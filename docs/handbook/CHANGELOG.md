@@ -1,5 +1,14 @@
 # Handbook Changelog
 
+## 1.20 — 2026-08-11
+
+- remplace le modèle UI multi-sessions par « un Événement = une Session » ;
+- ajoute l'intitulé de session directement à l'Événement ;
+- conserve une combobox créable alimentée par tous les fournisseurs et les
+  valeurs déjà enregistrées, sans distinction d'origine visible ;
+- conserve `0004_sessions` et ses routes comme compatibilité transitoire ;
+- planifie la migration réversible `0005_event_session_title`.
+
 ## 1.19 — 2026-08-11
 
 - consigne l'implémentation de la gestion Sessions dans la fiche Événement ;

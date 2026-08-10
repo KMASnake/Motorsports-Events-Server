@@ -61,12 +61,13 @@
 
 ## Interface
 
-- [x] sessions visibles depuis le contexte de l'événement ;
-- [x] création, modification et suppression fonctionnelles ;
-- [x] intitulé unique, horaires, statut et publication lisibles ;
-- [x] aucune métadonnée technique fournisseur dans le formulaire métier ;
-- [x] comportement correct à 1440×900, 1280×720 et largeur mobile ;
-- [x] aucune régression sur calendrier, liste, corrections, logos et filtres du Lot 4.2.
+- [ ] aucune sous-liste ni CRUD multi-sessions dans la fiche Événement ;
+- [ ] champ `Intitulé de session` intégré au formulaire Événement existant ;
+- [ ] combobox alimentée par toutes les valeurs fournisseur et enregistrées ;
+- [ ] intitulé inédit accepté puis proposé à la prochaine ouverture ;
+- [ ] aucune distinction fournisseur/local ni métadonnée technique visible ;
+- [ ] comportement correct à 1440×900, 1280×720 et largeur mobile ;
+- [ ] aucune régression sur calendrier, liste, corrections, logos et filtres du Lot 4.2.
 
 ## Tests et qualité
 

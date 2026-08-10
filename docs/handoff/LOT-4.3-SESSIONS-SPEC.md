@@ -2,20 +2,20 @@
 
 ## Objectif
 
-Introduire les sessions rattachées à un événement de sport mécanique sans
-régression sur le Lot 4.2. Une session représente une unité temporelle et
-métier d'un événement : essais, qualifications, sprint, warm-up, course ou
-autre intitulé fourni ou créé localement.
+Ajouter à l'Événement, qui représente directement une Session métier, un
+intitulé spécialisé provenant des fournisseurs ou créé par l'administrateur,
+sans régression sur le Lot 4.2.
 
 ## Principes
 
-- un événement peut contenir zéro, une ou plusieurs sessions ;
-- une session appartient à exactement un événement ;
+- un événement représente exactement une unité Session métier ;
+- il possède zéro ou un intitulé de session ;
+- l'interface ne crée ni n'affiche plusieurs sessions sous un événement ;
 - les sessions sont stockées en UTC ;
 - l'ordre d'affichage est temporel, avec un ordre stable en cas d'égalité ;
 - les métadonnées fournisseur restent réservées aux API d'administration ;
 - l'API publique n'expose que les champs utiles aux clients ;
-- les créations manuelles n'imposent aucun fournisseur ;
+- l'origine de l'intitulé reste invisible dans le formulaire ;
 - les règles de corrections fournisseur du Lot 4.2 doivent rester compatibles ;
 - aucune modification destructive des données existantes n'est autorisée.
 
@@ -27,7 +27,8 @@ l'utilisateur de gérer séparément un `type` et un `name` de session.
 Les API fournisseurs utilisées par le projet exposent un intitulé unique. Le
 modèle fonctionnel et l'interface doivent rester alignés sur cette réalité.
 
-L'utilisateur manipule donc un seul champ visible : **Intitulé de session**.
+L'utilisateur manipule donc un seul champ visible dans le formulaire
+Événement : **Intitulé de session**.
 
 Ce champ doit être présenté comme une combobox éditable :
 
@@ -53,47 +54,30 @@ migration déjà validée.
 
 ## Modèle métier minimal
 
-Chaque session doit disposer au minimum de :
+Chaque Événement conserve son identité, son championnat, son circuit, ses
+horaires, son statut, sa publication et sa description. Il reçoit un
+`session_title` facultatif. Ce texte n'est pas une clé de référentiel : il peut
+provenir d'un fournisseur ou être saisi pour la première fois par
+l'administrateur.
 
-- `id` ;
-- `event_id` ;
-- un intitulé métier unique visible par l'utilisateur ;
-- `starts_at` ;
-- `ends_at` facultatif ;
-- `status` ;
-- `published` ;
-- `description` facultative ;
-- métadonnées d'origine/fournisseur réservées à l'administration ;
-- dates de création et de modification.
-
-La distinction technique éventuelle entre `name` et `type` ne doit jamais se
-traduire par deux champs métier obligatoires dans l'interface. L'API doit
-permettre de créer une session à partir de l'intitulé choisi ou saisi par
-l'utilisateur.
+Les tables multi-sessions existantes restent transitoirement compatibles mais
+ne pilotent plus le formulaire métier.
 
 ## API administration
 
-Prévoir des routes administratives protégées pour :
-
-- lister les sessions d'un événement ;
-- créer une session ;
-- consulter une session ;
-- modifier une session ;
-- supprimer une session ;
-- filtrer et trier ;
-- fournir les suggestions d'intitulés provenant des fournisseurs et des valeurs
-  locales déjà utilisées ;
-- accepter un nouvel intitulé sans création préalable d'un type ;
-- ingérer ou synchroniser les données fournisseur sans exposer les champs
-  techniques dans les formulaires métier.
+Les routes Événements administratives acceptent et renvoient
+`session_title`. La route de suggestions fournit les intitulés provenant de
+tous les fournisseurs et des valeurs enregistrées, dédupliqués sans origine
+visible. Elle accepte qu'une valeur inédite apparaisse après enregistrement
+d'un Événement, sans création préalable d'un type.
 
 Toutes les mutations doivent être auditées et protégées par l'authentification
 administrateur existante.
 
 ## API publique
 
-L'API publique doit permettre de récupérer les sessions publiées liées aux
-événements visibles, sans exposer :
+L'API publique Événements ajoute uniquement la valeur effective facultative
+`session_title`, sans exposer :
 
 - origine ;
 - clé fournisseur ;
@@ -103,27 +87,20 @@ L'API publique doit permettre de récupérer les sessions publiées liées aux
 
 ## Interface
 
-La gestion principale des sessions doit être intégrée à la fiche ou au panneau
-de l'événement concerné. Une page Sessions globale ne doit pas devenir le point
-d'entrée principal du workflow métier.
-
 Dans l'administration Événements :
 
-- afficher les sessions de l'événement sélectionné ;
-- proposer création, modification et suppression ;
-- utiliser un seul champ visible `Intitulé de session` sous forme de combobox
+- conserver le formulaire Événement et ses champs existants ;
+- ajouter un seul champ visible `Intitulé de session` sous forme de combobox
   éditable/créable ;
 - alimenter les suggestions avec les valeurs fournisseur découvertes et les
-  intitulés locaux déjà utilisés ;
+  intitulés déjà enregistrés ;
 - permettre immédiatement la saisie d'un intitulé absent de la liste ;
+- ne jamais afficher l'origine fournisseur ou locale de la valeur ;
+- ne pas afficher de sous-liste ni d'actions CRUD Sessions ;
 - conserver les maquettes et composants MEDS existants ;
 - éviter une nouvelle navigation globale si l'intégration à la fiche/panneau
   événement suffit ;
-- afficher clairement intitulé, horaire, statut et publication ;
 - préserver l'usage du calendrier Lot 4.2.
-
-Une éventuelle vue globale Sessions pourra rester un outil administratif
-secondaire de recherche/filtrage, mais elle n'est pas le cœur de l'expérience.
 
 ## Validation temporelle
 
@@ -142,13 +119,14 @@ secondaire de recherche/filtrage, mais elle n'est pas le cœur de l'expérience.
 - aucun SQL destructif au démarrage ;
 - la base Lot 4.2 doit être migrable sans perte ;
 - rollback documenté et testé sur PostgreSQL isolé ;
-- la migration `0004_sessions` déjà validée ne doit pas être réécrite sans
-  justification, nouvelle recette migration/rollback et validation explicite.
+- la migration `0004_sessions` déjà validée ne doit pas être réécrite ;
+- `0005_event_session_title` ajoute la colonne facultative sans backfill
+  ambigu et refuse un rollback destructif.
 
 ## Tests obligatoires
 
 - tests unitaires des schémas et règles temporelles ;
-- CRUD API sur PostgreSQL ;
+- création et modification d'Événement avec `session_title` sur PostgreSQL ;
 - 401/403/admin success sur les routes administratives ;
 - API publique sans métadonnées fournisseur ;
 - migration et rollback ;
@@ -157,8 +135,9 @@ secondaire de recherche/filtrage, mais elle n'est pas le cœur de l'expérience.
 - création d'un intitulé inédit sans référentiel préalable ;
 - absence d'obligation de renseigner séparément type + nom dans le workflow
   métier ;
-- sessions traversant minuit et changement DST ;
-- scénarios Chromium sur l'administration des sessions depuis un événement ;
+- Événements traversant minuit et changement DST ;
+- scénarios Chromium sur la combobox du formulaire Événement ;
+- absence de sous-liste ou de création multiple dans l'interface ;
 - non-régression Lot 4.2.
 
 ## Hors périmètre

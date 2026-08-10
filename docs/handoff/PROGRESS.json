@@ -12,9 +12,9 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "ui-technically-validated-awaiting-final-audit",
+    "status": "event-session-redesign-documented-awaiting-document-review",
     "updated_at": "2026-08-11",
-    "implementation_percent": 95,
+    "implementation_percent": 80,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -103,8 +103,8 @@
     }
   },
   "lot_4_3_ui": {
-    "status": "technically-validated-awaiting-final-audit",
-    "scope": "Sessions administration integrated into Event details, editable title combobox, manual CRUD, provider correction workflow, UX states and visual rollback; no global Sessions page.",
+    "status": "superseded-by-maintainer-model-decision",
+    "scope": "The technically validated multi-session UI is retained in branch history but is no longer the accepted target. One Event now represents one Session and carries one editable session title.",
     "technical_validation": {
       "npm_audit": "zero-vulnerabilities",
       "unit_tests": "99-passed-69-api-30-web",
@@ -118,7 +118,15 @@
     "test_dataset": "tests/fixtures/lot43_ui.sql",
     "recipe": "scripts/test-lot43-ui.sh",
     "acceptance": "docs/handoff/LOT-4.3-UI-ACCEPTANCE.md",
-    "user_validation": null
+    "user_validation": "rejected-as-target-model-on-2026-08-11"
+  },
+  "lot_4_3_event_as_session": {
+    "status": "architecture-documented-awaiting-document-review",
+    "maintainer_model_validation": "2026-08-11",
+    "decision": "One Event represents one Session; the existing Event form gains one editable/createable session title combobox fed by all provider and stored values, with no visible origin distinction.",
+    "adr": "docs/handbook/architecture/ADR-0013-EVENT-AS-SESSION.md",
+    "migration_plan": "docs/handoff/LOT-4.3-EVENT-SESSION-MIGRATION-PLAN.md",
+    "application_changes_started": false
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",
@@ -302,8 +310,8 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Stop feature development and run the Lot 4.3 final audit when explicitly instructed; do not merge main or start Lot 4.4.",
-    "reference": "docs/handoff/LOT-4.3-UI-ACCEPTANCE.md",
+    "task": "Await explicit review of ADR-0013 and the 0005 migration plan before application changes; do not merge main or start Lot 4.4.",
+    "reference": "docs/handoff/LOT-4.3-EVENT-SESSION-MIGRATION-PLAN.md",
     "target_visual_fidelity": 98
   }
 }

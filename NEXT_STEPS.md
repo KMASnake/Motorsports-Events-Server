@@ -16,6 +16,14 @@
 - [x] implémenter et valider techniquement le workflow de corrections Sessions ;
 - [x] obtenir la validation mainteneur de la recette Corrections sur VPS isolé ;
 - [x] implémenter et valider techniquement l'interface Sessions intégrée ;
+- [x] recueillir le retour mainteneur rejetant le modèle UI multi-sessions ;
+- [x] valider le modèle métier « un Événement = une Session » ;
+- [x] rédiger l'ADR-0013 et le plan `0005_event_session_title` ;
+- [ ] obtenir la validation explicite de ces deux documents ;
+- [ ] implémenter et tester la migration réversible `0005` ;
+- [ ] ajouter la combobox créable au formulaire Événement ;
+- [ ] retirer du parcours UI la sous-liste et le CRUD multi-sessions ;
+- [ ] remplacer les fixtures et scénarios Chromium devenus obsolètes ;
 - [ ] réaliser l'audit final du Lot 4.3 ;
 - [ ] obtenir une CI verte sur le SHA candidat exact ;
 - [ ] exécuter les recettes VPS isolée et Windows ;
@@ -23,11 +31,11 @@
 - [ ] poursuivre dans l'ordre défini par
   `docs/handoff/LOT-4.3-SESSIONS-HANDOFF.md`.
 
-Critère de passage Corrections validé par le mainteneur le 2026-08-10 : valeurs
-typées, synchronisation fournisseur non destructive, résolutions, audit
-atomique, concurrence, API publique effective et suggestions ont réussi la
-recette VPS isolée. L'interface est maintenant techniquement validée à 95 % ;
-le prochain point d'arrêt est l'audit final. Les sections
+Critère de passage révisé le 2026-08-11 : l'interface multi-sessions a réussi
+ses tests techniques mais ne correspond pas au modèle métier mainteneur. Elle
+est remplacée par un champ unique sur l'Événement. L'avancement revient à 80 %
+et le prochain point d'arrêt est la validation de l'ADR-0013 et du plan 0005.
+Les sections
 suivantes sont conservées comme historique des jalons précédents.
 
 ## Remédiation de l'audit Lot 4.2

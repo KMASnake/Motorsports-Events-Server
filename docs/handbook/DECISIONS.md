@@ -1,5 +1,17 @@
 # Journal des décisions
 
+## 2026-08-11 — Un Événement représente une Session
+
+- l'Événement est l'unique unité temporelle administrée ;
+- il porte un seul `session_title` facultatif ;
+- le formulaire conserve ses champs et ajoute une combobox éditable/créable ;
+- les suggestions réunissent fournisseurs et valeurs enregistrées sans origine
+  visible ;
+- une valeur inédite est acceptée puis devient réutilisable ;
+- les tables et routes multi-sessions restent uniquement pour compatibilité.
+
+Voir `architecture/ADR-0013-EVENT-AS-SESSION.md`.
+
 ## 2026-08-10 — Intitulé unique des Sessions
 
 - le workflow métier ne demande qu'un `title`, jamais un couple nom/type ;
