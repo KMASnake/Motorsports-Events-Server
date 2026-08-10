@@ -1,5 +1,11 @@
 # Changelog
 
+## Lot 4.2 — fusion et passation
+
+- fusionne le Lot 4.2 validé dans `main` via la PR #25 ;
+- référence le commit de fusion `bb72e57` et les preuves de validation ;
+- clôt la remédiation d'audit à 100 % et prépare la reprise au Lot 4.3 Sessions.
+
 ## Lot 4.2 — correctif de recette Tableau de bord
 
 - affiche dans les prochaines séances les identités championnat issues du

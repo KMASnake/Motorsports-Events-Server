@@ -129,7 +129,7 @@ Voir `LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md`.
 - [x] procédure garantissant qu'aucune production n'est ciblée ;
 - [x] mise à jour de `PROJECT-STATUS.json`, `PROGRESS.json` et `CHANGELOG.md` ;
 - [x] revalidation explicite des logos du Tableau de bord le 2026-08-10 ;
-- [ ] fusion seulement après cette validation.
+- [x] fusion après validation via la PR #25 le 2026-08-10.
 
 La checklist humaine, les commandes et le nettoyage sont décrits dans
 `LOT-4.2-AUDIT-STEP-8-ACCEPTANCE.md`.

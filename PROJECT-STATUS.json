@@ -9,9 +9,9 @@
     "audit_action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md"
   },
   "repository_state": {
-    "branch": "codex/lot-4.2-complete",
-    "status": "lot-4.2-user-validated-awaiting-merge",
-    "reason": "Audit remediation is complete and the maintainer confirmed the final Dashboard logo correction on 2026-08-10."
+    "branch": "main",
+    "status": "lot-4.2-user-validated-and-merged",
+    "reason": "Audit remediation is complete; the maintainer confirmed the final Dashboard logo correction and PR #25 was merged on 2026-08-10 as bb72e576ae85d70f5f039475dbfb91e1341461a6."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,12 +53,12 @@
   "working_lot": {
     "lot": "4.2",
     "target_version": "8.1.0-alpha.2-lot.4.2",
-    "status": "user-validated-awaiting-merge",
+    "status": "user-validated-and-merged",
     "implementation_percent": 100,
     "audit_remediation_percent": 100,
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "merged_to_main": false,
+    "merged_to_main": true,
     "implemented_or_partially_implemented": [
       "Month, week, day and agenda calendar views",
       "Optimistic event movement and basic resize action",
@@ -126,5 +126,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Merge codex/lot-4.2-complete only on explicit maintainer request, then prepare Lot 4.3."
+  "next_action": "Prepare the Lot 4.3 Sessions specification and acceptance criteria before implementation."
 }
