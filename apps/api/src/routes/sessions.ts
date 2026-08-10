@@ -75,9 +75,17 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
   });
 
   app.get('/api/v1/admin/session-titles', async () => (
-    await pool.query(`select min(btrim(name)) title,count(*)::int usage_count
-      from sessions where btrim(name)<>''
-      group by lower(btrim(name)) order by lower(min(btrim(name)))`)
+    await pool.query(`with titles(title) as (
+      select name from sessions
+      union all
+      select provider_value #>> '{}' from session_corrections
+        where field_name='title' and jsonb_typeof(provider_value)='string'
+      union all
+      select override_value #>> '{}' from session_corrections
+        where field_name='title' and jsonb_typeof(override_value)='string'
+    ) select min(btrim(title)) title,count(*)::int usage_count
+      from titles where btrim(title)<>''
+      group by lower(btrim(title)) order by lower(min(btrim(title)))`)
   ).rows);
 
   // Compatibilité technique avec la migration 0004 ; ce référentiel n'est

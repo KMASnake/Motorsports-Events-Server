@@ -1,5 +1,16 @@
 # Changelog
 
+## Lot 4.3 — Corrections Sessions
+
+- ajoute les corrections typées pour l'intitulé, les horaires, le statut, la
+  publication et la description ;
+- ajoute synchronisation fournisseur, détection de conflit, convergence et
+  résolutions sans écraser les overrides ;
+- sérialise synchronisations, overrides et résolutions avec audit atomique ;
+- expose uniquement les valeurs effectives dans l'API publique ;
+- enrichit les suggestions d'intitulés avec les valeurs fournisseur et locales ;
+- ajoute une recette PostgreSQL isolée reproductible, sans interface.
+
 ## Lot 4.3 — API Sessions administrative et publique
 
 - consigne la validation explicite de la recette complète sur VPS isolé par le

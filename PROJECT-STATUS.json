@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-api-user-validated",
-    "reason": "Lot 4.2 remains the validated baseline and migration 0004_sessions is user-validated. The maintainer explicitly validated the Sessions administrative and public APIs on an isolated VPS on 2026-08-10. No Sessions corrections workflow or UI has started."
+    "status": "lot-4.3-corrections-technically-validated",
+    "reason": "Lot 4.2 remains the validated baseline. The migration and Sessions APIs are user-validated; the Sessions corrections workflow is technically validated and awaits maintainer validation. No Sessions UI has started."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,8 +53,8 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "api-user-validated-on-isolated-vps",
-    "implementation_percent": 60,
+    "status": "corrections-technically-validated-awaiting-maintainer",
+    "implementation_percent": 80,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -68,10 +68,12 @@
       "Protected administrative Session CRUD with server pagination and filters",
       "Atomic Session mutation and audit transactions",
       "Reproducible isolated Sessions API validator",
-      "Public Session projection with parent visibility and technical metadata redaction"
+      "Public Session projection with parent visibility and technical metadata redaction",
+      "Typed Session corrections, non-destructive provider synchronization and resolutions",
+      "Atomic correction audit, concurrency serialization and effective public projection"
     ],
     "mandatory_gaps": [
-      "Implement and validate the Sessions correction workflow",
+      "Obtain maintainer validation of the Sessions corrections recipe",
       "Implement and validate the Sessions administration UI",
       "Implement and validate all remaining Lot 4.3 acceptance criteria"
     ],
@@ -116,6 +118,8 @@
     "lot_4_3_admin_api": "passed locally on isolated PostgreSQL: 401 missing/invalid/expired, 403, admin, references, UTC, midnight, DST, overlaps, CRUD, pagination/filter/sort, provider protection, unique secret-free audit and rollback when audit fails",
     "lot_4_3_public_api": "passed locally on isolated PostgreSQL: published Session and parent visibility, stable ordering, strict filters, business title and complete technical metadata redaction",
     "lot_4_3_api_user_validation": "maintainer explicitly validated the complete isolated VPS API recipe on 2026-08-10: authentication, contracts, UTC, pagination, CRUD, provider protection, atomic audit and public redaction all passed",
+    "lot_4_3_corrections": "technically passed: typed six-field corrections, provider synchronization, convergence, resolutions, pagination/filter/sort, suggestions, effective public projection, atomic audit rollback and concurrent serialization",
+    "lot_4_3_corrections_quality": "npm audit zero; lint and typecheck passed; 69 API and 27 Web tests passed; API/Web/Types builds and Lot 4.2 regressions passed",
     "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
     "lot_4_3_quality": "npm audit zero; lint and typecheck passed; 48 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed",
     "known_tooling_issues": [
@@ -128,5 +132,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Prepare the next Lot 4.3 implementation step from the validated API baseline; do not start provider automation or UI without the next explicit instruction."
+  "next_action": "Have the maintainer run and explicitly validate scripts/test-lot43-corrections.sh on an isolated VPS; do not start the Sessions UI before that validation."
 }

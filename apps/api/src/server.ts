@@ -11,6 +11,7 @@ import { registerAdminAuth } from './lib/adminAuth.js';
 import { registerAdminAudit } from './lib/adminAudit.js';
 import { auditRoutes } from './routes/audit.js';
 import { sessionRoutes } from './routes/sessions.js';
+import { sessionCorrectionRoutes } from './routes/sessionCorrections.js';
 
 const app = Fastify({ logger: true });
 await verifyApplicationSchema();
@@ -41,6 +42,7 @@ await app.register(eventRoutes);
 await app.register(correctionRoutes);
 await app.register(auditRoutes);
 await app.register(sessionRoutes);
+await app.register(sessionCorrectionRoutes);
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';

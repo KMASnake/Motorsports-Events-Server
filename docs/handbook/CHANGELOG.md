@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.18 — 2026-08-10
+
+- fixe les six champs corrigibles d'une Session et leur validation typée ;
+- impose la synchronisation fournisseur non destructive et la convergence ;
+- sérialise résolutions, overrides et synchronisations par Session ;
+- impose un audit atomique unique et une projection publique effective ;
+- enrichit les suggestions d'intitulés avec source et override.
+
 ## 1.17 — 2026-08-10
 
 - consigne la validation mainteneur des API Sessions administrative et publique

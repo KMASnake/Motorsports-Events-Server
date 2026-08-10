@@ -95,10 +95,23 @@ L'ADR `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`, le plan détaill�
 et la migration `0004_sessions` sont validés explicitement. La recette VPS a
 conservé l'empreinte Lot 4.2 `cb816e2a25fc9cb3d11f0604b3506c03`.
 
-Avancement réel : 60 %. Les API administrative et publique Sessions et les
+Avancement réel : 80 %. Les API administrative et publique Sessions et les
 contrats partagés ont été validés explicitement par le mainteneur sur VPS isolé
 le 2026-08-10 selon `docs/handoff/LOT-4.3-API-ACCEPTANCE.md`. Les corrections
-applicatives, l'ingestion automatisée et l'interface n'ont pas été commencées.
+applicatives de corrections sont implémentées et validées techniquement. La
+recette mainteneur des corrections, l'automatisation fournisseur et l'interface
+restent à réaliser.
 
 L'API respecte la décision fonctionnelle ci-dessus : son contrat d'écriture
 utilise un intitulé unique et n'impose pas le couple technique `name`/`type`.
+
+## Étape Corrections Sessions — validation technique
+
+La preuve détaillée est `docs/handoff/LOT-4.3-CORRECTIONS-ACCEPTANCE.md`.
+Les six champs corrigibles sont `title`, `starts_at`, `ends_at`, `status`,
+`published` et `description`. La synchronisation conserve les overrides, crée
+les conflits champ par champ et supprime une correction convergente. Toutes les
+mutations et leur audit partagent une transaction et un verrou de Session.
+
+Point d'arrêt : ne pas commencer l'interface avant validation explicite de la
+recette Corrections par le mainteneur.

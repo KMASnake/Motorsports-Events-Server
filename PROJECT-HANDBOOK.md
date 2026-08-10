@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.17
+## Version 1.18
 
 Ce document est la source de vérité permanente du projet.
 
@@ -35,6 +35,13 @@ Les listes administratives sont paginées côté serveur après validation,
 filtrage et tri. Toute mutation sensible est journalisée avec son acteur, son
 identifiant de requête et ses valeurs avant/après, sans secret. Voir
 `docs/handbook/architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.
+
+Les corrections Sessions portent uniquement sur `title`, `starts_at`,
+`ends_at`, `status`, `published` et `description`. Elles séparent valeur
+fournisseur, override et valeur effective. Une synchronisation ne détruit pas
+un override ; toute mutation et son audit sont atomiques et sérialisés au
+niveau de la Session. L'API publique ne présente que la valeur effective. Voir
+`docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`.
 
 Toute évolution du schéma ou transformation de données utilise une migration
 versionnée exécutée avant l'API. Le démarrage applicatif vérifie le schéma en

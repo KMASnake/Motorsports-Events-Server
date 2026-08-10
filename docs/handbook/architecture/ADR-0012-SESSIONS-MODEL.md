@@ -120,7 +120,20 @@ conflit plutôt que d'altérer silencieusement la valeur fournisseur.
 ## Conséquences
 
 - la liste publique filtre sessions et événements publiés et masque les champs
-  techniques ;
+techniques ;
+
+Les champs corrigibles sont limités à `title`, `starts_at`, `ends_at`,
+`status`, `published` et `description`. Ils sont validés selon leur type métier ;
+`name` et `type` sont refusés dans ce contrat. La synchronisation fournisseur
+met à jour la source sans écraser l'override, crée un conflit si les valeurs
+divergent et supprime la correction lorsqu'elles convergent.
+
+Les résolutions, synchronisations et modifications d'override verrouillent la
+Session avant lecture et écriture. Accepter ou restaurer le fournisseur retire
+l'override ; conserver local le maintient. L'audit unique partage la transaction
+et le `PoolClient` de la mutation. Les suggestions d'intitulés incluent source
+et override, sont insensibles à la casse et dédupliquées. La projection publique
+ne contient que la valeur effective.
 - les routes publiques sont `GET /api/v1/events/:eventId/sessions` et
   `GET /api/v1/sessions/:id` ; elles exposent `id`, `event_id`, `title`,
   `starts_at`, `ends_at`, `status` et `description` seulement ;

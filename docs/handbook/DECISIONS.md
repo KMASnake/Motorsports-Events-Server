@@ -151,6 +151,22 @@ Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
 
 Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
 
+## 2026-08-10 — Corrections Sessions
+
+- seuls `title`, `starts_at`, `ends_at`, `status`, `published` et `description`
+  sont corrigibles et chaque valeur suit le type métier du champ ;
+- la synchronisation fournisseur conserve l'override, signale le conflit et
+  supprime la correction lorsque source et override convergent ;
+- accepter ou restaurer le fournisseur retire l'override, tandis que conserver
+  local maintient la valeur effective ;
+- résolutions, synchronisations et overrides concurrents sont sérialisés par
+  verrou de Session ;
+- mutation et audit unique utilisent la même transaction ;
+- suggestions et API publique lisent respectivement les valeurs source/locales
+  utiles et la seule valeur effective.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
 ## 2026-08-03 — Exploitation des corrections
 
 - les filtres de Corrections sont combinables et portent sur l'ensemble des

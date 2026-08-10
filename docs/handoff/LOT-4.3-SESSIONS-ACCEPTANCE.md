@@ -46,6 +46,19 @@
 - [x] chevauchement autorisé par défaut ;
 - [x] création manuelle sans fournisseur.
 
+## Corrections Sessions
+
+- [x] valeurs typées sur `title`, `starts_at`, `ends_at`, `status`, `published`
+  et `description` uniquement ;
+- [x] synchronisation fournisseur non destructive et convergence automatique ;
+- [x] accepter/restaurer fournisseur et conserver/modifier l'override ;
+- [x] pagination, filtres et tri serveur ;
+- [x] sérialisation des résolutions, synchronisations et overrides concurrents ;
+- [x] audit atomique unique et rollback intégral si l'audit échoue ;
+- [x] suggestions fournisseur et locales dédupliquées ;
+- [x] API publique limitée à la valeur effective ;
+- [ ] recette Corrections validée explicitement par le mainteneur.
+
 ## Interface
 
 - [ ] sessions visibles depuis le contexte de l'événement ;

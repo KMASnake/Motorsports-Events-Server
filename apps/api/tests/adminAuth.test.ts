@@ -10,7 +10,7 @@ const expired = signAdminToken({ sub: 'expired-test', role: 'admin', exp: 1 }, s
 
 async function securedApp() {
   const app = Fastify(); registerAdminAuth(app, secret);
-  for (const path of ['/api/v1/admin/events', '/api/v1/admin/provider-events', '/api/v1/admin/corrections', '/api/v1/admin/sessions/session-test']) app.get(path, async () => ({ ok: true }));
+  for (const path of ['/api/v1/admin/events', '/api/v1/admin/provider-events', '/api/v1/admin/corrections', '/api/v1/admin/sessions/session-test', '/api/v1/admin/session-corrections']) app.get(path, async () => ({ ok: true }));
   app.get('/api/v1/events', async () => ({ public: true }));
   app.get('/api/v1/events/event-test/sessions', async () => ({ public: true }));
   app.get('/api/v1/sessions/session-test', async () => ({ public: true }));
@@ -20,7 +20,7 @@ async function securedApp() {
 }
 
 describe('administrative route authentication', () => {
-  it.each(['/api/v1/admin/events', '/api/v1/admin/provider-events', '/api/v1/admin/corrections', '/api/v1/admin/sessions/session-test'])(
+  it.each(['/api/v1/admin/events', '/api/v1/admin/provider-events', '/api/v1/admin/corrections', '/api/v1/admin/sessions/session-test', '/api/v1/admin/session-corrections'])(
     'returns 401 without authentication for %s', async (url) => {
       const app = await securedApp(); expect((await app.inject({ url })).statusCode).toBe(401); await app.close();
     }

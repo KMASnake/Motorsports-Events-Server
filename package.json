@@ -34,7 +34,8 @@
     "validate:audit-step4": "node scripts/validate-audit-step4.mjs",
     "validate:audit-step5": "node scripts/validate-audit-step5.mjs",
     "test:lot43:migrations": "./scripts/test-lot43-migrations.sh",
-    "test:lot43:api": "./scripts/test-lot43-api.sh"
+    "test:lot43:api": "./scripts/test-lot43-api.sh",
+    "test:lot43:corrections": "./scripts/test-lot43-corrections.sh"
   },
   "engines": {
     "node": ">=22.0.0",

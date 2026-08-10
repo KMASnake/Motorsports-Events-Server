@@ -61,3 +61,21 @@ export interface CreateSessionInput {
 }
 
 export type UpdateSessionInput = Partial<CreateSessionInput>;
+
+export type SessionCorrectionField = 'title' | 'starts_at' | 'ends_at' | 'status' | 'published' | 'description';
+export type SessionCorrectionStatus = 'active' | 'conflict' | 'resolved' | 'ignored';
+
+export interface AdminSessionCorrection {
+  id: string;
+  session_id: string;
+  event_id: string;
+  field_name: SessionCorrectionField;
+  provider_value: unknown;
+  override_value: unknown;
+  effective_value: unknown;
+  status: SessionCorrectionStatus;
+  provider_key: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}

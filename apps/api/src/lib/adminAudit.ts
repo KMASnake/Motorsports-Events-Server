@@ -16,6 +16,8 @@ function sanitize(value: unknown): unknown {
 function target(request: FastifyRequest): { type: string; id: string | null; table: string | null } | null {
   const path = request.url.split('?', 1)[0];
   const params = request.params as { id?: string };
+  if (path.startsWith('/api/v1/admin/session-corrections')) return { type: 'session-correction', id: params.id ?? null, table: 'session_corrections' };
+  if (path.startsWith('/api/v1/admin/provider-sessions')) return { type: 'session-correction-sync', id: params.id ?? null, table: null };
   if (path.startsWith('/api/v1/admin/sessions')) return { type: 'session', id: params.id ?? null, table: 'sessions' };
   if (/^\/api\/v1\/admin\/events\/[^/]+\/sessions$/.test(path)) return { type: 'session', id: null, table: null };
   if (path.startsWith('/api/v1/admin/corrections')) return { type: 'correction', id: params.id ?? null, table: 'event_corrections' };

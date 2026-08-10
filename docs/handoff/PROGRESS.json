@@ -12,9 +12,9 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "api-user-validated-on-isolated-vps",
+    "status": "corrections-technically-validated-awaiting-maintainer",
     "updated_at": "2026-08-10",
-    "implementation_percent": 60,
+    "implementation_percent": 80,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -76,6 +76,27 @@
       "scope": "Administrative and public Sessions APIs on isolated VPS, including security, UTC, CRUD, suggestions, provider protection, atomic audit and public metadata redaction",
       "result": "maintainer explicitly validated the complete API recipe"
     }
+  },
+  "lot_4_3_corrections": {
+    "status": "technically-validated-awaiting-maintainer",
+    "scope": "Typed Session corrections, provider synchronization and resolutions, atomic audit, concurrency, suggestions and effective public projection; no UI and no migration change.",
+    "technical_validation": {
+      "isolated_postgresql_recipe": "passed",
+      "security_and_provider_protection": "passed",
+      "typed_fields": "title-starts_at-ends_at-status-published-description-only",
+      "provider_sync_conflict_and_convergence": "passed",
+      "pagination_filter_sort_and_suggestions": "passed",
+      "concurrency": "resolutions-sync-and-overrides-serialized",
+      "atomic_audit_and_rollback": "passed",
+      "public_projection": "effective-values-only",
+      "lot_4_2_regressions": "validate-lot4-step2-step3-passed",
+      "npm_audit": "zero-vulnerabilities",
+      "unit_tests": "96-passed-69-api-27-web",
+      "workspace_builds": "api-web-types-passed"
+    },
+    "test_dataset": "scripts/test-lot43-corrections.sh",
+    "acceptance": "docs/handoff/LOT-4.3-CORRECTIONS-ACCEPTANCE.md",
+    "user_validation": null
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",
@@ -259,8 +280,8 @@
   ],
   "next_action": {
     "owner": "Maintainer",
-    "task": "Validate the Sessions administrative API recipe before public API, corrections or UI work.",
-    "reference": "docs/handoff/LOT-4.3-API-ACCEPTANCE.md",
+    "task": "Run and explicitly validate the Sessions corrections recipe on an isolated VPS before UI work.",
+    "reference": "docs/handoff/LOT-4.3-CORRECTIONS-ACCEPTANCE.md",
     "target_visual_fidelity": 98
   }
 }
