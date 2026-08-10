@@ -61,12 +61,12 @@
 
 ## Interface
 
-- [ ] sessions visibles depuis le contexte de l'événement ;
-- [ ] création, modification et suppression fonctionnelles ;
-- [ ] intitulé unique, horaires, statut et publication lisibles ;
-- [ ] aucune métadonnée technique fournisseur dans le formulaire métier ;
-- [ ] comportement correct à 1440×900 et 1280×720 ;
-- [ ] aucune régression sur calendrier, liste, corrections, logos et filtres du Lot 4.2.
+- [x] sessions visibles depuis le contexte de l'événement ;
+- [x] création, modification et suppression fonctionnelles ;
+- [x] intitulé unique, horaires, statut et publication lisibles ;
+- [x] aucune métadonnée technique fournisseur dans le formulaire métier ;
+- [x] comportement correct à 1440×900, 1280×720 et largeur mobile ;
+- [x] aucune régression sur calendrier, liste, corrections, logos et filtres du Lot 4.2.
 
 ## Tests et qualité
 
@@ -76,7 +76,7 @@
 - [x] builds API/Web/Types ;
 - [x] tests PostgreSQL ;
 - [x] migration + rollback ;
-- [ ] scénarios Chromium ;
+- [x] scénarios Chromium ;
 - [x] `npm audit --audit-level=high` sans vulnérabilité bloquante ;
 - [ ] CI verte sur le SHA candidat exact ;
 - [ ] recette VPS Docker isolée ;

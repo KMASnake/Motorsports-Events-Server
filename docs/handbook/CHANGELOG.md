@@ -1,5 +1,12 @@
 # Handbook Changelog
 
+## 1.19 — 2026-08-11
+
+- consigne l'implémentation de la gestion Sessions dans la fiche Événement ;
+- confirme l'intitulé unique sous forme de combobox éditable/créable ;
+- confirme que les Sessions fournisseur passent par Corrections ;
+- conserve l'interface comme candidat technique avant audit et recettes finales.
+
 ## 1.18 — 2026-08-10
 
 - fixe les six champs corrigibles d'une Session et leur validation typée ;

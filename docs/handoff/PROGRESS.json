@@ -12,9 +12,9 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "corrections-user-validated-on-isolated-vps",
-    "updated_at": "2026-08-10",
-    "implementation_percent": 80,
+    "status": "ui-technically-validated-awaiting-final-audit",
+    "updated_at": "2026-08-11",
+    "implementation_percent": 95,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -101,6 +101,24 @@
       "scope": "Complete Sessions corrections recipe on isolated VPS: security, typed values, provider synchronization, overrides, convergence, pagination, suggestions, public effective projection, concurrency, atomic audit and rollback",
       "result": "maintainer explicitly reported all seven validator groups and the final recipe as OK"
     }
+  },
+  "lot_4_3_ui": {
+    "status": "technically-validated-awaiting-final-audit",
+    "scope": "Sessions administration integrated into Event details, editable title combobox, manual CRUD, provider correction workflow, UX states and visual rollback; no global Sessions page.",
+    "technical_validation": {
+      "npm_audit": "zero-vulnerabilities",
+      "unit_tests": "99-passed-69-api-30-web",
+      "lint_typecheck_builds": "api-web-types-passed",
+      "lot_4_3_migrations_api_corrections": "all-isolated-docker-recipes-passed",
+      "lot_4_2_regressions": "validate-lot4-step2-step3-and-eight-chromium-scenarios-passed",
+      "chromium": "12-passed-including-twenty-session-acceptance-criteria",
+      "docker": "isolated-api-web-postgresql-built-and-passed",
+      "screenshots": "three-desktop-corrections-mobile-captures"
+    },
+    "test_dataset": "tests/fixtures/lot43_ui.sql",
+    "recipe": "scripts/test-lot43-ui.sh",
+    "acceptance": "docs/handoff/LOT-4.3-UI-ACCEPTANCE.md",
+    "user_validation": null
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",
@@ -284,8 +302,8 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Await explicit instruction, then implement the Sessions administration UI from the validated corrections baseline.",
-    "reference": "docs/handoff/LOT-4.3-SESSIONS-SPEC.md",
+    "task": "Stop feature development and run the Lot 4.3 final audit when explicitly instructed; do not merge main or start Lot 4.4.",
+    "reference": "docs/handoff/LOT-4.3-UI-ACCEPTANCE.md",
     "target_visual_fidelity": 98
   }
 }

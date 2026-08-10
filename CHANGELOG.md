@@ -1,5 +1,16 @@
 # Changelog
 
+## Lot 4.3 — Interface Sessions intégrée
+
+- ajoute la section Sessions chronologique dans la fiche Événement ;
+- ajoute création, modification et suppression des Sessions manuelles ;
+- ajoute une combobox alimentée par les suggestions fournisseur et locales,
+  tout en acceptant une valeur inédite ;
+- ajoute le traitement embarqué des Corrections Sessions fournisseur ;
+- gère chargement, vide, erreurs HTTP, succès et rollback visuel ;
+- ajoute une fixture synthétique et 12 scénarios Chromium avec les régressions
+  Lot 4.2, ainsi que trois captures desktop/mobile.
+
 ## Lot 4.3 — Corrections Sessions
 
 - consigne la validation explicite de la recette complète sur VPS isolé par le

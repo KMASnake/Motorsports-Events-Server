@@ -10,9 +10,11 @@
 - workflow Corrections Sessions validé explicitement par le mainteneur sur VPS
   isolé le 2026-08-10 : valeurs typées, synchronisation fournisseur,
   résolutions, concurrence et audit atomique ;
-- implémentation fonctionnelle : 80 % ;
-- prochain point d'arrêt : instruction explicite avant l'interface Sessions ;
-  aucune interface ni ingestion automatisée n'est commencée.
+- interface Sessions intégrée à la fiche Événement techniquement validée avec
+  combobox libre, CRUD manuel, Corrections et rollback visuel ;
+- implémentation fonctionnelle : 95 % ;
+- prochain point d'arrêt : audit final, puis CI du SHA exact et recettes
+  VPS/Windows ; aucune ingestion automatisée n'est commencée.
 
 L'état canonique de l'architecture 8.1 reste `PROJECT-STATUS.json`. Les sections
 2.7.0 ci-dessous sont conservées comme historique de production.

@@ -4,6 +4,7 @@ import { fullDate } from './eventUtils';
 import type { Championship, EventRow } from './eventTypes';
 import { assetRegistry } from '../../assets/assetRegistry';
 import { providerLabel } from './providerDisplay';
+import { EventSessionsSection } from '../sessions/EventSessionsSection';
 
 interface Props {
   event: EventRow | null;
@@ -31,6 +32,7 @@ export function EventDetailsPanel({ event, championships, onEdit, onDuplicate, o
     </dl>
     {event.description && <p className="event-details-description">{event.description}</p>}
     {event.correction_count ? <div className="event-correction-badge">✎ Corrigé · {event.correction_count} champ(s)</div> : null}
+    <EventSessionsSection eventId={event.id} eventStart={event.starts_at} />
     <footer><button className="danger" onClick={() => onEdit(event)}>Modifier</button><button onClick={() => onDuplicate(event)}>Dupliquer</button><span className="event-resize" aria-label="Redimensionner visuellement la durée"><button disabled={!event.ends_at || new Date(event.ends_at).getTime()-new Date(event.starts_at).getTime()<30*60000} onClick={()=>onResize(event,new Date(new Date(event.ends_at??event.starts_at).getTime()-30*60000))}>−30 min</button><button onClick={()=>onResize(event,new Date(new Date(event.ends_at??event.starts_at).getTime()+30*60000))}>+30 min</button></span><button className="delete" onClick={() => onDelete(event)}>Supprimer</button></footer>
   </aside>;
 }

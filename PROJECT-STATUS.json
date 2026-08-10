@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-corrections-user-validated",
-    "reason": "Lot 4.2 remains the validated baseline. The migration, Sessions APIs and Sessions corrections workflow were explicitly validated by the maintainer on an isolated VPS on 2026-08-10. No Sessions UI has started."
+    "status": "lot-4.3-ui-technically-validated",
+    "reason": "Lot 4.2 remains the validated baseline. Migration, Sessions APIs and corrections are user-validated. The integrated Sessions UI is technically validated and awaits final audit, exact-SHA CI, VPS/Windows recipes and final user validation."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,8 +53,8 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "corrections-user-validated-on-isolated-vps",
-    "implementation_percent": 80,
+    "status": "ui-technically-validated-awaiting-final-audit",
+    "implementation_percent": 95,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -70,11 +70,14 @@
       "Reproducible isolated Sessions API validator",
       "Public Session projection with parent visibility and technical metadata redaction",
       "Typed Session corrections, non-destructive provider synchronization and resolutions",
-      "Atomic correction audit, concurrency serialization and effective public projection"
+      "Atomic correction audit, concurrency serialization and effective public projection",
+      "Integrated Event Sessions UI with editable title combobox, manual CRUD and provider correction workflow",
+      "Deterministic UI dataset, visual rollback and desktop/mobile Chromium coverage"
     ],
     "mandatory_gaps": [
-      "Implement and validate the Sessions administration UI",
-      "Implement and validate all remaining Lot 4.3 acceptance criteria"
+      "Run the Lot 4.3 final audit and exact-SHA CI",
+      "Run isolated VPS and Windows acceptance",
+      "Obtain final explicit maintainer validation"
     ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
     "progress": "docs/handoff/PROGRESS.json"
@@ -120,6 +123,8 @@
     "lot_4_3_corrections": "technically passed: typed six-field corrections, provider synchronization, convergence, resolutions, pagination/filter/sort, suggestions, effective public projection, atomic audit rollback and concurrent serialization",
     "lot_4_3_corrections_quality": "npm audit zero; lint and typecheck passed; 69 API and 27 Web tests passed; API/Web/Types builds and Lot 4.2 regressions passed",
     "lot_4_3_corrections_user_validation": "maintainer explicitly validated the complete isolated VPS corrections recipe on 2026-08-10: security, typed values, provider sync, overrides, convergence, pagination, suggestions, public projection, concurrency, atomic audit and rollback all passed",
+    "lot_4_3_ui": "technically passed: Event-integrated chronological Sessions, editable/createable title combobox, manual CRUD, provider correction actions, HTTP states, visual rollback, desktop/mobile rendering and no technical business fields",
+    "lot_4_3_ui_quality": "npm audit zero; lint/typecheck passed; 69 API and 30 Web tests passed; API/Web/Types builds, all Lot 4.3 Docker recipes, Lot 4.2 validators and 12 Chromium scenarios passed",
     "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
     "lot_4_3_quality": "npm audit zero; lint and typecheck passed; 48 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed",
     "known_tooling_issues": [
@@ -132,5 +137,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Await an explicit instruction before implementing the Sessions administration UI from the validated migration, API and corrections baseline."
+  "next_action": "Stop feature development. Run the Lot 4.3 final audit next; do not merge main or start Lot 4.4."
 }
