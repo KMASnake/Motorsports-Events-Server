@@ -98,9 +98,9 @@ conservé l'empreinte Lot 4.2 `cb816e2a25fc9cb3d11f0604b3506c03`.
 Avancement réel : 80 %. Les API administrative et publique Sessions et les
 contrats partagés ont été validés explicitement par le mainteneur sur VPS isolé
 le 2026-08-10 selon `docs/handoff/LOT-4.3-API-ACCEPTANCE.md`. Les corrections
-applicatives de corrections sont implémentées et validées techniquement. La
-recette mainteneur des corrections, l'automatisation fournisseur et l'interface
-restent à réaliser.
+applicatives de corrections sont implémentées et validées explicitement par le
+mainteneur sur VPS isolé. L'automatisation fournisseur et l'interface restent à
+réaliser.
 
 L'API respecte la décision fonctionnelle ci-dessus : son contrat d'écriture
 utilise un intitulé unique et n'impose pas le couple technique `name`/`type`.
@@ -113,5 +113,6 @@ Les six champs corrigibles sont `title`, `starts_at`, `ends_at`, `status`,
 les conflits champ par champ et supprime une correction convergente. Toutes les
 mutations et leur audit partagent une transaction et un verrou de Session.
 
-Point d'arrêt : ne pas commencer l'interface avant validation explicite de la
-recette Corrections par le mainteneur.
+La recette Corrections a été validée explicitement par le mainteneur le
+2026-08-10. Point d'arrêt : ne pas commencer l'interface sans instruction
+explicite portant sur cette nouvelle étape.

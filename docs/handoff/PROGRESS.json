@@ -12,7 +12,7 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "corrections-technically-validated-awaiting-maintainer",
+    "status": "corrections-user-validated-on-isolated-vps",
     "updated_at": "2026-08-10",
     "implementation_percent": 80,
     "architecture_percent": 100,
@@ -78,7 +78,7 @@
     }
   },
   "lot_4_3_corrections": {
-    "status": "technically-validated-awaiting-maintainer",
+    "status": "user-validated-on-isolated-vps",
     "scope": "Typed Session corrections, provider synchronization and resolutions, atomic audit, concurrency, suggestions and effective public projection; no UI and no migration change.",
     "technical_validation": {
       "isolated_postgresql_recipe": "passed",
@@ -96,7 +96,11 @@
     },
     "test_dataset": "scripts/test-lot43-corrections.sh",
     "acceptance": "docs/handoff/LOT-4.3-CORRECTIONS-ACCEPTANCE.md",
-    "user_validation": null
+    "user_validation": {
+      "date": "2026-08-10",
+      "scope": "Complete Sessions corrections recipe on isolated VPS: security, typed values, provider synchronization, overrides, convergence, pagination, suggestions, public effective projection, concurrency, atomic audit and rollback",
+      "result": "maintainer explicitly reported all seven validator groups and the final recipe as OK"
+    }
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",
@@ -279,9 +283,9 @@
     "The local npm version is below the declared npm >= 10 engine requirement; CI, VPS and Windows acceptance used the required versions."
   ],
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Run and explicitly validate the Sessions corrections recipe on an isolated VPS before UI work.",
-    "reference": "docs/handoff/LOT-4.3-CORRECTIONS-ACCEPTANCE.md",
+    "owner": "Codex",
+    "task": "Await explicit instruction, then implement the Sessions administration UI from the validated corrections baseline.",
+    "reference": "docs/handoff/LOT-4.3-SESSIONS-SPEC.md",
     "target_visual_fidelity": 98
   }
 }

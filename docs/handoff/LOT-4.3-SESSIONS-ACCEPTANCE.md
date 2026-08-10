@@ -57,7 +57,7 @@
 - [x] audit atomique unique et rollback intégral si l'audit échoue ;
 - [x] suggestions fournisseur et locales dédupliquées ;
 - [x] API publique limitée à la valeur effective ;
-- [ ] recette Corrections validée explicitement par le mainteneur.
+- [x] recette Corrections validée explicitement par le mainteneur.
 
 ## Interface
 

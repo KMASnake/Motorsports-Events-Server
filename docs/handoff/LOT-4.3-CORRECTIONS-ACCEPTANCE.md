@@ -62,6 +62,7 @@ Résultat attendu : les six lignes de contrôle se terminent par `OK`, puis
 
 ## État
 
-Validation technique acquise. Validation utilisateur/VPS des Corrections non
-encore acquise. Avancement réel du Lot 4.3 : 80 %. L'interface Sessions ne doit
-pas commencer avant validation explicite de cette recette.
+Validation technique acquise. Le mainteneur a explicitement validé sur VPS
+isolé les sept contrôles de la recette le 2026-08-10. Avancement réel du Lot
+4.3 : 80 %. L'interface Sessions n'a pas commencé et nécessite une instruction
+explicite distincte.

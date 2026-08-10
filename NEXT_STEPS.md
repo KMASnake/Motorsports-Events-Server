@@ -14,15 +14,15 @@
 - [x] implémenter et valider l'API publique Sessions ;
 - [x] obtenir la validation mainteneur de l'étape API sur VPS isolé ;
 - [x] implémenter et valider techniquement le workflow de corrections Sessions ;
-- [ ] obtenir la validation mainteneur de la recette Corrections sur VPS isolé ;
+- [x] obtenir la validation mainteneur de la recette Corrections sur VPS isolé ;
 - [ ] seulement ensuite commencer l'interface Sessions ;
 - [ ] poursuivre dans l'ordre défini par
   `docs/handoff/LOT-4.3-SESSIONS-HANDOFF.md`.
 
-Critère de passage Corrections atteint techniquement le 2026-08-10 : valeurs
+Critère de passage Corrections validé par le mainteneur le 2026-08-10 : valeurs
 typées, synchronisation fournisseur non destructive, résolutions, audit
 atomique, concurrence, API publique effective et suggestions ont réussi la
-recette isolée. La validation mainteneur reste requise avant l'interface. Les sections
+recette VPS isolée. L'interface reste soumise à une instruction explicite. Les sections
 suivantes sont conservées comme historique des jalons précédents.
 
 ## Remédiation de l'audit Lot 4.2

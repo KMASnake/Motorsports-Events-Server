@@ -2,6 +2,8 @@
 
 ## Lot 4.3 — Corrections Sessions
 
+- consigne la validation explicite de la recette complète sur VPS isolé par le
+  mainteneur le 2026-08-10 ;
 - ajoute les corrections typées pour l'intitulé, les horaires, le statut, la
   publication et la description ;
 - ajoute synchronisation fournisseur, détection de conflit, convergence et

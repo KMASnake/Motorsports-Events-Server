@@ -7,11 +7,12 @@
 - ADR, plan et migration `0004_sessions` validés par le mainteneur ;
 - API administrative et publique validées explicitement par le mainteneur sur
   VPS isolé le 2026-08-10 ;
-- workflow Corrections Sessions validé techniquement : valeurs typées,
-  synchronisation fournisseur, résolutions, concurrence et audit atomique ;
+- workflow Corrections Sessions validé explicitement par le mainteneur sur VPS
+  isolé le 2026-08-10 : valeurs typées, synchronisation fournisseur,
+  résolutions, concurrence et audit atomique ;
 - implémentation fonctionnelle : 80 % ;
-- prochain point d'arrêt : validation explicite de la recette Corrections par
-  le mainteneur ; aucune interface ni ingestion automatisée n'est commencée.
+- prochain point d'arrêt : instruction explicite avant l'interface Sessions ;
+  aucune interface ni ingestion automatisée n'est commencée.
 
 L'état canonique de l'architecture 8.1 reste `PROJECT-STATUS.json`. Les sections
 2.7.0 ci-dessous sont conservées comme historique de production.
