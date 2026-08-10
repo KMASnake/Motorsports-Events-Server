@@ -128,7 +128,7 @@ Voir `LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md`.
 - [x] recette VPS Docker isolée réussie le 2026-08-10 ;
 - [x] procédure garantissant qu'aucune production n'est ciblée ;
 - [x] mise à jour de `PROJECT-STATUS.json`, `PROGRESS.json` et `CHANGELOG.md` ;
-- [ ] revalidation explicite après correction des logos du Tableau de bord ;
+- [x] revalidation explicite des logos du Tableau de bord le 2026-08-10 ;
 - [ ] fusion seulement après cette validation.
 
 La checklist humaine, les commandes et le nettoyage sont décrits dans

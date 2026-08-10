@@ -23,8 +23,8 @@ selon la procédure du Handbook.
 ## Base et état fiables
 
 - Lot 4.1 : validé par l'utilisateur sur un VPS isolé ;
-- Lot 4.2 : remédiation d'audit terminée ; validation globale rouverte pour le
-  contrôle des logos du Tableau de bord signalé le 2026-08-10 ;
+- Lot 4.2 : remédiation d'audit terminée et validation globale confirmée après
+  contrôle des logos du Tableau de bord le 2026-08-10 ;
 - une fusion dans `main`, une CI verte ou un déploiement technique ne constitue
   jamais à elle seule une validation utilisateur.
 

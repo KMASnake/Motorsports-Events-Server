@@ -7,6 +7,8 @@
 - utilise le fallback local lorsqu'aucun logo spécifique n'est disponible ;
 - ajoute un scénario Chromium contrôlant six images chargées et visibles ;
 - rouvre la validation globale jusqu'au contrôle graphique du mainteneur.
+- consigne la revalidation graphique réussie du mainteneur le 2026-08-10 sur
+  le SHA `7d67672`.
 
 ## Lot 4.2 — remédiation audit, étape 8
 

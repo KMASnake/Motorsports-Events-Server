@@ -3,9 +3,9 @@
 ## État
 
 La recette technique VPS de l'étape 7 est validée. Après la recette Windows du
-2026-08-10, le mainteneur a signalé que les logos ne s'affichaient pas sur le
-Tableau de bord. La validation globale est rouverte jusqu'au contrôle du
-correctif ciblé.
+2026-08-10, le défaut d'affichage des logos du Tableau de bord a été corrigé et
+le mainteneur a confirmé leur rendu sur le SHA
+`7d67672a6a7a067ca4f4594284a917fd78afc6d4`.
 
 ## Préconditions Windows
 
@@ -42,7 +42,7 @@ Résultat de données attendu : 12 championnats, 40 circuits, 96 événements,
 
 Ouvrir <http://localhost:3600> puis confirmer :
 
-- [ ] Tableau de bord affiche les six logos ou fallbacks des prochaines séances ;
+- [x] Tableau de bord affiche les six logos ou fallbacks des prochaines séances ;
 - [x] Championnats s'affiche avec logos et fallbacks ;
 - [x] Événements s'ouvre en vue Mois avec légende des championnats visibles ;
 - [x] les vues Mois, Semaine, Jour, Agenda et Liste s'affichent correctement ;
@@ -78,6 +78,5 @@ projet Docker `mse-lot42-final`. La production n'est jamais ciblée.
 
 ## Clôture
 
-La revalidation attendue porte uniquement sur les logos de la section
-« Prochaines séances » du Tableau de bord. La fusion reste interdite avant cette
-confirmation explicite.
+Le mainteneur a confirmé « ok les logos » le 2026-08-10. Cette revalidation
+referme le dernier écart de l'étape 8. La fusion reste une opération distincte.
