@@ -7,7 +7,8 @@
 - conserve une combobox créable alimentée par tous les fournisseurs et les
   valeurs déjà enregistrées, sans distinction d'origine visible ;
 - conserve `0004_sessions` et ses routes comme compatibilité transitoire ;
-- planifie la migration réversible `0005_event_session_title`.
+- implémente la migration réversible `0005_event_session_title`, le contrat
+  Événement et la combobox cible.
 
 ## 1.19 — 2026-08-11
 

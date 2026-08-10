@@ -10,6 +10,9 @@ Avancement réel révisé du Lot 4.3 : **80 %**
 > multi-sessions, mais ne constitue plus l'acceptation UI cible. Le mainteneur
 > a validé « un Événement = une Session » avec un unique champ dans le
 > formulaire Événement. Voir ADR-0013.
+> La fixture et la commande décrites ci-dessous correspondent au commit
+> historique `3a10e49`. La recette courante est désormais documentée dans
+> `LOT-4.3-EVENT-SESSION-ACCEPTANCE.md` et retourne 11 scénarios réussis.
 
 ## Périmètre
 

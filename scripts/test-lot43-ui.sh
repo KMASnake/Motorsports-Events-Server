@@ -26,7 +26,7 @@ cleanup(){
 }
 trap cleanup EXIT INT TERM
 
-echo "Création de la pile UI Sessions isolée..."
+echo "Création de la pile UI Événement/Session isolée..."
 stack_cleanup
 docker compose up --build -d
 for attempt in $(seq 1 60); do
@@ -49,4 +49,4 @@ docker run --rm --network host \
   -v "$TEST_WORKDIR:/work" -w /work \
   mcr.microsoft.com/playwright:v1.62.1-noble \
   npx playwright test tests/ui/events.spec.ts tests/ui/sessions.spec.ts --project=chromium
-echo "Tests Chromium Sessions Lot 4.3 : OK"
+echo "Tests Chromium Événement/Session Lot 4.3 : OK"

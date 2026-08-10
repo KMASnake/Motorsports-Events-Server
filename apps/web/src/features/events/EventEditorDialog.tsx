@@ -8,6 +8,7 @@ interface Props {
   value: EventFormState;
   championships: Championship[];
   circuits: Circuit[];
+  sessionTitles: string[];
   error: string | null;
   onChange: (value: EventFormState) => void;
   onNameChange: (name: string) => void;
@@ -15,7 +16,7 @@ interface Props {
   onSubmit: (event: FormEvent) => void;
 }
 
-export function EventEditorDialog({ open, editing, saving, value, championships, circuits, error, onChange, onNameChange, onClose, onSubmit }: Props) {
+export function EventEditorDialog({ open, editing, saving, value, championships, circuits, sessionTitles, error, onChange, onNameChange, onClose, onSubmit }: Props) {
   if (!open) return null;
   return <div className="lot3-modal-backdrop" onMouseDown={() => !saving && onClose()}>
     <section className="lot3-modal lot4-modal" role="dialog" aria-modal="true" aria-labelledby="event-editor-title" onMouseDown={(event) => event.stopPropagation()}>
@@ -27,6 +28,11 @@ export function EventEditorDialog({ open, editing, saving, value, championships,
           <label>Catégorie facultative<input value={value.category} onChange={(event) => onChange({ ...value, category: event.target.value })} placeholder="Ex. Grand Prix, Rallye…" /></label>
           <label>Championnat *<select required value={value.championship_id} onChange={(event) => onChange({ ...value, championship_id: event.target.value })}><option value="">Sélectionner</option>{championships.filter((item) => item.active || item.id === value.championship_id).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
           <label>Circuit facultatif<select value={value.circuit_id} onChange={(event) => onChange({ ...value, circuit_id: event.target.value })}><option value="">Non défini</option>{circuits.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country_code ? ` · ${item.country_code}` : ''}</option>)}</select></label>
+          <label className="wide">Intitulé de session
+            <input maxLength={160} list="event-session-title-suggestions" autoComplete="off" value={value.session_title} onChange={(event) => onChange({ ...value, session_title: event.target.value })} placeholder="FP1, Qualifications, Warm-up…" />
+            <datalist id="event-session-title-suggestions">{sessionTitles.map((title) => <option key={title} value={title} />)}</datalist>
+            <small>Choisissez une suggestion connue ou saisissez un nouvel intitulé.</small>
+          </label>
           <label>Début *<input required type="datetime-local" value={value.starts_at} onChange={(event) => onChange({ ...value, starts_at: event.target.value })} /></label>
           <label>Fin<input type="datetime-local" min={value.starts_at} value={value.ends_at} onChange={(event) => onChange({ ...value, ends_at: event.target.value })} /></label>
           <label>Statut<select value={value.status} onChange={(event) => onChange({ ...value, status: event.target.value as EventFormState['status'] })}><option value="draft">Brouillon</option><option value="scheduled">À venir</option><option value="completed">Terminé</option><option value="cancelled">Annulé</option><option value="postponed">Reporté</option></select></label>

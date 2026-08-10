@@ -1,6 +1,6 @@
 # Lot 4.3 — Plan de migration Événement = Session
 
-Statut : conception validée par le mainteneur le 2026-08-11
+Statut : implémenté et techniquement validé le 2026-08-11
 
 Référence : `docs/handbook/architecture/ADR-0013-EVENT-AS-SESSION.md`.
 
@@ -71,5 +71,5 @@ La recette devra démontrer :
 
 ## Point d'arrêt
 
-Aucune migration ni modification applicative ne doit commencer avant la
-validation explicite de ce document et de l'ADR-0013 par le mainteneur.
+La migration et l'application sont implémentées. Le point d'arrêt suivant est
+la recette VPS et la validation visuelle explicite du mainteneur.

@@ -33,6 +33,11 @@ rollback_0004() {
     sh /migrations/migrate.sh down 0004_sessions
 }
 
+rollback_0005() {
+  docker compose run --rm migrate \
+    sh /migrations/migrate.sh down 0005_event_session_title
+}
+
 expect_sql_failure() {
   description=$1
   statement=$2
@@ -54,7 +59,7 @@ expect_rollback_failure() {
 
 lot42_fingerprint() {
   sql "select md5(jsonb_build_object(
-    'events', (select coalesce(jsonb_agg(to_jsonb(t) order by id), '[]'::jsonb) from events t),
+    'events', (select coalesce(jsonb_agg(to_jsonb(t) - 'session_title' order by id), '[]'::jsonb) from events t),
     'event_corrections', (select coalesce(jsonb_agg(to_jsonb(t) order by id), '[]'::jsonb) from event_corrections t),
     'admin_audit_log', (select coalesce(jsonb_agg(to_jsonb(t) order by id), '[]'::jsonb) from admin_audit_log t)
   )::text)"
@@ -103,6 +108,8 @@ echo "Empreinte Lot 4.2 avant migration : $before"
 
 docker compose run --rm migrate >/dev/null
 [ "$(sql "select count(*) from schema_migrations where version='0004_sessions'")" = "1" ]
+[ "$(sql "select count(*) from schema_migrations where version='0005_event_session_title'")" = "1" ]
+[ "$(sql "select count(*) from information_schema.columns where table_schema='public' and table_name='events' and column_name='session_title'")" = "1" ]
 [ "$(sql "select count(*) from information_schema.tables where table_schema='public' and table_name in ('session_types','sessions','session_corrections')")" = "3" ]
 [ "$(sql "select string_agg(key || ':' || label || ':' || sort_order || ':' || active, ',' order by sort_order) from session_types")" = "practice:Essais:1:true,qualifying:Qualifications:2:true,sprint:Sprint:3:true,warmup:Warm-up:4:true,race:Course:5:true,other:Autre:6:true" ]
 [ "$(sql "select count(*) from session_types")" = "6" ]
@@ -115,6 +122,17 @@ apply_file 0004_sessions.up.sql >/dev/null
 [ "$(sql "select count(*) from schema_migrations where version='0004_sessions'")" = "1" ]
 [ "$types_before" = "$(sql "select md5(jsonb_agg(to_jsonb(t) order by sort_order, key)::text) from session_types t")" ]
 echo "Seconde montée idempotente : OK"
+
+apply_file 0005_event_session_title.up.sql >/dev/null
+[ "$(sql "select count(*) from schema_migrations where version='0005_event_session_title'")" = "1" ]
+sql "update events set session_title='Superpole inédit' where id='evt-001'"
+[ "$(sql "select session_title from events where id='evt-001'")" = "Superpole inédit" ]
+if rollback_0005 >/dev/null 2>&1; then
+  echo "Échec : rollback 0005 accepté malgré un intitulé actif" >&2
+  exit 1
+fi
+sql "update events set session_title=null where id='evt-001'"
+echo "Intitulé inédit et rollback 0005 protégé : OK"
 
 docker compose build api >/dev/null
 api_before=$(database_fingerprint "$before")
@@ -208,6 +226,8 @@ expect_rollback_failure "correction de Session orpheline"
 sql "delete from session_corrections where id='lot43-orphan-correction'; delete from events where id='lot43-orphan-event'"
 
 [ "$before" = "$(lot42_fingerprint)" ]
+rollback_0005 >/dev/null
+[ "$(sql "select count(*) from schema_migrations where version='0005_event_session_title'")" = "0" ]
 rollback_0004 >/dev/null
 [ "$(sql "select count(*) from schema_migrations where version='0004_sessions'")" = "0" ]
 [ "$(sql "select count(*) from information_schema.tables where table_schema='public' and table_name in ('session_types','sessions','session_corrections')")" = "0" ]
@@ -216,7 +236,8 @@ echo "Rollback non destructif et empreinte Lot 4.2 inchangée : OK"
 
 docker compose run --rm migrate >/dev/null
 [ "$(sql "select count(*) from schema_migrations where version='0004_sessions'")" = "1" ]
+[ "$(sql "select count(*) from schema_migrations where version='0005_event_session_title'")" = "1" ]
 [ "$(sql "select count(*) from session_types")" = "6" ]
 [ "$before" = "$(lot42_fingerprint)" ]
-echo "Réapplication 0004_sessions : OK"
+echo "Réapplication 0004_sessions et 0005_event_session_title : OK"
 echo "Tests des migrations Lot 4.3 : OK"

@@ -19,11 +19,12 @@
 - [x] recueillir le retour mainteneur rejetant le modèle UI multi-sessions ;
 - [x] valider le modèle métier « un Événement = une Session » ;
 - [x] rédiger l'ADR-0013 et le plan `0005_event_session_title` ;
-- [ ] obtenir la validation explicite de ces deux documents ;
-- [ ] implémenter et tester la migration réversible `0005` ;
-- [ ] ajouter la combobox créable au formulaire Événement ;
-- [ ] retirer du parcours UI la sous-liste et le CRUD multi-sessions ;
-- [ ] remplacer les fixtures et scénarios Chromium devenus obsolètes ;
+- [x] obtenir la validation explicite de ces deux documents ;
+- [x] implémenter et tester la migration réversible `0005` ;
+- [x] ajouter la combobox créable au formulaire Événement ;
+- [x] retirer du parcours UI la sous-liste et le CRUD multi-sessions ;
+- [x] remplacer les fixtures et scénarios Chromium devenus obsolètes ;
+- [ ] exécuter la recette VPS autonome et la validation visuelle mainteneur ;
 - [ ] réaliser l'audit final du Lot 4.3 ;
 - [ ] obtenir une CI verte sur le SHA candidat exact ;
 - [ ] exécuter les recettes VPS isolée et Windows ;
@@ -33,8 +34,9 @@
 
 Critère de passage révisé le 2026-08-11 : l'interface multi-sessions a réussi
 ses tests techniques mais ne correspond pas au modèle métier mainteneur. Elle
-est remplacée par un champ unique sur l'Événement. L'avancement revient à 80 %
-et le prochain point d'arrêt est la validation de l'ADR-0013 et du plan 0005.
+est remplacée par un champ unique sur l'Événement. La nouvelle cible est
+techniquement validée à 95 % ; le prochain point d'arrêt est sa recette VPS et
+sa validation visuelle explicite.
 Les sections
 suivantes sont conservées comme historique des jalons précédents.
 

@@ -20,7 +20,7 @@ async function call<T>(path:string,init?:RequestInit):Promise<T>{
 
 const fieldLabels:Record<string,string>={
   championship_id:'Championnat',circuit_id:'Circuit',name:'Nom',category:'Catégorie',
-  starts_at:'Début',ends_at:'Fin',status:'Statut',published:'Publication',description:'Description'
+  starts_at:'Début',ends_at:'Fin',status:'Statut',published:'Publication',description:'Description',session_title:'Intitulé de session'
 };
 const initialFilters:CorrectionFilters={query:'',championship:'all',provider:'all',field:'all',status:'all',conflict:'all',author:'all',updatedFrom:'',updatedTo:'',minimumFields:1};
 

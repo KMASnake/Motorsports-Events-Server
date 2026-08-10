@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-event-session-redesign-documented",
-    "reason": "Lot 4.2 remains the validated baseline. The maintainer replaced the multi-session UI model with one Event representing one Session. ADR-0013 and the reversible 0005 plan are documented; application changes have not started."
+    "status": "lot-4.3-event-session-technically-validated",
+    "reason": "Lot 4.2 remains the validated baseline. ADR-0013, migration 0005, Event APIs, suggestions and the single editable title combobox are technically validated and await maintainer VPS/visual validation."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,8 +53,8 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "event-session-redesign-documented-awaiting-document-review",
-    "implementation_percent": 80,
+    "status": "event-session-technically-validated-awaiting-maintainer",
+    "implementation_percent": 95,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -71,15 +71,15 @@
       "Public Session projection with parent visibility and technical metadata redaction",
       "Typed Session corrections, non-destructive provider synchronization and resolutions",
       "Atomic correction audit, concurrency serialization and effective public projection",
-      "Integrated Event Sessions UI with editable title combobox, manual CRUD and provider correction workflow",
-      "Deterministic UI dataset, visual rollback and desktop/mobile Chromium coverage"
+      "Superseded multi-session UI retained only in Git history and technical evidence",
+      "Versioned 0005_event_session_title migration with guarded rollback",
+      "Single editable/createable session title combobox in the Event form",
+      "Event title persistence, public projection and origin-free aggregated suggestions"
     ],
     "mandatory_gaps": [
-      "Validate ADR-0013 and the 0005_event_session_title migration plan as written",
-      "Implement and validate migration 0005_event_session_title",
-      "Move the single editable session title combobox into the Event form",
-      "Replace obsolete multi-session UI tests and rerun regressions",
-      "Run final audit, exact-SHA CI, isolated VPS and Windows acceptance"
+      "Run isolated VPS and visual maintainer acceptance for ADR-0013",
+      "Run final audit, exact-SHA CI and Windows acceptance",
+      "Obtain final explicit maintainer validation"
     ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
     "progress": "docs/handoff/PROGRESS.json"
@@ -139,5 +139,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Await explicit maintainer validation of ADR-0013 and the 0005 migration plan before changing migrations or application code."
+  "next_action": "Publish the candidate, run the autonomous VPS recipe and obtain explicit visual maintainer validation before final audit."
 }

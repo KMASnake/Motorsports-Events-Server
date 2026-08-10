@@ -15,6 +15,8 @@
 - [x] base Lot 4.2 migrée sans perte ;
 - [x] aucun SQL métier destructif exécuté au démarrage de l'API ;
 - [x] stockage UTC vérifié.
+- [x] migration `0005_event_session_title` idempotente et rollback protégé ;
+- [x] aucune reprise automatique ambiguë des anciennes lignes multi-sessions ;
 
 ## API administration
 
@@ -61,13 +63,13 @@
 
 ## Interface
 
-- [ ] aucune sous-liste ni CRUD multi-sessions dans la fiche Événement ;
-- [ ] champ `Intitulé de session` intégré au formulaire Événement existant ;
-- [ ] combobox alimentée par toutes les valeurs fournisseur et enregistrées ;
-- [ ] intitulé inédit accepté puis proposé à la prochaine ouverture ;
-- [ ] aucune distinction fournisseur/local ni métadonnée technique visible ;
-- [ ] comportement correct à 1440×900, 1280×720 et largeur mobile ;
-- [ ] aucune régression sur calendrier, liste, corrections, logos et filtres du Lot 4.2.
+- [x] aucune sous-liste ni CRUD multi-sessions dans la fiche Événement ;
+- [x] champ `Intitulé de session` intégré au formulaire Événement existant ;
+- [x] combobox alimentée par toutes les valeurs fournisseur et enregistrées ;
+- [x] intitulé inédit accepté puis proposé à la prochaine ouverture ;
+- [x] aucune distinction fournisseur/local ni métadonnée technique visible ;
+- [x] comportement correct à 1440×900, 1280×720 et largeur mobile ;
+- [x] aucune régression sur calendrier, liste, corrections, logos et filtres du Lot 4.2.
 
 ## Tests et qualité
 

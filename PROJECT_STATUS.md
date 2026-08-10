@@ -14,10 +14,12 @@
   cible lors de la recette mainteneur du 2026-08-11 ;
 - nouveau modèle validé : un Événement représente une Session et reçoit un
   unique intitulé dans une combobox créable, sans origine visible ;
-- ADR-0013 et plan réversible `0005_event_session_title` rédigés ;
-- implémentation fonctionnelle ramenée à 80 % ;
-- prochain point d'arrêt : validation documentaire explicite avant toute
-  migration ou modification applicative.
+- ADR-0013 et migration réversible `0005_event_session_title` implémentés ;
+- API Événement et suggestions, combobox créable et retrait de l'interface
+  multi-sessions techniquement validés ;
+- implémentation fonctionnelle : 95 % ;
+- prochain point d'arrêt : recette VPS et validation visuelle explicite avant
+  l'audit final.
 
 L'état canonique de l'architecture 8.1 reste `PROJECT-STATUS.json`. Les sections
 2.7.0 ci-dessous sont conservées comme historique de production.

@@ -34,6 +34,15 @@ try {
   expect(types.map((type) => type.key).join(',') === 'practice,qualifying,sprint,warmup,race,other', 'Référentiel des types incorrect.');
   const initialTitles = await ok('/api/v1/admin/session-titles');
   expect(Array.isArray(initialTitles), 'Suggestions d’intitulés invalides.');
+  const eventWithTitle = await ok(`/api/v1/admin/events/${eventId}`, {
+    method: 'PATCH', body: JSON.stringify({ session_title: 'Superpole inédit API' })
+  });
+  expect(eventWithTitle.session_title === 'Superpole inédit API', 'Intitulé unique de l’Événement non enregistré.');
+  const publicEventWithTitle = await ok(`/api/v1/events/${eventId}`, {}, '');
+  expect(publicEventWithTitle.session_title === 'Superpole inédit API', 'Intitulé effectif absent de l’API publique Événement.');
+  const eventTitles = await ok('/api/v1/admin/session-titles');
+  const eventSuggestion = eventTitles.find((entry) => entry.title === 'Superpole inédit API');
+  expect(eventSuggestion && !('origin' in eventSuggestion) && !('provider_key' in eventSuggestion), 'Suggestion Événement absente ou origine exposée.');
   expect((await call(`/api/v1/admin/events/${eventId}/sessions?sort=sql`)).response.status === 400, 'Tri invalide non rejeté.');
   expect((await call(`/api/v1/admin/events/missing-event/sessions`)).response.status === 404, 'Événement absent non rejeté.');
   expect((await call(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify({ title: 'Sans offset', starts_at: '2026-06-12T10:00:00' }) })).response.status === 400, 'Date sans offset acceptée.');
@@ -105,5 +114,6 @@ try {
   console.log('Audit atomique unique et rollback sur échec : OK');
   console.log('API publique visible, ordonnée et sans métadonnée technique : OK');
 } finally {
+  await call(`/api/v1/admin/events/${eventId}`, { method: 'PATCH', body: JSON.stringify({ session_title: null }) }).catch(() => undefined);
   for (const id of created.reverse()) await call(`/api/v1/admin/sessions/${id}`, { method: 'DELETE' }).catch(() => undefined);
 }

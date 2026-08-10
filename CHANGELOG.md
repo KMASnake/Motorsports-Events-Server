@@ -4,8 +4,13 @@
 
 - consigne la décision mainteneur « un Événement = une Session » ;
 - planifie `events.session_title` et sa combobox éditable/créable ;
-- conserve sans suppression les composants multi-sessions comme compatibilité
-  technique jusqu'à l'implémentation de la révision.
+- conserve les tables et routes multi-sessions comme compatibilité technique ;
+- ajoute la migration gardée `0005_event_session_title` ;
+- expose le champ facultatif dans les contrats Événement administratifs et
+  publics ainsi que dans les Corrections ;
+- agrège les suggestions sans origine visible ;
+- remplace l'interface multi-sessions par la combobox du formulaire Événement ;
+- ajoute une fixture et 11 scénarios Chromium reproductibles.
 
 ## Lot 4.3 — Correctif du validateur UI Sessions
 

@@ -76,6 +76,8 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
 
   app.get('/api/v1/admin/session-titles', async () => (
     await pool.query(`with titles(title) as (
+      select session_title from events where session_title is not null
+      union all
       select name from sessions
       union all
       select provider_value #>> '{}' from session_corrections

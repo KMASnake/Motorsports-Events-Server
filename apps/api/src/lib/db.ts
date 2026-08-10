@@ -36,6 +36,7 @@ export async function verifyApplicationSchema(): Promise<void> {
     session_types_table: string | null;
     sessions_table: string | null;
     session_corrections_table: string | null;
+    session_title_column: string | null;
     applied_migrations: number;
   }>(`
     select
@@ -43,12 +44,15 @@ export async function verifyApplicationSchema(): Promise<void> {
       to_regclass('public.session_types')::text as session_types_table,
       to_regclass('public.sessions')::text as sessions_table,
       to_regclass('public.session_corrections')::text as session_corrections_table,
+      (select column_name from information_schema.columns
+        where table_schema='public' and table_name='events' and column_name='session_title') as session_title_column,
       (select count(*)::int from schema_migrations
        where version in (
          '0001_event_corrections',
          '0002_utc_storage',
          '0003_admin_audit_and_provider_identity',
-         '0004_sessions'
+         '0004_sessions',
+         '0005_event_session_title'
        )) as applied_migrations
   `);
 
@@ -58,7 +62,8 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.session_types_table ||
     !schema.sessions_table ||
     !schema.session_corrections_table ||
-    schema.applied_migrations !== 4
+    !schema.session_title_column ||
+    schema.applied_migrations !== 5
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }
