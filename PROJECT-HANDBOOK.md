@@ -146,8 +146,8 @@ validation utilisateur.
 
 ## État
 Lots 4.1 et 4.2 validés par l'utilisateur. Pour le Lot 4.3, l'ADR Sessions et
-le plan de migration ont été validés par le mainteneur ; la migration reste
-une étape technique distincte à valider avant toute API ou interface Sessions.
+le plan de migration ont été validés par le mainteneur ; la migration a ensuite
+été validée sur un VPS isolé. Le Lot 4.3 complet reste en développement.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

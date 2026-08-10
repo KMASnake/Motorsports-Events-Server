@@ -20,8 +20,8 @@ Branche de travail du nouveau lot : `codex/lot-4.3-sessions`.
 
 ## Décision de démarrage
 
-Le Lot 4.3 est **spécifié mais non implémenté**. Codex ne doit pas commencer par
-modifier l'interface. L'ordre recommandé est :
+Le Lot 4.3 est spécifié et sa migration est validée sur VPS isolé. Codex ne
+doit pas commencer par modifier l'interface. L'ordre recommandé est :
 
 1. modèle de données et ADR/migration ;
 2. API et contrats de types ;
@@ -54,18 +54,21 @@ d'architecture du Lot 4.3, sans bloquer la spécification fonctionnelle :
 2. séparation entre les actions administratives humaines et une ingestion
    fournisseur automatisée future.
 
-## Première tâche Codex
+## Première tâche Codex — terminée
 
 Avant tout code : produire l'ADR du modèle Sessions et le plan de migration,
 puis vérifier qu'ils satisfont `LOT-4.3-SESSIONS-SPEC.md` et
 `LOT-4.3-SESSIONS-ACCEPTANCE.md`.
 
-Aucune fusion dans `main` et aucune déclaration de validation utilisateur ne
-sont autorisées avant exécution complète de la recette du lot.
+Aucune fusion dans `main` ni déclaration de validation du Lot 4.3 complet n'est
+autorisée avant exécution complète de la recette du lot.
 
-## Avancement de conception
+## Avancement
 
-L'ADR proposé est `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md` et le
-plan détaillé est `docs/handoff/LOT-4.3-SESSIONS-MIGRATION-PLAN.md`. Ils sont en
-attente de validation explicite. Aucun SQL, code API ou changement d'interface
-n'a été produit.
+L'ADR `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`, le plan détaillé
+et la migration `0004_sessions` sont validés explicitement. La recette VPS a
+conservé l'empreinte Lot 4.2 `cb816e2a25fc9cb3d11f0604b3506c03`.
+
+Avancement réel : 20 %. La prochaine étape est l'API Sessions et les contrats
+de types partagés. Aucun code API Sessions ni changement d'interface n'a encore
+été produit.

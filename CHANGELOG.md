@@ -11,6 +11,8 @@
 - étend la vérification de schéma au démarrage par des lectures uniquement ;
 - ajoute une recette PostgreSQL isolée couvrant intégrité, UTC, minuit, DST,
   chevauchement, contraintes, cascade, rollback et réapplication ;
+- consigne la validation explicite du mainteneur après réussite de la recette
+  VPS isolée et conservation de l'empreinte Lot 4.2 ;
 - ne crée aucune route, logique CRUD, ingestion ou interface Sessions.
 
 ## Lot 4.3 — conception Sessions

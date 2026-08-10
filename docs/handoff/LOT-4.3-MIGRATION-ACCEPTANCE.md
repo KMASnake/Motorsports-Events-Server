@@ -2,7 +2,9 @@
 
 Date : 2026-08-10
 
-Statut : techniquement validée, validation explicite du mainteneur requise
+Statut : validée explicitement par le mainteneur sur VPS isolé
+
+Validation utilisateur : 2026-08-10
 
 Avancement réel du Lot 4.3 : **20 %**
 
@@ -120,10 +122,11 @@ n'exécute aucune mutation sur ces trois tables.
   globale ultérieure du Lot 4.3 ;
 - aucune API n'existe encore pour appliquer les règles de création humaine,
   d'audit atomique ou de projection publique ;
-- aucune validation VPS par le mainteneur n'est encore consignée pour cette
-  étape de migration.
+- la validation concerne uniquement la migration ; les contrats et fonctions
+  Sessions restent à développer et à valider séparément.
 
-## Point d'arrêt
+## Passage à l'étape suivante
 
-Attendre la validation explicite du mainteneur. Ne pas commencer l'API, le CRUD,
-les corrections applicatives, l'ingestion fournisseur ou l'interface Sessions.
+La migration est validée. L'étape suivante autorisée est l'API Sessions et les
+contrats de types partagés. Les corrections applicatives, l'ingestion
+fournisseur automatisée et l'interface restent hors de cette autorisation.

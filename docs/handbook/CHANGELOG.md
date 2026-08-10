@@ -7,7 +7,9 @@
 - impose l'atomicité entre mutation Session et audit ;
 - sépare l'identité d'ingestion automatisée des administrateurs humains ;
 - formalise la réversibilité de la migration Sessions ;
-- consigne la validation explicite de l'ADR-0012 et du plan `0004_sessions`.
+- consigne la validation explicite de l'ADR-0012 et du plan `0004_sessions` ;
+- consigne la validation VPS explicite de l'étape migration, sans déclarer le
+  Lot 4.3 complet validé.
 
 ## 1.14 — 2026-08-09
 

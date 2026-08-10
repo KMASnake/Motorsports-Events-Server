@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-migration-technically-validated",
-    "reason": "Lot 4.2 remains the validated baseline. The maintainer approved the Lot 4.3 architecture; migration 0004_sessions and its rollback passed the isolated PostgreSQL recipe. No Sessions API, CRUD or UI implementation has started."
+    "status": "lot-4.3-migration-user-validated",
+    "reason": "Lot 4.2 remains the validated baseline. The maintainer explicitly validated migration 0004_sessions after the isolated VPS recipe. The complete Lot 4.3 remains in development because no Sessions API, CRUD or UI implementation has started."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,7 +53,7 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "migration-technically-validated-awaiting-maintainer-validation",
+    "status": "migration-user-validated-api-not-started",
     "implementation_percent": 20,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
@@ -66,8 +66,7 @@
       "Reproducible isolated PostgreSQL migration validator"
     ],
     "mandatory_gaps": [
-      "Obtain explicit maintainer validation of the 0004_sessions migration recipe",
-      "Implement and validate the Sessions API only after that validation",
+      "Implement and validate the Sessions API and shared contracts",
       "Implement and validate all remaining Lot 4.3 acceptance criteria"
     ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
@@ -107,6 +106,7 @@
     "audit_step_7_final_sha_ci": "validated on 2026-08-10: green on a5f716cc0b216e49fde9a58eb7515f8489fee2a7; local, GitHub and isolated VPS audit, ESLint 9, 75 tests, typecheck, API/Web/Types builds, Lot 4/Step 2/Step 3 validators, Docker and 7 Chromium scenarios passed; GitHub also passed 68 Python tests, 4 PostgreSQL integrations and release artifact",
     "final_sha_ci_after_audit": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
     "lot_4_3_migration": "passed on isolated PostgreSQL: Lot 4.2 fingerprint e58eebe637f26159764123d7cf019e77 preserved across up, rollback and reapply; idempotence, read-only API restarts, UTC, midnight, DST, overlaps, constraints, cascade and guarded rollback passed",
+    "lot_4_3_migration_user_validation": "maintainer explicitly validated the Lot 4.3 migration step on 2026-08-10 after isolated VPS fingerprint cb816e2a25fc9cb3d11f0604b3506c03 remained unchanged",
     "lot_4_3_quality": "npm audit zero; lint and typecheck passed; 48 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
@@ -118,5 +118,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Obtain explicit maintainer validation of docs/handoff/LOT-4.3-MIGRATION-ACCEPTANCE.md before starting any Sessions API, CRUD, corrections application logic or UI."
+  "next_action": "Prepare the Sessions API and shared-contract implementation as the next distinct step; do not start the UI or automated provider ingestion."
 }
