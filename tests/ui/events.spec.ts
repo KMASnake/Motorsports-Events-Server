@@ -192,6 +192,16 @@ test.describe('Événements lot 4 rev.1', () => {
     await page.screenshot({path:'tests/ui/screenshots/championships-logos-1440x900.png'});
   });
 
+  test('affiche les identités visuelles sur le tableau de bord', async ({ page }) => {
+    await page.goto('/');
+    const logos = page.locator('.timeline-championship img');
+    await expect(logos).toHaveCount(6);
+    for (const logo of await logos.all()) {
+      await expect(logo).toBeVisible();
+      expect(await logo.evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
+    }
+  });
+
   test('adapte la navigation à la vue semaine et jour', async ({ page }) => {
     await page.clock.setFixedTime(new Date('2026-07-01T10:00:00+02:00'));
     await page.goto('/events');

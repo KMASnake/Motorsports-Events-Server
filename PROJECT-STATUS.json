@@ -10,15 +10,15 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.2-complete",
-    "status": "lot-4.2-user-validated-awaiting-merge",
-    "reason": "All audit remediation steps passed locally, in exact-code-SHA CI, on isolated VPS and in the final Windows acceptance; the maintainer explicitly validated Lot 4.2 on 2026-08-10."
+    "status": "lot-4.2-dashboard-logo-fix-awaiting-user-recheck",
+    "reason": "Audit remediation remains complete, but the maintainer reported missing Dashboard logos during final Windows review; merge is paused until the targeted fix is rechecked."
   },
   "independent_audit": {
     "date": "2026-08-03",
     "document": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
     "action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
     "decision": "changes-requested",
-    "merge_authorized": true,
+    "merge_authorized": false,
     "new_features_authorized_before_p1_closure": false,
     "blocking_findings": [
       "Replace destructive startup SQL with a versioned, idempotent and reversible migration.",
@@ -39,24 +39,24 @@
     ]
   },
   "last_fully_validated_lot": {
-    "lot": "4.2",
-    "version": "8.1.0-alpha.2-lot.4.2",
+    "lot": "4.1",
+    "version": "v8.1.0-alpha.2-lot.4-rev.1",
     "status": "user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "validation_date": "2026-08-10",
+    "validation_date": "2026-08-01",
     "evidence": [
-      "docs/handoff/LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md",
-      "docs/handoff/LOT-4.2-AUDIT-STEP-8-ACCEPTANCE.md"
+      "docs/handover/LOT-4-REV-1-VPS-VALIDATION.md",
+      "docs/handover/LOT-4-REV-1-ACCEPTANCE.md"
     ]
   },
   "working_lot": {
     "lot": "4.2",
     "target_version": "8.1.0-alpha.2-lot.4.2",
-    "status": "user-validated-awaiting-merge",
-    "implementation_percent": 100,
+    "status": "dashboard-logo-fix-awaiting-user-recheck",
+    "implementation_percent": 99,
     "audit_remediation_percent": 100,
-    "validated_on_user_workstation": true,
+    "validated_on_user_workstation": false,
     "validated_on_vps": true,
     "merged_to_main": false,
     "implemented_or_partially_implemented": [
@@ -79,7 +79,9 @@
       "Ascending and descending list-column sorting before pagination",
       "Complete correction filters, typed local editing and event navigation"
     ],
-    "mandatory_gaps": [],
+    "mandatory_gaps": [
+      "Revalidate the six championship logos or fallbacks in the Dashboard upcoming-sessions panel"
+    ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
     "progress": "docs/handoff/PROGRESS.json"
   },
@@ -126,5 +128,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Merge codex/lot-4.2-complete only on explicit maintainer request, then prepare Lot 4.3."
+  "next_action": "Rebuild the Windows test stack and recheck Dashboard championship logos before restoring Lot 4.2 validation."
 }

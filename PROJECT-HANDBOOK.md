@@ -131,7 +131,8 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
 validation utilisateur.
 
 ## État
-Lots 4.1 et 4.2 validés par l'utilisateur. Lot 4.3 non démarré.
+Lot 4.1 validé. Lot 4.2 en attente de revalidation graphique après correction
+des logos du Tableau de bord. Lot 4.3 non démarré.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

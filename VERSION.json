@@ -3,14 +3,14 @@
   "series": "8.1.0-alpha.2",
   "lot": 4,
   "revision": 2,
-  "status": "user-validated",
+  "status": "candidate-dashboard-logo-recheck",
   "scope": [
     "event CRUD",
     "public events API",
     "admin events API",
     "MEDS desktop events calendar and list UI"
   ],
-  "validated_on_user_workstation": true,
+  "validated_on_user_workstation": false,
   "validated_on_vps": true,
-  "validation_date": "2026-08-10"
+  "validation_date": null
 }

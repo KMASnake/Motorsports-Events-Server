@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 4.2 — correctif de recette Tableau de bord
+
+- affiche dans les prochaines séances les identités championnat issues du
+  registre local d'assets ;
+- utilise le fallback local lorsqu'aucun logo spécifique n'est disponible ;
+- ajoute un scénario Chromium contrôlant six images chargées et visibles ;
+- rouvre la validation globale jusqu'au contrôle graphique du mainteneur.
+
 ## Lot 4.2 — remédiation audit, étape 8
 
 - ajoute une recette Windows finale reproductible sur une pile Docker isolée ;

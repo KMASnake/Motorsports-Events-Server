@@ -2,9 +2,10 @@
 
 ## État
 
-La recette technique VPS de l'étape 7 est validée. Le mainteneur a confirmé la
-réussite de la recette humaine Windows et la validation globale du Lot 4.2 le
-2026-08-10, sur le SHA `70e78ecb0a23ea5521a1f92c378a3f7a26153810`.
+La recette technique VPS de l'étape 7 est validée. Après la recette Windows du
+2026-08-10, le mainteneur a signalé que les logos ne s'affichaient pas sur le
+Tableau de bord. La validation globale est rouverte jusqu'au contrôle du
+correctif ciblé.
 
 ## Préconditions Windows
 
@@ -41,7 +42,8 @@ Résultat de données attendu : 12 championnats, 40 circuits, 96 événements,
 
 Ouvrir <http://localhost:3600> puis confirmer :
 
-- [x] Tableau de bord et Championnats s'affichent, avec logos et fallbacks ;
+- [ ] Tableau de bord affiche les six logos ou fallbacks des prochaines séances ;
+- [x] Championnats s'affiche avec logos et fallbacks ;
 - [x] Événements s'ouvre en vue Mois avec légende des championnats visibles ;
 - [x] les vues Mois, Semaine, Jour, Agenda et Liste s'affichent correctement ;
 - [x] précédent/suivant avance selon la vue active, et Aujourd'hui recentre ;
@@ -76,6 +78,6 @@ projet Docker `mse-lot42-final`. La production n'est jamais ciblée.
 
 ## Clôture
 
-Le mainteneur a répondu « tout est ok » après la recette du 2026-08-10. Cette
-confirmation vaut validation utilisateur explicite du Lot 4.2. La fusion reste
-une opération distincte et n'est pas exécutée par cette consignation.
+La revalidation attendue porte uniquement sur les logos de la section
+« Prochaines séances » du Tableau de bord. La fusion reste interdite avant cette
+confirmation explicite.
