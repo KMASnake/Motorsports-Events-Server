@@ -88,6 +88,8 @@ non-régression calendrier, liste, filtres, Corrections, logos et navigation.
 - `tests/ui/sessions.spec.ts` ;
 - `tests/fixtures/lot43_ui.sql` ;
 - `scripts/test-lot43-ui.sh` ;
+- le validateur est autonome sur un hôte Docker : Node.js et npm ne sont pas
+  requis sur le VPS ;
 - `package.json`.
 
 ## Risques résiduels et point d'arrêt

@@ -1,5 +1,12 @@
 # Changelog
 
+## Lot 4.3 — Correctif du validateur UI Sessions
+
+- rend `scripts/test-lot43-ui.sh` autonome sur un hôte Docker sans installation
+  locale de Node.js ou npm ;
+- installe les dépendances et génère les données dans un espace temporaire
+  exécuté par l'image officielle Node 22.
+
 ## Lot 4.3 — Interface Sessions intégrée
 
 - ajoute la section Sessions chronologique dans la fiche Événement ;
