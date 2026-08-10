@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-admin-api-technically-validated",
-    "reason": "Lot 4.2 remains the validated baseline and migration 0004_sessions is user-validated. The Sessions administrative API and shared contracts passed local isolated validation and now await maintainer validation. No public Sessions API or UI has started."
+    "status": "lot-4.3-api-technically-validated",
+    "reason": "Lot 4.2 remains the validated baseline and migration 0004_sessions is user-validated. The Sessions administrative and public APIs and shared contracts passed local isolated validation and now await maintainer validation. No Sessions corrections workflow or UI has started."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,8 +53,8 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "admin-api-technically-validated-awaiting-maintainer",
-    "implementation_percent": 45,
+    "status": "api-technically-validated-awaiting-maintainer",
+    "implementation_percent": 60,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -67,11 +67,11 @@
       "Shared Session contracts with a single business title",
       "Protected administrative Session CRUD with server pagination and filters",
       "Atomic Session mutation and audit transactions",
-      "Reproducible isolated Sessions API validator"
+      "Reproducible isolated Sessions API validator",
+      "Public Session projection with parent visibility and technical metadata redaction"
     ],
     "mandatory_gaps": [
       "Obtain explicit maintainer validation of the Sessions administrative API step",
-      "Implement and validate the public Sessions API",
       "Implement and validate the Sessions correction workflow",
       "Implement and validate the Sessions administration UI",
       "Implement and validate all remaining Lot 4.3 acceptance criteria"
@@ -114,8 +114,9 @@
     "final_sha_ci_after_audit": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
     "lot_4_3_migration": "passed on isolated PostgreSQL: Lot 4.2 fingerprint e58eebe637f26159764123d7cf019e77 preserved across up, rollback and reapply; idempotence, read-only API restarts, UTC, midnight, DST, overlaps, constraints, cascade and guarded rollback passed",
     "lot_4_3_migration_user_validation": "maintainer explicitly validated the Lot 4.3 migration step on 2026-08-10 after isolated VPS fingerprint cb816e2a25fc9cb3d11f0604b3506c03 remained unchanged",
-    "lot_4_3_admin_api": "passed locally on isolated PostgreSQL: 401/403/admin, references, UTC, midnight, DST, overlaps, CRUD, pagination/filter/sort, provider protection, unique secret-free audit and rollback when audit fails",
-    "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 52 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint 05b73eca937b4fb160e42575ae3fc317 preserved",
+    "lot_4_3_admin_api": "passed locally on isolated PostgreSQL: 401 missing/invalid/expired, 403, admin, references, UTC, midnight, DST, overlaps, CRUD, pagination/filter/sort, provider protection, unique secret-free audit and rollback when audit fails",
+    "lot_4_3_public_api": "passed locally on isolated PostgreSQL: published Session and parent visibility, stable ordering, strict filters, business title and complete technical metadata redaction",
+    "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
     "lot_4_3_quality": "npm audit zero; lint and typecheck passed; 48 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
@@ -127,5 +128,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Obtain explicit maintainer validation of docs/handoff/LOT-4.3-API-ACCEPTANCE.md before starting the public Sessions API, corrections workflow or UI."
+  "next_action": "Obtain explicit maintainer validation of docs/handoff/LOT-4.3-API-ACCEPTANCE.md before starting the Sessions corrections workflow, provider automation or UI."
 }

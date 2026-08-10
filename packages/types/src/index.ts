@@ -41,6 +41,16 @@ export interface AdminSession {
   updated_at: string;
 }
 
+export interface PublicSession {
+  id: string;
+  event_id: string;
+  title: string;
+  starts_at: string;
+  ends_at: string | null;
+  status: Exclude<SessionStatus, 'draft'>;
+  description: string | null;
+}
+
 export interface CreateSessionInput {
   title: string;
   starts_at: string;

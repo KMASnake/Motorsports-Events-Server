@@ -32,10 +32,10 @@
 
 ## API publique
 
-- [ ] seules les sessions publiées d'événements visibles sont exposées ;
-- [ ] aucun `provider_key`, `external_id`, origine ou donnée d'audit ;
-- [ ] ordre temporel stable ;
-- [ ] filtres documentés et validés.
+- [x] seules les sessions publiées d'événements visibles sont exposées ;
+- [x] aucun `provider_key`, `external_id`, origine ou donnée d'audit ;
+- [x] ordre temporel stable ;
+- [x] filtres documentés et validés.
 
 ## Règles métier
 

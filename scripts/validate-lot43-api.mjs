@@ -1,8 +1,10 @@
 const api = process.env.API_URL ?? 'http://127.0.0.1:3001';
 const adminToken = process.env.ADMIN_TOKEN;
 const viewerToken = process.env.VIEWER_TOKEN;
+const expiredToken = process.env.EXPIRED_TOKEN;
 const providerSessionId = process.env.PROVIDER_SESSION_ID;
-if (!adminToken || !viewerToken || !providerSessionId) throw new Error('ADMIN_TOKEN, VIEWER_TOKEN et PROVIDER_SESSION_ID sont requis.');
+const hiddenSessionId = process.env.HIDDEN_SESSION_ID;
+if (!adminToken || !viewerToken || !expiredToken || !providerSessionId || !hiddenSessionId) throw new Error('Les jetons et identifiants de recette sont requis.');
 
 const expect = (condition, message) => { if (!condition) throw new Error(message); };
 async function call(path, options = {}, token = adminToken) {
@@ -13,8 +15,8 @@ async function call(path, options = {}, token = adminToken) {
   const body = response.status === 204 ? null : await response.json().catch(() => null);
   return { response, body };
 }
-async function ok(path, options = {}) {
-  const result = await call(path, options);
+async function ok(path, options = {}, token = adminToken) {
+  const result = await call(path, options, token);
   expect(result.response.ok, `${path}: ${result.response.status} ${JSON.stringify(result.body)}`);
   return result.body;
 }
@@ -23,6 +25,8 @@ const eventId = 'evt-001';
 const created = [];
 try {
   expect((await call(`/api/v1/admin/events/${eventId}/sessions`, {}, '')).response.status === 401, 'La liste Sessions sans jeton n’est pas rejetée en 401.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, {}, 'invalid')).response.status === 401, 'Le jeton invalide n’est pas rejeté en 401.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, {}, expiredToken)).response.status === 401, 'Le jeton expiré n’est pas rejeté en 401.');
   expect((await call(`/api/v1/admin/events/${eventId}/sessions`, {}, viewerToken)).response.status === 403, 'Le rôle viewer n’est pas rejeté en 403.');
   expect((await call('/api/v1/events', {}, '')).response.ok, 'L’API publique Événements exige désormais une authentification.');
 
@@ -59,9 +63,27 @@ try {
 
   const suggestions = await ok('/api/v1/admin/session-titles');
   expect(suggestions.some((entry) => entry.title === 'Echo chevauchement'), 'Le nouvel intitulé local n’est pas suggéré.');
+  expect(suggestions.some((entry) => entry.title === 'Session fournisseur protégée'), 'L’intitulé fournisseur n’est pas suggéré.');
+  expect(new Set(suggestions.map((entry) => entry.title)).size === suggestions.length, 'Les suggestions ne sont pas dédupliquées.');
+  expect(suggestions.filter((entry) => entry.title.toLowerCase() === 'alpha essais').length === 1, 'La déduplication fournisseur/local est incorrecte.');
+  expect(suggestions.find((entry) => entry.title.toLowerCase() === 'alpha essais')?.usage_count === 2, 'Le compteur de suggestion dédupliquée est incorrect.');
   const updated = await ok(`/api/v1/admin/sessions/${created[0]}`, { method: 'PATCH', body: JSON.stringify({ title: 'Alpha modifié', ends_at: '2026-06-12T13:30:00Z', status: 'completed' }) });
   expect(updated.title === 'Alpha modifié' && updated.status === 'completed', 'Modification Session incorrecte.');
   expect((await call(`/api/v1/admin/sessions/${providerSessionId}`, { method: 'PATCH', body: JSON.stringify({ title: 'Interdit' }) })).response.status === 409, 'Session fournisseur modifiée sans corrections.');
+
+  const publicProvider = await ok('/api/v1/events/evt-002/sessions', {}, '');
+  const providerProjection = publicProvider.find((session) => session.id === providerSessionId);
+  expect(providerProjection?.title === 'Session fournisseur protégée', 'Intitulé fournisseur absent de l’API publique.');
+  for (const forbidden of ['origin', 'provider_key', 'external_id', 'published', 'type', 'name', 'created_at', 'updated_at']) {
+    expect(!(forbidden in providerProjection), `Champ public interdit exposé : ${forbidden}`);
+  }
+  const publicManual = await ok(`/api/v1/events/${eventId}/sessions`, {}, '');
+  expect(publicManual.some((session) => session.title === 'Alpha modifié'), 'Session publiée absente de l’API publique.');
+  expect(!publicManual.some((session) => session.title === 'Charlie DST'), 'Session non publiée exposée.');
+  expect(!publicManual.some((session) => session.title === 'Delta chevauchement'), 'Session brouillon exposée.');
+  expect(publicManual.every((session, index) => index === 0 || `${session.starts_at}:${session.id}` >= `${publicManual[index - 1].starts_at}:${publicManual[index - 1].id}`), 'Ordre public instable.');
+  expect((await call(`/api/v1/sessions/${hiddenSessionId}`, {}, '')).response.status === 404, 'Session d’un événement non publié exposée.');
+  expect((await call(`/api/v1/events/${eventId}/sessions?provider_key=hidden`, {}, '')).response.status === 400, 'Filtre public technique accepté.');
 
   const auditFailure = await call(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify({ title: 'lot43-audit-failure', starts_at: '2026-08-01T10:00:00Z' }) });
   expect(auditFailure.response.status === 500, 'L’échec d’audit n’a pas fait échouer la mutation.');
@@ -76,11 +98,12 @@ try {
   expect(relevant.every((row) => row.actor === 'lot43-api-test' && row.request_id && 'old_value' in row && 'new_value' in row), 'Audit acteur/avant/après/requête incomplet.');
   expect(!JSON.stringify(relevant).includes(adminToken), 'Le jeton administrateur est exposé dans l’audit.');
 
-  console.log('401, 403 et administrateur autorisé : OK');
+  console.log('401 sans/invalide/expiré, 403 et administrateur autorisé : OK');
   console.log('Contrats, références, UTC, minuit, DST et chevauchement : OK');
   console.log('Pagination, filtres et tri avant découpage : OK');
   console.log('CRUD manuel et protection fournisseur : OK');
   console.log('Audit atomique unique et rollback sur échec : OK');
+  console.log('API publique visible, ordonnée et sans métadonnée technique : OK');
 } finally {
   for (const id of created.reverse()) await call(`/api/v1/admin/sessions/${id}`, { method: 'DELETE' }).catch(() => undefined);
 }

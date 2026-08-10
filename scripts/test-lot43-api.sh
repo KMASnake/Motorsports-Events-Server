@@ -7,6 +7,8 @@ API_PORT=${LOT43_API_PORT:-3551}
 PASSWORD=${LOT43_API_POSTGRES_PASSWORD:-lot43-api-test}
 AUTH_SECRET=${LOT43_API_AUTH_SECRET:-lot43-api-secret-with-at-least-thirty-two-characters}
 PROVIDER_SESSION_ID=lot43-provider-session
+PROVIDER_DUPLICATE_TITLE_ID=lot43-provider-duplicate-title
+HIDDEN_SESSION_ID=lot43-hidden-event-session
 
 export COMPOSE_PROJECT_NAME="$PROJECT"
 export POSTGRES_PORT API_HOST_PORT="$API_PORT" WEB_HOST_PORT=${LOT43_API_WEB_PORT:-3550}
@@ -27,8 +29,10 @@ sql() {
 token() {
   role=$1
   subject=$2
+  lifetime=${3:-3600}
   docker run --rm \
     -e ADMIN_AUTH_SECRET="$AUTH_SECRET" -e ADMIN_ROLE="$role" -e ADMIN_SUBJECT="$subject" \
+    -e ADMIN_TOKEN_LIFETIME_SECONDS="$lifetime" \
     -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs
 }
 
@@ -46,6 +50,21 @@ sql "insert into sessions(
 ) values (
   '$PROVIDER_SESSION_ID','evt-002','Session fournisseur protégée','race',
   '2026-09-01T10:00:00Z','scheduled',true,'provider','lot43-test','provider-session-1'
+) , (
+  '$PROVIDER_DUPLICATE_TITLE_ID','evt-002','alpha essais','practice',
+  '2026-09-01T11:00:00Z','scheduled',true,'provider','lot43-test','provider-session-2'
+)"
+sql "insert into events(
+  id,championship_id,circuit_id,name,slug,starts_at,timezone,status,published,origin
+) values (
+  'lot43-hidden-event','motogp','lemans','Événement public masqué','lot43-hidden-event',
+  '2026-09-02T10:00:00Z','UTC','scheduled',false,'manual'
+);
+insert into sessions(
+  id,event_id,name,type,starts_at,status,published,origin
+) values (
+  '$HIDDEN_SESSION_ID','lot43-hidden-event','Session parent masqué','other',
+  '2026-09-02T10:00:00Z','scheduled',true,'manual'
 )"
 sql "create or replace function lot43_reject_session_audit() returns trigger language plpgsql as \$\$
 begin
@@ -59,16 +78,18 @@ for each row execute function lot43_reject_session_audit()"
 
 ADMIN_TOKEN=$(token admin lot43-api-test)
 VIEWER_TOKEN=$(token viewer lot43-viewer-test)
-export ADMIN_TOKEN VIEWER_TOKEN PROVIDER_SESSION_ID
+EXPIRED_TOKEN=$(token admin lot43-expired-test -1)
+export ADMIN_TOKEN VIEWER_TOKEN EXPIRED_TOKEN PROVIDER_SESSION_ID HIDDEN_SESSION_ID
 
 docker run --rm --network host \
   -e API_URL="http://127.0.0.1:$API_PORT" \
-  -e ADMIN_TOKEN -e VIEWER_TOKEN -e PROVIDER_SESSION_ID \
+  -e ADMIN_TOKEN -e VIEWER_TOKEN -e EXPIRED_TOKEN -e PROVIDER_SESSION_ID -e HIDDEN_SESSION_ID \
   -v "$PWD/scripts:/scripts:ro" node:22-alpine \
   node /scripts/validate-lot43-api.mjs
 
 sql "drop trigger lot43_reject_session_audit on admin_audit_log;
 drop function lot43_reject_session_audit();
-delete from sessions where id='$PROVIDER_SESSION_ID'"
+delete from sessions where id in ('$PROVIDER_SESSION_ID','$PROVIDER_DUPLICATE_TITLE_ID')"
+sql "delete from events where id='lot43-hidden-event'"
 
 echo "Tests API Sessions Lot 4.3 : OK"

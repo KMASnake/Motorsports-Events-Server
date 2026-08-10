@@ -6,6 +6,7 @@ import { pool, withTransaction } from '../lib/db.js';
 import {
   createSessionBody,
   normalizedSessionDates,
+  publicSessionQuery,
   sessionListQuery,
   updateSessionBody,
   validateSessionPeriod
@@ -39,9 +40,44 @@ function databaseError(reply: FastifyReply, error: unknown): unknown {
 }
 
 export async function sessionRoutes(app: FastifyInstance): Promise<void> {
+  app.get('/api/v1/events/:eventId/sessions', async (request, reply) => {
+    const { eventId } = request.params as { eventId: string };
+    const parsed = publicSessionQuery.safeParse(request.query);
+    if (!parsed.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsed.error.issues });
+    const params: unknown[] = [eventId];
+    const where = [
+      's.event_id=$1', 's.published=true', `s.status <> 'draft'`,
+      'e.published=true', `e.status <> 'draft'`, 'c.active=true'
+    ];
+    if (parsed.data.status) { params.push(parsed.data.status); where.push(`s.status=$${params.length}`); }
+    if (parsed.data.from) { params.push(parsed.data.from); where.push(`s.starts_at >= $${params.length}::timestamptz`); }
+    if (parsed.data.to) { params.push(parsed.data.to); where.push(`s.starts_at <= $${params.length}::timestamptz`); }
+    return (await pool.query(`
+      select s.id,s.event_id,s.name title,s.starts_at,s.ends_at,s.status,s.description
+      from sessions s
+      join events e on e.id=s.event_id
+      join championships c on c.id=e.championship_id
+      where ${where.join(' and ')}
+      order by s.starts_at asc,s.id asc`, params)).rows;
+  });
+
+  app.get('/api/v1/sessions/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const result = await pool.query(`
+      select s.id,s.event_id,s.name title,s.starts_at,s.ends_at,s.status,s.description
+      from sessions s
+      join events e on e.id=s.event_id
+      join championships c on c.id=e.championship_id
+      where s.id=$1 and s.published=true and s.status <> 'draft'
+        and e.published=true and e.status <> 'draft' and c.active=true`, [id]);
+    if (!result.rowCount) return reply.code(404).send({ message: 'Session introuvable.' });
+    return result.rows[0];
+  });
+
   app.get('/api/v1/admin/session-titles', async () => (
-    await pool.query(`select name title,count(*)::int usage_count
-      from sessions where btrim(name)<>'' group by name order by lower(name),name`)
+    await pool.query(`select min(btrim(name)) title,count(*)::int usage_count
+      from sessions where btrim(name)<>''
+      group by lower(btrim(name)) order by lower(min(btrim(name)))`)
   ).rows);
 
   // Compatibilité technique avec la migration 0004 ; ce référentiel n'est

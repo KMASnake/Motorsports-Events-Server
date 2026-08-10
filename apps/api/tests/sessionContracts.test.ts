@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createSessionBody,
   normalizedSessionDates,
+  publicSessionQuery,
   sessionListQuery,
   updateSessionBody,
   validateSessionPeriod
@@ -35,5 +36,13 @@ describe('Session contracts', () => {
     expect(sessionListQuery.safeParse({ sort: 'drop table sessions' }).success).toBe(false);
     expect(sessionListQuery.parse({ page: '2', page_size: '10', sort: 'title', direction: 'desc' }))
       .toMatchObject({ page: 2, page_size: 10, sort: 'title', direction: 'desc' });
+  });
+
+  it('strictly validates public filters and excludes draft', () => {
+    expect(publicSessionQuery.parse({ status: 'scheduled', from: '2026-06-12T14:00:00Z' }))
+      .toEqual({ status: 'scheduled', from: '2026-06-12T14:00:00Z' });
+    expect(publicSessionQuery.safeParse({ status: 'draft' }).success).toBe(false);
+    expect(publicSessionQuery.safeParse({ provider_key: 'hidden' }).success).toBe(false);
+    expect(publicSessionQuery.safeParse({ from: '2026-06-12T14:00:00' }).success).toBe(false);
   });
 });

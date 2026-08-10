@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.16
+## Version 1.17
 
 Ce document est la source de vérité permanente du projet.
 
@@ -120,6 +120,13 @@ Les suggestions d'intitulés sont disponibles par
 `GET /api/v1/admin/session-titles`. Le référentiel `session_types` et sa route
 restent uniquement pour la compatibilité de la migration `0004`.
 
+L'API publique expose les Sessions publiées d'un Événement visible par
+`GET /api/v1/events/:eventId/sessions` et une Session visible par
+`GET /api/v1/sessions/:id`. Sa projection contient uniquement l'identifiant,
+l'événement parent, l'intitulé, les horaires, le statut et la description ;
+elle est ordonnée par début puis identifiant et exclut toute métadonnée
+technique ou administrative.
+
 ## Calendrier
 Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer,
 redimensionnement, création rapide ou par plage, duplication et rollback. Une
@@ -161,8 +168,9 @@ validation utilisateur.
 ## État
 Lots 4.1 et 4.2 validés par l'utilisateur. Pour le Lot 4.3, l'ADR Sessions et
 le plan de migration ont été validés par le mainteneur ; la migration a ensuite
-été validée sur un VPS isolé. L'API administrative Sessions est techniquement
-prête pour sa recette mainteneur. Le Lot 4.3 complet reste en développement.
+été validée sur un VPS isolé. Les API administrative et publique Sessions
+sont techniquement prêtes pour leur recette mainteneur. Le Lot 4.3 complet
+reste en développement.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

@@ -1,10 +1,10 @@
-# Lot 4.3 Sessions — recette de l'étape API administrative
+# Lot 4.3 Sessions — recette des API administrative et publique
 
 Date : 2026-08-10
 
 Statut : techniquement validée, validation explicite du mainteneur requise
 
-Avancement réel du Lot 4.3 : **45 %**
+Avancement réel du Lot 4.3 : **60 %**
 
 ## Périmètre livré
 
@@ -19,9 +19,12 @@ Avancement réel du Lot 4.3 : **45 %**
 - création humaine `manual` sans fournisseur ;
 - audit atomique dans la transaction de mutation ;
 - refus des mutations d'une Session fournisseur avant Corrections.
+- projection publique des Sessions publiées dont l'Événement est visible ;
+- intitulé métier public sans métadonnée fournisseur ou administrative ;
+- ordre public stable et filtres publics strictement validés.
 
-L'API publique Sessions, les corrections applicatives, l'ingestion fournisseur
-automatisée et l'interface ne font pas partie de cette étape.
+Les corrections applicatives, l'ingestion fournisseur automatisée et
+l'interface ne font pas partie de cette étape.
 
 ## Routes
 
@@ -33,6 +36,8 @@ POST   /api/v1/admin/events/:eventId/sessions
 GET    /api/v1/admin/sessions/:id
 PATCH  /api/v1/admin/sessions/:id
 DELETE /api/v1/admin/sessions/:id
+GET    /api/v1/events/:eventId/sessions
+GET    /api/v1/sessions/:id
 ```
 
 ## Jeu de données et commande principale
@@ -50,11 +55,12 @@ sudo ./scripts/test-lot43-api.sh
 Résultat exact :
 
 ```text
-401, 403 et administrateur autorisé : OK
+401 sans/invalide/expiré, 403 et administrateur autorisé : OK
 Contrats, références, UTC, minuit, DST et chevauchement : OK
 Pagination, filtres et tri avant découpage : OK
 CRUD manuel et protection fournisseur : OK
 Audit atomique unique et rollback sur échec : OK
+API publique visible, ordonnée et sans métadonnée technique : OK
 Tests API Sessions Lot 4.3 : OK
 ```
 
@@ -77,12 +83,17 @@ La chaîne complète a aussi été rejouée sous `node:22-alpine` avec `npm ci` 
 - audit npm : 0 vulnérabilité ;
 - lint : API et Web réussis ;
 - typecheck : API, Web et Types réussis ;
-- tests : 52 API + 27 Web, soit 79 réussis ;
+- tests : 53 API + 27 Web, soit 80 réussis ;
 - builds : API, Web et Types réussis ;
 - images Docker : API et Web construites ;
 - recette PostgreSQL/API isolée : réussie ;
 - intitulé inédit créé puis retrouvé dans les suggestions : réussi ;
 - ancien couple technique `name`/`type` refusé à l'écriture : réussi ;
+- suggestion fournisseur, suggestion locale et déduplication : réussies ;
+- intitulé totalement inédit accepté puis proposé : réussi ;
+- Session non publiée et Session d'un Événement non publié : masquées ;
+- projection publique sans origine, fournisseur, identifiant externe, type
+  technique, audit ni timestamps administratifs : réussie ;
 - non-régression migration/rollback : réussie ;
 - empreinte Lot 4.2 de cette non-régression :
   `05b73eca937b4fb160e42575ae3fc317`, inchangée.
@@ -104,10 +115,9 @@ La chaîne complète a aussi été rejouée sous `node:22-alpine` avec `npm ci` 
 ## Risques résiduels et point d'arrêt
 
 - la validation VPS mainteneur de cette étape n'est pas encore consignée ;
-- aucune projection publique Sessions n'existe encore ;
 - les Sessions fournisseur attendent le workflow de corrections ;
 - aucun écran Sessions n'existe encore ;
 - la CI du SHA candidat, Chromium et Windows appartiennent aux étapes suivantes.
 
-Ne pas commencer l'API publique, Corrections ou l'interface avant validation
-explicite de cette recette.
+Ne pas commencer Corrections, l'ingestion automatisée ou l'interface avant
+validation explicite de cette recette.

@@ -12,6 +12,8 @@ async function securedApp() {
   const app = Fastify(); registerAdminAuth(app, secret);
   for (const path of ['/api/v1/admin/events', '/api/v1/admin/provider-events', '/api/v1/admin/corrections', '/api/v1/admin/sessions/session-test']) app.get(path, async () => ({ ok: true }));
   app.get('/api/v1/events', async () => ({ public: true }));
+  app.get('/api/v1/events/event-test/sessions', async () => ({ public: true }));
+  app.get('/api/v1/sessions/session-test', async () => ({ public: true }));
   app.get('/api/v1/championships', async () => ({ public: true }));
   app.post('/api/v1/championships', async () => ({ ok: true }));
   return app;
@@ -36,7 +38,10 @@ describe('administrative route authentication', () => {
   it('allows an administrator and keeps public routes public', async () => {
     const app = await securedApp();
     expect((await app.inject({ url: '/api/v1/admin/events', headers: { authorization: `Bearer ${admin}` } })).statusCode).toBe(200);
-    expect((await app.inject({ url: '/api/v1/events' })).statusCode).toBe(200); await app.close();
+    expect((await app.inject({ url: '/api/v1/events' })).statusCode).toBe(200);
+    expect((await app.inject({ url: '/api/v1/events/event-test/sessions' })).statusCode).toBe(200);
+    expect((await app.inject({ url: '/api/v1/sessions/session-test' })).statusCode).toBe(200);
+    await app.close();
   });
   it('protects legacy championship mutations but not their public read', async () => {
     const app = await securedApp();

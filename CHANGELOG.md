@@ -1,6 +1,6 @@
 # Changelog
 
-## Lot 4.3 — API administrative Sessions
+## Lot 4.3 — API Sessions administrative et publique
 
 - ajoute les contrats TypeScript Session avec un intitulé métier unique ;
 - ajoute le référentiel, la liste paginée par événement et le CRUD administratif
@@ -9,9 +9,13 @@
 - crée les Sessions humaines sans fournisseur et protège les Sessions non
   manuelles jusqu'au futur workflow de corrections ;
 - rend mutation et audit atomiques et empêche le double audit du hook hérité ;
-- ajoute une recette Docker synthétique couvrant sécurité, CRUD, filtres, temps,
-  audit unique sans secret et rollback sur échec d'audit ;
-- ne modifie ni l'API publique ni l'interface.
+- ajoute la projection publique par événement et par identifiant avec un
+  intitulé unique, un ordre stable et des filtres stricts ;
+- masque les Sessions non publiées, brouillon ou rattachées à un Événement
+  non visible ainsi que toutes les métadonnées techniques ;
+- ajoute une recette Docker synthétique couvrant sécurité, CRUD, suggestions,
+  filtres, temps, projection publique, audit unique sans secret et rollback ;
+- ne modifie pas l'interface.
 
 ## Lot 4.3 — migration Sessions
 

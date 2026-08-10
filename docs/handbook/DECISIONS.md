@@ -10,6 +10,16 @@
 
 Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
 
+## 2026-08-10 — Projection publique des Sessions
+
+- les Sessions publiques sont lues sous leur Événement ou par identifiant ;
+- une Session non publiée, brouillon ou rattachée à un Événement non visible
+  n'est jamais exposée ;
+- la projection ne contient que les champs métier et est ordonnée par instant
+  de début puis identifiant.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
 ## 2026-08-02
 - administration orientée métier ;
 - slug masqué ;

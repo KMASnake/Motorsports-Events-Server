@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.17 — 2026-08-10
+
+- fixe les routes publiques Sessions imbriquées par Événement et par
+  identifiant ;
+- limite la projection publique aux champs métier et aux Sessions publiées
+  dont l'Événement parent est visible ;
+- impose l'ordre stable `starts_at`, puis `id`, et des filtres publics stricts.
+
 ## 1.16 — 2026-08-10
 
 - remplace le couple métier nom/type par un intitulé unique extensible ;

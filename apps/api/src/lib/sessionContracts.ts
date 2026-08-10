@@ -34,6 +34,12 @@ export const sessionListQuery = z.object({
   direction: z.enum(['asc', 'desc']).default('asc')
 }).strict();
 
+export const publicSessionQuery = z.object({
+  status: sessionStatus.exclude(['draft']).optional(),
+  from: instant.optional(),
+  to: instant.optional()
+}).strict();
+
 export type CreateSessionBody = z.infer<typeof createSessionBody>;
 export type UpdateSessionBody = z.infer<typeof updateSessionBody>;
 

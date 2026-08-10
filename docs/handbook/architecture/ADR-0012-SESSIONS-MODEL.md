@@ -121,6 +121,9 @@ conflit plutôt que d'altérer silencieusement la valeur fournisseur.
 
 - la liste publique filtre sessions et événements publiés et masque les champs
   techniques ;
+- les routes publiques sont `GET /api/v1/events/:eventId/sessions` et
+  `GET /api/v1/sessions/:id` ; elles exposent `id`, `event_id`, `title`,
+  `starts_at`, `ends_at`, `status` et `description` seulement ;
 - filtres et tris administratifs sont validés avant pagination conformément à
   l'ADR-0011 ;
 - la migration ne transforme aucune ligne Lot 4.2 ;
