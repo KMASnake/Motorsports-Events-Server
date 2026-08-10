@@ -19,7 +19,7 @@
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "merged_to_main": false,
+    "merged_to_main": true,
     "merge_authorized": true,
     "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
   },
@@ -204,9 +204,9 @@
     "The local npm version is below the declared npm >= 10 engine requirement; CI, VPS and Windows acceptance used the required versions."
   ],
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Merge the validated Lot 4.2 branch only when explicitly requested, then begin Lot 4.3 planning.",
-    "reference": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
+    "owner": "Product and architecture",
+    "task": "Specify Lot 4.3 Sessions and its acceptance criteria before implementation.",
+    "reference": "docs/handoff/LOT-4.2-FINAL-HANDOFF.md",
     "target_visual_fidelity": 98
   }
 }
