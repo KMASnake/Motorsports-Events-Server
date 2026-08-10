@@ -18,17 +18,17 @@
 
 ## API administration
 
-- [ ] liste des sessions d'un événement ;
-- [ ] création ;
-- [ ] consultation ;
-- [ ] modification ;
-- [ ] suppression ;
-- [ ] pagination, tri et filtres côté serveur ;
-- [ ] validation des références et types ;
-- [ ] 401 sans authentification ;
-- [ ] 403 sans rôle administrateur ;
-- [ ] succès avec rôle administrateur ;
-- [ ] journal d'audit sans secret.
+- [x] liste des sessions d'un événement ;
+- [x] création ;
+- [x] consultation ;
+- [x] modification ;
+- [x] suppression ;
+- [x] pagination, tri et filtres côté serveur ;
+- [x] validation des références et types ;
+- [x] 401 sans authentification ;
+- [x] 403 sans rôle administrateur ;
+- [x] succès avec rôle administrateur ;
+- [x] journal d'audit sans secret.
 
 ## API publique
 
@@ -44,13 +44,13 @@
 - [x] session traversant minuit acceptée ;
 - [x] passage DST couvert ;
 - [x] chevauchement autorisé par défaut ;
-- [ ] création manuelle sans fournisseur.
+- [x] création manuelle sans fournisseur.
 
 ## Interface
 
 - [ ] sessions visibles depuis le contexte de l'événement ;
 - [ ] création, modification et suppression fonctionnelles ;
-- [ ] nom, type, horaires, statut et publication lisibles ;
+- [ ] intitulé unique, horaires, statut et publication lisibles ;
 - [ ] aucune métadonnée technique fournisseur dans le formulaire métier ;
 - [ ] comportement correct à 1440×900 et 1280×720 ;
 - [ ] aucune régression sur calendrier, liste, corrections, logos et filtres du Lot 4.2.

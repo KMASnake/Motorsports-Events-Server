@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.15
+## Version 1.16
 
 Ce document est la source de vérité permanente du projet.
 
@@ -94,8 +94,11 @@ Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle nati
 
 ## Sessions
 
-Une session appartient à un événement et utilise un type issu d'un référentiel
-global extensible. Ses horaires sont stockés en UTC ; une fin facultative ne
+Une session appartient à un événement. L'utilisateur manipule un seul intitulé
+métier dans une liste extensible alimentée par les fournisseurs et les valeurs
+locales ; il peut saisir immédiatement un nouvel intitulé. La distinction
+technique historique entre nom et type n'est pas imposée au contrat d'écriture
+ni à l'interface. Ses horaires sont stockés en UTC ; une fin facultative ne
 précède jamais le début. Les chevauchements, passages à minuit et changements
 d'heure sont autorisés. L'ordre public est stable par début puis identifiant.
 
@@ -105,6 +108,17 @@ L'audit d'une mutation Session appartient à la même transaction PostgreSQL que
 la mutation : un échec d'audit annule l'ensemble. Une ingestion automatisée
 future utilise une identité de service et des routes distinctes des actions
 humaines. Voir `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`.
+
+L'administration des Sessions utilise les routes imbriquées d'un événement
+pour la liste et la création, puis une route par identifiant pour consulter,
+modifier ou supprimer. Les mutations humaines créent uniquement des Sessions
+manuelles. Une Session fournisseur n'est pas modifiée silencieusement avant le
+workflow de corrections prévu. Chaque mutation Session et son audit sont
+atomiques.
+
+Les suggestions d'intitulés sont disponibles par
+`GET /api/v1/admin/session-titles`. Le référentiel `session_types` et sa route
+restent uniquement pour la compatibilité de la migration `0004`.
 
 ## Calendrier
 Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer,
@@ -147,7 +161,8 @@ validation utilisateur.
 ## État
 Lots 4.1 et 4.2 validés par l'utilisateur. Pour le Lot 4.3, l'ADR Sessions et
 le plan de migration ont été validés par le mainteneur ; la migration a ensuite
-été validée sur un VPS isolé. Le Lot 4.3 complet reste en développement.
+été validée sur un VPS isolé. L'API administrative Sessions est techniquement
+prête pour sa recette mainteneur. Le Lot 4.3 complet reste en développement.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

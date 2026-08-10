@@ -1,5 +1,15 @@
 # Journal des décisions
 
+## 2026-08-10 — Intitulé unique des Sessions
+
+- le workflow métier ne demande qu'un `title`, jamais un couple nom/type ;
+- les suggestions regroupent les intitulés fournisseur et locaux déjà connus ;
+- un intitulé inédit peut être créé directement puis réutilisé ;
+- `session_types` reste un détail technique de compatibilité de la migration
+  `0004`, sans devenir un second champ visible.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
 ## 2026-08-02
 - administration orientée métier ;
 - slug masqué ;
@@ -116,6 +126,18 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
 - mutation Session et journal d'audit sont atomiques ;
 - l'ingestion automatisée future utilise une identité de service et des routes
   séparées de l'administration humaine.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
+## 2026-08-10 — API administrative Sessions
+
+- la liste et la création sont rattachées à l'événement dans le chemin HTTP ;
+- la consultation, la modification et la suppression utilisent l'identifiant
+  propre de la Session ;
+- les entrées datées exigent un offset et sont normalisées en UTC ;
+- une création humaine est manuelle et sans identité fournisseur ;
+- une mutation Session et son audit utilisent une transaction unique ;
+- une Session fournisseur n'est pas modifiée avant le workflow de corrections.
 
 Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
 

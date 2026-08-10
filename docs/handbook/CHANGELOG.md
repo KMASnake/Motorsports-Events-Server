@@ -1,5 +1,16 @@
 # Handbook Changelog
 
+## 1.16 — 2026-08-10
+
+- remplace le couple métier nom/type par un intitulé unique extensible ;
+- ajoute les suggestions issues des données fournisseur et locales ;
+- conserve le référentiel technique uniquement pour la compatibilité `0004` ;
+- fixe les routes du CRUD administratif Sessions ;
+- impose pagination, filtres et tri serveur sur la liste d'un événement ;
+- limite cette étape aux créations humaines manuelles ;
+- refuse les mutations silencieuses des Sessions fournisseur avant Corrections ;
+- applique l'audit atomique prévu par l'ADR-0012.
+
 ## 1.15 — 2026-08-10
 
 - définit le modèle relationnel et temporel des Sessions ;

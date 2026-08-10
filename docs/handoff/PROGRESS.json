@@ -12,9 +12,9 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "migration-user-validated-api-not-started",
+    "status": "admin-api-technically-validated-awaiting-maintainer",
     "updated_at": "2026-08-10",
-    "implementation_percent": 20,
+    "implementation_percent": 45,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -49,6 +49,26 @@
     },
     "functional_scope_started": false,
     "acceptance": "docs/handoff/LOT-4.3-MIGRATION-ACCEPTANCE.md"
+  },
+  "lot_4_3_admin_api": {
+    "status": "completed-technically-awaiting-maintainer-validation",
+    "scope": "Shared contracts and protected administrative CRUD only; no public Sessions API, correction workflow, provider automation or UI.",
+    "technical_validation": {
+      "authentication": "401-without-token-403-viewer-admin-success",
+      "contracts_and_time": "offset-required-utc-midnight-dst-overlap-and-null-end-passed",
+      "references": "unknown-event-and-type-rejected",
+      "pagination_filters_sort": "passed-before-pagination",
+      "manual_crud": "create-read-update-delete-passed",
+      "provider_protection": "non-manual-mutation-rejected-with-409",
+      "atomic_audit": "single-secret-free-entry-per-mutation-and-business-rollback-on-audit-failure",
+      "unit_tests": "79-passed-52-api-27-web",
+      "npm_audit": "zero-vulnerabilities",
+      "lint_typecheck_builds": "api-web-types-passed",
+      "docker": "api-web-builds-and-isolated-api-postgresql-validator-passed",
+      "migration_regression": "passed-with-fingerprint-05b73eca937b4fb160e42575ae3fc317-preserved"
+    },
+    "test_dataset": "scripts/test-lot43-api.sh",
+    "acceptance": "docs/handoff/LOT-4.3-API-ACCEPTANCE.md"
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",
@@ -231,9 +251,9 @@
     "The local npm version is below the declared npm >= 10 engine requirement; CI, VPS and Windows acceptance used the required versions."
   ],
   "next_action": {
-    "owner": "Codex",
-    "task": "Implement the Sessions API and shared contracts as a separate validated step, without starting the UI or automated provider ingestion.",
-    "reference": "docs/handoff/LOT-4.3-SESSIONS-SPEC.md",
+    "owner": "Maintainer",
+    "task": "Validate the Sessions administrative API recipe before public API, corrections or UI work.",
+    "reference": "docs/handoff/LOT-4.3-API-ACCEPTANCE.md",
     "target_visual_fidelity": 98
   }
 }

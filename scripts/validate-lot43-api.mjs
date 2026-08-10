@@ -1,0 +1,86 @@
+const api = process.env.API_URL ?? 'http://127.0.0.1:3001';
+const adminToken = process.env.ADMIN_TOKEN;
+const viewerToken = process.env.VIEWER_TOKEN;
+const providerSessionId = process.env.PROVIDER_SESSION_ID;
+if (!adminToken || !viewerToken || !providerSessionId) throw new Error('ADMIN_TOKEN, VIEWER_TOKEN et PROVIDER_SESSION_ID sont requis.');
+
+const expect = (condition, message) => { if (!condition) throw new Error(message); };
+async function call(path, options = {}, token = adminToken) {
+  const headers = new Headers(options.headers);
+  if (token) headers.set('authorization', `Bearer ${token}`);
+  if (options.body) headers.set('content-type', 'application/json');
+  const response = await fetch(`${api}${path}`, { ...options, headers });
+  const body = response.status === 204 ? null : await response.json().catch(() => null);
+  return { response, body };
+}
+async function ok(path, options = {}) {
+  const result = await call(path, options);
+  expect(result.response.ok, `${path}: ${result.response.status} ${JSON.stringify(result.body)}`);
+  return result.body;
+}
+
+const eventId = 'evt-001';
+const created = [];
+try {
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, {}, '')).response.status === 401, 'La liste Sessions sans jeton n’est pas rejetée en 401.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, {}, viewerToken)).response.status === 403, 'Le rôle viewer n’est pas rejeté en 403.');
+  expect((await call('/api/v1/events', {}, '')).response.ok, 'L’API publique Événements exige désormais une authentification.');
+
+  const types = await ok('/api/v1/admin/session-types');
+  expect(types.map((type) => type.key).join(',') === 'practice,qualifying,sprint,warmup,race,other', 'Référentiel des types incorrect.');
+  const initialTitles = await ok('/api/v1/admin/session-titles');
+  expect(Array.isArray(initialTitles), 'Suggestions d’intitulés invalides.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions?sort=sql`)).response.status === 400, 'Tri invalide non rejeté.');
+  expect((await call(`/api/v1/admin/events/missing-event/sessions`)).response.status === 404, 'Événement absent non rejeté.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify({ title: 'Sans offset', starts_at: '2026-06-12T10:00:00' }) })).response.status === 400, 'Date sans offset acceptée.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify({ name: 'Ancien contrat', type: 'practice', starts_at: '2026-06-12T10:00:00Z' }) })).response.status === 400, 'Le couple technique nom/type est encore exigé.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify({ title: 'Période invalide', starts_at: '2026-06-12T11:00:00Z', ends_at: '2026-06-12T10:00:00Z' }) })).response.status === 400, 'Fin antérieure acceptée.');
+  expect((await call(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify({ title: 'Technique', starts_at: '2026-06-12T10:00:00Z', origin: 'provider' }) })).response.status === 400, 'Champ technique accepté.');
+
+  const fixtures = [
+    { title: 'Alpha essais', starts_at: '2026-06-12T14:00:00+02:00', ends_at: null, status: 'scheduled', published: true },
+    { title: 'Bravo minuit', starts_at: '2026-06-13T23:30:00Z', ends_at: '2026-06-14T01:00:00Z', status: 'scheduled', published: true },
+    { title: 'Charlie DST', starts_at: '2026-10-25T02:30:00+02:00', ends_at: '2026-10-25T02:30:00+01:00', status: 'scheduled', published: false },
+    { title: 'Delta chevauchement', starts_at: '2026-06-15T10:00:00Z', ends_at: '2026-06-15T11:00:00Z', status: 'draft', published: true },
+    { title: 'Echo chevauchement', starts_at: '2026-06-15T10:30:00Z', ends_at: '2026-06-15T11:30:00Z', status: 'scheduled', published: true }
+  ];
+  for (const fixture of fixtures) {
+    const session = await ok(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify(fixture) });
+    created.push(session.id);
+    expect(session.origin === 'manual' && session.provider_key === null && session.external_id === null, 'La création humaine contient des métadonnées fournisseur.');
+  }
+  const utc = await ok(`/api/v1/admin/sessions/${created[0]}`);
+  expect(new Date(utc.starts_at).toISOString() === '2026-06-12T12:00:00.000Z' && utc.ends_at === null, 'Normalisation UTC ou fin facultative incorrecte.');
+
+  const page = await ok(`/api/v1/admin/events/${eventId}/sessions?page=2&page_size=2&sort=title&direction=asc`);
+  expect(page.pagination.total === 5 && page.items.map((item) => item.name).join(',') === 'Charlie DST,Delta chevauchement', 'Pagination ou tri serveur incorrect.');
+  const filtered = await ok(`/api/v1/admin/events/${eventId}/sessions?title=Alpha%20essais&status=scheduled&published=true`);
+  expect(filtered.pagination.total === 1 && filtered.items[0].name === 'Alpha essais', 'Filtres combinés incorrects.');
+
+  const suggestions = await ok('/api/v1/admin/session-titles');
+  expect(suggestions.some((entry) => entry.title === 'Echo chevauchement'), 'Le nouvel intitulé local n’est pas suggéré.');
+  const updated = await ok(`/api/v1/admin/sessions/${created[0]}`, { method: 'PATCH', body: JSON.stringify({ title: 'Alpha modifié', ends_at: '2026-06-12T13:30:00Z', status: 'completed' }) });
+  expect(updated.title === 'Alpha modifié' && updated.status === 'completed', 'Modification Session incorrecte.');
+  expect((await call(`/api/v1/admin/sessions/${providerSessionId}`, { method: 'PATCH', body: JSON.stringify({ title: 'Interdit' }) })).response.status === 409, 'Session fournisseur modifiée sans corrections.');
+
+  const auditFailure = await call(`/api/v1/admin/events/${eventId}/sessions`, { method: 'POST', body: JSON.stringify({ title: 'lot43-audit-failure', starts_at: '2026-08-01T10:00:00Z' }) });
+  expect(auditFailure.response.status === 500, 'L’échec d’audit n’a pas fait échouer la mutation.');
+  const afterFailure = await ok(`/api/v1/admin/events/${eventId}/sessions?search=lot43-audit-failure`);
+  expect(afterFailure.pagination.total === 0, 'La Session a survécu à l’échec transactionnel de l’audit.');
+
+  await ok(`/api/v1/admin/sessions/${created[0]}`, { method: 'DELETE' });
+  created.shift();
+  const audit = await ok('/api/v1/admin/audit?page=1&page_size=100&resource_type=session');
+  const relevant = audit.items.filter((row) => row.resource_id === utc.id);
+  expect(relevant.length === 3, `Audit Session dupliqué ou incomplet (${relevant.length} lignes).`);
+  expect(relevant.every((row) => row.actor === 'lot43-api-test' && row.request_id && 'old_value' in row && 'new_value' in row), 'Audit acteur/avant/après/requête incomplet.');
+  expect(!JSON.stringify(relevant).includes(adminToken), 'Le jeton administrateur est exposé dans l’audit.');
+
+  console.log('401, 403 et administrateur autorisé : OK');
+  console.log('Contrats, références, UTC, minuit, DST et chevauchement : OK');
+  console.log('Pagination, filtres et tri avant découpage : OK');
+  console.log('CRUD manuel et protection fournisseur : OK');
+  console.log('Audit atomique unique et rollback sur échec : OK');
+} finally {
+  for (const id of created.reverse()) await call(`/api/v1/admin/sessions/${id}`, { method: 'DELETE' }).catch(() => undefined);
+}

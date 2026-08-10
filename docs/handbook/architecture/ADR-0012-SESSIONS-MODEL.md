@@ -97,6 +97,26 @@ secret ou mécanisme d'authentification distinct. L'identité déclarée dans le
 jeton devra correspondre au fournisseur ciblé. Cette séparation empêche un
 service d'obtenir les droits généraux d'un administrateur.
 
+## Décision — contrat administratif humain
+
+Le contrat administratif de cette étape est :
+
+- `GET /api/v1/admin/session-titles` pour les suggestions d'intitulés
+  fournisseur et locaux ;
+- `GET /api/v1/admin/session-types` reste une route technique de compatibilité
+  avec la migration `0004`, sans devenir un champ métier distinct ;
+- `GET /api/v1/admin/events/:eventId/sessions` pour la liste paginée ;
+- `POST /api/v1/admin/events/:eventId/sessions` pour une création humaine ;
+- `GET /api/v1/admin/sessions/:id` pour la consultation ;
+- `PATCH /api/v1/admin/sessions/:id` pour la modification ;
+- `DELETE /api/v1/admin/sessions/:id` pour la suppression.
+
+Toutes ces routes héritent de l'autorisation administrateur. Les listes sont
+filtrées et triées avant pagination. Une création impose `origin=manual` et une
+identité fournisseur nulle. Tant que le workflow de corrections Session n'est
+pas implémenté, modifier ou supprimer une Session non manuelle retourne un
+conflit plutôt que d'altérer silencieusement la valeur fournisseur.
+
 ## Conséquences
 
 - la liste publique filtre sessions et événements publiés et masque les champs

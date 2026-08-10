@@ -1,5 +1,18 @@
 # Changelog
 
+## Lot 4.3 — API administrative Sessions
+
+- ajoute les contrats TypeScript Session avec un intitulé métier unique ;
+- ajoute le référentiel, la liste paginée par événement et le CRUD administratif
+  protégé des Sessions ;
+- exige un offset, normalise en UTC et valide la période ;
+- crée les Sessions humaines sans fournisseur et protège les Sessions non
+  manuelles jusqu'au futur workflow de corrections ;
+- rend mutation et audit atomiques et empêche le double audit du hook hérité ;
+- ajoute une recette Docker synthétique couvrant sécurité, CRUD, filtres, temps,
+  audit unique sans secret et rollback sur échec d'audit ;
+- ne modifie ni l'API publique ni l'interface.
+
 ## Lot 4.3 — migration Sessions
 
 - consigne la validation mainteneur de l'ADR-0012 et du plan de migration ;

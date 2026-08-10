@@ -9,15 +9,17 @@
 - [x] écrire et tester la migration PostgreSQL `0004_sessions` ;
 - [x] vérifier deux démarrages API avec une base forcée en lecture seule ;
 - [x] obtenir la validation explicite de la recette migration par le mainteneur ;
-- [ ] implémenter ensuite l'API Sessions et les contrats de types partagés ;
-- [ ] valider cette étape API avant l'API publique et l'interface ;
+- [x] implémenter l'API Sessions administrative et les contrats partagés ;
+- [x] valider localement l'étape API sur PostgreSQL/Docker isolé ;
+- [ ] obtenir la validation mainteneur de l'étape API ;
+- [ ] seulement ensuite commencer l'API publique Sessions ;
 - [ ] poursuivre dans l'ordre défini par
   `docs/handoff/LOT-4.3-SESSIONS-HANDOFF.md`.
 
-Critère de passage : la migration est validée. L'API et les contrats constituent
-la prochaine étape distincte ; l'API publique, les corrections applicatives,
-l'ingestion automatisée et l'interface attendent leurs étapes respectives. Les
-sections suivantes sont conservées comme historique des jalons précédents.
+Critère de passage : l'API administrative et les contrats sont techniquement
+prêts. L'API publique, les corrections applicatives, l'ingestion automatisée et
+l'interface attendent la validation explicite de cette recette. Les sections
+suivantes sont conservées comme historique des jalons précédents.
 
 ## Remédiation de l'audit Lot 4.2
 
