@@ -104,6 +104,21 @@ Voir `architecture/ADR-0009-VERSIONED-DATABASE-MIGRATIONS.md`.
 
 Voir `architecture/ADR-0007-CALENDAR.md`.
 
+## 2026-08-10 — Modèle Sessions
+
+- une session appartient à un événement et possède une identité propre ;
+- les types proviennent d'un référentiel global extensible initialisé avec
+  practice, qualifying, sprint, warmup, race et other ;
+- les horaires sont en UTC, la fin est facultative et les chevauchements sont
+  autorisés ;
+- l'ordre canonique est le début puis l'identifiant ;
+- les corrections Session reprennent la séparation source/override/effective ;
+- mutation Session et journal d'audit sont atomiques ;
+- l'ingestion automatisée future utilise une identité de service et des routes
+  séparées de l'administration humaine.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
 ## 2026-08-03 — Exploitation des corrections
 
 - les filtres de Corrections sont combinables et portent sur l'ensemble des

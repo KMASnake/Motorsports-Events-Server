@@ -1,5 +1,12 @@
 # Changelog
 
+## Lot 4.3 — conception Sessions
+
+- propose l'ADR permanent du modèle Sessions et des types extensibles ;
+- définit l'audit atomique et la séparation de l'ingestion automatisée ;
+- documente le plan réversible de la future migration `0004_sessions` ;
+- n'ajoute aucun SQL, code applicatif ou changement d'interface.
+
 ## Lot 4.2 — fusion et passation
 
 - fusionne le Lot 4.2 validé dans `main` via la PR #25 ;

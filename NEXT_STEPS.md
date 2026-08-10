@@ -1,5 +1,19 @@
 # Prochaines étapes
 
+## Priorité courante — Lot 4.3 Sessions
+
+- [x] spécifier le périmètre et les critères d'acceptation ;
+- [x] proposer l'ADR du modèle Sessions ;
+- [x] proposer le plan réversible de migration `0004_sessions` ;
+- [ ] obtenir la validation explicite de l'ADR et du plan ;
+- [ ] seulement ensuite écrire et tester la migration PostgreSQL ;
+- [ ] poursuivre dans l'ordre défini par
+  `docs/handoff/LOT-4.3-SESSIONS-HANDOFF.md`.
+
+Critère de passage : aucune implémentation fonctionnelle, migration SQL ou
+interface ne commence avant validation de la conception. Les sections suivantes
+sont conservées comme historique des jalons précédents.
+
 ## Remédiation de l'audit Lot 4.2
 
 - [x] remplacer le SQL destructif au démarrage par des migrations versionnées ;

@@ -9,9 +9,9 @@
     "audit_action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md"
   },
   "repository_state": {
-    "branch": "main",
-    "status": "lot-4.2-user-validated-and-merged",
-    "reason": "Audit remediation is complete; the maintainer confirmed the final Dashboard logo correction and PR #25 was merged on 2026-08-10 as bb72e576ae85d70f5f039475dbfb91e1341461a6."
+    "branch": "codex/lot-4.3-sessions",
+    "status": "lot-4.3-architecture-awaiting-validation",
+    "reason": "Lot 4.2 remains the validated baseline. Lot 4.3 has a proposed Sessions ADR and reversible migration plan; no functional implementation has started."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -51,35 +51,19 @@
     ]
   },
   "working_lot": {
-    "lot": "4.2",
-    "target_version": "8.1.0-alpha.2-lot.4.2",
-    "status": "user-validated-and-merged",
-    "implementation_percent": 100,
-    "audit_remediation_percent": 100,
-    "validated_on_user_workstation": true,
-    "validated_on_vps": true,
-    "merged_to_main": true,
-    "implemented_or_partially_implemented": [
-      "Month, week, day and agenda calendar views",
-      "Optimistic event movement and basic resize action",
-      "Quick creation, duplication and overlap warning",
-      "Initial field-level provider corrections and administration page",
-      "Local branding, asset registry, flags and fallbacks",
-      "Deterministic synthetic sports-data generator",
-      "Provider filters and readable provider labels",
-      "Transactional provider-source and local-override reconciliation",
-      "Non-destructive provider synchronization with explicit conflicts",
-      "Local/provider resolution and automatic override removal on convergence",
-      "Business-only event administration form and mutations",
-      "Server-generated unique slugs and automatic origins",
-      "Circuit-derived timezones with deterministic UTC fallback",
-      "Dedicated provider ingestion endpoint",
-      "UTC-only event storage",
-      "25-event list pagination ordered by temporal proximity",
-      "Ascending and descending list-column sorting before pagination",
-      "Complete correction filters, typed local editing and event navigation"
+    "lot": "4.3",
+    "target_version": "8.1.0-alpha.2-lot.4.3",
+    "status": "architecture-awaiting-user-validation",
+    "implementation_percent": 0,
+    "architecture_percent": 100,
+    "validated_on_user_workstation": false,
+    "validated_on_vps": false,
+    "merged_to_main": false,
+    "implemented_or_partially_implemented": [],
+    "mandatory_gaps": [
+      "Validate ADR-0012 and the 0004_sessions migration plan before implementation",
+      "Implement and validate all Lot 4.3 acceptance criteria"
     ],
-    "mandatory_gaps": [],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
     "progress": "docs/handoff/PROGRESS.json"
   },
@@ -126,5 +110,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Prepare the Lot 4.3 Sessions specification and acceptance criteria before implementation."
+  "next_action": "Obtain explicit validation of ADR-0012 and docs/handoff/LOT-4.3-SESSIONS-MIGRATION-PLAN.md before writing SQL or application code."
 }

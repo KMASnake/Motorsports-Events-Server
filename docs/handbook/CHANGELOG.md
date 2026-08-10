@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.15 — 2026-08-10
+
+- définit le modèle relationnel et temporel des Sessions ;
+- introduit un référentiel extensible de types de session ;
+- impose l'atomicité entre mutation Session et audit ;
+- sépare l'identité d'ingestion automatisée des administrateurs humains ;
+- formalise la réversibilité de la migration Sessions.
+
 ## 1.14 — 2026-08-09
 
 - précise la création d'événement par plage ;

@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.14
+## Version 1.15
 
 Ce document est la source de vérité permanente du projet.
 
@@ -92,6 +92,20 @@ traduits dans l'interface, notamment `postponed` en « Reporté ».
 ## Valeur effective
 Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle native. L'API publique expose uniquement cette valeur.
 
+## Sessions
+
+Une session appartient à un événement et utilise un type issu d'un référentiel
+global extensible. Ses horaires sont stockés en UTC ; une fin facultative ne
+précède jamais le début. Les chevauchements, passages à minuit et changements
+d'heure sont autorisés. L'ordre public est stable par début puis identifiant.
+
+Les créations humaines restent sans fournisseur. Les corrections fournisseur
+séparent source, override et valeur effective comme pour les événements.
+L'audit d'une mutation Session appartient à la même transaction PostgreSQL que
+la mutation : un échec d'audit annule l'ensemble. Une ingestion automatisée
+future utilise une identité de service et des routes distinctes des actions
+humaines. Voir `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`.
+
 ## Calendrier
 Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer,
 redimensionnement, création rapide ou par plage, duplication et rollback. Une
@@ -131,7 +145,8 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
 validation utilisateur.
 
 ## État
-Lots 4.1 et 4.2 validés par l'utilisateur. Lot 4.3 non démarré.
+Lots 4.1 et 4.2 validés par l'utilisateur. Lot 4.3 en conception, ADR et plan
+de migration en attente de validation avant toute implémentation.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

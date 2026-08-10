@@ -72,8 +72,10 @@
 
 ## Dette technique Lot 4.2
 
-- [ ] décision documentée sur l'atomicité du journal d'audit ;
-- [ ] décision documentée sur l'identité et l'authentification de l'ingestion fournisseur automatisée.
+- [ ] décision proposée sur l'atomicité du journal d'audit dans l'ADR-0012,
+  en attente de validation ;
+- [ ] décision proposée sur l'identité et l'authentification de l'ingestion
+  fournisseur automatisée dans l'ADR-0012, en attente de validation.
 
 ## Sortie du lot
 

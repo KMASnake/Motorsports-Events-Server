@@ -62,3 +62,10 @@ puis vérifier qu'ils satisfont `LOT-4.3-SESSIONS-SPEC.md` et
 
 Aucune fusion dans `main` et aucune déclaration de validation utilisateur ne
 sont autorisées avant exécution complète de la recette du lot.
+
+## Avancement de conception
+
+L'ADR proposé est `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md` et le
+plan détaillé est `docs/handoff/LOT-4.3-SESSIONS-MIGRATION-PLAN.md`. Ils sont en
+attente de validation explicite. Aucun SQL, code API ou changement d'interface
+n'a été produit.

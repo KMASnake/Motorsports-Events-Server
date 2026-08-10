@@ -1,5 +1,18 @@
 # État du projet
 
+## Architecture 8.1 — état courant
+
+- Lot 4.2 validé et fusionné dans `main` le 2026-08-10 ;
+- Lot 4.3 Sessions spécifié sur `codex/lot-4.3-sessions` ;
+- ADR proposé : `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md` ;
+- plan proposé : `docs/handoff/LOT-4.3-SESSIONS-MIGRATION-PLAN.md` ;
+- implémentation fonctionnelle : 0 % ;
+- prochain point d'arrêt : validation explicite de l'ADR et du plan avant tout
+  SQL, code API ou changement d'interface.
+
+L'état canonique de l'architecture 8.1 reste `PROJECT-STATUS.json`. Les sections
+2.7.0 ci-dessous sont conservées comme historique de production.
+
 Dernière mise à jour : 29 juillet 2026.
 
 ## Version retenue
