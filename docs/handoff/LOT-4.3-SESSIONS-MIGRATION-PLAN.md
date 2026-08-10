@@ -1,8 +1,8 @@
 # Lot 4.3 Sessions — plan de migration PostgreSQL
 
-Statut : proposé, en attente de validation de conception
+Statut : validé par le mainteneur le 2026-08-10
 
-Aucun SQL de migration n'est créé par ce document.
+La création des fichiers SQL `0004_sessions` est désormais autorisée. L'implémentation doit respecter strictement ce plan et `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`. Toute modification structurelle doit être revalidée avant poursuite.
 
 ## Version prévue
 
@@ -100,7 +100,6 @@ Après validation de conception seulement :
 | migration sans perte | aucune mutation des tables Lot 4.2, empreinte vérifiée |
 | rollback réversible | refus si données Session ou types personnalisés |
 
-## Point d'arrêt
+## Point d'arrêt suivant
 
-La création des fichiers SQL, des routes, des types TypeScript ou de
-l'interface attend la validation explicite de cet ADR et de ce plan.
+Codex peut maintenant implémenter uniquement la migration `0004_sessions`, son rollback et les tests de migration prévus. Il ne doit pas commencer les routes API ou l'interface avant validation technique de cette étape.
