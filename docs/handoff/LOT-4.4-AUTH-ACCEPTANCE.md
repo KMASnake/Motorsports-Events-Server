@@ -2,15 +2,14 @@
 
 Date : 2026-08-11
 
-Statut : `step-4-candidate-awaiting-maintainer-validation`
+Statut : `maintainer-validated-awaiting-merge`
 
 ## État de couverture — 2026-08-12
 
-Les étapes 0 à 3 ont été validées explicitement par le mainteneur. L'étape 4
-est candidate : les recettes finales couvrent le durcissement API, la session
-humaine, le bootstrap CI, le contrôle Chromium et les régressions techniques.
-La validation mainteneur et la CI verte sur le SHA final restent requises avant
-toute fusion dans `main`.
+Les étapes 0 à 4 ont été validées explicitement par le mainteneur. Les recettes
+finales Windows et VPS couvrent le durcissement API, la session humaine, le
+bootstrap CI, le contrôle Chromium et les régressions techniques. La CI verte
+sur le SHA final reste requise avant toute fusion dans `main`.
 
 Preuves associées :
 

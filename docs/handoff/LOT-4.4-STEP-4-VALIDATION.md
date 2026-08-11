@@ -2,10 +2,23 @@
 
 Date : 2026-08-12
 
-Statut : `candidate-awaiting-maintainer-validation`
+Statut : `maintainer-validated-awaiting-merge`
 
-Validation mainteneur : non réalisée. Cette étape prépare le durcissement final
-et les recettes complètes, mais ne vaut pas validation utilisateur.
+Validation mainteneur : réalisée le 2026-08-12 sur Windows avec Docker Desktop
+et Chromium, puis sur un VPS Docker isolé. Cette validation est distincte de
+la future fusion dans `main`.
+
+## Résultats mainteneur
+
+- Windows : services sains, authentification manuelle réussie et recette
+  Chromium terminée avec `1 passed` ;
+- VPS : recette finale terminée avec succès après libération d'un port occupé
+  par une ancienne pile Lot 4.3 ;
+- API : santé PostgreSQL confirmée ;
+- session : connexion, restauration de destination, persistance au
+  rechargement, logout et révocation confirmés ;
+- origine locale : recette et documentation alignées sur
+  `http://127.0.0.1:3600`.
 
 ## Périmètre
 
@@ -52,8 +65,8 @@ Résultat attendu :
 
 ```text
 Recette automatisée Lot 4.4 : OK
-Interface : http://localhost:3600
-API       : http://localhost:3601/health
+Interface : http://127.0.0.1:3600
+API       : http://127.0.0.1:3601/health
 Identifiant : admin
 Mot de passe de test : correct horse battery staple
 ```
@@ -66,7 +79,7 @@ Nettoyage après validation :
 
 ## Points à valider humainement
 
-- `http://localhost:3600` affiche la page de connexion sans champ HMAC ;
+- `http://127.0.0.1:3600` affiche la page de connexion sans champ HMAC ;
 - l'identifiant `admin` et le mot de passe de test ouvrent la console ;
 - la destination demandée avant login est restaurée ;
 - le bouton `Se déconnecter` renvoie vers `/login` ;
@@ -83,6 +96,6 @@ Nettoyage après validation :
 
 ## Point d'arrêt
 
-Après réussite de la recette finale et de la CI sur le SHA publié, le
-mainteneur doit confirmer explicitement la validation. La fusion dans `main`
-reste interdite sans cette confirmation.
+La validation mainteneur est acquise. La CI doit encore réussir sur le SHA
+publié avant fusion. La fusion dans `main` ne constitue pas une validation
+utilisateur supplémentaire.

@@ -3,7 +3,7 @@
   "series": "8.1.0-alpha.2",
   "lot": 4,
   "revision": 4,
-  "status": "step-1-foundation-local-validation",
+  "status": "maintainer-validated-awaiting-merge",
   "scope": [
     "event CRUD",
     "public events API",
@@ -13,7 +13,7 @@
     "versioned Sessions compatibility migrations and APIs",
     "administrator authentication schema and secure bootstrap foundation"
   ],
-  "validated_on_user_workstation": false,
-  "validated_on_vps": false,
-  "validation_date": null
+  "validated_on_user_workstation": true,
+  "validated_on_vps": true,
+  "validation_date": "2026-08-12"
 }

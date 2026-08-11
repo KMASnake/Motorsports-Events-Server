@@ -84,10 +84,10 @@ try {
     Invoke-Checked { npm run typecheck } "Le typecheck a échoué."
     Invoke-Checked { npm test } "Les tests unitaires ont échoué."
     Invoke-Checked { npm run build } "Le build a échoué."
-    Invoke-Checked { docker compose up --build -d } "Le démarrage Docker a échoué."
+    Invoke-Checked { docker compose up --build --wait -d } "Le démarrage Docker a échoué."
 
     "correct horse battery staple" |
-        docker compose run --rm -T api node apps/api/dist/cli/admin.js create --username admin --password-stdin
+        docker compose exec -T api node apps/api/dist/cli/admin.js create --username admin --password-stdin
     if ($LASTEXITCODE -ne 0) { throw "La création de l'administrateur a échoué." }
 
     Invoke-Checked { npx playwright install chromium } "L'installation de Chromium a échoué."
@@ -95,8 +95,8 @@ try {
 
     Write-Host ""
     Write-Host "Recette automatisée Lot 4.4 : OK" -ForegroundColor Green
-    Write-Host "Interface : http://localhost:3600"
-    Write-Host "API       : http://localhost:3601/health"
+    Write-Host "Interface : http://127.0.0.1:3600"
+    Write-Host "API       : http://127.0.0.1:3601/health"
     Write-Host "Identifiant : admin"
     Write-Host "Mot de passe de test : correct horse battery staple"
     Write-Host "La pile reste active pour la validation humaine."

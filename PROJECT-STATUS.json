@@ -12,8 +12,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.4",
-    "status": "step-4-candidate-awaiting-maintainer-validation",
-    "reason": "Steps 0 through 3 are maintainer-validated. Step 4 hardening, final recipes and CI bootstrap updates are prepared; maintainer validation is still required."
+    "status": "maintainer-validated-awaiting-merge",
+    "reason": "Lot 4.4 is fully implemented and explicitly validated by the maintainer on Windows and an isolated VPS. Final CI review and merge remain pending."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -58,12 +58,12 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-4-candidate-awaiting-maintainer-validation",
+    "status": "maintainer-validated-awaiting-merge",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
-    "validated_on_user_workstation": false,
-    "validated_on_vps": false,
+    "validated_on_user_workstation": true,
+    "validated_on_vps": true,
     "merged_to_main": false,
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-11",
@@ -77,7 +77,12 @@
     "step_3_validation_date": "2026-08-11",
     "step_3_validation_environment": "isolated-vps-chromium",
     "step_4_candidate_date": "2026-08-12",
-    "step_4_validated_by_maintainer": false,
+    "step_4_validated_by_maintainer": true,
+    "step_4_validation_date": "2026-08-12",
+    "step_4_validation_environments": [
+      "windows-docker-desktop-chromium",
+      "isolated-vps-docker"
+    ],
     "scope": [
       "Single administrator account",
       "Initial administrator creation through a dedicated CLI/bootstrap command",
@@ -135,5 +140,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Run Lot 4.4 final validation on Windows or VPS, review CI, then wait for explicit maintainer validation before merge."
+  "next_action": "Publish the validated Lot 4.4 closure commit, confirm CI on the exact SHA, then prepare the pull request for merge without treating merge as a new user validation."
 }

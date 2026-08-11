@@ -1,5 +1,14 @@
 # Handbook Changelog
 
+## 1.24 — 2026-08-12
+
+- consigne la validation explicite du Lot 4.4 sur Windows et VPS ;
+- sécurise la recette Windows en bootstrapant le compte dans l'API déjà
+  démarrée, sans réexécuter le service de migration ;
+- aligne les URL locales sur `127.0.0.1` et la version affichée par l'API et
+  l'interface sur `8.1.0-alpha.2-lot.4.4` ;
+- conserve la CI verte sur le SHA final comme prérequis de fusion.
+
 ## 1.23 — 2026-08-12
 
 - prépare le Lot 4.4 comme candidat de validation finale ;
