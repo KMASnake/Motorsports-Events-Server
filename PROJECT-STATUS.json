@@ -11,9 +11,9 @@
     "lot_4_4_preparation": "docs/handoff/LOT-4.4-KICKOFF.md"
   },
   "repository_state": {
-    "branch": "main",
-    "status": "lot-4.3-merged-and-user-validated",
-    "reason": "Lot 4.3 was explicitly user-validated after isolated VPS and Windows acceptance, then merged into main through PR #27 on commit d16e2bbe5698913e2046c1f645819057ed9196b8. Lot 4.4 is prepared but not started and is limited to Event duplication."
+    "branch": "codex/lot-4.4",
+    "status": "lot-4.4-phase-0-specification-complete-awaiting-maintainer-validation",
+    "reason": "Lot 4.3 remains the merged and user-validated baseline. Lot 4.4 Phase 0 documents Event duplication only, recommends Web prefill plus the existing Event POST, requires no migration or new route and contains no application implementation."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -65,9 +65,9 @@
   "working_lot": {
     "lot": "4.4",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "prepared-not-started",
+    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
     "implementation_percent": 0,
-    "architecture_percent": 0,
+    "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -90,6 +90,14 @@
       "Do not modify validated Lot 4.3 migrations without a new explicit migration decision"
     ],
     "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
+    "phase_0_deliverables": [
+      "docs/handoff/LOT-4.4-SPEC.md",
+      "docs/handoff/LOT-4.4-ACCEPTANCE.md",
+      "docs/handoff/LOT-4.4-IMPACT-ANALYSIS.md"
+    ],
+    "recommended_solution": "Web-only prefill of the existing Event form followed by the existing POST /api/v1/admin/events after explicit user confirmation.",
+    "migration_required": false,
+    "new_api_route_required": false,
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation."
   },
   "technical_baseline": {
@@ -108,5 +116,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Start Lot 4.4 Phase 0 for Event duplication only: specification, acceptance criteria and impact analysis; do not implement functional code before that framing is reviewed."
+  "next_action": "Obtain explicit maintainer validation of the Lot 4.4 Phase 0 documents before any application, migration, API route or React change."
 }

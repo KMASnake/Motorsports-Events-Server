@@ -20,11 +20,11 @@
   "current": {
     "lot": "4.4",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "prepared-not-started",
+    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
     "updated_at": "2026-08-11",
     "implementation_percent": 0,
-    "architecture_percent": 0,
-    "documentation_readiness_percent": 25,
+    "architecture_percent": 100,
+    "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -48,7 +48,7 @@
     "accepted_model": "One Event represents one Session; Event has one optional editable/createable session_title and no official multi-session workflow."
   },
   "lot_4_4_preparation": {
-    "status": "prepared-not-started",
+    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
     "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
     "scope": [
       "Advanced Event duplication through the existing Event workflow"
@@ -60,11 +60,11 @@
       "Overlap detection or warnings"
     ],
     "phase_0_required_deliverables": [
-      "Lot 4.4 functional duplication specification",
-      "Lot 4.4 acceptance criteria",
-      "Impact analysis covering database, API, UI, providers, corrections, calendar and tests",
-      "Architecture decision only if duplication requires a permanent architecture change",
-      "Migration plan only if a schema change is demonstrated to be necessary"
+      "docs/handoff/LOT-4.4-SPEC.md-completed",
+      "docs/handoff/LOT-4.4-ACCEPTANCE.md-completed",
+      "docs/handoff/LOT-4.4-IMPACT-ANALYSIS.md-completed",
+      "No new ADR required because ADR-0001 already defines duplication as a new business creation",
+      "No migration plan required because the existing Event schema is sufficient"
     ],
     "constraints": [
       "Preserve the Lot 4.3 Event-as-Session model",
@@ -76,7 +76,15 @@
       "No production test data or production mutation during validation"
     ],
     "implementation_started": false,
-    "user_validation": null
+    "user_validation": null,
+    "recommended_solution": "web-only-prefill-existing-event-form-then-existing-admin-event-post",
+    "migration_required": false,
+    "new_api_route_required": false,
+    "maintainer_decisions_required": [
+      "Approve empty start/end dates in the duplicated draft",
+      "Approve draft status and unpublished defaults",
+      "Approve the Web-only approach and list/detail entry points"
+    ]
   },
   "quality_baseline": {
     "lot_4_3_unit_tests": "99-passed-in-final-audit",
@@ -92,8 +100,8 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Prepare Lot 4.4 Phase 0 for Event duplication only: specification, acceptance criteria and impact analysis. Do not implement functional code until the framing is explicitly reviewed.",
-    "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
+    "task": "Wait for explicit maintainer validation of Lot 4.4 Phase 0. Do not implement functional code, a migration, an API route or a React change before approval.",
+    "reference": "docs/handoff/LOT-4.4-SPEC.md",
     "target_visual_fidelity": 98
   }
 }
