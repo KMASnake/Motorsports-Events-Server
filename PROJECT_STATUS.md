@@ -6,7 +6,8 @@ L'audit local complet est réussi : migrations, API, corrections, concurrence,
 audit atomique, 99 tests unitaires, builds, 11 scénarios Chromium et 51 tests
 historiques. Deux écarts CI ont été corrigés : chargement explicite de la
 fixture Lot 4.3 avant Chromium et masquage du jeton administrateur généré. La
-CI verte sur le nouveau SHA exact reste obligatoire.
+CI du SHA candidat `b055ec8` est verte sur les six contrôles GitHub Actions.
+Restent la recette Windows/globale et la validation finale du mainteneur.
 
 ## Correctif d'interface Lot 4.3 — 2026-08-11
 

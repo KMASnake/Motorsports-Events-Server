@@ -4,7 +4,7 @@ Date : 2026-08-11
 
 Branche : `codex/lot-4.3-sessions`
 
-Statut : audit local réussi, CI du SHA corrigé requise
+Statut : audit local et CI du SHA candidat réussis
 
 ## Périmètre audité
 
@@ -46,6 +46,7 @@ La CI charge désormais explicitement la fixture avant Chromium et appelle
 ## Conclusion
 
 Aucun défaut métier, migration, API ou interface supplémentaire n'a été trouvé
-pendant l'audit local. La sortie du lot reste bloquée jusqu'à une CI verte sur
-le SHA contenant les corrections ci-dessus, puis jusqu'aux recettes finales et
-à la validation explicite du mainteneur.
+pendant l'audit local. Les six contrôles GitHub Actions du SHA candidat
+`b055ec8` sont verts, y compris Node/Chromium, Docker, PostgreSQL et l'artefact
+de livraison. La sortie du lot reste bloquée jusqu'aux recettes finales et à
+la validation explicite du mainteneur.

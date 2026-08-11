@@ -28,7 +28,7 @@
   intitulé inédit dans la combobox explicite ;
 - [ ] exécuter la recette VPS autonome et la validation visuelle mainteneur ;
 - [x] réaliser l'audit final du Lot 4.3 ;
-- [ ] obtenir une CI verte sur le SHA candidat exact ;
+- [x] obtenir une CI verte sur le SHA candidat exact `b055ec8` ;
 - [ ] exécuter les recettes VPS isolée et Windows ;
 - [ ] obtenir la validation utilisateur finale du Lot 4.3 ;
 - [ ] poursuivre dans l'ordre défini par

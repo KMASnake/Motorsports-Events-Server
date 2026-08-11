@@ -81,7 +81,7 @@
 - [x] migration + rollback ;
 - [x] scénarios Chromium ;
 - [x] `npm audit --audit-level=high` sans vulnérabilité bloquante ;
-- [ ] CI verte sur le SHA candidat exact ;
+- [x] CI verte sur le SHA candidat exact `b055ec8` ;
 - [ ] recette VPS Docker isolée ;
 - [ ] recette Windows ;
 - [ ] validation explicite du mainteneur.
