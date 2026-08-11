@@ -2,7 +2,10 @@
 
 Date : 2026-08-11
 
-Statut : `awaiting-maintainer-validation`
+Statut : `maintainer-validated`
+
+Validation mainteneur : confirmée le 2026-08-11 sur une pile Docker VPS
+isolée. La recette s'est terminée par `Tests Lot 4.4 étape 1 : OK`.
 
 ## Périmètre
 
@@ -42,7 +45,7 @@ Dans Docker, une entrée non interactive peut être transmise par le standard
 input avec `--password-stdin`. Le mot de passe réel ne doit jamais être écrit
 dans une documentation, un fichier versionné ou l'historique du shell.
 
-## Point d'arrêt
+## Levée du point d'arrêt
 
-Ne pas commencer les routes de login/session avant confirmation explicite de
-cette étape par le mainteneur.
+Le mainteneur a explicitement validé cette étape le 2026-08-11. Les routes de
+login/session de l'étape 2 peuvent désormais être développées séparément.

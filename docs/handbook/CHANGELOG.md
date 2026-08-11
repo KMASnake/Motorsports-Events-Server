@@ -11,6 +11,8 @@
 - autorise le démarrage ultérieur de l'implémentation, encore à 0 %.
 - implémente l'étape 1 : migration `0006`, Argon2id et bootstrap/récupération
   du compte administrateur singleton, sans route ni interface de connexion.
+- consigne la réussite de la recette Docker VPS et la validation explicite de
+  l'étape 1 par le mainteneur.
 
 ## 1.21 — 2026-08-11
 
