@@ -2,7 +2,7 @@
 
 Date : 2026-08-11
 
-Statut : proposé, non implémenté, validation mainteneur requise
+Statut : implémenté en étape 1, validation mainteneur requise
 
 Migration proposée : `0006_admin_console_authentication`
 
@@ -112,4 +112,5 @@ ligne `schema_migrations`. Aucun `cascade` global ni suppression silencieuse.
 - contraintes singleton, token hash, temps, clés étrangères et cascade du
   compte uniquement dans une base de recette.
 
-Aucun SQL de cette migration n'est créé pendant la Phase 0.
+La migration a été créée après validation explicite de la Phase 0. Sa recette
+isolée est fournie par `scripts/test-lot44-auth-foundation.sh`.

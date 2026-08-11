@@ -1,6 +1,6 @@
 {
   "name": "motorsports-events-server",
-  "version": "8.1.0-alpha.2-lot.4.3",
+  "version": "8.1.0-alpha.2-lot.4.4",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -36,7 +36,9 @@
     "test:lot43:migrations": "./scripts/test-lot43-migrations.sh",
     "test:lot43:api": "./scripts/test-lot43-api.sh",
     "test:lot43:corrections": "./scripts/test-lot43-corrections.sh",
-    "test:lot43:ui": "./scripts/test-lot43-ui.sh"
+    "test:lot43:ui": "./scripts/test-lot43-ui.sh",
+    "admin": "npm run admin --workspace @mse/api --",
+    "test:lot44:foundation": "./scripts/test-lot44-auth-foundation.sh"
   },
   "engines": {
     "node": ">=22.0.0",

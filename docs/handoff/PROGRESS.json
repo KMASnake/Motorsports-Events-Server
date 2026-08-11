@@ -21,9 +21,9 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "phase-0-validated-ready-for-implementation",
+    "status": "step-1-foundation-implemented-awaiting-maintainer-validation",
     "updated_at": "2026-08-11",
-    "implementation_percent": 0,
+    "implementation_percent": 25,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -41,8 +41,8 @@
     "note": "Existing Event duplication is satisfactory to the maintainer and requires no dedicated follow-up lot."
   },
   "lot_4_4_authentication": {
-    "status": "phase-0-validated-ready-for-implementation",
-    "implementation_started": false,
+    "status": "step-1-foundation-implemented-awaiting-maintainer-validation",
+    "implementation_started": true,
     "decisions": [
       "One administrator account for the initial version",
       "Initial account created with a dedicated initialization command",
@@ -103,7 +103,7 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Begin Lot 4.4 implementation from the validated specification, starting with the versioned reversible migration and secure administrator bootstrap foundations; validate each stage before proceeding.",
+    "task": "Validate step 1 on an isolated Docker stack with scripts/test-lot44-auth-foundation.sh. Do not start login/session routes before maintainer confirmation.",
     "target_visual_fidelity": 98
   }
 }

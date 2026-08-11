@@ -37,6 +37,9 @@ export async function verifyApplicationSchema(): Promise<void> {
     sessions_table: string | null;
     session_corrections_table: string | null;
     session_title_column: string | null;
+    admin_accounts_table: string | null;
+    admin_login_guard_table: string | null;
+    admin_sessions_table: string | null;
     applied_migrations: number;
   }>(`
     select
@@ -46,13 +49,17 @@ export async function verifyApplicationSchema(): Promise<void> {
       to_regclass('public.session_corrections')::text as session_corrections_table,
       (select column_name from information_schema.columns
         where table_schema='public' and table_name='events' and column_name='session_title') as session_title_column,
+      to_regclass('public.admin_accounts')::text as admin_accounts_table,
+      to_regclass('public.admin_login_guard')::text as admin_login_guard_table,
+      to_regclass('public.admin_sessions')::text as admin_sessions_table,
       (select count(*)::int from schema_migrations
        where version in (
          '0001_event_corrections',
          '0002_utc_storage',
          '0003_admin_audit_and_provider_identity',
          '0004_sessions',
-         '0005_event_session_title'
+         '0005_event_session_title',
+         '0006_admin_console_authentication'
        )) as applied_migrations
   `);
 
@@ -63,7 +70,10 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.sessions_table ||
     !schema.session_corrections_table ||
     !schema.session_title_column ||
-    schema.applied_migrations !== 5
+    !schema.admin_accounts_table ||
+    !schema.admin_login_guard_table ||
+    !schema.admin_sessions_table ||
+    schema.applied_migrations !== 6
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }

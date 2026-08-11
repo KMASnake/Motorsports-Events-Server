@@ -9,6 +9,8 @@
 - ajoute l'ADR-0014 et le plan proposé de migration `0006`.
 - consigne la validation explicite de la Phase 0 et accepte l'ADR-0014 ;
 - autorise le démarrage ultérieur de l'implémentation, encore à 0 %.
+- implémente l'étape 1 : migration `0006`, Argon2id et bootstrap/récupération
+  du compte administrateur singleton, sans route ni interface de connexion.
 
 ## 1.21 — 2026-08-11
 
