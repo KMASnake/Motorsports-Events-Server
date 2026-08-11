@@ -4,6 +4,8 @@
 
 - consigne la validation utilisateur finale du Lot 4.3 le 2026-08-11 ;
 - prépare la passation de fusion avec les preuves VPS et Windows séparées ;
+- aligne les métadonnées npm et leur test de cohérence sur la version validée
+  `8.1.0-alpha.2-lot.4.3` ;
 - clôt l'audit local final et documente sa matrice de preuves ;
 - charge la fixture Lot 4.3 dans la CI avant les scénarios Chromium ;
 - masque le jeton administrateur généré avant son export dans GitHub Actions ;

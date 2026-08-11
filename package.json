@@ -1,6 +1,6 @@
 {
   "name": "motorsports-events-server",
-  "version": "8.1.0-alpha.2-lot.4.2",
+  "version": "8.1.0-alpha.2-lot.4.3",
   "private": true,
   "workspaces": [
     "apps/*",
