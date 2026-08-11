@@ -1,5 +1,55 @@
 # État du projet
 
+## Recette Windows Lot 4.3 — 2026-08-11
+
+Le mainteneur a exécuté `scripts\test-lot43-final.cmd` sur Windows. Le
+nettoyage ciblé, la chaîne qualité, les données synthétiques, les validateurs
+et les 11 scénarios Chromium ont réussi. La pile reste ouverte pour le dernier
+contrôle visuel ; cette preuve automatisée ne vaut pas encore validation finale
+globale du Lot 4.3.
+
+## Audit final Lot 4.3 — 2026-08-11
+
+L'audit local complet est réussi : migrations, API, corrections, concurrence,
+audit atomique, 99 tests unitaires, builds, 11 scénarios Chromium et 51 tests
+historiques. Deux écarts CI ont été corrigés : chargement explicite de la
+fixture Lot 4.3 avant Chromium et masquage du jeton administrateur généré. La
+CI du SHA candidat `b055ec8` est verte sur les six contrôles GitHub Actions.
+Restent la recette Windows/globale et la validation finale du mainteneur.
+
+## Correctif d'interface Lot 4.3 — 2026-08-11
+
+La liste des intitulés de session est désormais une combobox explicite et
+ouvrable, avec filtrage lors de la saisie et prise en charge des valeurs
+inédites. L'intitulé effectif apparaît dans les aperçus Événement. Le
+typecheck, les 99 tests unitaires, les builds API/Web/Types, l'audit npm sans
+vulnérabilité et les 11 scénarios Chromium sont réussis. Le mainteneur a validé
+sur VPS le 2026-08-11 qu'un intitulé inédit est conservé puis reproposé dans la
+liste. Cette validation ciblée ne remplace pas l'audit final du Lot 4.3.
+
+## Architecture 8.1 — état courant
+
+- Lot 4.2 validé et fusionné dans `main` le 2026-08-10 ;
+- Lot 4.3 Sessions en développement sur `codex/lot-4.3-sessions` ;
+- ADR, plan et migration `0004_sessions` validés par le mainteneur ;
+- API administrative et publique validées explicitement par le mainteneur sur
+  VPS isolé le 2026-08-10 ;
+- workflow Corrections Sessions validé explicitement par le mainteneur sur VPS
+  isolé le 2026-08-10 : valeurs typées, synchronisation fournisseur,
+  résolutions, concurrence et audit atomique ;
+- l'interface multi-sessions techniquement validée a été refusée comme modèle
+  cible lors de la recette mainteneur du 2026-08-11 ;
+- nouveau modèle validé : un Événement représente une Session et reçoit un
+  unique intitulé dans une combobox créable, sans origine visible ;
+- ADR-0013 et migration réversible `0005_event_session_title` implémentés ;
+- API Événement et suggestions, combobox créable et retrait de l'interface
+  multi-sessions techniquement validés ;
+- implémentation fonctionnelle : 96 % ;
+- prochain point d'arrêt : audit final, CI du SHA exact et recette globale.
+
+L'état canonique de l'architecture 8.1 reste `PROJECT-STATUS.json`. Les sections
+2.7.0 ci-dessous sont conservées comme historique de production.
+
 Dernière mise à jour : 29 juillet 2026.
 
 ## Version retenue

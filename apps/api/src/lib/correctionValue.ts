@@ -17,7 +17,8 @@ export const correctionOverrideBody = z.discriminatedUnion('field_name', [
   z.object({ field_name: z.literal('ends_at'), override_value: z.union([instant, z.null()]) }).strict(),
   z.object({ field_name: z.literal('status'), override_value: status }).strict(),
   z.object({ field_name: z.literal('published'), override_value: z.boolean() }).strict(),
-  z.object({ field_name: z.literal('description'), override_value: nullableText }).strict()
+  z.object({ field_name: z.literal('description'), override_value: nullableText }).strict(),
+  z.object({ field_name: z.literal('session_title'), override_value: z.union([text.max(160), z.null()]) }).strict()
 ]);
 
 export type CorrectionOverrideBody = z.infer<typeof correctionOverrideBody>;

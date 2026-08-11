@@ -1,5 +1,69 @@
 # Handbook Changelog
 
+## 1.21 — 2026-08-11
+
+- consigne la validation utilisateur explicite du Lot 4.3 ;
+- rattache cette validation aux preuves VPS isolées et à la recette Windows
+  complète réussie avec 11 scénarios Chromium ;
+- autorise la préparation de la fusion sans confondre fusion et validation.
+
+## 1.20 — 2026-08-11
+
+- remplace le modèle UI multi-sessions par « un Événement = une Session » ;
+- ajoute l'intitulé de session directement à l'Événement ;
+- conserve une combobox créable alimentée par tous les fournisseurs et les
+  valeurs déjà enregistrées, sans distinction d'origine visible ;
+- conserve `0004_sessions` et ses routes comme compatibilité transitoire ;
+- implémente la migration réversible `0005_event_session_title`, le contrat
+  Événement et la combobox cible.
+
+## 1.19 — 2026-08-11
+
+- consigne l'implémentation de la gestion Sessions dans la fiche Événement ;
+- confirme l'intitulé unique sous forme de combobox éditable/créable ;
+- confirme que les Sessions fournisseur passent par Corrections ;
+- conserve l'interface comme candidat technique avant audit et recettes finales.
+
+## 1.18 — 2026-08-10
+
+- fixe les six champs corrigibles d'une Session et leur validation typée ;
+- impose la synchronisation fournisseur non destructive et la convergence ;
+- sérialise résolutions, overrides et synchronisations par Session ;
+- impose un audit atomique unique et une projection publique effective ;
+- enrichit les suggestions d'intitulés avec source et override.
+
+## 1.17 — 2026-08-10
+
+- consigne la validation mainteneur des API Sessions administrative et publique
+  sur VPS isolé ;
+- fixe les routes publiques Sessions imbriquées par Événement et par
+  identifiant ;
+- limite la projection publique aux champs métier et aux Sessions publiées
+  dont l'Événement parent est visible ;
+- impose l'ordre stable `starts_at`, puis `id`, et des filtres publics stricts.
+
+## 1.16 — 2026-08-10
+
+- remplace le couple métier nom/type par un intitulé unique extensible ;
+- ajoute les suggestions issues des données fournisseur et locales ;
+- conserve le référentiel technique uniquement pour la compatibilité `0004` ;
+- fixe les routes du CRUD administratif Sessions ;
+- impose pagination, filtres et tri serveur sur la liste d'un événement ;
+- limite cette étape aux créations humaines manuelles ;
+- refuse les mutations silencieuses des Sessions fournisseur avant Corrections ;
+- applique l'audit atomique prévu par l'ADR-0012.
+
+## 1.15 — 2026-08-10
+
+- définit le modèle relationnel et temporel des Sessions ;
+- introduit un référentiel extensible de types de session ;
+- impose l'atomicité entre mutation Session et audit ;
+- sépare l'identité d'ingestion automatisée des administrateurs humains ;
+- formalise la réversibilité de la migration Sessions ;
+- consigne la validation explicite de l'ADR-0012 et du plan `0004_sessions` ;
+- consigne la validation VPS explicite de l'étape migration, sans déclarer le
+  Lot 4.3 complet validé.
+
 ## 1.14 — 2026-08-09
 
 - précise la création d'événement par plage ;

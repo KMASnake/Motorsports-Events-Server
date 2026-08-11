@@ -39,6 +39,7 @@ export interface EventRow {
   published: boolean;
   origin: EventOrigin;
   description: string | null;
+  session_title?: string | null;
   provider_key?: string | null;
   external_id?: string | null;
   correction_count?: number;
@@ -54,7 +55,10 @@ export interface EventFormState {
   status: EventStatus;
   published: boolean;
   description: string;
+  session_title: string;
 }
+
+export interface SessionTitleSuggestion { title: string; usage_count: number }
 
 export interface EventFiltersState {
   search: string;

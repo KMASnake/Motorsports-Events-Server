@@ -1,5 +1,49 @@
 # Prochaines étapes
 
+## Priorité courante — Lot 4.3 Sessions
+
+- [x] spécifier le périmètre et les critères d'acceptation ;
+- [x] proposer l'ADR du modèle Sessions ;
+- [x] proposer le plan réversible de migration `0004_sessions` ;
+- [x] obtenir la validation explicite de l'ADR et du plan ;
+- [x] écrire et tester la migration PostgreSQL `0004_sessions` ;
+- [x] vérifier deux démarrages API avec une base forcée en lecture seule ;
+- [x] obtenir la validation explicite de la recette migration par le mainteneur ;
+- [x] implémenter l'API Sessions administrative et les contrats partagés ;
+- [x] valider localement l'étape API sur PostgreSQL/Docker isolé ;
+- [x] implémenter et valider l'API publique Sessions ;
+- [x] obtenir la validation mainteneur de l'étape API sur VPS isolé ;
+- [x] implémenter et valider techniquement le workflow de corrections Sessions ;
+- [x] obtenir la validation mainteneur de la recette Corrections sur VPS isolé ;
+- [x] implémenter et valider techniquement l'interface Sessions intégrée ;
+- [x] recueillir le retour mainteneur rejetant le modèle UI multi-sessions ;
+- [x] valider le modèle métier « un Événement = une Session » ;
+- [x] rédiger l'ADR-0013 et le plan `0005_event_session_title` ;
+- [x] obtenir la validation explicite de ces deux documents ;
+- [x] implémenter et tester la migration réversible `0005` ;
+- [x] ajouter la combobox créable au formulaire Événement ;
+- [x] retirer du parcours UI la sous-liste et le CRUD multi-sessions ;
+- [x] remplacer les fixtures et scénarios Chromium devenus obsolètes ;
+- [x] valider visuellement sur VPS la création puis la réutilisation d'un
+  intitulé inédit dans la combobox explicite ;
+- [x] exécuter les recettes VPS isolées et la validation visuelle mainteneur ;
+- [x] réaliser l'audit final du Lot 4.3 ;
+- [x] obtenir une CI verte sur le SHA candidat exact `b055ec8` ;
+- [x] fournir une recette Windows Lot 4.3 autonome avec nettoyage ciblé ;
+- [x] exécuter la recette Windows automatisée ;
+- [x] terminer les validations VPS isolées et le contrôle visuel Windows ;
+- [x] obtenir la validation utilisateur finale du Lot 4.3 ;
+- [ ] vérifier la CI sur le dernier SHA documentaire puis fusionner la pull
+  request dans `main` ;
+- [ ] préparer le démarrage du lot suivant depuis `main` après passation.
+
+Critère de passage atteint le 2026-08-11 : le modèle « un Événement = une
+Session », sa combobox et ses aperçus ont été validés sur VPS puis dans la
+recette Windows complète. L'implémentation du Lot 4.3 est à 100 % et validée
+explicitement ; le prochain point d'arrêt est la fusion contrôlée dans `main`.
+Les sections
+suivantes sont conservées comme historique des jalons précédents.
+
 ## Remédiation de l'audit Lot 4.2
 
 - [x] remplacer le SQL destructif au démarrage par des migrations versionnées ;

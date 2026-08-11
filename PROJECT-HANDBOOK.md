@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.14
+## Version 1.21
 
 Ce document est la source de vérité permanente du projet.
 
@@ -35,6 +35,13 @@ Les listes administratives sont paginées côté serveur après validation,
 filtrage et tri. Toute mutation sensible est journalisée avec son acteur, son
 identifiant de requête et ses valeurs avant/après, sans secret. Voir
 `docs/handbook/architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.
+
+Les corrections Sessions portent uniquement sur `title`, `starts_at`,
+`ends_at`, `status`, `published` et `description`. Elles séparent valeur
+fournisseur, override et valeur effective. Une synchronisation ne détruit pas
+un override ; toute mutation et son audit sont atomiques et sérialisés au
+niveau de la Session. L'API publique ne présente que la valeur effective. Voir
+`docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`.
 
 Toute évolution du schéma ou transformation de données utilise une migration
 versionnée exécutée avant l'API. Le démarrage applicatif vérifie le schéma en
@@ -92,6 +99,28 @@ traduits dans l'interface, notamment `postponed` en « Reporté ».
 ## Valeur effective
 Override local s'il existe, sinon valeur fournisseur, sinon valeur manuelle native. L'API publique expose uniquement cette valeur.
 
+## Événement et intitulé de session
+
+Un Événement représente directement une Session métier. Il n'existe pas de
+collection de Sessions dans le workflow officiel et l'interface ne propose
+jamais plusieurs Sessions sous un Événement.
+
+L'Événement conserve ses champs métier et possède un `session_title`
+facultatif. L'utilisateur le manipule dans une combobox éditable et créable :
+les suggestions agrègent les valeurs découvertes chez tous les fournisseurs et
+les valeurs déjà enregistrées, sans afficher leur origine. Une valeur inédite
+peut être saisie immédiatement et devient ensuite réutilisable.
+
+Les tables, routes et corrections Sessions introduites avec `0004_sessions`
+restent temporairement disponibles pour compatibilité, mais ne constituent
+plus le modèle principal ni l'interface cible. Toute suppression ultérieure
+fera l'objet d'une décision et d'une migration séparées.
+
+Le stockage temporel, le statut, la publication et la description sont ceux de
+l'Événement. Les métadonnées fournisseur restent techniques et l'API publique
+n'expose que la valeur effective. Voir
+`docs/handbook/architecture/ADR-0013-EVENT-AS-SESSION.md`.
+
 ## Calendrier
 Vue principale avec Mois, Semaine, Jour, Agenda, glisser-déposer,
 redimensionnement, création rapide ou par plage, duplication et rollback. Une
@@ -131,7 +160,11 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
 validation utilisateur.
 
 ## État
-Lots 4.1 et 4.2 validés par l'utilisateur. Lot 4.3 non démarré.
+Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves
+VPS isolées des migrations, API, corrections et contrôles visuels avec la
+recette Windows complète réussie le 2026-08-11 (qualité, données synthétiques
+et 11 scénarios Chromium). Il attend sa fusion contrôlée dans `main` ; cette
+fusion ne constitue pas elle-même la validation, déjà acquise explicitement.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

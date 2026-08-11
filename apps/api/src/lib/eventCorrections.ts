@@ -11,7 +11,7 @@ import {
 
 export const correctableEventFields = [
   'championship_id', 'circuit_id', 'name', 'slug', 'category', 'starts_at',
-  'ends_at', 'status', 'published', 'description'
+  'ends_at', 'status', 'published', 'description', 'session_title'
 ] as const;
 
 export type CorrectableEventField = typeof correctableEventFields[number];

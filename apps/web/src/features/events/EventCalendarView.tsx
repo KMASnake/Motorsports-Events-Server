@@ -38,7 +38,7 @@ export function EventCalendarView({ month, events, championships, selectedId, on
         >
           <strong className="event-chip-brand"><img src={assetRegistry.championship(event.championship_slug,event.championship_logo_url).src} alt=""/><span>{event.championship_name}</span>{assetRegistry.country(event.country_code).src&&<img className="event-chip-flag" src={assetRegistry.country(event.country_code).src!} alt={assetRegistry.country(event.country_code).alt}/>}</strong>
           <span>{event.name}</span>
-          <small>{event.category ?? (event.published ? 'Publié' : 'Privé')}</small>
+          <small>{event.session_title ?? event.category ?? (event.published ? 'Publié' : 'Privé')}</small>
           {event.correction_count ? <em title="Correction locale">✎ {event.correction_count}</em> : null}
         </button>)}
         {day.events.length > 3 && <small className="events-calendar-more">+ {day.events.length - 3} autre(s)</small>}

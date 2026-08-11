@@ -26,6 +26,7 @@ export function EventDetailsPanel({ event, championships, onEdit, onDuplicate, o
       <div><dt>Fin</dt><dd>{event.ends_at ? fullDate(event.ends_at) : 'Non définie'}</dd></div>
       <div><dt>Fuseau</dt><dd>{event.timezone}</dd></div>
       <div><dt>Catégorie</dt><dd>{event.category ?? 'Non définie'}</dd></div>
+      <div><dt>Intitulé</dt><dd>{event.session_title ?? 'Non défini'}</dd></div>
       <div><dt>Statut</dt><dd>{event.status}</dd></div>
       <div><dt>Fournisseur</dt><dd>{providerLabel(event.origin,event.provider_key)}</dd></div>
     </dl>

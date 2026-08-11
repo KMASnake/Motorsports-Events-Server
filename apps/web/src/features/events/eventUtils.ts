@@ -4,7 +4,7 @@ import { providerSource } from './providerDisplay';
 export const emptyEventForm = (): EventFormState => ({
   championship_id: '', circuit_id: '', name: '', category: '',
   starts_at: '', ends_at: '', status: 'scheduled',
-  published: true, description: ''
+  published: true, description: '', session_title: ''
 });
 
 export const localDateTimeInput = (iso: string | null) => iso
@@ -21,7 +21,8 @@ export function eventToForm(event: EventRow): EventFormState {
     ends_at: localDateTimeInput(event.ends_at),
     status: event.status,
     published: event.published,
-    description: event.description ?? ''
+    description: event.description ?? '',
+    session_title: event.session_title ?? ''
   };
 }
 

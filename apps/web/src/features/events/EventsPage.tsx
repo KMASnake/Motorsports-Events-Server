@@ -23,6 +23,7 @@ export function EventsPage() {
   const [rows, setRows] = useState<EventRow[]>([]);
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [circuits, setCircuits] = useState<Circuit[]>([]);
+  const [sessionTitles, setSessionTitles] = useState<string[]>([]);
   const [filters, setFilters] = useState(defaultFilters);
   const [view, setView] = useState<EventView>(initialView);
   const [month, setMonth] = useState(() => new Date());
@@ -40,6 +41,7 @@ export function EventsPage() {
     try {
       const workspace = await loadEventWorkspace();
       setRows(workspace.events); setChampionships(workspace.championships); setCircuits(workspace.circuits);
+      setSessionTitles(workspace.sessionTitles.map((item) => item.title));
       setSelectedId((current) => requestedEventId && workspace.events.some((event) => event.id === requestedEventId)
         ? requestedEventId
         : current && workspace.events.some((event) => event.id === current) ? current : workspace.events[0]?.id ?? null);
@@ -114,6 +116,6 @@ export function EventsPage() {
     </div>}
     {conflicts.size > 0 && <div className="events-conflict-warning" role="alert">⚠ {conflicts.size} événement(s) publié(s) se chevauchent sur un même circuit.</div>}
     <div className="events-selection-bar"><span>{selected ? `1 sélectionné · ${selected.name}` : '0 sélectionné'}</span><button disabled={!selected} onClick={() => selected && startEdit(selected)}>Modifier</button><button onClick={() => void load()}>↻ Synchroniser l’affichage</button><b>{filtered.length} événement(s)</b></div>
-    <EventEditorDialog open={editorOpen} editing={Boolean(editing)} saving={saving} value={form} championships={championships} circuits={circuits} error={formError} onChange={setForm} onNameChange={changeName} onClose={() => setEditorOpen(false)} onSubmit={submit} />
+    <EventEditorDialog open={editorOpen} editing={Boolean(editing)} saving={saving} value={form} championships={championships} circuits={circuits} sessionTitles={sessionTitles} error={formError} onChange={setForm} onNameChange={changeName} onClose={() => setEditorOpen(false)} onSubmit={submit} />
   </>;
 }

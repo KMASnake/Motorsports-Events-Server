@@ -5,7 +5,8 @@ const accepted = [
   ['championship_id', 'f1'], ['circuit_id', 'monza'], ['circuit_id', null],
   ['name', 'Grand Prix'], ['slug', 'grand-prix'], ['category', null],
   ['starts_at', '2026-08-09T10:30:00+02:00'], ['ends_at', null],
-  ['status', 'postponed'], ['published', false], ['description', 'Texte']
+  ['status', 'postponed'], ['published', false], ['description', 'Texte'],
+  ['session_title', 'Superpole'], ['session_title', null]
 ] as const;
 
 describe('typed correction override values', () => {
@@ -17,7 +18,7 @@ describe('typed correction override values', () => {
     ['championship_id', null], ['circuit_id', 42], ['name', false],
     ['slug', 'Slug invalide'], ['starts_at', '2026-08-09 10:30'],
     ['ends_at', 0], ['status', 'unknown'], ['published', 'true'],
-    ['description', { arbitrary: true }], ['timezone', 'UTC']
+    ['description', { arbitrary: true }], ['session_title', false], ['timezone', 'UTC']
   ])('rejects incompatible %s value', (field_name, override_value) => {
     expect(correctionOverrideBody.safeParse({ field_name, override_value }).success).toBe(false);
   });

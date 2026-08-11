@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-10",
+  "generated_at": "2026-08-11",
   "documentation": {
     "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
     "current_lot_progress": "docs/handoff/PROGRESS.json",
@@ -9,9 +9,9 @@
     "audit_action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md"
   },
   "repository_state": {
-    "branch": "main",
-    "status": "lot-4.2-user-validated-and-merged",
-    "reason": "Audit remediation is complete; the maintainer confirmed the final Dashboard logo correction and PR #25 was merged on 2026-08-10 as bb72e576ae85d70f5f039475dbfb91e1341461a6."
+    "branch": "codex/lot-4.3-sessions",
+    "status": "lot-4.3-user-validated-awaiting-merge",
+    "reason": "Lot 4.3 is explicitly user-validated. Its isolated VPS migration, API, corrections and visual checks passed, followed by the complete Windows recipe with 11 Chromium scenarios on 2026-08-11. Merge into main remains pending."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -39,47 +39,49 @@
     ]
   },
   "last_fully_validated_lot": {
-    "lot": "4.2",
-    "version": "8.1.0-alpha.2-lot.4.2",
+    "lot": "4.3",
+    "version": "8.1.0-alpha.2-lot.4.3",
     "status": "user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "validation_date": "2026-08-10",
+    "validation_date": "2026-08-11",
     "evidence": [
-      "docs/handoff/LOT-4.2-AUDIT-STEP-7-ACCEPTANCE.md",
-      "docs/handoff/LOT-4.2-AUDIT-STEP-8-ACCEPTANCE.md"
+      "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
+      "docs/handoff/LOT-4.3-SESSIONS-ACCEPTANCE.md",
+      "docs/handoff/LOT-4.3-FINAL-HANDOFF.md"
     ]
   },
   "working_lot": {
-    "lot": "4.2",
-    "target_version": "8.1.0-alpha.2-lot.4.2",
-    "status": "user-validated-and-merged",
+    "lot": "4.3",
+    "target_version": "8.1.0-alpha.2-lot.4.3",
+    "status": "user-validated-awaiting-merge",
     "implementation_percent": 100,
-    "audit_remediation_percent": 100,
+    "architecture_percent": 100,
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "merged_to_main": true,
+    "merged_to_main": false,
     "implemented_or_partially_implemented": [
-      "Month, week, day and agenda calendar views",
-      "Optimistic event movement and basic resize action",
-      "Quick creation, duplication and overlap warning",
-      "Initial field-level provider corrections and administration page",
-      "Local branding, asset registry, flags and fallbacks",
-      "Deterministic synthetic sports-data generator",
-      "Provider filters and readable provider labels",
-      "Transactional provider-source and local-override reconciliation",
-      "Non-destructive provider synchronization with explicit conflicts",
-      "Local/provider resolution and automatic override removal on convergence",
-      "Business-only event administration form and mutations",
-      "Server-generated unique slugs and automatic origins",
-      "Circuit-derived timezones with deterministic UTC fallback",
-      "Dedicated provider ingestion endpoint",
-      "UTC-only event storage",
-      "25-event list pagination ordered by temporal proximity",
-      "Ascending and descending list-column sorting before pagination",
-      "Complete correction filters, typed local editing and event navigation"
+      "Validated ADR-0012 and reversible migration plan",
+      "Versioned 0004_sessions up and guarded down migrations",
+      "Read-only API startup schema verification for 0004_sessions",
+      "Reproducible isolated PostgreSQL migration validator",
+      "Shared Session contracts with a single business title",
+      "Protected administrative Session CRUD with server pagination and filters",
+      "Atomic Session mutation and audit transactions",
+      "Reproducible isolated Sessions API validator",
+      "Public Session projection with parent visibility and technical metadata redaction",
+      "Typed Session corrections, non-destructive provider synchronization and resolutions",
+      "Atomic correction audit, concurrency serialization and effective public projection",
+      "Superseded multi-session UI retained only in Git history and technical evidence",
+      "Versioned 0005_event_session_title migration with guarded rollback",
+      "Single editable/createable session title combobox in the Event form",
+      "Event title persistence, public projection and origin-free aggregated suggestions",
+      "Explicit session-title dropdown and title display in Event previews",
+      "Autonomous Windows Lot 4.3 recipe with targeted cleanup and acceptance fixture"
     ],
-    "mandatory_gaps": [],
+    "mandatory_gaps": [
+      "Merge the validated branch into main through pull request"
+    ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
     "progress": "docs/handoff/PROGRESS.json"
   },
@@ -116,6 +118,20 @@
     "lint_after_audit_step_2": "resolved in Step 7 with eslint.config.mjs; Web and API lint pass locally",
     "audit_step_7_final_sha_ci": "validated on 2026-08-10: green on a5f716cc0b216e49fde9a58eb7515f8489fee2a7; local, GitHub and isolated VPS audit, ESLint 9, 75 tests, typecheck, API/Web/Types builds, Lot 4/Step 2/Step 3 validators, Docker and 7 Chromium scenarios passed; GitHub also passed 68 Python tests, 4 PostgreSQL integrations and release artifact",
     "final_sha_ci_after_audit": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
+    "lot_4_3_migration": "passed on isolated PostgreSQL: Lot 4.2 fingerprint e58eebe637f26159764123d7cf019e77 preserved across up, rollback and reapply; idempotence, read-only API restarts, UTC, midnight, DST, overlaps, constraints, cascade and guarded rollback passed",
+    "lot_4_3_migration_user_validation": "maintainer explicitly validated the Lot 4.3 migration step on 2026-08-10 after isolated VPS fingerprint cb816e2a25fc9cb3d11f0604b3506c03 remained unchanged",
+    "lot_4_3_admin_api": "passed locally on isolated PostgreSQL: 401 missing/invalid/expired, 403, admin, references, UTC, midnight, DST, overlaps, CRUD, pagination/filter/sort, provider protection, unique secret-free audit and rollback when audit fails",
+    "lot_4_3_public_api": "passed locally on isolated PostgreSQL: published Session and parent visibility, stable ordering, strict filters, business title and complete technical metadata redaction",
+    "lot_4_3_api_user_validation": "maintainer explicitly validated the complete isolated VPS API recipe on 2026-08-10: authentication, contracts, UTC, pagination, CRUD, provider protection, atomic audit and public redaction all passed",
+    "lot_4_3_corrections": "technically passed: typed six-field corrections, provider synchronization, convergence, resolutions, pagination/filter/sort, suggestions, effective public projection, atomic audit rollback and concurrent serialization",
+    "lot_4_3_corrections_quality": "npm audit zero; lint and typecheck passed; 69 API and 27 Web tests passed; API/Web/Types builds and Lot 4.2 regressions passed",
+    "lot_4_3_corrections_user_validation": "maintainer explicitly validated the complete isolated VPS corrections recipe on 2026-08-10: security, typed values, provider sync, overrides, convergence, pagination, suggestions, public projection, concurrency, atomic audit and rollback all passed",
+    "lot_4_3_ui": "technically passed: Event-integrated chronological Sessions, editable/createable title combobox, manual CRUD, provider correction actions, HTTP states, visual rollback, desktop/mobile rendering and no technical business fields",
+    "lot_4_3_ui_quality": "npm audit zero; lint/typecheck passed; 69 API and 30 Web tests passed; API/Web/Types builds, all Lot 4.3 Docker recipes, Lot 4.2 validators and 12 Chromium scenarios passed",
+    "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
+    "lot_4_3_quality": "npm audit zero; typecheck passed; 72 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; 11 Chromium scenarios passed after the explicit combobox and preview correction",
+    "lot_4_3_final_audit": "passed locally on 2026-08-11; migrations, APIs, corrections, concurrency, audit rollback, 99 unit tests, builds, 11 Chromium scenarios and 51 historical tests passed; all six GitHub Actions checks passed on exact candidate SHA b055ec8 after CI fixture and token masking corrections",
+    "lot_4_3_windows_recipe": "maintainer ran scripts/test-lot43-final.cmd on Windows on 2026-08-11; cleanup, quality chain, synthetic dataset, Lot 4 validators and 11 Chromium scenarios passed",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
@@ -126,5 +142,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Prepare the Lot 4.3 Sessions specification and acceptance criteria before implementation."
+  "next_action": "Verify the pull request checks on the final documentation SHA, merge the user-validated Lot 4.3 into main and prepare the next lot without expanding Lot 4.3."
 }

@@ -4,6 +4,7 @@ import type { AdminPrincipal } from './adminAuth.js';
 
 type AuditContext = { actor: string; action: string; resourceType: string; resourceId: string | null; oldValue: unknown };
 const contexts = new WeakMap<FastifyRequest, AuditContext>();
+const atomicallyAudited = new WeakSet<FastifyRequest>();
 const sensitive = /authorization|token|secret|password|cookie/i;
 
 function sanitize(value: unknown): unknown {
@@ -15,6 +16,10 @@ function sanitize(value: unknown): unknown {
 function target(request: FastifyRequest): { type: string; id: string | null; table: string | null } | null {
   const path = request.url.split('?', 1)[0];
   const params = request.params as { id?: string };
+  if (path.startsWith('/api/v1/admin/session-corrections')) return { type: 'session-correction', id: params.id ?? null, table: 'session_corrections' };
+  if (path.startsWith('/api/v1/admin/provider-sessions')) return { type: 'session-correction-sync', id: params.id ?? null, table: null };
+  if (path.startsWith('/api/v1/admin/sessions')) return { type: 'session', id: params.id ?? null, table: 'sessions' };
+  if (/^\/api\/v1\/admin\/events\/[^/]+\/sessions$/.test(path)) return { type: 'session', id: null, table: null };
   if (path.startsWith('/api/v1/admin/corrections')) return { type: 'correction', id: params.id ?? null, table: 'event_corrections' };
   if (path === '/api/v1/admin/provider-events') return { type: 'provider-event', id: null, table: null };
   if (path.startsWith('/api/v1/admin/events')) return { type: 'event', id: params.id ?? null, table: 'events' };
@@ -32,6 +37,7 @@ export function registerAdminAudit(app: FastifyInstance): void {
     contexts.set(request, { actor: principal?.sub ?? 'unknown', action: `${request.method} ${request.url.split('?', 1)[0]}`, resourceType: resource.type, resourceId: resource.id, oldValue });
   });
   app.addHook('onSend', async (request, reply, payload) => {
+    if (atomicallyAudited.has(request)) return payload;
     const context = contexts.get(request); if (!context || reply.statusCode >= 400) return payload;
     let newValue: unknown = request.method === 'DELETE' || reply.statusCode === 204 ? null : payload;
     if (typeof newValue === 'string') { try { newValue = JSON.parse(newValue); } catch { /* keep text */ } }
@@ -41,4 +47,8 @@ export function registerAdminAudit(app: FastifyInstance): void {
       request.id, JSON.stringify(sanitize(context.oldValue)), JSON.stringify(sanitize(newValue))]);
     return payload;
   });
+}
+
+export function markAtomicallyAudited(request: FastifyRequest): void {
+  atomicallyAudited.add(request);
 }

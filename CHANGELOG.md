@@ -1,5 +1,113 @@
 # Changelog
 
+## Lot 4.3 — Révision du modèle Événement/Session
+
+- consigne la validation utilisateur finale du Lot 4.3 le 2026-08-11 ;
+- prépare la passation de fusion avec les preuves VPS et Windows séparées ;
+- aligne les métadonnées npm et leur test de cohérence sur la version validée
+  `8.1.0-alpha.2-lot.4.3` ;
+- clôt l'audit local final et documente sa matrice de preuves ;
+- charge la fixture Lot 4.3 dans la CI avant les scénarios Chromium ;
+- masque le jeton administrateur généré avant son export dans GitHub Actions ;
+- consigne les six contrôles GitHub Actions verts sur le SHA candidat
+  `b055ec8` ;
+- ajoute la recette Windows finale du Lot 4.3 avec nettoyage ciblé des
+  anciennes piles de test, fixture Sessions et validation Chromium ;
+- rend le nettoyage compatible avec PowerShell 5.1 lorsque Docker avertit
+  qu'une pile de test est déjà absente ;
+- consigne la recette Windows automatisée réussie avec 11 scénarios Chromium ;
+- force les sorties de la recette en UTF-8 pour éviter les caractères mal
+  encodés sous Windows PowerShell 5.1 ;
+- ajoute les anciennes piles `mse-lot42-test` et `mse-lot43-test` au nettoyage
+  ciblé afin d'éviter de rouvrir une interface obsolète sur les ports 3200/3201 ;
+- remplace le `datalist` natif par une combobox explicite, ouvrable et filtrable,
+  tout en conservant la saisie d'un intitulé inédit ;
+- affiche l'intitulé de session dans les aperçus calendrier, semaine, jour,
+  agenda, liste et détail de l'Événement ;
+- consigne la validation visuelle VPS de la création d'un intitulé inédit puis
+  de sa réapparition dans les propositions ;
+- consigne la décision mainteneur « un Événement = une Session » ;
+- planifie `events.session_title` et sa combobox éditable/créable ;
+- conserve les tables et routes multi-sessions comme compatibilité technique ;
+- ajoute la migration gardée `0005_event_session_title` ;
+- expose le champ facultatif dans les contrats Événement administratifs et
+  publics ainsi que dans les Corrections ;
+- agrège les suggestions sans origine visible ;
+- remplace l'interface multi-sessions par la combobox du formulaire Événement ;
+- ajoute une fixture et 11 scénarios Chromium reproductibles.
+
+## Lot 4.3 — Correctif du validateur UI Sessions
+
+- rend `scripts/test-lot43-ui.sh` autonome sur un hôte Docker sans installation
+  locale de Node.js ou npm ;
+- installe les dépendances et génère les données dans un espace temporaire
+  exécuté par l'image officielle Node 22.
+
+## Lot 4.3 — Interface Sessions intégrée
+
+- ajoute la section Sessions chronologique dans la fiche Événement ;
+- ajoute création, modification et suppression des Sessions manuelles ;
+- ajoute une combobox alimentée par les suggestions fournisseur et locales,
+  tout en acceptant une valeur inédite ;
+- ajoute le traitement embarqué des Corrections Sessions fournisseur ;
+- gère chargement, vide, erreurs HTTP, succès et rollback visuel ;
+- ajoute une fixture synthétique et 12 scénarios Chromium avec les régressions
+  Lot 4.2, ainsi que trois captures desktop/mobile.
+
+## Lot 4.3 — Corrections Sessions
+
+- consigne la validation explicite de la recette complète sur VPS isolé par le
+  mainteneur le 2026-08-10 ;
+- ajoute les corrections typées pour l'intitulé, les horaires, le statut, la
+  publication et la description ;
+- ajoute synchronisation fournisseur, détection de conflit, convergence et
+  résolutions sans écraser les overrides ;
+- sérialise synchronisations, overrides et résolutions avec audit atomique ;
+- expose uniquement les valeurs effectives dans l'API publique ;
+- enrichit les suggestions d'intitulés avec les valeurs fournisseur et locales ;
+- ajoute une recette PostgreSQL isolée reproductible, sans interface.
+
+## Lot 4.3 — API Sessions administrative et publique
+
+- consigne la validation explicite de la recette complète sur VPS isolé par le
+  mainteneur le 2026-08-10 ;
+- ajoute les contrats TypeScript Session avec un intitulé métier unique ;
+- ajoute le référentiel, la liste paginée par événement et le CRUD administratif
+  protégé des Sessions ;
+- exige un offset, normalise en UTC et valide la période ;
+- crée les Sessions humaines sans fournisseur et protège les Sessions non
+  manuelles jusqu'au futur workflow de corrections ;
+- rend mutation et audit atomiques et empêche le double audit du hook hérité ;
+- ajoute la projection publique par événement et par identifiant avec un
+  intitulé unique, un ordre stable et des filtres stricts ;
+- masque les Sessions non publiées, brouillon ou rattachées à un Événement
+  non visible ainsi que toutes les métadonnées techniques ;
+- ajoute une recette Docker synthétique couvrant sécurité, CRUD, suggestions,
+  filtres, temps, projection publique, audit unique sans secret et rollback ;
+- ne modifie pas l'interface.
+
+## Lot 4.3 — migration Sessions
+
+- consigne la validation mainteneur de l'ADR-0012 et du plan de migration ;
+- ajoute la migration versionnée et idempotente `0004_sessions` ;
+- crée les référentiels, sessions et corrections Sessions sans transformer les
+  données Lot 4.2 ;
+- refuse tout rollback contenant une session, une correction ou un type
+  personnalisé ou modifié ;
+- étend la vérification de schéma au démarrage par des lectures uniquement ;
+- ajoute une recette PostgreSQL isolée couvrant intégrité, UTC, minuit, DST,
+  chevauchement, contraintes, cascade, rollback et réapplication ;
+- consigne la validation explicite du mainteneur après réussite de la recette
+  VPS isolée et conservation de l'empreinte Lot 4.2 ;
+- ne crée aucune route, logique CRUD, ingestion ou interface Sessions.
+
+## Lot 4.3 — conception Sessions
+
+- propose l'ADR permanent du modèle Sessions et des types extensibles ;
+- définit l'audit atomique et la séparation de l'ingestion automatisée ;
+- documente le plan réversible de la future migration `0004_sessions` ;
+- n'ajoute aucun SQL, code applicatif ou changement d'interface.
+
 ## Lot 4.2 — fusion et passation
 
 - fusionne le Lot 4.2 validé dans `main` via la PR #25 ;

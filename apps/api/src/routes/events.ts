@@ -13,6 +13,7 @@ import {
 import { adminEventQuery, paginated, publicEventQuery } from '../lib/adminQuery.js';
 
 const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional();
+const nullableSessionTitle = z.union([z.string().trim().min(1).max(160), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
 const eventOrigin = z.enum(['manual', 'provider', 'mixed']);
 const businessEventBody = z.object({
@@ -24,6 +25,7 @@ const businessEventBody = z.object({
   ends_at: z.union([z.string().datetime({ offset: true }), z.null()]).optional(),
   status: eventStatus.default('scheduled'),
   published: z.boolean().default(true),
+  session_title: nullableSessionTitle,
   description: nullableText
 });
 const eventBody = businessEventBody.extend({
@@ -48,12 +50,13 @@ const providerUpdateBody = eventBody.pick({
   ends_at: true,
   status: true,
   published: true,
+  session_title: true,
   description: true
 }).partial().refine((value) => Object.keys(value).length > 0, 'Aucune valeur fournisseur à synchroniser.');
 const technicalAdminFields = ['slug', 'timezone', 'origin', 'provider_key', 'external_id'] as const;
 
 const publicSelect = `
-  select e.id,e.slug,e.name,e.category,e.starts_at,e.ends_at,e.timezone,e.status,e.description,
+  select e.id,e.slug,e.name,e.category,e.starts_at,e.ends_at,e.timezone,e.status,e.session_title,e.description,
     c.id championship_id,c.slug championship_slug,c.name championship_name,c.short_name championship_short_name,
     ci.id circuit_id,ci.name circuit_name,ci.city circuit_city,ci.country_code
   from events e
@@ -77,7 +80,7 @@ function clean(value: unknown): string | null {
 function values(body: z.infer<typeof eventBody>) {
   return [body.championship_id, clean(body.circuit_id), body.name, body.slug, clean(body.category),
     body.starts_at, clean(body.ends_at), body.timezone, body.status, body.published, body.origin,
-    clean(body.provider_key), clean(body.external_id), clean(body.description)];
+    clean(body.provider_key), clean(body.external_id), clean(body.session_title), clean(body.description)];
 }
 function validateDates(body: z.infer<typeof eventBody>): string | null {
   if (body.ends_at && new Date(body.ends_at) < new Date(body.starts_at)) {
@@ -162,8 +165,8 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         });
         const result = await client.query(`insert into events(
           id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,
-          origin,provider_key,external_id,description
-        ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) returning *`, [randomUUID(), ...values(complete)]);
+          origin,provider_key,external_id,session_title,description
+        ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *`, [randomUUID(), ...values(complete)]);
         return result.rows[0];
       });
       return reply.code(201).send(created);
@@ -199,7 +202,7 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         await reconcileAdministrativePatch(client, current, patch as CorrectableEventPatch);
         const result = await client.query(`update events set championship_id=$2,circuit_id=$3,name=$4,slug=$5,
           category=$6,starts_at=$7,ends_at=$8,timezone=$9,status=$10,published=$11,origin=$12,
-          provider_key=$13,external_id=$14,description=$15,updated_at=now() where id=$1 returning *`, [id, ...values(merged)]);
+          provider_key=$13,external_id=$14,session_title=$15,description=$16,updated_at=now() where id=$1 returning *`, [id, ...values(merged)]);
         return result.rows[0];
       });
       if (!updated) return reply.code(404).send({ message: 'Événement introuvable.' });
@@ -228,8 +231,8 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         });
         const result = await client.query(`insert into events(
           id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,
-          origin,provider_key,external_id,description
-        ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) returning *`, [randomUUID(), ...values(complete)]);
+          origin,provider_key,external_id,session_title,description
+        ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *`, [randomUUID(), ...values(complete)]);
         return result.rows[0];
       });
       return reply.code(201).send(created);

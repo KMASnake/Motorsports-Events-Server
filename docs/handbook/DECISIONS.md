@@ -1,5 +1,37 @@
 # Journal des décisions
 
+## 2026-08-11 — Un Événement représente une Session
+
+- l'Événement est l'unique unité temporelle administrée ;
+- il porte un seul `session_title` facultatif ;
+- le formulaire conserve ses champs et ajoute une combobox éditable/créable ;
+- les suggestions réunissent fournisseurs et valeurs enregistrées sans origine
+  visible ;
+- une valeur inédite est acceptée puis devient réutilisable ;
+- les tables et routes multi-sessions restent uniquement pour compatibilité.
+
+Voir `architecture/ADR-0013-EVENT-AS-SESSION.md`.
+
+## 2026-08-10 — Intitulé unique des Sessions
+
+- le workflow métier ne demande qu'un `title`, jamais un couple nom/type ;
+- les suggestions regroupent les intitulés fournisseur et locaux déjà connus ;
+- un intitulé inédit peut être créé directement puis réutilisé ;
+- `session_types` reste un détail technique de compatibilité de la migration
+  `0004`, sans devenir un second champ visible.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
+## 2026-08-10 — Projection publique des Sessions
+
+- les Sessions publiques sont lues sous leur Événement ou par identifiant ;
+- une Session non publiée, brouillon ou rattachée à un Événement non visible
+  n'est jamais exposée ;
+- la projection ne contient que les champs métier et est ordonnée par instant
+  de début puis identifiant.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
 ## 2026-08-02
 - administration orientée métier ;
 - slug masqué ;
@@ -103,6 +135,49 @@ Voir `architecture/ADR-0009-VERSIONED-DATABASE-MIGRATIONS.md`.
 - tout changement de tri revient à la première page.
 
 Voir `architecture/ADR-0007-CALENDAR.md`.
+
+## 2026-08-10 — Modèle Sessions
+
+- une session appartient à un événement et possède une identité propre ;
+- les types proviennent d'un référentiel global extensible initialisé avec
+  practice, qualifying, sprint, warmup, race et other ;
+- les horaires sont en UTC, la fin est facultative et les chevauchements sont
+  autorisés ;
+- l'ordre canonique est le début puis l'identifiant ;
+- les corrections Session reprennent la séparation source/override/effective ;
+- mutation Session et journal d'audit sont atomiques ;
+- l'ingestion automatisée future utilise une identité de service et des routes
+  séparées de l'administration humaine.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
+## 2026-08-10 — API administrative Sessions
+
+- la liste et la création sont rattachées à l'événement dans le chemin HTTP ;
+- la consultation, la modification et la suppression utilisent l'identifiant
+  propre de la Session ;
+- les entrées datées exigent un offset et sont normalisées en UTC ;
+- une création humaine est manuelle et sans identité fournisseur ;
+- une mutation Session et son audit utilisent une transaction unique ;
+- une Session fournisseur n'est pas modifiée avant le workflow de corrections.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
+## 2026-08-10 — Corrections Sessions
+
+- seuls `title`, `starts_at`, `ends_at`, `status`, `published` et `description`
+  sont corrigibles et chaque valeur suit le type métier du champ ;
+- la synchronisation fournisseur conserve l'override, signale le conflit et
+  supprime la correction lorsque source et override convergent ;
+- accepter ou restaurer le fournisseur retire l'override, tandis que conserver
+  local maintient la valeur effective ;
+- résolutions, synchronisations et overrides concurrents sont sérialisés par
+  verrou de Session ;
+- mutation et audit unique utilisent la même transaction ;
+- suggestions et API publique lisent respectivement les valeurs source/locales
+  utiles et la seule valeur effective.
+
+Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
 
 ## 2026-08-03 — Exploitation des corrections
 
