@@ -20,6 +20,11 @@ la future fusion dans `main`.
 - origine locale : recette et documentation alignées sur
   `http://127.0.0.1:3600`.
 
+La première exécution CI du SHA de clôture a révélé un décalage d'origine :
+Playwright utilisait `127.0.0.1` tandis que l'API autorisait `localhost`. La CI
+est désormais alignée sur `http://127.0.0.1:3000` et bootstrappe le compte via
+le conteneur API déjà démarré.
+
 ## Périmètre
 
 - durcissement des tests de session, cookies, CSRF, anti-bruteforce et audit ;

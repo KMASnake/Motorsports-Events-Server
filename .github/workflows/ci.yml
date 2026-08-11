@@ -8,7 +8,7 @@ jobs:
     env:
       ADMIN_AUTH_SECRET: ci-only-admin-auth-secret-at-least-32-characters
       ADMIN_SESSION_SECRET: ci-only-session-secret-at-least-32-characters
-      ADMIN_WEB_ORIGIN: http://localhost:3000
+      ADMIN_WEB_ORIGIN: http://127.0.0.1:3000
       ADMIN_COOKIE_SECURE: "false"
       ADMIN_PASSWORD: correct-horse-battery-staple-ci
       POSTGRES_PASSWORD: ci-only-postgres-password
@@ -28,14 +28,14 @@ jobs:
       - run: npm run test
       - run: npm run build
       - name: Start isolated application stack
-        run: docker compose up --build -d
+        run: docker compose up --build --wait -d
       - name: Generate validation token
         run: |
           ADMIN_TOKEN="$(node scripts/generate-admin-token.mjs)"
           echo "::add-mask::$ADMIN_TOKEN"
           echo "ADMIN_TOKEN=$ADMIN_TOKEN" >> "$GITHUB_ENV"
       - name: Bootstrap the human administrator
-        run: printf '%s\n' "$ADMIN_PASSWORD" | docker compose run --rm -T api node apps/api/dist/cli/admin.js create --username admin --password-stdin
+        run: printf '%s\n' "$ADMIN_PASSWORD" | docker compose exec -T api node apps/api/dist/cli/admin.js create --username admin --password-stdin
       - name: Generate deterministic acceptance dataset
         env:
           DATABASE_URL: postgresql://mse:ci-only-postgres-password@127.0.0.1:5433/motorsports_events

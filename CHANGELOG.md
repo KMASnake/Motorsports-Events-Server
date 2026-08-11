@@ -7,6 +7,8 @@
   une protection CSRF, tout en conservant l'authentification HMAC technique ;
 - corrige la recette Windows afin que le bootstrap du compte ne relance pas la
   migration déjà appliquée ;
+- aligne la CI Chromium sur l'origine autorisée `127.0.0.1` et bootstrappe le
+  compte dans l'API déjà démarrée ;
 - impose `127.0.0.1` comme origine de recette locale cohérente ;
 - aligne les versions affichées par l'API et l'interface sur
   `8.1.0-alpha.2-lot.4.4`.
