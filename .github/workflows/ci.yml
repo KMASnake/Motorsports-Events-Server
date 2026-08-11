@@ -26,7 +26,10 @@ jobs:
       - name: Start isolated application stack
         run: docker compose up --build -d
       - name: Generate validation token
-        run: echo "ADMIN_TOKEN=$(node scripts/generate-admin-token.mjs)" >> "$GITHUB_ENV"
+        run: |
+          ADMIN_TOKEN="$(node scripts/generate-admin-token.mjs)"
+          echo "::add-mask::$ADMIN_TOKEN"
+          echo "ADMIN_TOKEN=$ADMIN_TOKEN" >> "$GITHUB_ENV"
       - name: Generate deterministic acceptance dataset
         env:
           DATABASE_URL: postgresql://mse:ci-only-postgres-password@127.0.0.1:5433/motorsports_events
@@ -34,6 +37,8 @@ jobs:
       - run: npm run validate:lot4
       - run: npm run validate:step2
       - run: npm run validate:step3
+      - name: Load Lot 4.3 UI acceptance fixture
+        run: docker compose exec -T postgres psql -U mse -d motorsports_events < tests/fixtures/lot43_ui.sql
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium
       - name: Run Chromium acceptance tests

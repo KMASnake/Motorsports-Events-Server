@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-event-session-vps-visual-correction-validated",
-    "reason": "Lot 4.2 remains the validated baseline. The maintainer validated on the isolated VPS that a newly created session title is persisted and then appears in the explicit suggestion dropdown. Final audit, exact-SHA CI and complete Lot 4.3 validation remain pending."
+    "status": "lot-4.3-final-audit-passed-awaiting-exact-sha-ci",
+    "reason": "Lot 4.2 remains the validated baseline. Lot 4.3 passed its complete local audit and targeted VPS visual validation. The CI fixture and token masking gaps are corrected; exact-SHA CI, final recipes and complete maintainer validation remain pending."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,8 +53,8 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "event-session-vps-visual-correction-validated-awaiting-final-audit",
-    "implementation_percent": 96,
+    "status": "final-audit-passed-awaiting-exact-sha-ci",
+    "implementation_percent": 97,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": true,
@@ -78,7 +78,7 @@
       "Explicit session-title dropdown and title display in Event previews"
     ],
     "mandatory_gaps": [
-      "Run final audit, exact-SHA CI and Windows acceptance",
+      "Obtain green exact-SHA CI and run Windows acceptance",
       "Obtain final explicit maintainer validation"
     ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
@@ -129,6 +129,7 @@
     "lot_4_3_ui_quality": "npm audit zero; lint/typecheck passed; 69 API and 30 Web tests passed; API/Web/Types builds, all Lot 4.3 Docker recipes, Lot 4.2 validators and 12 Chromium scenarios passed",
     "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
     "lot_4_3_quality": "npm audit zero; typecheck passed; 72 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; 11 Chromium scenarios passed after the explicit combobox and preview correction",
+    "lot_4_3_final_audit": "passed locally on 2026-08-11; migrations, APIs, corrections, concurrency, audit rollback, 99 unit tests, builds, 11 Chromium scenarios and 51 historical tests passed; CI fixture and token masking corrected pending exact-SHA proof",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."

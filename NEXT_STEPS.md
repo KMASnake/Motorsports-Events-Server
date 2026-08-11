@@ -27,7 +27,7 @@
 - [x] valider visuellement sur VPS la création puis la réutilisation d'un
   intitulé inédit dans la combobox explicite ;
 - [ ] exécuter la recette VPS autonome et la validation visuelle mainteneur ;
-- [ ] réaliser l'audit final du Lot 4.3 ;
+- [x] réaliser l'audit final du Lot 4.3 ;
 - [ ] obtenir une CI verte sur le SHA candidat exact ;
 - [ ] exécuter les recettes VPS isolée et Windows ;
 - [ ] obtenir la validation utilisateur finale du Lot 4.3 ;

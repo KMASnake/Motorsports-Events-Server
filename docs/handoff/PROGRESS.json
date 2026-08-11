@@ -12,9 +12,9 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "event-session-vps-visual-correction-validated-awaiting-final-audit",
+    "status": "final-audit-passed-awaiting-exact-sha-ci",
     "updated_at": "2026-08-11",
-    "implementation_percent": 96,
+    "implementation_percent": 97,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -142,6 +142,14 @@
       "result": "maintainer-confirmed-ok",
       "limitation": "This validates the corrected combobox workflow, not the final Lot 4.3 audit, exact-SHA CI or complete release acceptance."
     }
+  },
+  "lot_4_3_final_audit": {
+    "status": "local-audit-passed-awaiting-exact-sha-ci",
+    "date": "2026-08-11",
+    "evidence": "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
+    "local_matrix": "migrations-api-corrections-ui-lint-typecheck-99-unit-builds-audit-11-chromium-51-historical-passed",
+    "ci_corrections": "load-lot43-fixture-before-chromium-and-mask-generated-admin-token",
+    "exact_sha_ci": null
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",

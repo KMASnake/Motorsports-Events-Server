@@ -2,6 +2,9 @@
 
 ## Lot 4.3 — Révision du modèle Événement/Session
 
+- clôt l'audit local final et documente sa matrice de preuves ;
+- charge la fixture Lot 4.3 dans la CI avant les scénarios Chromium ;
+- masque le jeton administrateur généré avant son export dans GitHub Actions ;
 - remplace le `datalist` natif par une combobox explicite, ouvrable et filtrable,
   tout en conservant la saisie d'un intitulé inédit ;
 - affiche l'intitulé de session dans les aperçus calendrier, semaine, jour,

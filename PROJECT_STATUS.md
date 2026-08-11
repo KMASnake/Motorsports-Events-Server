@@ -1,5 +1,13 @@
 # État du projet
 
+## Audit final Lot 4.3 — 2026-08-11
+
+L'audit local complet est réussi : migrations, API, corrections, concurrence,
+audit atomique, 99 tests unitaires, builds, 11 scénarios Chromium et 51 tests
+historiques. Deux écarts CI ont été corrigés : chargement explicite de la
+fixture Lot 4.3 avant Chromium et masquage du jeton administrateur généré. La
+CI verte sur le nouveau SHA exact reste obligatoire.
+
 ## Correctif d'interface Lot 4.3 — 2026-08-11
 
 La liste des intitulés de session est désormais une combobox explicite et
