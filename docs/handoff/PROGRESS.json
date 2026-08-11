@@ -49,23 +49,29 @@
   },
   "lot_4_4_preparation": {
     "status": "prepared-not-started",
-    "reference": "docs/handoff/LOT-4.4-PREPARATION.md",
-    "scope_candidates": [
-      "Advanced Event duplication",
-      "Recurring or series creation where explicitly specified",
-      "Conflict and overlap detection and management"
+    "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
+    "scope": [
+      "Advanced Event duplication through the existing Event workflow"
+    ],
+    "explicitly_out_of_scope": [
+      "Recurrence",
+      "Recurring or series creation",
+      "Conflict management",
+      "Overlap detection or warnings"
     ],
     "phase_0_required_deliverables": [
-      "Lot 4.4 functional specification",
+      "Lot 4.4 functional duplication specification",
       "Lot 4.4 acceptance criteria",
       "Impact analysis covering database, API, UI, providers, corrections, calendar and tests",
-      "Architecture decision if recurrence or conflict persistence requires a schema change",
-      "Migration plan before any schema modification"
+      "Architecture decision only if duplication requires a permanent architecture change",
+      "Migration plan only if a schema change is demonstrated to be necessary"
     ],
     "constraints": [
       "Preserve the Lot 4.3 Event-as-Session model",
       "Keep session_title as the single session business label",
       "Do not reintroduce the superseded multi-session administration UI",
+      "Prefer pre-filling the existing Event form and persisting only after explicit user confirmation",
+      "A duplicated provider Event must become an independent manual Event without provider identifiers or copied corrections",
       "No functional implementation before Phase 0 review",
       "No production test data or production mutation during validation"
     ],
@@ -86,8 +92,8 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Prepare Lot 4.4 Phase 0 only: specification, acceptance criteria and impact analysis. Do not implement functional code until the framing is explicitly reviewed.",
-    "reference": "docs/handoff/LOT-4.4-PREPARATION.md",
+    "task": "Prepare Lot 4.4 Phase 0 for Event duplication only: specification, acceptance criteria and impact analysis. Do not implement functional code until the framing is explicitly reviewed.",
+    "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
     "target_visual_fidelity": 98
   }
 }
