@@ -5,136 +5,96 @@
     "current_lot_progress": "docs/handoff/PROGRESS.json",
     "lot_specific_rules": "docs/handoff/",
     "historical_handover": "docs/handover/",
-    "blocking_audit": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
-    "audit_action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md"
+    "lot_4_3_final_audit": "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
+    "lot_4_3_final_handoff": "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
+    "lot_4_3_post_merge_closure": "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md",
+    "lot_4_4_preparation": "docs/handoff/LOT-4.4-PREPARATION.md"
   },
   "repository_state": {
-    "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-user-validated-awaiting-merge",
-    "reason": "Lot 4.3 is explicitly user-validated. Its isolated VPS migration, API, corrections and visual checks passed, followed by the complete Windows recipe with 11 Chromium scenarios on 2026-08-11. Merge into main remains pending."
-  },
-  "independent_audit": {
-    "date": "2026-08-03",
-    "document": "docs/handoff/LOT-4.2-CODE-AUDIT-2026-08-03.md",
-    "action_plan": "docs/handoff/LOT-4.2-AUDIT-ACTION-PLAN.md",
-    "decision": "changes-requested",
-    "merge_authorized": true,
-    "new_features_authorized_before_p1_closure": false,
-    "blocking_findings": [
-      "Replace destructive startup SQL with a versioned, idempotent and reversible migration.",
-      "Publish green CI attached to the exact final branch SHA using Node >= 22 and npm >= 10.",
-      "Prove authentication and authorization for every administrative route.",
-      "Validate correction override values according to the corrected business field type."
-    ],
-    "required_sequence": [
-      "database migration safety",
-      "typed correction validation",
-      "administrative route security tests",
-      "server pagination, filter validation and mutation audit logging",
-      "concurrency, rollback and calendar interaction tests",
-      "npm high-severity advisory review",
-      "complete CI on the final SHA",
-      "Windows and isolated VPS validation",
-      "explicit user validation"
-    ]
+    "branch": "main",
+    "status": "lot-4.3-merged-and-user-validated",
+    "reason": "Lot 4.3 was explicitly user-validated after isolated VPS and Windows acceptance, then merged into main through PR #27 on commit d16e2bbe5698913e2046c1f645819057ed9196b8. Lot 4.4 is prepared but not started."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "user-validated",
+    "status": "merged-and-user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
     "validation_date": "2026-08-11",
+    "merged_to_main": true,
+    "merge_pr": 27,
+    "merge_commit": "d16e2bbe5698913e2046c1f645819057ed9196b8",
     "evidence": [
       "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
       "docs/handoff/LOT-4.3-SESSIONS-ACCEPTANCE.md",
-      "docs/handoff/LOT-4.3-FINAL-HANDOFF.md"
+      "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
+      "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md"
     ]
   },
-  "working_lot": {
-    "lot": "4.3",
-    "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "user-validated-awaiting-merge",
+  "completed_lot_4_3": {
     "implementation_percent": 100,
     "architecture_percent": 100,
+    "documentation_readiness_percent": 100,
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "merged_to_main": false,
-    "implemented_or_partially_implemented": [
-      "Validated ADR-0012 and reversible migration plan",
-      "Versioned 0004_sessions up and guarded down migrations",
-      "Read-only API startup schema verification for 0004_sessions",
-      "Reproducible isolated PostgreSQL migration validator",
-      "Shared Session contracts with a single business title",
-      "Protected administrative Session CRUD with server pagination and filters",
-      "Atomic Session mutation and audit transactions",
-      "Reproducible isolated Sessions API validator",
-      "Public Session projection with parent visibility and technical metadata redaction",
-      "Typed Session corrections, non-destructive provider synchronization and resolutions",
-      "Atomic correction audit, concurrency serialization and effective public projection",
-      "Superseded multi-session UI retained only in Git history and technical evidence",
-      "Versioned 0005_event_session_title migration with guarded rollback",
-      "Single editable/createable session title combobox in the Event form",
-      "Event title persistence, public projection and origin-free aggregated suggestions",
-      "Explicit session-title dropdown and title display in Event previews",
-      "Autonomous Windows Lot 4.3 recipe with targeted cleanup and acceptance fixture"
+    "merged_to_main": true,
+    "model_decision": "One Event represents one Session; Event carries one optional editable/createable session_title with origin-free aggregated suggestions.",
+    "validated_capabilities": [
+      "ADR-0012 and ADR-0013 architecture decisions",
+      "Versioned reversible 0004_sessions and 0005_event_session_title migrations",
+      "Read-only application schema verification",
+      "Protected administrative APIs and public redacted projections",
+      "Atomic audit and rollback guarantees",
+      "Typed provider corrections and concurrency serialization",
+      "Single editable/createable session title combobox on Event",
+      "Session title persistence and display in Event previews",
+      "Isolated VPS acceptance",
+      "Windows acceptance with 11 Chromium scenarios",
+      "Exact-SHA CI candidate with all six GitHub Actions checks passing"
     ],
-    "mandatory_gaps": [
-      "Merge the validated branch into main through pull request"
-    ],
-    "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
-    "progress": "docs/handoff/PROGRESS.json"
+    "final_validation": {
+      "exact_sha_ci": "b055ec8-all-six-github-actions-checks-passed",
+      "unit_tests": "99 passed in final audit",
+      "chromium": "11 passed in final accepted model",
+      "windows_recipe": "scripts/test-lot43-final.cmd passed by maintainer on 2026-08-11",
+      "vps": "migration, API, corrections and visual acceptance passed",
+      "explicit_user_validation": "confirmed-2026-08-11"
+    }
   },
-  "technical_validation": {
-    "audit_date": "2026-08-03",
-    "workspace_typecheck": "passed before independent audit remediation",
-    "web_build": "passed before independent audit remediation",
-    "api_build": "passed before independent audit remediation",
-    "unit_tests": "38 passed before independent audit remediation",
-    "docker": "3 isolated services healthy (PostgreSQL, API and Web)",
-    "api_health": "passed with database=true",
-    "web_health": "passed",
-    "step_2_integration": "passed on isolated PostgreSQL through npm run validate:step2",
-    "step_2_user_validation": "maintainer reported the isolated VPS test dataset and correction workflow looked correct on 2026-08-03",
-    "step_3_integration": "passed on isolated PostgreSQL through npm run validate:step3",
-    "step_3_user_validation": "maintainer confirmed the Step 3 VPS workflow on 2026-08-03",
-    "utc_and_pagination_adjustment": "98 generated events stored only in UTC; 25-row proximity ordering validated",
-    "list_sorting_adjustment": "date ascending/descending and alphabetical column sorting passed in Chromium",
-    "step_3_adjustments_user_validation": "maintainer confirmed UTC storage, pagination and list sorting on the isolated VPS on 2026-08-03",
-    "step_4_corrections": "combined filters, override editing and direct event navigation passed in Chromium",
-    "step_4_test_dataset": "12 deterministic corrections validated on isolated PostgreSQL across 4 statuses, 3 providers, 8 fields and 5 authors",
-    "step_4_typed_editors": "reference and enum corrections use controlled lists; dates use datetime-local and persist UTC",
-    "step_4_pagination_and_labels": "10 corrections per page, simplified resolution actions and postponed translated as Reporté",
-    "step_4_resolution_action": "Restaurer fournisseur is the sole visible override-removal action; redundant delete action remains API-compatible but is hidden",
-    "step_4_user_validation": "maintainer validated the complete Corrections step on the isolated VPS on 2026-08-03",
-    "lot_4_api_regression": "passed through npm run validate:lot4 before independent audit remediation",
-    "playwright": "7 Chromium scenarios passed in the official Playwright container before independent audit remediation",
-    "audit_step_1_migrations": "validated on 2026-08-09: typecheck, 38 unit tests, Web/API builds, isolated WSL Docker migration/rollback test and isolated VPS validator passed",
-    "audit_step_2_typed_corrections": "validated on 2026-08-09: typecheck, 61 unit tests, Web/API builds and isolated Docker API/PostgreSQL validator passed locally and on VPS",
-    "audit_step_3_admin_security": "validated on 2026-08-09: 69 unit tests, Web/API builds and isolated Docker security validator passed locally and on VPS; 401, 403, invalid/expired tokens, admin success and public API confirmed",
-    "audit_step_4_pagination_and_audit": "validated on 2026-08-09: 72 unit tests, Web/API builds, migration/rollback and isolated Docker validator passed locally and on VPS; pagination, invalid filters, provider uniqueness and secret-free audit confirmed",
-    "audit_step_5_concurrency_and_calendar": "validated on 2026-08-09: 75 unit tests, Web/API builds and isolated Docker PostgreSQL validator passed locally and on VPS; graphical range creation, movement, resize and persistence confirmed by maintainer; Agenda UX clarification noted",
-    "audit_step_6_dependencies": "validated on 2026-08-09: nanoid GHSA-2v37-7h3g-55p8 identified as transitive PostCSS/Vite build dependency, lock upgraded from 3.3.16 to 3.3.18, npm audit zero; 75 tests, typecheck and API/Web/Types builds passed locally and under Node 22/npm 10 on isolated VPS",
-    "lint_after_audit_step_2": "resolved in Step 7 with eslint.config.mjs; Web and API lint pass locally",
-    "audit_step_7_final_sha_ci": "validated on 2026-08-10: green on a5f716cc0b216e49fde9a58eb7515f8489fee2a7; local, GitHub and isolated VPS audit, ESLint 9, 75 tests, typecheck, API/Web/Types builds, Lot 4/Step 2/Step 3 validators, Docker and 7 Chromium scenarios passed; GitHub also passed 68 Python tests, 4 PostgreSQL integrations and release artifact",
-    "final_sha_ci_after_audit": "green-on-a5f716cc0b216e49fde9a58eb7515f8489fee2a7",
-    "lot_4_3_migration": "passed on isolated PostgreSQL: Lot 4.2 fingerprint e58eebe637f26159764123d7cf019e77 preserved across up, rollback and reapply; idempotence, read-only API restarts, UTC, midnight, DST, overlaps, constraints, cascade and guarded rollback passed",
-    "lot_4_3_migration_user_validation": "maintainer explicitly validated the Lot 4.3 migration step on 2026-08-10 after isolated VPS fingerprint cb816e2a25fc9cb3d11f0604b3506c03 remained unchanged",
-    "lot_4_3_admin_api": "passed locally on isolated PostgreSQL: 401 missing/invalid/expired, 403, admin, references, UTC, midnight, DST, overlaps, CRUD, pagination/filter/sort, provider protection, unique secret-free audit and rollback when audit fails",
-    "lot_4_3_public_api": "passed locally on isolated PostgreSQL: published Session and parent visibility, stable ordering, strict filters, business title and complete technical metadata redaction",
-    "lot_4_3_api_user_validation": "maintainer explicitly validated the complete isolated VPS API recipe on 2026-08-10: authentication, contracts, UTC, pagination, CRUD, provider protection, atomic audit and public redaction all passed",
-    "lot_4_3_corrections": "technically passed: typed six-field corrections, provider synchronization, convergence, resolutions, pagination/filter/sort, suggestions, effective public projection, atomic audit rollback and concurrent serialization",
-    "lot_4_3_corrections_quality": "npm audit zero; lint and typecheck passed; 69 API and 27 Web tests passed; API/Web/Types builds and Lot 4.2 regressions passed",
-    "lot_4_3_corrections_user_validation": "maintainer explicitly validated the complete isolated VPS corrections recipe on 2026-08-10: security, typed values, provider sync, overrides, convergence, pagination, suggestions, public projection, concurrency, atomic audit and rollback all passed",
-    "lot_4_3_ui": "technically passed: Event-integrated chronological Sessions, editable/createable title combobox, manual CRUD, provider correction actions, HTTP states, visual rollback, desktop/mobile rendering and no technical business fields",
-    "lot_4_3_ui_quality": "npm audit zero; lint/typecheck passed; 69 API and 30 Web tests passed; API/Web/Types builds, all Lot 4.3 Docker recipes, Lot 4.2 validators and 12 Chromium scenarios passed",
-    "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
-    "lot_4_3_quality": "npm audit zero; typecheck passed; 72 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; 11 Chromium scenarios passed after the explicit combobox and preview correction",
-    "lot_4_3_final_audit": "passed locally on 2026-08-11; migrations, APIs, corrections, concurrency, audit rollback, 99 unit tests, builds, 11 Chromium scenarios and 51 historical tests passed; all six GitHub Actions checks passed on exact candidate SHA b055ec8 after CI fixture and token masking corrections",
-    "lot_4_3_windows_recipe": "maintainer ran scripts/test-lot43-final.cmd on Windows on 2026-08-11; cleanup, quality chain, synthetic dataset, Lot 4 validators and 11 Chromium scenarios passed",
+  "working_lot": {
+    "lot": "4.4",
+    "target_version": "8.1.0-alpha.2-lot.4.4",
+    "status": "prepared-not-started",
+    "implementation_percent": 0,
+    "architecture_percent": 0,
+    "validated_on_user_workstation": false,
+    "validated_on_vps": false,
+    "merged_to_main": false,
+    "scope": [
+      "Advanced Event duplication",
+      "Recurring or series creation where explicitly specified",
+      "Conflict and overlap detection/management"
+    ],
+    "mandatory_constraints": [
+      "Preserve the Lot 4.3 model: one Event represents one Session",
+      "Keep session_title as the single session business label",
+      "Do not reintroduce the superseded multi-session UI",
+      "Produce specification, acceptance criteria and impact analysis before implementation",
+      "Do not modify validated Lot 4.3 migrations without a new explicit migration decision"
+    ],
+    "reference": "docs/handoff/LOT-4.4-PREPARATION.md",
+    "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation."
+  },
+  "technical_baseline": {
+    "lot_4_3_final_audit": "passed",
+    "lot_4_3_exact_sha_ci": "green-on-b055ec8",
+    "lot_4_3_windows_validation": "passed-2026-08-11",
+    "lot_4_3_isolated_vps_validation": "passed",
+    "npm_audit": "zero-vulnerabilities-at-final-validation",
     "known_tooling_issues": [
-      "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
-      "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
+      "The host npm version may remain below the declared npm >= 10 engine requirement; CI, VPS and Windows acceptance use the required versions.",
+      "The Agenda view is functional but its purpose still deserves later UX clarification."
     ]
   },
   "historical_production": {
@@ -142,5 +102,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Verify the pull request checks on the final documentation SHA, merge the user-validated Lot 4.3 into main and prepare the next lot without expanding Lot 4.3."
+  "next_action": "Start Lot 4.4 with specification, acceptance criteria and impact analysis only; do not implement functional code before that framing is reviewed."
 }
