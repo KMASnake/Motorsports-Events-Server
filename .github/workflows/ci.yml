@@ -11,6 +11,7 @@ jobs:
       ADMIN_WEB_ORIGIN: http://127.0.0.1:3000
       ADMIN_COOKIE_SECURE: "false"
       ADMIN_PASSWORD: correct-horse-battery-staple-ci
+      VITE_API_URL: http://127.0.0.1:3001
       POSTGRES_PASSWORD: ci-only-postgres-password
       DATABASE_URL: postgresql://mse:ci-only-postgres-password@postgres:5432/motorsports_events
     steps:

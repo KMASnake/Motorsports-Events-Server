@@ -23,7 +23,9 @@ la future fusion dans `main`.
 La première exécution CI du SHA de clôture a révélé un décalage d'origine :
 Playwright utilisait `127.0.0.1` tandis que l'API autorisait `localhost`. La CI
 est désormais alignée sur `http://127.0.0.1:3000` et bootstrappe le compte via
-le conteneur API déjà démarré.
+le conteneur API déjà démarré. Le bundle Web CI utilise également
+`VITE_API_URL=http://127.0.0.1:3001`, afin que le cookie de session reste sur
+le même hôte que l'interface.
 
 ## Périmètre
 
