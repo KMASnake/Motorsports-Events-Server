@@ -8,12 +8,12 @@
     "lot_4_3_final_audit": "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
     "lot_4_3_final_handoff": "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
     "lot_4_3_post_merge_closure": "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md",
-    "lot_4_4_preparation": "docs/handoff/LOT-4.4-KICKOFF.md"
+    "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
-    "branch": "codex/lot-4.4",
-    "status": "lot-4.4-phase-0-specification-complete-awaiting-maintainer-validation",
-    "reason": "Lot 4.3 remains the merged and user-validated baseline. Lot 4.4 Phase 0 documents Event duplication only, recommends Web prefill plus the existing Event POST, requires no migration or new route and contains no application implementation."
+    "branch": "main",
+    "status": "lot-4-complete-authentication-next",
+    "reason": "Lot 4.3 is merged and user-validated and the maintainer considers Lot 4 functionally complete. Existing Event duplication is satisfactory. The next implementation lot is administration authentication; provider synchronization follows after separate maintainer design discussion."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -52,69 +52,74 @@
       "Isolated VPS acceptance",
       "Windows acceptance with 11 Chromium scenarios",
       "Exact-SHA CI candidate with all six GitHub Actions checks passing"
-    ],
-    "final_validation": {
-      "exact_sha_ci": "b055ec8-all-six-github-actions-checks-passed",
-      "unit_tests": "99 passed in final audit",
-      "chromium": "11 passed in final accepted model",
-      "windows_recipe": "scripts/test-lot43-final.cmd passed by maintainer on 2026-08-11",
-      "vps": "migration, API, corrections and visual acceptance passed",
-      "explicit_user_validation": "confirmed-2026-08-11"
-    }
+    ]
   },
   "working_lot": {
     "lot": "4.4",
+    "name": "Administration authentication",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
+    "status": "functional-decisions-approved-specification-pending",
     "implementation_percent": 0,
-    "architecture_percent": 100,
+    "architecture_percent": 0,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
     "scope": [
-      "Advanced Event duplication through the existing Event workflow"
+      "Single administrator account",
+      "Initial administrator creation through a dedicated CLI/bootstrap command",
+      "Login page with username and password",
+      "Server-side authenticated sessions",
+      "HttpOnly Secure SameSite session cookie",
+      "Protected administration navigation and login redirect",
+      "Server-side logout invalidation",
+      "Eight-hour absolute session lifetime",
+      "One-hour inactivity expiration",
+      "Five failed attempts in fifteen minutes followed by a fifteen-minute temporary login block",
+      "Authentication failure and lockout audit without secrets"
     ],
     "out_of_scope": [
-      "Recurrence",
-      "Recurring or series creation",
-      "Conflict management",
-      "Overlap detection or warnings"
+      "Multiple administrator accounts",
+      "User administration UI",
+      "Complex role or permission management",
+      "CAPTCHA",
+      "Permanent account lockout",
+      "IP-only blocking",
+      "Provider synchronization implementation"
     ],
     "mandatory_constraints": [
-      "Preserve the Lot 4.3 model: one Event represents one Session",
-      "Keep session_title as the single session business label",
-      "Do not reintroduce the superseded multi-session UI",
-      "A duplicated provider Event becomes an independent manual Event without provider identifiers or copied corrections",
-      "Prefer opening the existing Event form prefilled before persistence rather than immediate database duplication",
-      "Produce specification, acceptance criteria and impact analysis before implementation",
-      "Do not modify validated Lot 4.3 migrations without a new explicit migration decision"
+      "Passwords must never be stored or logged in plaintext",
+      "The browser must not receive an HMAC secret or JavaScript-readable authentication JWT",
+      "A successful login resets failed-login counters",
+      "Authentication errors must not disclose whether the administrator account exists",
+      "Logout invalidates the server-side session immediately",
+      "Existing technical HMAC/API authentication remains separate from the human administration login",
+      "No implementation before specification, acceptance criteria and impact analysis are reviewed"
     ],
-    "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
-    "phase_0_deliverables": [
-      "docs/handoff/LOT-4.4-SPEC.md",
-      "docs/handoff/LOT-4.4-ACCEPTANCE.md",
-      "docs/handoff/LOT-4.4-IMPACT-ANALYSIS.md"
-    ],
-    "recommended_solution": "Web-only prefill of the existing Event form followed by the existing POST /api/v1/admin/events after explicit user confirmation.",
-    "migration_required": false,
-    "new_api_route_required": false,
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation."
+  },
+  "planned_after_current": {
+    "name": "Providers and API synchronization core",
+    "status": "concept-discussion-required-before-roadmap-detail",
+    "known_intent": [
+      "Providers administration page",
+      "API synchronization engine",
+      "Monthly quota management",
+      "Per-minute rate quota management",
+      "Persistent synchronization cursor and resume"
+    ],
+    "rule": "Discuss and explicitly validate functional and architectural concepts with the maintainer before updating detailed roadmap or implementation specifications."
   },
   "technical_baseline": {
     "lot_4_3_final_audit": "passed",
     "lot_4_3_exact_sha_ci": "green-on-b055ec8",
     "lot_4_3_windows_validation": "passed-2026-08-11",
     "lot_4_3_isolated_vps_validation": "passed",
-    "npm_audit": "zero-vulnerabilities-at-final-validation",
-    "known_tooling_issues": [
-      "The host npm version may remain below the declared npm >= 10 engine requirement; CI, VPS and Windows acceptance use the required versions.",
-      "The Agenda view is functional but its purpose still deserves later UX clarification."
-    ]
+    "npm_audit": "zero-vulnerabilities-at-final-validation"
   },
   "historical_production": {
     "version": "2.7.0",
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Obtain explicit maintainer validation of the Lot 4.4 Phase 0 documents before any application, migration, API route or React change."
+  "next_action": "Prepare the Lot 4.4 authentication specification, acceptance criteria and impact analysis from the maintainer-approved functional decisions; do not implement authentication code before framing review."
 }
