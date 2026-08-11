@@ -11,6 +11,9 @@
   anciennes piles de test, fixture Sessions et validation Chromium ;
 - rend le nettoyage compatible avec PowerShell 5.1 lorsque Docker avertit
   qu'une pile de test est déjà absente ;
+- consigne la recette Windows automatisée réussie avec 11 scénarios Chromium ;
+- force les sorties de la recette en UTF-8 pour éviter les caractères mal
+  encodés sous Windows PowerShell 5.1 ;
 - remplace le `datalist` natif par une combobox explicite, ouvrable et filtrable,
   tout en conservant la saisie d'un intitulé inédit ;
 - affiche l'intitulé de session dans les aperçus calendrier, semaine, jour,

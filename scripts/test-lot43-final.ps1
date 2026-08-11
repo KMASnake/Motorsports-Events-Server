@@ -3,6 +3,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$Utf8Encoding = New-Object System.Text.UTF8Encoding $false
+[Console]::OutputEncoding = $Utf8Encoding
+$OutputEncoding = $Utf8Encoding
 $ProjectRoot = Split-Path $PSScriptRoot -Parent
 $ComposeProject = "mse-lot43-final"
 $PreviousTestProjects = @(

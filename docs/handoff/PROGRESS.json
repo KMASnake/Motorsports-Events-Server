@@ -12,9 +12,9 @@
   "current": {
     "lot": "4.3",
     "version": "8.1.0-alpha.2-lot.4.3",
-    "status": "final-audit-and-exact-sha-ci-passed-awaiting-final-recipes",
+    "status": "windows-automated-recipe-passed-awaiting-final-visual-validation",
     "updated_at": "2026-08-11",
-    "implementation_percent": 98,
+    "implementation_percent": 99,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -150,7 +150,7 @@
     "local_matrix": "migrations-api-corrections-ui-lint-typecheck-99-unit-builds-audit-11-chromium-51-historical-passed",
     "ci_corrections": "load-lot43-fixture-before-chromium-and-mask-generated-admin-token",
     "exact_sha_ci": "b055ec8-all-six-github-actions-checks-passed",
-    "windows_recipe": "scripts/test-lot43-final.cmd-ready-awaiting-maintainer-run"
+    "windows_recipe": "scripts/test-lot43-final.cmd-passed-by-maintainer-on-windows-2026-08-11-with-11-chromium-scenarios"
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",

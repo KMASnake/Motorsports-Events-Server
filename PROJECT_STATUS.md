@@ -1,5 +1,13 @@
 # État du projet
 
+## Recette Windows Lot 4.3 — 2026-08-11
+
+Le mainteneur a exécuté `scripts\test-lot43-final.cmd` sur Windows. Le
+nettoyage ciblé, la chaîne qualité, les données synthétiques, les validateurs
+et les 11 scénarios Chromium ont réussi. La pile reste ouverte pour le dernier
+contrôle visuel ; cette preuve automatisée ne vaut pas encore validation finale
+globale du Lot 4.3.
+
 ## Audit final Lot 4.3 — 2026-08-11
 
 L'audit local complet est réussi : migrations, API, corrections, concurrence,

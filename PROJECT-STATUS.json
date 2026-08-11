@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-final-audit-and-exact-sha-ci-passed",
-    "reason": "Lot 4.2 remains the validated baseline. Lot 4.3 passed its complete local audit, targeted VPS visual validation and all six GitHub Actions checks on candidate SHA b055ec8. Final Windows/global recipes and complete maintainer validation remain pending."
+    "status": "lot-4.3-windows-automated-recipe-passed",
+    "reason": "Lot 4.2 remains the validated baseline. Lot 4.3 passed its complete audit, exact-SHA CI, targeted VPS visual validation and the complete automated Windows recipe with 11 Chromium scenarios. Final visual/global maintainer validation remains pending."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,8 +53,8 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "final-audit-and-exact-sha-ci-passed-awaiting-final-recipes",
-    "implementation_percent": 98,
+    "status": "windows-automated-recipe-passed-awaiting-final-visual-validation",
+    "implementation_percent": 99,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": true,
@@ -79,7 +79,7 @@
       "Autonomous Windows Lot 4.3 recipe with targeted cleanup and acceptance fixture"
     ],
     "mandatory_gaps": [
-      "Run Windows and final global acceptance",
+      "Complete final visual and global acceptance",
       "Obtain final explicit maintainer validation"
     ],
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation.",
@@ -131,6 +131,7 @@
     "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
     "lot_4_3_quality": "npm audit zero; typecheck passed; 72 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; 11 Chromium scenarios passed after the explicit combobox and preview correction",
     "lot_4_3_final_audit": "passed locally on 2026-08-11; migrations, APIs, corrections, concurrency, audit rollback, 99 unit tests, builds, 11 Chromium scenarios and 51 historical tests passed; all six GitHub Actions checks passed on exact candidate SHA b055ec8 after CI fixture and token masking corrections",
+    "lot_4_3_windows_recipe": "maintainer ran scripts/test-lot43-final.cmd on Windows on 2026-08-11; cleanup, quality chain, synthetic dataset, Lot 4 validators and 11 Chromium scenarios passed",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."

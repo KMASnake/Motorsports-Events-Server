@@ -83,7 +83,7 @@
 - [x] `npm audit --audit-level=high` sans vulnérabilité bloquante ;
 - [x] CI verte sur le SHA candidat exact `b055ec8` ;
 - [ ] recette VPS Docker isolée ;
-- [ ] recette Windows ;
+- [x] recette Windows automatisée ;
 - [ ] validation explicite du mainteneur.
 
 ## Dette technique Lot 4.2
