@@ -26,21 +26,21 @@
 - [x] remplacer les fixtures et scénarios Chromium devenus obsolètes ;
 - [x] valider visuellement sur VPS la création puis la réutilisation d'un
   intitulé inédit dans la combobox explicite ;
-- [ ] exécuter la recette VPS autonome et la validation visuelle mainteneur ;
+- [x] exécuter les recettes VPS isolées et la validation visuelle mainteneur ;
 - [x] réaliser l'audit final du Lot 4.3 ;
 - [x] obtenir une CI verte sur le SHA candidat exact `b055ec8` ;
 - [x] fournir une recette Windows Lot 4.3 autonome avec nettoyage ciblé ;
 - [x] exécuter la recette Windows automatisée ;
-- [ ] terminer la recette VPS isolée et le contrôle visuel Windows ;
-- [ ] obtenir la validation utilisateur finale du Lot 4.3 ;
-- [ ] poursuivre dans l'ordre défini par
-  `docs/handoff/LOT-4.3-SESSIONS-HANDOFF.md`.
+- [x] terminer les validations VPS isolées et le contrôle visuel Windows ;
+- [x] obtenir la validation utilisateur finale du Lot 4.3 ;
+- [ ] vérifier la CI sur le dernier SHA documentaire puis fusionner la pull
+  request dans `main` ;
+- [ ] préparer le démarrage du lot suivant depuis `main` après passation.
 
-Critère de passage révisé le 2026-08-11 : l'interface multi-sessions a réussi
-ses tests techniques mais ne correspond pas au modèle métier mainteneur. Elle
-est remplacée par un champ unique sur l'Événement. La nouvelle cible est
-techniquement validée à 96 % ; sa combobox corrigée est validée visuellement
-sur VPS et le prochain point d'arrêt est l'audit final avec la recette globale.
+Critère de passage atteint le 2026-08-11 : le modèle « un Événement = une
+Session », sa combobox et ses aperçus ont été validés sur VPS puis dans la
+recette Windows complète. L'implémentation du Lot 4.3 est à 100 % et validée
+explicitement ; le prochain point d'arrêt est la fusion contrôlée dans `main`.
 Les sections
 suivantes sont conservées comme historique des jalons précédents.
 

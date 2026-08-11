@@ -4,7 +4,7 @@ Date : 2026-08-11
 
 Branche : `codex/lot-4.3-sessions`
 
-Statut : audit local et CI du SHA candidat réussis
+Statut : audit, CI candidate et validation utilisateur réussis
 
 ## Périmètre audité
 
@@ -48,5 +48,7 @@ La CI charge désormais explicitement la fixture avant Chromium et appelle
 Aucun défaut métier, migration, API ou interface supplémentaire n'a été trouvé
 pendant l'audit local. Les six contrôles GitHub Actions du SHA candidat
 `b055ec8` sont verts, y compris Node/Chromium, Docker, PostgreSQL et l'artefact
-de livraison. La sortie du lot reste bloquée jusqu'aux recettes finales et à
-la validation explicite du mainteneur.
+de livraison. Après les preuves VPS isolées, le mainteneur a exécuté la recette
+Windows complète avec 11 scénarios Chromium et a explicitement confirmé le
+2026-08-11 que la recette était correcte. Le Lot 4.3 est donc accepté ; seule
+sa fusion contrôlée dans `main` reste à effectuer.

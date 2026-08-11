@@ -2,7 +2,7 @@
 
 Date : 2026-08-11
 
-Statut : candidat techniquement validé, validation mainteneur requise
+Statut : validé explicitement par le mainteneur le 2026-08-11
 
 ## Implémentation
 
@@ -54,6 +54,6 @@ Statut : candidat techniquement validé, validation mainteneur requise
 
 ## État de validation
 
-La validation technique ne vaut pas validation utilisateur. La recette VPS et
-la vérification visuelle du mainteneur restent obligatoires avant le prochain
-audit final.
+Le mainteneur a validé l'intitulé inédit et sa réutilisation sur VPS, puis la
+recette Windows finale et ses 11 scénarios Chromium le 2026-08-11. Cette
+validation explicite clôt l'acceptation fonctionnelle Événement = Session.

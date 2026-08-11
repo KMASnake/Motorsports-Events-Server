@@ -1,5 +1,12 @@
 # Handbook Changelog
 
+## 1.21 — 2026-08-11
+
+- consigne la validation utilisateur explicite du Lot 4.3 ;
+- rattache cette validation aux preuves VPS isolées et à la recette Windows
+  complète réussie avec 11 scénarios Chromium ;
+- autorise la préparation de la fusion sans confondre fusion et validation.
+
 ## 1.20 — 2026-08-11
 
 - remplace le modèle UI multi-sessions par « un Événement = une Session » ;

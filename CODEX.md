@@ -25,6 +25,9 @@ selon la procédure du Handbook.
 - Lot 4.1 : validé par l'utilisateur sur un VPS isolé ;
 - Lot 4.2 : remédiation d'audit terminée et validation globale confirmée après
   contrôle des logos du Tableau de bord le 2026-08-10 ;
+- Lot 4.3 : validation utilisateur finale confirmée le 2026-08-11 après les
+  preuves VPS isolées et la recette Windows complète ; fusion dans `main` en
+  attente ;
 - une fusion dans `main`, une CI verte ou un déploiement technique ne constitue
   jamais à elle seule une validation utilisateur.
 

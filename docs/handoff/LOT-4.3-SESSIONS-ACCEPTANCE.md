@@ -82,9 +82,11 @@
 - [x] scénarios Chromium ;
 - [x] `npm audit --audit-level=high` sans vulnérabilité bloquante ;
 - [x] CI verte sur le SHA candidat exact `b055ec8` ;
-- [ ] recette VPS Docker isolée ;
+- [x] recettes VPS Docker isolées pour migrations, API, corrections et
+  validation visuelle ;
 - [x] recette Windows automatisée ;
-- [ ] validation explicite du mainteneur.
+- [x] validation explicite du mainteneur le 2026-08-11 après réussite de la
+  recette Windows complète.
 
 ## Dette technique Lot 4.2
 
@@ -94,9 +96,11 @@
 
 ## Sortie du lot
 
-Le Lot 4.3 ne peut être déclaré validé ni fusionné tant que les critères
-ci-dessus ne sont pas satisfaits ou explicitement différés par une décision
-documentée conforme au Handbook.
+Le Lot 4.3 est validé explicitement par le mainteneur le 2026-08-11. La preuve
+finale combine les recettes VPS isolées déjà réussies et la recette Windows
+complète (qualité, migrations, API, données synthétiques et 11 scénarios
+Chromium). La fusion dans `main` est autorisée après contrôle de la CI attachée
+au dernier SHA documentaire.
 
 ## Recette Windows finale
 

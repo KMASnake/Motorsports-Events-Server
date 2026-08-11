@@ -2,6 +2,8 @@
 
 ## Lot 4.3 — Révision du modèle Événement/Session
 
+- consigne la validation utilisateur finale du Lot 4.3 le 2026-08-11 ;
+- prépare la passation de fusion avec les preuves VPS et Windows séparées ;
 - clôt l'audit local final et documente sa matrice de preuves ;
 - charge la fixture Lot 4.3 dans la CI avant les scénarios Chromium ;
 - masque le jeton administrateur généré avant son export dans GitHub Actions ;

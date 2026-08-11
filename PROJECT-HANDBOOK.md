@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.20
+## Version 1.21
 
 Ce document est la source de vérité permanente du projet.
 
@@ -160,12 +160,11 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
 validation utilisateur.
 
 ## État
-Lots 4.1 et 4.2 validés par l'utilisateur. Pour le Lot 4.3, l'ADR Sessions et
-le plan de migration ont été validés par le mainteneur ; la migration a ensuite
-été validée sur un VPS isolé. Les API administrative et publique ainsi que les
-Corrections Sessions ont été validées explicitement par le mainteneur sur VPS
-isolé le 2026-08-10. L'interface intégrée est un candidat techniquement validé ;
-le Lot 4.3 complet reste en développement.
+Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves
+VPS isolées des migrations, API, corrections et contrôles visuels avec la
+recette Windows complète réussie le 2026-08-11 (qualité, données synthétiques
+et 11 scénarios Chromium). Il attend sa fusion contrôlée dans `main` ; cette
+fusion ne constitue pas elle-même la validation, déjà acquise explicitement.
 
 ## Règles Codex
 Avant toute modification : lire ce Handbook, `CODEX.md`,

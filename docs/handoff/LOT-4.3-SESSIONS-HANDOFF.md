@@ -111,13 +111,15 @@ L'ADR `docs/handbook/architecture/ADR-0012-SESSIONS-MODEL.md`, le plan détaill�
 et la migration `0004_sessions` sont validés explicitement. La recette VPS a
 conservé l'empreinte Lot 4.2 `cb816e2a25fc9cb3d11f0604b3506c03`.
 
-Avancement réel : 95 %. Les API administrative et publique Sessions et les
+Avancement réel : 100 %. Les API administrative et publique Sessions et les
 contrats partagés ont été validés explicitement par le mainteneur sur VPS isolé
 le 2026-08-10 selon `docs/handoff/LOT-4.3-API-ACCEPTANCE.md`. Les corrections
 applicatives de corrections sont implémentées et validées explicitement par le
-mainteneur sur VPS isolé. L'interface Sessions intégrée est techniquement
-validée. L'audit final, la CI du SHA exact, les recettes VPS/Windows et la
-validation utilisateur finale restent à réaliser.
+mainteneur sur VPS isolé. Après l'audit final et la CI candidate, l'interface
+cible « un Événement = une Session » a été validée sur VPS, puis la recette
+Windows complète et ses 11 scénarios Chromium ont été confirmés par le
+mainteneur le 2026-08-11. Le Lot 4.3 est validé ; sa fusion dans `main` reste à
+effectuer selon `docs/handoff/LOT-4.3-FINAL-HANDOFF.md`.
 
 L'API respecte la décision fonctionnelle ci-dessus : son contrat d'écriture
 utilise un intitulé unique et n'impose pas le couple technique `name`/`type`.
