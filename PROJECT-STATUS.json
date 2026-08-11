@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-11",
+  "generated_at": "2026-08-12",
   "documentation": {
     "permanent_source_of_truth": "PROJECT-HANDBOOK.md",
     "current_lot_progress": "docs/handoff/PROGRESS.json",
@@ -8,115 +8,61 @@
     "lot_4_3_final_audit": "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
     "lot_4_3_final_handoff": "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
     "lot_4_3_post_merge_closure": "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md",
+    "lot_4_4_post_merge_closure": "docs/handoff/LOT-4.4-POST-MERGE-CLOSURE.md",
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
-    "branch": "codex/lot-4.4",
-    "status": "maintainer-validated-ci-green-awaiting-merge",
-    "reason": "Lot 4.4 is fully implemented, explicitly validated by the maintainer on Windows and an isolated VPS, and green in CI and Docker build on commit 27b85ae. Merge authorization remains pending."
+    "branch": "main",
+    "status": "lot-4.4-merged-and-user-validated",
+    "reason": "Lot 4.4 administration authentication was explicitly validated by the maintainer on Windows and isolated VPS, passed CI and Docker build on the final branch SHA, and was merged into main through PR #28 on commit b42a97129a8aa1cb9a42ce01ba0affb8e5a848a1."
   },
   "last_fully_validated_lot": {
-    "lot": "4.3",
-    "version": "8.1.0-alpha.2-lot.4.3",
+    "lot": "4.4",
+    "name": "Administration authentication",
+    "version": "8.1.0-alpha.2-lot.4.4",
     "status": "merged-and-user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "validation_date": "2026-08-11",
+    "validation_date": "2026-08-12",
     "merged_to_main": true,
-    "merge_pr": 27,
-    "merge_commit": "d16e2bbe5698913e2046c1f645819057ed9196b8",
+    "merge_pr": 28,
+    "merge_commit": "b42a97129a8aa1cb9a42ce01ba0affb8e5a848a1",
+    "final_branch_sha": "5428c1bc2c65193e2b0b623297ea366c2ddd196e",
     "evidence": [
-      "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
-      "docs/handoff/LOT-4.3-SESSIONS-ACCEPTANCE.md",
-      "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
-      "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md"
+      "docs/handoff/LOT-4.4-AUTH-ACCEPTANCE.md",
+      "docs/handoff/LOT-4.4-STEP-1-VALIDATION.md",
+      "docs/handoff/LOT-4.4-STEP-2-VALIDATION.md",
+      "docs/handoff/LOT-4.4-STEP-3-VALIDATION.md",
+      "docs/handoff/LOT-4.4-STEP-4-VALIDATION.md",
+      "docs/handoff/LOT-4.4-POST-MERGE-CLOSURE.md"
     ]
   },
-  "completed_lot_4_3": {
+  "completed_lot_4_4": {
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
     "merged_to_main": true,
-    "model_decision": "One Event represents one Session; Event carries one optional editable/createable session_title with origin-free aggregated suggestions.",
-    "validated_capabilities": [
-      "ADR-0012 and ADR-0013 architecture decisions",
-      "Versioned reversible 0004_sessions and 0005_event_session_title migrations",
-      "Read-only application schema verification",
-      "Protected administrative APIs and public redacted projections",
-      "Atomic audit and rollback guarantees",
-      "Typed provider corrections and concurrency serialization",
-      "Single editable/createable session title combobox on Event",
-      "Session title persistence and display in Event previews",
-      "Isolated VPS acceptance",
-      "Windows acceptance with 11 Chromium scenarios",
-      "Exact-SHA CI candidate with all six GitHub Actions checks passing"
-    ]
-  },
-  "working_lot": {
-    "lot": "4.4",
-    "name": "Administration authentication",
-    "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "maintainer-validated-ci-green-awaiting-merge",
-    "implementation_percent": 100,
-    "architecture_percent": 100,
-    "documentation_readiness_percent": 100,
-    "validated_on_user_workstation": true,
-    "validated_on_vps": true,
-    "merged_to_main": false,
-    "phase_0_validated_by_maintainer": true,
-    "phase_0_validation_date": "2026-08-11",
-    "step_1_validated_by_maintainer": true,
-    "step_1_validation_date": "2026-08-11",
-    "step_1_validation_environment": "isolated-vps-docker",
-    "step_2_validated_by_maintainer": true,
-    "step_2_validation_date": "2026-08-11",
-    "step_2_validation_environment": "isolated-vps-docker",
-    "step_3_validated_by_maintainer": true,
-    "step_3_validation_date": "2026-08-11",
-    "step_3_validation_environment": "isolated-vps-chromium",
-    "step_4_candidate_date": "2026-08-12",
-    "step_4_validated_by_maintainer": true,
-    "step_4_validation_date": "2026-08-12",
-    "step_4_validation_environments": [
-      "windows-docker-desktop-chromium",
-      "isolated-vps-docker"
-    ],
-    "ci_validation_commit": "27b85ae467935d44e8d75841830e878eba3b9ea0",
+    "ci_validation_commit": "5428c1bc2c65193e2b0b623297ea366c2ddd196e",
     "ci_validation_status": "ci-and-docker-build-green",
-    "scope": [
+    "validated_capabilities": [
       "Single administrator account",
-      "Initial administrator creation through a dedicated CLI/bootstrap command",
-      "Login page with username and password",
-      "Server-side authenticated sessions",
+      "Initial administrator creation through a dedicated CLI command",
+      "Argon2id password hashing",
+      "Server-side opaque authenticated sessions",
       "HttpOnly Secure SameSite session cookie",
+      "CSRF protection",
       "Protected administration navigation and login redirect",
       "Server-side logout invalidation",
       "Eight-hour absolute session lifetime",
       "One-hour inactivity expiration",
       "Five failed attempts in fifteen minutes followed by a fifteen-minute temporary login block",
-      "Authentication failure and lockout audit without secrets"
-    ],
-    "out_of_scope": [
-      "Multiple administrator accounts",
-      "User administration UI",
-      "Complex role or permission management",
-      "CAPTCHA",
-      "Permanent account lockout",
-      "IP-only blocking",
-      "Provider synchronization implementation"
-    ],
-    "mandatory_constraints": [
-      "Passwords must never be stored or logged in plaintext",
-      "The browser must not receive an HMAC secret or JavaScript-readable authentication JWT",
-      "A successful login resets failed-login counters",
-      "Authentication errors must not disclose whether the administrator account exists",
-      "Logout invalidates the server-side session immediately",
-      "Existing technical HMAC/API authentication remains separate from the human administration login",
-      "No implementation before specification, acceptance criteria and impact analysis are reviewed"
-    ],
-    "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation."
+      "Authentication audit without secrets",
+      "Coexistence with existing technical HMAC authentication",
+      "Windows Docker Desktop Chromium acceptance",
+      "Isolated VPS Docker acceptance"
+    ]
   },
   "planned_after_current": {
     "name": "Providers and API synchronization core",
@@ -131,16 +77,16 @@
     "rule": "Discuss and explicitly validate functional and architectural concepts with the maintainer before updating detailed roadmap or implementation specifications."
   },
   "technical_baseline": {
-    "lot_4_3_final_audit": "passed",
-    "lot_4_3_exact_sha_ci": "green-on-b055ec8",
-    "lot_4_3_windows_validation": "passed-2026-08-11",
-    "lot_4_3_isolated_vps_validation": "passed",
-    "npm_audit": "zero-vulnerabilities-at-final-validation"
+    "lot_4_4_node_tests": "110-passed",
+    "lot_4_4_ci": "CI-198-success-on-5428c1b",
+    "lot_4_4_docker_build": "Docker-build-74-success-on-5428c1b",
+    "lot_4_4_windows_validation": "passed-2026-08-12",
+    "lot_4_4_isolated_vps_validation": "passed-2026-08-12"
   },
   "historical_production": {
     "version": "2.7.0",
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Review draft pull request #28 and wait for explicit merge authorization; merging does not constitute a new user validation."
+  "next_action": "Discuss and validate the Providers and API synchronization concepts with the maintainer before changing the detailed roadmap or starting implementation."
 }
