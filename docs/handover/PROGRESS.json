@@ -12,10 +12,12 @@
   },
   "current": {
     "lot": "4.4",
+    "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
     "status": "phase-0-specification-complete-awaiting-maintainer-validation",
     "updated_at": "2026-08-11",
     "implementation_percent": 0,
+    "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
@@ -24,7 +26,7 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Use docs/handoff/PROGRESS.json as the canonical current-lot tracker; this file is only a compatibility mirror.",
+    "task": "Review and explicitly validate the Lot 4.4 authentication Phase 0 documents; use docs/handoff/PROGRESS.json as the canonical tracker.",
     "target_visual_fidelity": 98
   }
 }

@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.22 — 2026-08-11
+
+- clôt le Lot 4 fonctionnel et retire la duplication du périmètre futur ;
+- consigne les décisions fonctionnelles d'authentification humaine du Lot 4.4 ;
+- propose Argon2id, sessions PostgreSQL opaques et CSRF signé lié à la session ;
+- conserve le HMAC comme mécanisme technique séparé ;
+- ajoute l'ADR-0014 et le plan proposé de migration `0006`.
+
 ## 1.21 — 2026-08-11
 
 - consigne la validation utilisateur explicite du Lot 4.3 ;

@@ -11,9 +11,9 @@
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
-    "branch": "main",
-    "status": "lot-4-complete-authentication-next",
-    "reason": "Lot 4.3 is merged and user-validated and the maintainer considers Lot 4 functionally complete. Existing Event duplication is satisfactory. The next implementation lot is administration authentication; provider synchronization follows after separate maintainer design discussion."
+    "branch": "codex/lot-4.4",
+    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
+    "reason": "Lot 4 is functionally complete and existing Event duplication is satisfactory. Lot 4.4 authentication Phase 0 is documented without application implementation and awaits explicit maintainer validation."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -58,9 +58,10 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "functional-decisions-approved-specification-pending",
+    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
     "implementation_percent": 0,
-    "architecture_percent": 0,
+    "architecture_percent": 100,
+    "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -121,5 +122,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Prepare the Lot 4.4 authentication specification, acceptance criteria and impact analysis from the maintainer-approved functional decisions; do not implement authentication code before framing review."
+  "next_action": "Wait for explicit maintainer validation of the Lot 4.4 authentication Phase 0 documents; do not implement authentication code, routes, migrations or interface before that validation."
 }

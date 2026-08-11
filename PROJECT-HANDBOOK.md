@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.21
+## Version 1.22
 
 Ce document est la source de vérité permanente du projet.
 
@@ -30,6 +30,19 @@ aucun jeton n'est embarqué dans le bundle Web. Voir
 `docs/handbook/architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.
 Les mutations historiques de championnats suivent la même protection tandis
 que leur lecture reste publique.
+
+### Authentification humaine de la console
+
+Le Lot 4.4 prépare une connexion humaine distincte du HMAC technique : compte
+administrateur unique, mot de passe Argon2id, session opaque côté serveur dans
+PostgreSQL et cookie HttpOnly. Les décisions fonctionnelles sont acquises ;
+l'architecture détaillée reste proposée jusqu'à validation de l'ADR-0014.
+
+La session expire après une heure d'inactivité et au plus tard après huit
+heures. Le logout révoque côté serveur. Les mutations par cookie utilisent une
+protection CSRF dédiée ; SameSite n'est jamais l'unique protection. Aucun mot
+de passe, hash, cookie, token de session ou secret HMAC n'est exposé au Web,
+aux logs ou à l'audit.
 
 Les listes administratives sont paginées côté serveur après validation,
 filtrage et tri. Toute mutation sensible est journalisée avec son acteur, son
