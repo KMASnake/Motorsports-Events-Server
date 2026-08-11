@@ -14,9 +14,9 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-2-validated-ready-for-step-3",
+    "status": "step-3-ui-implemented-awaiting-maintainer-validation",
     "updated_at": "2026-08-11",
-    "implementation_percent": 50,
+    "implementation_percent": 75,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -32,7 +32,7 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Implement Lot 4.4 step 3; use docs/handoff/PROGRESS.json as the canonical tracker.",
+    "task": "Validate Lot 4.4 step 3 with the canonical Chromium recipe; use docs/handoff/PROGRESS.json as the canonical tracker.",
     "target_visual_fidelity": 98
   }
 }

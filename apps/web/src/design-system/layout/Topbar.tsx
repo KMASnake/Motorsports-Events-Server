@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { IconButton } from '../components';
 import { MedsIcon } from './icons';
+import { useAdminAuth } from '../../lib/adminAuth';
 
 function formatClock(date: Date) {
   return new Intl.DateTimeFormat('fr-FR', {
@@ -13,6 +14,8 @@ function formatClock(date: Date) {
 }
 
 export function Topbar({ onMenu }: { onMenu: () => void }) {
+  const auth = useAdminAuth();
+  const [logoutFailed, setLogoutFailed] = useState(false);
   const [clock, setClock] = useState(() => formatClock(new Date()));
 
   useEffect(() => {
@@ -50,10 +53,10 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
 
       <div className="avatar" aria-hidden="true">●</div>
       <div className="user">
-        <b>admin@example.com</b>
-        <span>Super Administrateur</span>
+        <b>{auth.session?.administrator.username}</b>
+        <span>Administrateur</span>
       </div>
-      <MedsIcon name="chevron" size={14} />
+      <button className="logout-button" title={logoutFailed ? 'La déconnexion a échoué. Réessayez.' : undefined} onClick={() => { setLogoutFailed(false); void auth.logout().catch(() => setLogoutFailed(true)); }} aria-label="Se déconnecter">{logoutFailed ? 'Réessayer' : 'Déconnexion'}</button>
     </header>
   );
 }

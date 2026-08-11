@@ -21,9 +21,9 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-2-validated-ready-for-step-3",
+    "status": "step-3-ui-implemented-awaiting-maintainer-validation",
     "updated_at": "2026-08-11",
-    "implementation_percent": 50,
+    "implementation_percent": 75,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -47,7 +47,7 @@
     "note": "Existing Event duplication is satisfactory to the maintainer and requires no dedicated follow-up lot."
   },
   "lot_4_4_authentication": {
-    "status": "step-2-validated-ready-for-step-3",
+    "status": "step-3-ui-implemented-awaiting-maintainer-validation",
     "implementation_started": true,
     "decisions": [
       "One administrator account for the initial version",
@@ -83,7 +83,8 @@
     ],
     "user_validation": "step-2-confirmed-2026-08-11",
     "step_1_evidence": "docs/handoff/LOT-4.4-STEP-1-VALIDATION.md",
-    "step_2_evidence": "docs/handoff/LOT-4.4-STEP-2-VALIDATION.md"
+    "step_2_evidence": "docs/handoff/LOT-4.4-STEP-2-VALIDATION.md",
+    "step_3_evidence": "docs/handoff/LOT-4.4-STEP-3-VALIDATION.md"
   },
   "planned_after_authentication": {
     "name": "Providers and API synchronization core",
@@ -111,7 +112,7 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Implement and independently validate step 3: React login, session bootstrap, route protection, cookie/CSRF client and logout UX.",
+    "task": "Run and explicitly validate the isolated Chromium recipe for Lot 4.4 step 3 before final hardening.",
     "target_visual_fidelity": 98
   }
 }

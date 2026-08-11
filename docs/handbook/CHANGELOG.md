@@ -17,6 +17,9 @@
   expirations, anti-bruteforce, CSRF, audit et coexistence HMAC.
 - consigne la réussite de la recette API Docker VPS et la validation explicite
   de l'étape 2 par le mainteneur.
+- implémente l'étape 3 Web : `/login`, restauration de session, navigation
+  protégée, client cookie/CSRF et déconnexion sans stockage de jeton JavaScript.
+- migre les recettes Chromium historiques vers la connexion humaine.
 
 ## 1.21 — 2026-08-11
 

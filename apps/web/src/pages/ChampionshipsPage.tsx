@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { PageHeader, Panel, StatusChip as Pill } from '../design-system';
 import { assetRegistry } from '../assets/assetRegistry';
-import { adminAuthorization } from '../lib/adminAuth';
+import { adminAuthorization, notifyAuthenticationRequired } from '../lib/adminAuth';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
@@ -45,10 +45,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   const response = await fetch(`${API}${path}`, {
     ...init,
+    credentials: 'include',
     headers
   });
 
   if (!response.ok) {
+    if (response.status === 401) notifyAuthenticationRequired();
     const payload = await response
       .json()
       .catch(() => ({ message: response.statusText }));
