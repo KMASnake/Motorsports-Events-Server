@@ -9,22 +9,35 @@ Le Lot 4.3 est clos, validé utilisateur et fusionné dans `main` via la PR #27 
 
 Le Lot 4.4 doit démarrer depuis le `main` post-fusion. Aucun développement ne doit commencer avant validation explicite du cadrage fonctionnel et technique ci-dessous.
 
-## Objectif proposé
+## Décision mainteneur — périmètre définitif du Lot 4.4
 
-Faire évoluer les opérations de calendrier autour du modèle désormais stabilisé « un Événement = une Session », sans remettre en cause les décisions des Lots 4.2 et 4.3.
+Le Lot 4.4 est exclusivement consacré à la **duplication d'Événements**.
 
-Axes à cadrer avant implémentation :
+Sont explicitement hors périmètre :
 
-- duplication avancée d'un événement ;
-- éventuelle création répétée/récurrente d'événements ;
-- détection et présentation des conflits/chevauchements ;
-- comportement des données fournisseur et overrides lors d'une duplication ;
-- ergonomie calendrier associée ;
-- garanties UTC, minuit et DST ;
-- audit et sécurité des mutations administratives ;
-- non-régression du champ unique `session_title`.
+- récurrence ;
+- création récurrente ou en série ;
+- moteur de règles de récurrence ;
+- gestion des conflits ;
+- détection de chevauchements ;
+- avertissements ou blocages fondés sur des chevauchements temporels.
 
-Ces axes sont une **proposition de cadrage**, pas encore une spécification autorisant le code.
+Ces fonctions ne doivent pas être analysées, spécifiées ni implémentées dans le Lot 4.4.
+
+## Objectif
+
+Permettre à un administrateur de créer rapidement un nouvel Événement à partir d'un Événement existant tout en conservant le modèle validé « un Événement = une Session ».
+
+Le parcours cible à privilégier est :
+
+1. sélectionner un Événement existant ;
+2. choisir `Dupliquer` ;
+3. ouvrir le formulaire Événement existant prérempli avec les données métier copiables ;
+4. permettre à l'utilisateur de modifier les champs souhaités, notamment date, heure, championnat, circuit, intitulé et `session_title` ;
+5. ne créer le nouvel Événement qu'après validation explicite du formulaire ;
+6. rendre la copie totalement indépendante de l'Événement source.
+
+Une duplication immédiate en base sans étape de vérification utilisateur n'est pas la cible privilégiée.
 
 ## Décisions Lot 4.3 à préserver
 
@@ -40,61 +53,111 @@ Ces axes sont une **proposition de cadrage**, pas encore une spécification auto
 - mutations sensibles auditées ;
 - migrations versionnées, réversibles et séparées du démarrage API.
 
+## Règles de duplication à cadrer
+
+La Phase 0 doit décider précisément quels champs sont préremplis et lesquels sont régénérés ou supprimés.
+
+À étudier obligatoirement :
+
+- nom de l'Événement ;
+- championnat ;
+- circuit ;
+- sport si applicable ;
+- `session_title` ;
+- date et heure ;
+- statut ;
+- publication ;
+- description ;
+- durée / date de fin si applicable ;
+- slug ;
+- identifiant interne ;
+- origine ;
+- `provider_key` ;
+- `external_id` ;
+- corrections et overrides ;
+- journal d'audit.
+
+Principe attendu : une copie issue d'un Événement fournisseur devient un nouvel Événement manuel indépendant. Les identifiants fournisseur, identifiants externes et corrections de l'Événement source ne doivent pas être copiés vers le nouvel Événement.
+
+Le slug et les identifiants internes doivent être générés par le serveur selon les règles existantes.
+
 ## Phase 0 obligatoire
 
 Avant toute modification applicative, Codex doit produire :
 
 1. `docs/handoff/LOT-4.4-SPEC.md` ;
 2. `docs/handoff/LOT-4.4-ACCEPTANCE.md` ;
-3. une analyse d'impact base/API/Web/tests ;
-4. un ADR uniquement si une nouvelle décision architecturale permanente est nécessaire ;
-5. un plan de migration si le schéma doit évoluer ;
+3. `docs/handoff/LOT-4.4-IMPACT-ANALYSIS.md` ;
+4. un ADR uniquement si une nouvelle décision architecturale permanente est réellement nécessaire ;
+5. un plan de migration uniquement si le schéma doit réellement évoluer ;
 6. une stratégie de données synthétiques et de non-régression ;
 7. un découpage en étapes auditables avec point d'arrêt après chaque étape importante.
 
-## Questions à trancher dans la spécification
+Aucune migration ne doit être créée pendant la Phase 0.
 
-### Duplication
+## UX à privilégier
 
-- quels champs sont copiés ?
-- quelle nouvelle date/heure est appliquée ?
-- un événement fournisseur dupliqué devient-il obligatoirement manuel ?
-- les overrides/corrections sont-ils exclus de la copie ?
-- comment traiter slug, identifiants externes et métadonnées techniques ?
+Réutiliser le formulaire Événement existant.
 
-### Récurrence
+Le bouton ou l'action `Dupliquer` peut être disponible depuis les endroits pertinents déjà existants, notamment :
 
-- la récurrence est-elle une aide à la création en série ou un objet métier persistant ?
-- quelles fréquences sont réellement nécessaires ?
-- comment gérer exceptions et modifications d'une occurrence ?
-- comment garantir UTC/DST sans dérive horaire ?
+- détail d'un Événement ;
+- liste des Événements ;
+- calendrier si cela reste cohérent avec l'UX actuelle.
 
-### Conflits
+Ne pas créer une nouvelle page uniquement pour la duplication si le formulaire Événement suffit.
 
-- un chevauchement doit-il seulement avertir ou pouvoir bloquer ?
-- quels événements sont comparés : même championnat, même circuit, même sport, tous ?
-- quelles informations doivent être présentées à l'administrateur ?
-- comment distinguer conflit métier et simple chevauchement volontaire ?
+Le formulaire prérempli doit clairement représenter un **nouvel Événement non encore enregistré**.
+
+## API à étudier
+
+La Phase 0 doit comparer au minimum :
+
+- duplication purement côté Web par préremplissage du formulaire puis utilisation du POST Event existant ;
+- éventuel endpoint spécialisé de duplication si une logique serveur supplémentaire le justifie réellement.
+
+Privilégier la solution la plus simple qui respecte les règles métier, de sécurité, d'audit et d'indépendance de la copie.
+
+Aucune nouvelle route ne doit être créée pendant la Phase 0.
+
+## Base de données
+
+Ne pas ajouter de table ou colonne si la duplication peut fonctionner proprement avec le modèle Event existant.
+
+Toute proposition de migration doit démontrer qu'elle est indispensable et fournir avant implémentation :
+
+- justification ;
+- stratégie UP ;
+- idempotence ;
+- stratégie DOWN ;
+- risques ;
+- compatibilité Lot 4.3.
 
 ## Tests minimum à prévoir
 
-- duplication simple ;
-- duplication d'un événement fournisseur sans copier ses métadonnées techniques ;
-- conservation de `session_title` ;
-- nouvelle valeur de date avec offset explicite ;
-- minuit ;
-- DST ;
-- chevauchements volontaires ;
-- conflits détectés ;
-- rollback sur erreur ;
-- sécurité 401/403/admin ;
+- duplication d'un Événement manuel ;
+- duplication d'un Événement fournisseur ;
+- copie indépendante de la source ;
+- conservation de `session_title` dans le formulaire prérempli ;
+- possibilité de modifier `session_title` avant création ;
+- absence de `provider_key` et `external_id` sur la copie manuelle ;
+- absence de copie des corrections/overrides de la source ;
+- nouvel ID ;
+- nouveau slug généré ;
+- date avec offset explicite et stockage UTC ;
+- cas minuit et DST pour la date choisie ;
+- annulation du formulaire sans création ;
+- échec de création sans événement partiellement persisté ;
+- sécurité 401/403/admin côté mutation existante ou éventuelle route dédiée ;
 - audit sans secret ;
 - non-régression Events/Corrections/Calendrier du Lot 4.2 ;
 - non-régression du modèle Event-as-Session du Lot 4.3 ;
 - Chromium sur les parcours réellement ajoutés.
 
+Aucun test de récurrence, de conflit ou de chevauchement ne fait partie du Lot 4.4.
+
 ## Point d'arrêt
 
-La première tâche du Lot 4.4 est **le cadrage**, pas le code.
+La première tâche du Lot 4.4 est **le cadrage de la duplication**, pas le code.
 
 Après production de la SPEC, des critères d'acceptation et de l'analyse d'impact : **STOP** et demander validation du mainteneur avant implémentation.
