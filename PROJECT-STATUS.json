@@ -8,12 +8,12 @@
     "lot_4_3_final_audit": "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
     "lot_4_3_final_handoff": "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
     "lot_4_3_post_merge_closure": "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md",
-    "lot_4_4_preparation": "docs/handoff/LOT-4.4-PREPARATION.md"
+    "lot_4_4_preparation": "docs/handoff/LOT-4.4-KICKOFF.md"
   },
   "repository_state": {
     "branch": "main",
     "status": "lot-4.3-merged-and-user-validated",
-    "reason": "Lot 4.3 was explicitly user-validated after isolated VPS and Windows acceptance, then merged into main through PR #27 on commit d16e2bbe5698913e2046c1f645819057ed9196b8. Lot 4.4 is prepared but not started."
+    "reason": "Lot 4.3 was explicitly user-validated after isolated VPS and Windows acceptance, then merged into main through PR #27 on commit d16e2bbe5698913e2046c1f645819057ed9196b8. Lot 4.4 is prepared but not started and is limited to Event duplication."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -72,18 +72,24 @@
     "validated_on_vps": false,
     "merged_to_main": false,
     "scope": [
-      "Advanced Event duplication",
-      "Recurring or series creation where explicitly specified",
-      "Conflict and overlap detection/management"
+      "Advanced Event duplication through the existing Event workflow"
+    ],
+    "out_of_scope": [
+      "Recurrence",
+      "Recurring or series creation",
+      "Conflict management",
+      "Overlap detection or warnings"
     ],
     "mandatory_constraints": [
       "Preserve the Lot 4.3 model: one Event represents one Session",
       "Keep session_title as the single session business label",
       "Do not reintroduce the superseded multi-session UI",
+      "A duplicated provider Event becomes an independent manual Event without provider identifiers or copied corrections",
+      "Prefer opening the existing Event form prefilled before persistence rather than immediate database duplication",
       "Produce specification, acceptance criteria and impact analysis before implementation",
       "Do not modify validated Lot 4.3 migrations without a new explicit migration decision"
     ],
-    "reference": "docs/handoff/LOT-4.4-PREPARATION.md",
+    "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
     "validation_rule": "A merge, green CI, build or technical deployment does not constitute user validation."
   },
   "technical_baseline": {
@@ -102,5 +108,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Start Lot 4.4 with specification, acceptance criteria and impact analysis only; do not implement functional code before that framing is reviewed."
+  "next_action": "Start Lot 4.4 Phase 0 for Event duplication only: specification, acceptance criteria and impact analysis; do not implement functional code before that framing is reviewed."
 }
