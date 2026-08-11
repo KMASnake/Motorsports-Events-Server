@@ -9,7 +9,9 @@ $OutputEncoding = $Utf8Encoding
 $ProjectRoot = Split-Path $PSScriptRoot -Parent
 $ComposeProject = "mse-lot43-final"
 $PreviousTestProjects = @(
+    "mse-lot42-test",
     "mse-lot42-final",
+    "mse-lot43-test",
     "mse-lot43-manual",
     "mse-lot43-ui",
     "mse-lot43-api",

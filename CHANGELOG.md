@@ -14,6 +14,8 @@
 - consigne la recette Windows automatisée réussie avec 11 scénarios Chromium ;
 - force les sorties de la recette en UTF-8 pour éviter les caractères mal
   encodés sous Windows PowerShell 5.1 ;
+- ajoute les anciennes piles `mse-lot42-test` et `mse-lot43-test` au nettoyage
+  ciblé afin d'éviter de rouvrir une interface obsolète sur les ports 3200/3201 ;
 - remplace le `datalist` natif par une combobox explicite, ouvrable et filtrable,
   tout en conservant la saisie d'un intitulé inédit ;
 - affiche l'intitulé de session dans les aperçus calendrier, semaine, jour,
