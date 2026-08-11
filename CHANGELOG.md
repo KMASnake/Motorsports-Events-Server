@@ -9,6 +9,8 @@
   `b055ec8` ;
 - ajoute la recette Windows finale du Lot 4.3 avec nettoyage ciblé des
   anciennes piles de test, fixture Sessions et validation Chromium ;
+- rend le nettoyage compatible avec PowerShell 5.1 lorsque Docker avertit
+  qu'une pile de test est déjà absente ;
 - remplace le `datalist` natif par une combobox explicite, ouvrable et filtrable,
   tout en conservant la saisie d'un intitulé inédit ;
 - affiche l'intitulé de session dans les aperçus calendrier, semaine, jour,

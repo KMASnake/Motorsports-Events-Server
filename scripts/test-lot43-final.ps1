@@ -24,8 +24,10 @@ function Invoke-Checked {
 function Remove-TestProjects {
     foreach ($Project in $PreviousTestProjects) {
         Write-Host "Nettoyage de la pile de test $Project..."
-        docker compose --project-name $Project down --volumes --remove-orphans 2>$null
-        if ($LASTEXITCODE -ne 0) {
+        $DockerCleanup = Start-Process -FilePath "docker" `
+            -ArgumentList @("compose", "--project-name", $Project, "down", "--volumes", "--remove-orphans") `
+            -NoNewWindow -Wait -PassThru
+        if ($DockerCleanup.ExitCode -ne 0) {
             throw "Le nettoyage Docker de $Project a échoué."
         }
     }
