@@ -2,7 +2,22 @@
 
 Date : 2026-08-11
 
-Statut : `phase-0-specification-complete-awaiting-maintainer-validation`
+Statut : `step-4-candidate-awaiting-maintainer-validation`
+
+## État de couverture — 2026-08-12
+
+Les étapes 0 à 3 ont été validées explicitement par le mainteneur. L'étape 4
+est candidate : les recettes finales couvrent le durcissement API, la session
+humaine, le bootstrap CI, le contrôle Chromium et les régressions techniques.
+La validation mainteneur et la CI verte sur le SHA final restent requises avant
+toute fusion dans `main`.
+
+Preuves associées :
+
+- `docs/handoff/LOT-4.4-STEP-1-VALIDATION.md` ;
+- `docs/handoff/LOT-4.4-STEP-2-VALIDATION.md` ;
+- `docs/handoff/LOT-4.4-STEP-3-VALIDATION.md` ;
+- `docs/handoff/LOT-4.4-STEP-4-VALIDATION.md`.
 
 ## Phase 0
 

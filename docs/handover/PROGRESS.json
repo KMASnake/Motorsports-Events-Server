@@ -14,9 +14,9 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-3-validated-ready-for-step-4",
-    "updated_at": "2026-08-11",
-    "implementation_percent": 75,
+    "status": "step-4-candidate-awaiting-maintainer-validation",
+    "updated_at": "2026-08-12",
+    "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -30,11 +30,13 @@
     "step_2_validation_date": "2026-08-11",
     "step_3_validated_by_maintainer": true,
     "step_3_validation_date": "2026-08-11",
+    "step_4_candidate_date": "2026-08-12",
+    "step_4_validated_by_maintainer": false,
     "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Perform Lot 4.4 step 4 hardening and final validation; use docs/handoff/PROGRESS.json as the canonical tracker.",
+    "task": "Run Lot 4.4 final validation, confirm CI, then wait for explicit maintainer validation before merge; use docs/handoff/PROGRESS.json as the canonical tracker.",
     "target_visual_fidelity": 98
   }
 }

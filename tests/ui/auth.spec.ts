@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Authentification administration Lot 4.4', () => {
   test('protège la console, restaure la destination et révoque au logout', async ({ page }) => {
+    const adminPassword = process.env.ADMIN_PASSWORD ?? 'correct horse battery staple';
     await page.goto('/events?view=list');
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByRole('heading', { name: 'Connexion' })).toBeVisible();
@@ -12,7 +13,7 @@ test.describe('Authentification administration Lot 4.4', () => {
     await page.getByRole('button', { name: 'Se connecter' }).click();
     await expect(page.getByRole('alert')).toContainText('Identifiant ou mot de passe incorrect');
 
-    await page.getByLabel('Mot de passe').fill('correct horse battery staple');
+    await page.getByLabel('Mot de passe').fill(adminPassword);
     await page.getByRole('button', { name: 'Se connecter' }).click();
     await expect(page).toHaveURL(/\/events\?view=list$/);
     await expect(page.locator('.app-shell')).toBeVisible();

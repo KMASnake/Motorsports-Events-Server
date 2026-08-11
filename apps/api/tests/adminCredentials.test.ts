@@ -26,4 +26,13 @@ describe('administrator credentials', () => {
     await expect(verifyAdminPassword(hash, password)).resolves.toBe(true);
     await expect(verifyAdminPassword(hash, 'incorrect password')).resolves.toBe(false);
   });
+
+  it('uses a distinct random salt for the same password', async () => {
+    const password = 'another sufficiently long password';
+    const first = await hashAdminPassword(password);
+    const second = await hashAdminPassword(password);
+    expect(first).not.toBe(second);
+    await expect(verifyAdminPassword(first, password)).resolves.toBe(true);
+    await expect(verifyAdminPassword(second, password)).resolves.toBe(true);
+  });
 });

@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.23 — 2026-08-12
+
+- prépare le Lot 4.4 comme candidat de validation finale ;
+- ajoute les recettes finales Windows et VPS pour l'authentification ;
+- rappelle que la CI et la fusion ne valent pas validation mainteneur.
+
 ## 1.22 — 2026-08-11
 
 - clôt le Lot 4 fonctionnel et retire la duplication du périmètre futur ;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { constantTimeTokenEqual, createCsrfToken, verifyCsrfToken } from '../src/lib/adminSession.js';
-import { adminCookieConfig, parseCookies } from '../src/lib/adminCookies.js';
+import { adminCookieConfig, parseCookies, setAdminCookies } from '../src/lib/adminCookies.js';
 
 describe('human administrator session primitives', () => {
   it('binds a signed CSRF token to one server session', () => {
@@ -36,5 +36,21 @@ describe('human administrator session primitives', () => {
   it('parses cookies without throwing on invalid encoding', () => {
     const request = { headers: { cookie: 'valid=value; broken=%ZZ' } } as never;
     expect(parseCookies(request)).toEqual({ valid: 'value' });
+  });
+
+  it('sets production session and CSRF cookies with the required attributes', () => {
+    let header: unknown;
+    const reply = { header(_name: string, value: unknown) { header = value; } } as never;
+    const config = { secure: true, sessionName: '__Host-mse_admin_session', csrfName: '__Host-mse_admin_csrf' };
+    setAdminCookies(reply, config, 'opaque-session', 'signed-csrf');
+    const cookies = header as string[];
+    expect(cookies[0]).toContain('__Host-mse_admin_session=opaque-session');
+    expect(cookies[0]).toContain('; HttpOnly');
+    expect(cookies[0]).toContain('; Secure');
+    expect(cookies[0]).toContain('; SameSite=Lax');
+    expect(cookies[0]).toContain('; Path=/');
+    expect(cookies[0]).not.toContain('Domain=');
+    expect(cookies[1]).not.toContain('HttpOnly');
+    expect(cookies[1]).toContain('; Secure');
   });
 });

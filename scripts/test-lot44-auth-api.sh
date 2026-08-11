@@ -38,6 +38,13 @@ login() {
     "http://127.0.0.1:$API_PORT/api/v1/auth/login"
 }
 
+login_as() {
+  curl -sS -c "$TMP_DIR/cookies" -o "$TMP_DIR/login.json" -w '%{http_code}' \
+    -H 'Content-Type: application/json' -H "Origin: $ORIGIN" \
+    -d "{\"username\":\"$1\",\"password\":\"$2\"}" \
+    "http://127.0.0.1:$API_PORT/api/v1/auth/login"
+}
+
 echo "Démarrage de la pile isolée Lot 4.4 étape 2..."
 docker compose down --volumes --remove-orphans >/dev/null 2>&1 || true
 docker compose up -d --wait postgres >/dev/null
@@ -65,9 +72,20 @@ assert value.get("idle_expires_at") and value.get("absolute_expires_at")' "$TMP_
 csrf=$(awk '$6=="mse_admin_csrf" {print $7}' "$TMP_DIR/cookies")
 [ -n "$csrf" ]
 grep -q 'mse_admin_session' "$TMP_DIR/cookies"
+[ "$(sql "select count(*) from admin_sessions where octet_length(token_hash)=32")" = "1" ]
 echo "Login, réponse publique et cookies locaux : OK"
 
 [ "$(request_code -b "$TMP_DIR/cookies" "http://127.0.0.1:$API_PORT/api/v1/auth/session")" = "200" ]
+before_idle=$(sql "select extract(epoch from idle_expires_at)::bigint from admin_sessions where revoked_at is null")
+sleep 1
+[ "$(request_code -b "$TMP_DIR/cookies" "http://127.0.0.1:$API_PORT/api/v1/auth/session")" = "200" ]
+after_idle=$(sql "select extract(epoch from idle_expires_at)::bigint from admin_sessions where revoked_at is null")
+[ "$after_idle" -gt "$before_idle" ]
+[ "$(sql "select idle_expires_at<=absolute_expires_at from admin_sessions where revoked_at is null")" = "t" ]
+[ "$(request_code -X POST -b "$TMP_DIR/cookies" -H "Origin: $ORIGIN" -H 'X-CSRF-Token: altered' \
+  "http://127.0.0.1:$API_PORT/api/v1/auth/logout")" = "403" ]
+[ "$(request_code -X POST -b "$TMP_DIR/cookies" -H 'Origin: https://evil.invalid' -H "X-CSRF-Token: $csrf" \
+  "http://127.0.0.1:$API_PORT/api/v1/auth/logout")" = "403" ]
 [ "$(request_code -b "$TMP_DIR/cookies" "http://127.0.0.1:$API_PORT/api/v1/admin/events?page=1&page_size=10")" = "200" ]
 [ "$(request_code -b "$TMP_DIR/cookies" -H 'Authorization: Bearer invalid' \
   "http://127.0.0.1:$API_PORT/api/v1/admin/events?page=1&page_size=10")" = "401" ]
@@ -78,15 +96,27 @@ echo "Login, réponse publique et cookies locaux : OK"
 [ "$(request_code -b "$TMP_DIR/cookies" "http://127.0.0.1:$API_PORT/api/v1/auth/session")" = "401" ]
 echo "Session, priorité Authorization, CSRF et logout : OK"
 
+[ "$(login_as 'unknown-admin' 'wrong password for unknown user')" = "401" ]
+sql "update admin_login_guard set failed_attempts=0,window_started_at=null,blocked_until=null"
 for attempt in 1 2 3 4; do
   [ "$(login 'incorrect password value')" = "401" ]
 done
-[ "$(login 'incorrect password value')" = "429" ]
+blocked_headers="$TMP_DIR/blocked-headers"
+[ "$(curl -sS -D "$blocked_headers" -o "$TMP_DIR/body" -w '%{http_code}' -H 'Content-Type: application/json' -H "Origin: $ORIGIN" \
+  -d '{"username":"admin","password":"incorrect password value"}' "http://127.0.0.1:$API_PORT/api/v1/auth/login")" = "429" ]
+grep -qi '^retry-after: 900' "$blocked_headers"
 [ "$(login 'correct horse battery staple')" = "429" ]
 [ "$(sql "select failed_attempts=5 and blocked_until>now() from admin_login_guard")" = "t" ]
 sql "update admin_login_guard set blocked_until=now()-interval '1 second'"
 [ "$(login 'correct horse battery staple')" = "200" ]
 [ "$(sql "select failed_attempts=0 and window_started_at is null and blocked_until is null from admin_login_guard")" = "t" ]
+docker compose restart api >/dev/null
+for attempt in $(seq 1 30); do
+  curl -fsS "http://127.0.0.1:$API_PORT/health" >/dev/null 2>&1 && break
+  [ "$attempt" -lt 30 ] || { echo "API non opérationnelle après redémarrage" >&2; exit 1; }
+  sleep 1
+done
+[ "$(request_code -b "$TMP_DIR/cookies" "http://127.0.0.1:$API_PORT/api/v1/auth/session")" = "200" ]
 echo "Anti-bruteforce et réinitialisation après succès : OK"
 
 sql "update admin_sessions set idle_expires_at=created_at where revoked_at is null"
@@ -102,6 +132,13 @@ signature=base64.urlsafe_b64encode(hmac.new(os.environ["ADMIN_AUTH_SECRET"].enco
 print(f"{payload}.{signature}")')
 [ "$(request_code -H "Authorization: Bearer $technical_token" \
   "http://127.0.0.1:$API_PORT/api/v1/admin/events?page=1&page_size=10")" = "200" ]
+viewer_token=$(ADMIN_ROLE=viewer python3 -c 'import base64,hashlib,hmac,json,os,time
+payload=base64.urlsafe_b64encode(json.dumps({"sub":"vps-viewer","role":os.environ["ADMIN_ROLE"],"exp":int(time.time())+3600},separators=(",",":")).encode()).rstrip(b"=").decode()
+signature=base64.urlsafe_b64encode(hmac.new(os.environ["ADMIN_AUTH_SECRET"].encode(),payload.encode(),hashlib.sha256).digest()).rstrip(b"=").decode()
+print(f"{payload}.{signature}")')
+[ "$(request_code -H "Authorization: Bearer $viewer_token" \
+  "http://127.0.0.1:$API_PORT/api/v1/admin/events?page=1&page_size=10")" = "403" ]
+[ "$(request_code "http://127.0.0.1:$API_PORT/api/v1/events")" = "200" ]
 [ "$(sql "select count(*)>=1 from admin_audit_log where action='auth.login_succeeded'")" = "t" ]
 [ "$(sql "select count(*)>=4 from admin_audit_log where action='auth.login_failed'")" = "t" ]
 [ "$(sql "select count(*)>=1 from admin_audit_log where action='auth.login_blocked'")" = "t" ]
