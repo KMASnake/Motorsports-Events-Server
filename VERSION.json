@@ -3,7 +3,7 @@
   "series": "8.1.0-alpha.2",
   "lot": 4,
   "revision": 4,
-  "status": "maintainer-validated-awaiting-merge",
+  "status": "maintainer-validated-ci-green-awaiting-merge",
   "scope": [
     "event CRUD",
     "public events API",

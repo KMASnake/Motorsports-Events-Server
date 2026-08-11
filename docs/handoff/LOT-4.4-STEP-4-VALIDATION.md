@@ -2,7 +2,7 @@
 
 Date : 2026-08-12
 
-Statut : `maintainer-validated-awaiting-merge`
+Statut : `maintainer-validated-ci-green-awaiting-merge`
 
 Validation mainteneur : réalisée le 2026-08-12 sur Windows avec Docker Desktop
 et Chromium, puis sur un VPS Docker isolé. Cette validation est distincte de
@@ -26,6 +26,12 @@ est désormais alignée sur `http://127.0.0.1:3000` et bootstrappe le compte via
 le conteneur API déjà démarré. Le bundle Web CI utilise également
 `VITE_API_URL=http://127.0.0.1:3001`, afin que le cookie de session reste sur
 le même hôte que l'interface.
+
+GitHub Actions est vert sur le commit
+`27b85ae467935d44e8d75841830e878eba3b9ea0` :
+
+- workflow `CI` n°196 : succès ;
+- workflow `Docker build` n°73 : succès.
 
 ## Périmètre
 
@@ -103,6 +109,6 @@ Nettoyage après validation :
 
 ## Point d'arrêt
 
-La validation mainteneur est acquise. La CI doit encore réussir sur le SHA
-publié avant fusion. La fusion dans `main` ne constitue pas une validation
-utilisateur supplémentaire.
+La validation mainteneur et la CI sont acquises. Le PR brouillon #28 est prêt
+pour revue, mais la fusion attend une autorisation explicite. La fusion dans
+`main` ne constitue pas une validation utilisateur supplémentaire.

@@ -12,8 +12,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.4",
-    "status": "maintainer-validated-awaiting-merge",
-    "reason": "Lot 4.4 is fully implemented and explicitly validated by the maintainer on Windows and an isolated VPS. Final CI review and merge remain pending."
+    "status": "maintainer-validated-ci-green-awaiting-merge",
+    "reason": "Lot 4.4 is fully implemented, explicitly validated by the maintainer on Windows and an isolated VPS, and green in CI and Docker build on commit 27b85ae. Merge authorization remains pending."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -58,7 +58,7 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "maintainer-validated-awaiting-merge",
+    "status": "maintainer-validated-ci-green-awaiting-merge",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -83,6 +83,8 @@
       "windows-docker-desktop-chromium",
       "isolated-vps-docker"
     ],
+    "ci_validation_commit": "27b85ae467935d44e8d75841830e878eba3b9ea0",
+    "ci_validation_status": "ci-and-docker-build-green",
     "scope": [
       "Single administrator account",
       "Initial administrator creation through a dedicated CLI/bootstrap command",
@@ -140,5 +142,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Publish the validated Lot 4.4 closure commit, confirm CI on the exact SHA, then prepare the pull request for merge without treating merge as a new user validation."
+  "next_action": "Review draft pull request #28 and wait for explicit merge authorization; merging does not constitute a new user validation."
 }

@@ -14,7 +14,7 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "maintainer-validated-awaiting-merge",
+    "status": "maintainer-validated-ci-green-awaiting-merge",
     "updated_at": "2026-08-12",
     "implementation_percent": 100,
     "architecture_percent": 100,
@@ -37,11 +37,13 @@
       "windows-docker-desktop-chromium",
       "isolated-vps-docker"
     ],
+    "ci_validation_commit": "27b85ae467935d44e8d75841830e878eba3b9ea0",
+    "ci_validation_status": "ci-and-docker-build-green",
     "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Publish the validated Lot 4.4 closure commit, confirm CI and prepare the pull request for merge; use docs/handoff/PROGRESS.json as the canonical tracker.",
+    "task": "Review draft pull request #28 and wait for explicit merge authorization; use docs/handoff/PROGRESS.json as the canonical tracker.",
     "target_visual_fidelity": 98
   }
 }
