@@ -34,6 +34,8 @@ sudo env \
 
 La recette crée son compte avec une valeur factice uniquement dans une base
 éphémère, teste les contrats HTTP et supprime ensuite conteneurs et volume. Le
+VPS n'a besoin que de Docker, `curl` et Python 3 ; Node.js n'est pas requis sur
+l'hôte. Le
 résultat attendu est :
 
 ```text

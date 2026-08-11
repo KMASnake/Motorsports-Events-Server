@@ -57,7 +57,11 @@ done
   -d '{"username":"admin","password":"correct horse battery staple"}' \
   "http://127.0.0.1:$API_PORT/api/v1/auth/login")" = "403" ]
 [ "$(login 'correct horse battery staple')" = "200" ]
-node -e "const v=require('$TMP_DIR/login.json');if(!v.authenticated||v.administrator.username!=='admin'||!v.idle_expires_at||!v.absolute_expires_at)process.exit(1)"
+python3 -c 'import json,sys
+value=json.load(open(sys.argv[1],encoding="utf-8"))
+assert value.get("authenticated") is True
+assert value.get("administrator",{}).get("username") == "admin"
+assert value.get("idle_expires_at") and value.get("absolute_expires_at")' "$TMP_DIR/login.json"
 csrf=$(awk '$6=="mse_admin_csrf" {print $7}' "$TMP_DIR/cookies")
 [ -n "$csrf" ]
 grep -q 'mse_admin_session' "$TMP_DIR/cookies"
@@ -92,7 +96,10 @@ sql "update admin_sessions set idle_expires_at=created_at+interval '1 millisecon
 [ "$(request_code -b "$TMP_DIR/cookies" "http://127.0.0.1:$API_PORT/api/v1/auth/session")" = "401" ]
 echo "Expirations idle et absolue : OK"
 
-technical_token=$(node scripts/generate-admin-token.mjs)
+technical_token=$(python3 -c 'import base64,hashlib,hmac,json,os,time
+payload=base64.urlsafe_b64encode(json.dumps({"sub":"vps-validation","role":"admin","exp":int(time.time())+3600},separators=(",",":")).encode()).rstrip(b"=").decode()
+signature=base64.urlsafe_b64encode(hmac.new(os.environ["ADMIN_AUTH_SECRET"].encode(),payload.encode(),hashlib.sha256).digest()).rstrip(b"=").decode()
+print(f"{payload}.{signature}")')
 [ "$(request_code -H "Authorization: Bearer $technical_token" \
   "http://127.0.0.1:$API_PORT/api/v1/admin/events?page=1&page_size=10")" = "200" ]
 [ "$(sql "select count(*)>=1 from admin_audit_log where action='auth.login_succeeded'")" = "t" ]
