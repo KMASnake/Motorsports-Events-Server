@@ -1,5 +1,14 @@
 # État du projet
 
+## Correctif d'interface Lot 4.3 — 2026-08-11
+
+La liste des intitulés de session est désormais une combobox explicite et
+ouvrable, avec filtrage lors de la saisie et prise en charge des valeurs
+inédites. L'intitulé effectif apparaît dans les aperçus Événement. Le
+typecheck, les 99 tests unitaires, les builds API/Web/Types, l'audit npm sans
+vulnérabilité et les 11 scénarios Chromium sont réussis. La validation visuelle
+du mainteneur reste requise.
+
 ## Architecture 8.1 — état courant
 
 - Lot 4.2 validé et fusionné dans `main` le 2026-08-10 ;

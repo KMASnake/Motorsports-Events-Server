@@ -19,14 +19,17 @@ test.describe.serial('Lot 4.3 — un Événement représente une Session', () =>
   });
 
   test('intègre une unique combobox créable au formulaire Événement', async ({ page }) => {
+    await page.goto('/events?event_id=evt-001');
+    await expect(page.locator('.event-details')).toContainText('Qualifications');
     const dialog = await openEventEditor(page);
     const title = dialog.getByLabel('Intitulé de session');
     await expect(title).toHaveValue('Qualifications');
-    await expect(dialog.locator('datalist option[value="FP1 fournisseur"]')).toHaveCount(1);
-    await expect(dialog.locator('datalist option[value="Warm-up"]')).toHaveCount(1);
+    await dialog.getByRole('button', { name: 'Afficher les intitulés de session' }).click();
+    await expect(dialog.getByRole('option', { name: 'FP1 fournisseur' })).toBeVisible();
+    await expect(dialog.getByRole('option', { name: 'Warm-up' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Sessions de l’événement' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Ajouter.*Session/i })).toHaveCount(0);
-    await expect(dialog.getByText(/fournisseur|local/i)).toHaveCount(0);
+    await expect(dialog.getByText(/^(fournisseur|local)$/i)).toHaveCount(0);
     await page.screenshot({ path: 'tests/ui/screenshots/event-session-title-1440x900.png' });
   });
 
@@ -42,7 +45,8 @@ test.describe.serial('Lot 4.3 — un Événement représente une Session', () =>
 
     dialog = await openEventEditor(page);
     await expect(dialog.getByLabel('Intitulé de session')).toHaveValue('Superpole inédit UI');
-    await expect(dialog.locator('datalist option[value="Superpole inédit UI"]')).toHaveCount(1);
+    await dialog.getByRole('button', { name: 'Afficher les intitulés de session' }).click();
+    await expect(dialog.getByRole('option', { name: 'Superpole inédit UI' })).toBeVisible();
   });
 
   test('reste utilisable sur mobile sans interface multi-sessions', async ({ page }) => {

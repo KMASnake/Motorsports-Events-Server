@@ -123,7 +123,7 @@
   "lot_4_3_event_as_session": {
     "status": "technically-validated-awaiting-maintainer",
     "maintainer_model_validation": "2026-08-11",
-    "decision": "One Event represents one Session; the existing Event form gains one editable/createable session title combobox fed by all provider and stored values, with no visible origin distinction.",
+    "decision": "One Event represents one Session; the existing Event form gains one explicit editable/createable session title combobox fed by all provider and stored values, with no visible origin distinction; previews display the effective title.",
     "adr": "docs/handbook/architecture/ADR-0013-EVENT-AS-SESSION.md",
     "migration_plan": "docs/handoff/LOT-4.3-EVENT-SESSION-MIGRATION-PLAN.md",
     "application_changes_started": true,
@@ -133,6 +133,7 @@
       "audit_lint_typecheck_build": "zero-vulnerabilities-and-passed",
       "api": "event-admin-public-suggestions-and-regressions-passed",
       "chromium": "11-passed-3-event-session-and-8-lot42-regressions",
+      "visual_correction": "native-datalist-replaced-by-explicit-dropdown-and-session-title-visible-in-calendar-week-day-agenda-list-and-details",
       "dataset": "tests/fixtures/lot43_ui.sql"
     },
     "maintainer_validation": null

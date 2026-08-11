@@ -54,7 +54,7 @@ export function EventListView({ events, championships, selectedId, onSelect, onE
     <div className="events-list">
       {visible.map((event) => <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
         <time><strong>{fullDate(event.starts_at)}</strong><small>{event.timezone}</small></time>
-        <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.name}</strong><small>{event.category || event.slug}</small></span></div>
+        <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.name}</strong><small>{event.session_title || event.category || event.slug}</small></span></div>
         <div><strong>{event.championship_name}</strong><small>{event.origin === 'manual' ? 'Gestion manuelle' : event.origin === 'mixed' ? 'Gestion hybride' : 'Synchronisé'}</small></div>
         <div><strong>{event.circuit_name || 'Circuit non défini'}</strong><small>{[event.circuit_city, event.country_code].filter(Boolean).join(' · ') || event.timezone}</small></div>
         <Pill text={statusMeta[event.status].text} tone={statusMeta[event.status].tone} />

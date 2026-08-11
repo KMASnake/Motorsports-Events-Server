@@ -2,6 +2,10 @@
 
 ## Lot 4.3 — Révision du modèle Événement/Session
 
+- remplace le `datalist` natif par une combobox explicite, ouvrable et filtrable,
+  tout en conservant la saisie d'un intitulé inédit ;
+- affiche l'intitulé de session dans les aperçus calendrier, semaine, jour,
+  agenda, liste et détail de l'Événement ;
 - consigne la décision mainteneur « un Événement = une Session » ;
 - planifie `events.session_title` et sa combobox éditable/créable ;
 - conserve les tables et routes multi-sessions comme compatibilité technique ;

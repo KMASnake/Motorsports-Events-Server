@@ -26,11 +26,11 @@ export function EventDetailsPanel({ event, championships, onEdit, onDuplicate, o
       <div><dt>Fin</dt><dd>{event.ends_at ? fullDate(event.ends_at) : 'Non définie'}</dd></div>
       <div><dt>Fuseau</dt><dd>{event.timezone}</dd></div>
       <div><dt>Catégorie</dt><dd>{event.category ?? 'Non définie'}</dd></div>
+      <div><dt>Intitulé</dt><dd>{event.session_title ?? 'Non défini'}</dd></div>
       <div><dt>Statut</dt><dd>{event.status}</dd></div>
       <div><dt>Fournisseur</dt><dd>{providerLabel(event.origin,event.provider_key)}</dd></div>
     </dl>
     {event.description && <p className="event-details-description">{event.description}</p>}
-    {event.session_title && <p><b>Intitulé de session :</b> {event.session_title}</p>}
     {event.correction_count ? <div className="event-correction-badge">✎ Corrigé · {event.correction_count} champ(s)</div> : null}
     <footer><button className="danger" onClick={() => onEdit(event)}>Modifier</button><button onClick={() => onDuplicate(event)}>Dupliquer</button><span className="event-resize" aria-label="Redimensionner visuellement la durée"><button disabled={!event.ends_at || new Date(event.ends_at).getTime()-new Date(event.starts_at).getTime()<30*60000} onClick={()=>onResize(event,new Date(new Date(event.ends_at??event.starts_at).getTime()-30*60000))}>−30 min</button><button onClick={()=>onResize(event,new Date(new Date(event.ends_at??event.starts_at).getTime()+30*60000))}>+30 min</button></span><button className="delete" onClick={() => onDelete(event)}>Supprimer</button></footer>
   </aside>;

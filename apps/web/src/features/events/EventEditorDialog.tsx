@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Championship, Circuit, EventFormState } from './eventTypes';
 
 interface Props {
@@ -17,6 +17,13 @@ interface Props {
 }
 
 export function EventEditorDialog({ open, editing, saving, value, championships, circuits, sessionTitles, error, onChange, onNameChange, onClose, onSubmit }: Props) {
+  const [sessionTitlesOpen, setSessionTitlesOpen] = useState(false);
+  const [filterSessionTitles, setFilterSessionTitles] = useState(false);
+  const matchingSessionTitles = useMemo(() => {
+    const query = value.session_title.trim().toLocaleLowerCase('fr-FR');
+    return sessionTitles.filter((title) => !filterSessionTitles || !query || title.toLocaleLowerCase('fr-FR').includes(query));
+  }, [filterSessionTitles, sessionTitles, value.session_title]);
+  useEffect(() => { setSessionTitlesOpen(false); setFilterSessionTitles(false); }, [open]);
   if (!open) return null;
   return <div className="lot3-modal-backdrop" onMouseDown={() => !saving && onClose()}>
     <section className="lot3-modal lot4-modal" role="dialog" aria-modal="true" aria-labelledby="event-editor-title" onMouseDown={(event) => event.stopPropagation()}>
@@ -29,8 +36,13 @@ export function EventEditorDialog({ open, editing, saving, value, championships,
           <label>Championnat *<select required value={value.championship_id} onChange={(event) => onChange({ ...value, championship_id: event.target.value })}><option value="">Sélectionner</option>{championships.filter((item) => item.active || item.id === value.championship_id).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
           <label>Circuit facultatif<select value={value.circuit_id} onChange={(event) => onChange({ ...value, circuit_id: event.target.value })}><option value="">Non défini</option>{circuits.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country_code ? ` · ${item.country_code}` : ''}</option>)}</select></label>
           <label className="wide">Intitulé de session
-            <input maxLength={160} list="event-session-title-suggestions" autoComplete="off" value={value.session_title} onChange={(event) => onChange({ ...value, session_title: event.target.value })} placeholder="FP1, Qualifications, Warm-up…" />
-            <datalist id="event-session-title-suggestions">{sessionTitles.map((title) => <option key={title} value={title} />)}</datalist>
+            <span className="event-session-title-combobox">
+              <input role="combobox" aria-controls="event-session-title-options" aria-expanded={sessionTitlesOpen} aria-autocomplete="list" maxLength={160} autoComplete="off" value={value.session_title} onFocus={() => { setFilterSessionTitles(false); setSessionTitlesOpen(true); }} onChange={(event) => { onChange({ ...value, session_title: event.target.value }); setFilterSessionTitles(true); setSessionTitlesOpen(true); }} placeholder="FP1, Qualifications, Warm-up…" />
+              <button type="button" aria-label="Afficher les intitulés de session" aria-expanded={sessionTitlesOpen} onClick={() => { setFilterSessionTitles(false); setSessionTitlesOpen((current) => !current); }}>⌄</button>
+              {sessionTitlesOpen && <span className="event-session-title-options" id="event-session-title-options" role="listbox">
+                {matchingSessionTitles.length ? matchingSessionTitles.map((title) => <button key={title} type="button" role="option" aria-selected={title === value.session_title} onClick={() => { onChange({ ...value, session_title: title }); setSessionTitlesOpen(false); }}>{title}</button>) : <small>Aucune suggestion — votre nouvel intitulé sera enregistré.</small>}
+              </span>}
+            </span>
             <small>Choisissez une suggestion connue ou saisissez un nouvel intitulé.</small>
           </label>
           <label>Début *<input required type="datetime-local" value={value.starts_at} onChange={(event) => onChange({ ...value, starts_at: event.target.value })} /></label>

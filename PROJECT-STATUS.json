@@ -11,7 +11,7 @@
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
     "status": "lot-4.3-event-session-technically-validated",
-    "reason": "Lot 4.2 remains the validated baseline. ADR-0013, migration 0005, Event APIs, suggestions and the single editable title combobox are technically validated and await maintainer VPS/visual validation."
+    "reason": "Lot 4.2 remains the validated baseline. ADR-0013, migration 0005, Event APIs, the explicit editable title combobox and session-title previews are technically validated and await maintainer VPS/visual validation."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -74,7 +74,8 @@
       "Superseded multi-session UI retained only in Git history and technical evidence",
       "Versioned 0005_event_session_title migration with guarded rollback",
       "Single editable/createable session title combobox in the Event form",
-      "Event title persistence, public projection and origin-free aggregated suggestions"
+      "Event title persistence, public projection and origin-free aggregated suggestions",
+      "Explicit session-title dropdown and title display in Event previews"
     ],
     "mandatory_gaps": [
       "Run isolated VPS and visual maintainer acceptance for ADR-0013",
@@ -128,7 +129,7 @@
     "lot_4_3_ui": "technically passed: Event-integrated chronological Sessions, editable/createable title combobox, manual CRUD, provider correction actions, HTTP states, visual rollback, desktop/mobile rendering and no technical business fields",
     "lot_4_3_ui_quality": "npm audit zero; lint/typecheck passed; 69 API and 30 Web tests passed; API/Web/Types builds, all Lot 4.3 Docker recipes, Lot 4.2 validators and 12 Chromium scenarios passed",
     "lot_4_3_admin_api_quality": "npm audit zero; lint and typecheck passed; 53 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; migration regression fingerprint a99402cd3f0d22322ba552b64e65024d preserved",
-    "lot_4_3_quality": "npm audit zero; lint and typecheck passed; 48 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed",
+    "lot_4_3_quality": "npm audit zero; typecheck passed; 72 API and 27 Web tests passed; API/Web/Types and Docker API/Web builds passed; 11 Chromium scenarios passed after the explicit combobox and preview correction",
     "known_tooling_issues": [
       "The host npm is 9.2.0, but final validation is executed under npm >= 10 in Node 22 containers and CI.",
       "The Agenda view is functional but its purpose needs clearer UX wording or presentation in a later UI task."
