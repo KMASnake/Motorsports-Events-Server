@@ -15,6 +15,8 @@
   l'étape 1 par le mainteneur.
 - implémente l'étape 2 API : login/session/logout, sessions PostgreSQL opaques,
   expirations, anti-bruteforce, CSRF, audit et coexistence HMAC.
+- consigne la réussite de la recette API Docker VPS et la validation explicite
+  de l'étape 2 par le mainteneur.
 
 ## 1.21 — 2026-08-11
 

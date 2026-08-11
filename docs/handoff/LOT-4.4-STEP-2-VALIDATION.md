@@ -2,7 +2,10 @@
 
 Date : 2026-08-11
 
-Statut : `awaiting-maintainer-validation`
+Statut : `maintainer-validated`
+
+Validation mainteneur : confirmée le 2026-08-11 après réussite complète de la
+recette Docker sur le VPS.
 
 ## Périmètre
 
@@ -42,7 +45,8 @@ résultat attendu est :
 Tests Lot 4.4 étape 2 : OK
 ```
 
-## Point d'arrêt
+## Levée du point d'arrêt
 
-Ne pas commencer la page React `/login` et les gardes de navigation avant la
-validation explicite de cette étape par le mainteneur.
+Le mainteneur a explicitement validé cette étape le 2026-08-11. La page React
+`/login` et les gardes de navigation peuvent désormais être développées dans
+l'étape 3.

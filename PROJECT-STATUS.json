@@ -12,8 +12,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.4",
-    "status": "step-2-api-implemented-awaiting-maintainer-validation",
-    "reason": "Steps 0 and 1 are maintainer-validated. Login/session/logout, expiry, brute-force protection, CSRF, audit and HMAC coexistence are implemented and locally validated; the React login UI has not started."
+    "status": "step-2-validated-ready-for-step-3",
+    "reason": "Steps 0, 1 and 2 are maintainer-validated. The complete authentication API recipe passed on the isolated VPS on 2026-08-11; the React login UI has not started."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -58,7 +58,7 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-2-api-implemented-awaiting-maintainer-validation",
+    "status": "step-2-validated-ready-for-step-3",
     "implementation_percent": 50,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -70,6 +70,9 @@
     "step_1_validated_by_maintainer": true,
     "step_1_validation_date": "2026-08-11",
     "step_1_validation_environment": "isolated-vps-docker",
+    "step_2_validated_by_maintainer": true,
+    "step_2_validation_date": "2026-08-11",
+    "step_2_validation_environment": "isolated-vps-docker",
     "scope": [
       "Single administrator account",
       "Initial administrator creation through a dedicated CLI/bootstrap command",
@@ -127,5 +130,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Have the maintainer run the isolated VPS recipe for Lot 4.4 step 2. Do not implement the React login flow before explicit validation."
+  "next_action": "Implement Lot 4.4 step 3: React login page, session bootstrap, protected navigation, cookie/CSRF HTTP client and logout UX."
 }
