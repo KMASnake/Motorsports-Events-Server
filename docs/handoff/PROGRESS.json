@@ -149,7 +149,8 @@
     "evidence": "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
     "local_matrix": "migrations-api-corrections-ui-lint-typecheck-99-unit-builds-audit-11-chromium-51-historical-passed",
     "ci_corrections": "load-lot43-fixture-before-chromium-and-mask-generated-admin-token",
-    "exact_sha_ci": "b055ec8-all-six-github-actions-checks-passed"
+    "exact_sha_ci": "b055ec8-all-six-github-actions-checks-passed",
+    "windows_recipe": "scripts/test-lot43-final.cmd-ready-awaiting-maintainer-run"
   },
   "independent_audit": {
     "status": "remediated-and-user-validated",

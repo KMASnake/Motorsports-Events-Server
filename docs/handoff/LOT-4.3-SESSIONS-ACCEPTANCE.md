@@ -97,3 +97,14 @@
 Le Lot 4.3 ne peut être déclaré validé ni fusionné tant que les critères
 ci-dessus ne sont pas satisfaits ou explicitement différés par une décision
 documentée conforme au Handbook.
+
+## Recette Windows finale
+
+- lancement : `scripts\test-lot43-final.cmd` ;
+- nettoyage seul : `scripts\test-lot43-final.cmd -Cleanup` ;
+- piles supprimées : uniquement les projets Docker de test MEDS connus ;
+- ports : interface `3610`, API `3611`, PostgreSQL `55437` ;
+- données : générateur `windows-lot43-final` puis fixture
+  `tests/fixtures/lot43_ui.sql` ;
+- le jeton temporaire est copié dans le presse-papiers sans être écrit dans le
+  dépôt.

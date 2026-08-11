@@ -75,7 +75,8 @@
       "Versioned 0005_event_session_title migration with guarded rollback",
       "Single editable/createable session title combobox in the Event form",
       "Event title persistence, public projection and origin-free aggregated suggestions",
-      "Explicit session-title dropdown and title display in Event previews"
+      "Explicit session-title dropdown and title display in Event previews",
+      "Autonomous Windows Lot 4.3 recipe with targeted cleanup and acceptance fixture"
     ],
     "mandatory_gaps": [
       "Run Windows and final global acceptance",

@@ -29,6 +29,7 @@
 - [ ] exécuter la recette VPS autonome et la validation visuelle mainteneur ;
 - [x] réaliser l'audit final du Lot 4.3 ;
 - [x] obtenir une CI verte sur le SHA candidat exact `b055ec8` ;
+- [x] fournir une recette Windows Lot 4.3 autonome avec nettoyage ciblé ;
 - [ ] exécuter les recettes VPS isolée et Windows ;
 - [ ] obtenir la validation utilisateur finale du Lot 4.3 ;
 - [ ] poursuivre dans l'ordre défini par
