@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 const apiUrl = process.env.API_URL ?? 'http://localhost:3001';
 const adminToken = process.env.ADMIN_TOKEN;
+const adminPassword = process.env.ADMIN_PASSWORD;
 const headers = () => ({ authorization: `Bearer ${adminToken}` });
 
 async function openEventEditor(page: Page) {
@@ -14,8 +15,12 @@ async function openEventEditor(page: Page) {
 test.describe.serial('Lot 4.3 — un Événement représente une Session', () => {
   test.use({ extraHTTPHeaders: adminToken ? headers() : {} });
   test.beforeEach(async ({ page }) => {
-    if (!adminToken) throw new Error('ADMIN_TOKEN est requis.');
-    await page.addInitScript((token) => sessionStorage.setItem('mse_admin_token', token), adminToken);
+    if (!adminToken || !adminPassword) throw new Error('ADMIN_TOKEN et ADMIN_PASSWORD sont requis.');
+    await page.goto('/events');
+    await page.getByLabel('Identifiant').fill('admin');
+    await page.getByLabel('Mot de passe').fill(adminPassword);
+    await page.getByRole('button', { name: 'Se connecter' }).click();
+    await expect(page).toHaveURL(/\/events/);
   });
 
   test('intègre une unique combobox créable au formulaire Événement', async ({ page }) => {

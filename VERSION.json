@@ -1,18 +1,19 @@
 {
-  "version": "8.1.0-alpha.2-lot.4.3",
+  "version": "8.1.0-alpha.2-lot.4.4",
   "series": "8.1.0-alpha.2",
   "lot": 4,
-  "revision": 3,
-  "status": "user-validated",
+  "revision": 4,
+  "status": "maintainer-validated-ci-green-awaiting-merge",
   "scope": [
     "event CRUD",
     "public events API",
     "admin events API",
     "MEDS desktop events calendar and list UI",
     "event-as-session title and reusable suggestions",
-    "versioned Sessions compatibility migrations and APIs"
+    "versioned Sessions compatibility migrations and APIs",
+    "administrator authentication schema and secure bootstrap foundation"
   ],
   "validated_on_user_workstation": true,
   "validated_on_vps": true,
-  "validation_date": "2026-08-11"
+  "validation_date": "2026-08-12"
 }

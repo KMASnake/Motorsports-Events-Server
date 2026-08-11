@@ -1,5 +1,18 @@
 # Changelog
 
+## Lot 4.4 — Authentification administrateur validée
+
+- consigne la validation mainteneur sur Windows et VPS le 2026-08-12 ;
+- protège la console avec une session humaine serveur, un cookie sécurisé et
+  une protection CSRF, tout en conservant l'authentification HMAC technique ;
+- corrige la recette Windows afin que le bootstrap du compte ne relance pas la
+  migration déjà appliquée ;
+- aligne la CI Chromium sur l'origine autorisée `127.0.0.1` et bootstrappe le
+  compte dans l'API déjà démarrée ;
+- impose `127.0.0.1` comme origine de recette locale cohérente ;
+- aligne les versions affichées par l'API et l'interface sur
+  `8.1.0-alpha.2-lot.4.4`.
+
 ## Lot 4.3 — Révision du modèle Événement/Session
 
 - consigne la validation utilisateur finale du Lot 4.3 le 2026-08-11 ;

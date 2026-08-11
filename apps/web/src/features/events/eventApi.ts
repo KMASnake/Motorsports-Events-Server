@@ -1,5 +1,5 @@
 import type { Championship, Circuit, EventFormState, EventRow, SessionTitleSuggestion } from './eventTypes';
-import { adminAuthorization } from '../../lib/adminAuth';
+import { adminAuthorization, notifyAuthenticationRequired } from '../../lib/adminAuth';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
@@ -7,7 +7,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   for (const [name, value] of Object.entries(adminAuthorization())) headers.set(name, value);
   if (init.body !== undefined && init.body !== null) headers.set('Content-Type', 'application/json');
-  const response = await fetch(`${API}${path}`, { ...init, headers });
+  const response = await fetch(`${API}${path}`, { ...init, credentials: 'include', headers });
+  if (response.status === 401) notifyAuthenticationRequired();
   if (!response.ok) {
     const body = await response.json().catch(() => ({ message: response.statusText }));
     throw new Error(body.message ?? 'Une erreur est survenue.');

@@ -7,12 +7,16 @@ API_PORT=${LOT43_UI_API_PORT:-3581}
 WEB_PORT=${LOT43_UI_WEB_PORT:-3580}
 PASSWORD=${LOT43_UI_POSTGRES_PASSWORD:-lot43-ui-test}
 AUTH_SECRET=${LOT43_UI_AUTH_SECRET:-lot43-ui-secret-at-least-thirty-two-characters}
+SESSION_SECRET=${LOT43_UI_SESSION_SECRET:-lot43-ui-session-secret-at-least-thirty-two-characters}
+ADMIN_PASSWORD=${LOT43_UI_ADMIN_PASSWORD:-correct-horse-battery-staple-lot43}
 TEST_WORKDIR=$(mktemp -d "${TMPDIR:-/tmp}/mse-lot43-ui.XXXXXX")
 
 export COMPOSE_PROJECT_NAME="$PROJECT" POSTGRES_PORT
 export API_HOST_PORT="$API_PORT" WEB_HOST_PORT="$WEB_PORT" POSTGRES_PASSWORD="$PASSWORD"
 export DATABASE_URL="postgresql://mse:$PASSWORD@postgres:5432/motorsports_events"
-export VITE_API_URL="http://localhost:$API_PORT" ADMIN_AUTH_SECRET="$AUTH_SECRET"
+export VITE_API_URL="http://127.0.0.1:$API_PORT" ADMIN_AUTH_SECRET="$AUTH_SECRET"
+export ADMIN_SESSION_SECRET="$SESSION_SECRET" ADMIN_WEB_ORIGIN="http://127.0.0.1:$WEB_PORT"
+export ADMIN_COOKIE_SECURE=false TRUST_PROXY=false
 export API_URL="http://127.0.0.1:$API_PORT" WEB_URL="http://127.0.0.1:$WEB_PORT"
 
 stack_cleanup(){
@@ -41,11 +45,13 @@ docker run --rm --network host \
   node:22-alpine \
   sh -lc 'tar -C /source --exclude=.git --exclude=node_modules --exclude=test-results -cf - . | tar -C /work -xf - && npm ci && npm run data:generate -- --seed=lot43-ui'
 docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_ui.sql
+printf '%s\n' "$ADMIN_PASSWORD" | docker compose run --rm -T api \
+  node apps/api/dist/cli/admin.js create --username admin --password-stdin >/dev/null
 ADMIN_TOKEN=$(docker run --rm -e ADMIN_AUTH_SECRET="$AUTH_SECRET" -e ADMIN_ROLE=admin -e ADMIN_SUBJECT=lot43-ui-test -v "$PWD/scripts:/scripts:ro" node:22-alpine node /scripts/generate-admin-token.mjs)
-export ADMIN_TOKEN
+export ADMIN_TOKEN ADMIN_PASSWORD
 
 docker run --rm --network host \
-  -e API_URL -e WEB_URL -e ADMIN_TOKEN \
+  -e API_URL -e WEB_URL -e ADMIN_TOKEN -e ADMIN_PASSWORD \
   -v "$TEST_WORKDIR:/work" -w /work \
   mcr.microsoft.com/playwright:v1.62.1-noble \
   npx playwright test tests/ui/events.spec.ts tests/ui/sessions.spec.ts --project=chromium

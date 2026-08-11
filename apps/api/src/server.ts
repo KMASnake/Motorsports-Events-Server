@@ -12,11 +12,17 @@ import { registerAdminAudit } from './lib/adminAudit.js';
 import { auditRoutes } from './routes/audit.js';
 import { sessionRoutes } from './routes/sessions.js';
 import { sessionCorrectionRoutes } from './routes/sessionCorrections.js';
+import { authRoutes } from './routes/auth.js';
+import { adminCookieConfig } from './lib/adminCookies.js';
 
-const app = Fastify({ logger: true });
+const app = Fastify({ logger: true, trustProxy: process.env.TRUST_PROXY === 'true' });
 await verifyApplicationSchema();
-await app.register(cors, { origin: true });
-registerAdminAuth(app);
+const webOrigin = process.env.ADMIN_WEB_ORIGIN ?? 'http://localhost:3000';
+const sessionSecret = process.env.ADMIN_SESSION_SECRET;
+if (!sessionSecret || sessionSecret.length < 32) throw new Error('ADMIN_SESSION_SECRET doit contenir au moins 32 caractères.');
+const cookie = adminCookieConfig();
+await app.register(cors, { origin: webOrigin, credentials: true });
+registerAdminAuth(app, process.env.ADMIN_AUTH_SECRET, { cookie, sessionSecret, webOrigin });
 registerAdminAudit(app);
 
 app.addHook('onRequest', async (request) => {
@@ -35,6 +41,7 @@ app.addHook('onRequest', async (request) => {
 });
 
 await app.register(healthRoutes);
+await app.register(authRoutes, { cookie, sessionSecret, webOrigin });
 await app.register(dashboardRoutes);
 await app.register(catalogRoutes);
 await app.register(championshipRoutes);

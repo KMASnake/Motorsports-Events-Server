@@ -1,5 +1,17 @@
 # Journal des décisions
 
+## 2026-08-11 — Authentification humaine de la console
+
+- un compte administrateur unique est initialisé par une commande dédiée ;
+- la connexion humaine utilise identifiant/mot de passe et session serveur ;
+- les durées validées sont une heure d'inactivité et huit heures absolues ;
+- cinq échecs en quinze minutes bloquent quinze minutes ;
+- le Bearer HMAC reste réservé aux usages techniques ;
+- Argon2id, PostgreSQL et le double-submit CSRF signé constituent la décision
+  technique validée par le mainteneur le 2026-08-11 dans l'ADR-0014.
+
+Voir `architecture/ADR-0014-ADMIN-CONSOLE-AUTHENTICATION.md`.
+
 ## 2026-08-11 — Un Événement représente une Session
 
 - l'Événement est l'unique unité temporelle administrée ;

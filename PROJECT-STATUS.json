@@ -11,9 +11,9 @@
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
-    "branch": "main",
-    "status": "lot-4-complete-authentication-next",
-    "reason": "Lot 4.3 is merged and user-validated and the maintainer considers Lot 4 functionally complete. Existing Event duplication is satisfactory. The next implementation lot is administration authentication; provider synchronization follows after separate maintainer design discussion."
+    "branch": "codex/lot-4.4",
+    "status": "maintainer-validated-ci-green-awaiting-merge",
+    "reason": "Lot 4.4 is fully implemented, explicitly validated by the maintainer on Windows and an isolated VPS, and green in CI and Docker build on commit 27b85ae. Merge authorization remains pending."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -58,12 +58,33 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "functional-decisions-approved-specification-pending",
-    "implementation_percent": 0,
-    "architecture_percent": 0,
-    "validated_on_user_workstation": false,
-    "validated_on_vps": false,
+    "status": "maintainer-validated-ci-green-awaiting-merge",
+    "implementation_percent": 100,
+    "architecture_percent": 100,
+    "documentation_readiness_percent": 100,
+    "validated_on_user_workstation": true,
+    "validated_on_vps": true,
     "merged_to_main": false,
+    "phase_0_validated_by_maintainer": true,
+    "phase_0_validation_date": "2026-08-11",
+    "step_1_validated_by_maintainer": true,
+    "step_1_validation_date": "2026-08-11",
+    "step_1_validation_environment": "isolated-vps-docker",
+    "step_2_validated_by_maintainer": true,
+    "step_2_validation_date": "2026-08-11",
+    "step_2_validation_environment": "isolated-vps-docker",
+    "step_3_validated_by_maintainer": true,
+    "step_3_validation_date": "2026-08-11",
+    "step_3_validation_environment": "isolated-vps-chromium",
+    "step_4_candidate_date": "2026-08-12",
+    "step_4_validated_by_maintainer": true,
+    "step_4_validation_date": "2026-08-12",
+    "step_4_validation_environments": [
+      "windows-docker-desktop-chromium",
+      "isolated-vps-docker"
+    ],
+    "ci_validation_commit": "27b85ae467935d44e8d75841830e878eba3b9ea0",
+    "ci_validation_status": "ci-and-docker-build-green",
     "scope": [
       "Single administrator account",
       "Initial administrator creation through a dedicated CLI/bootstrap command",
@@ -121,5 +142,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Prepare the Lot 4.4 authentication specification, acceptance criteria and impact analysis from the maintainer-approved functional decisions; do not implement authentication code before framing review."
+  "next_action": "Review draft pull request #28 and wait for explicit merge authorization; merging does not constitute a new user validation."
 }

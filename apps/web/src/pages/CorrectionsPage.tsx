@@ -5,7 +5,7 @@ import { CORRECTIONS_PER_PAGE, correctionPage, filterCorrections, type Correctio
 import { correctionEditorKind, editableCorrectionValue, parsedCorrectionValue } from '../features/corrections/correctionEditor';
 import type { Championship, Circuit } from '../features/events/eventTypes';
 import { availableProviderOptions, providerLabel, providerSource } from '../features/events/providerDisplay';
-import { adminAuthorization } from '../lib/adminAuth';
+import { adminAuthorization, notifyAuthenticationRequired } from '../lib/adminAuth';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 type References = { championships: Map<string, string>; circuits: Map<string, string> };
@@ -13,7 +13,8 @@ type References = { championships: Map<string, string>; circuits: Map<string, st
 async function call<T>(path:string,init?:RequestInit):Promise<T>{
   const headers=new Headers(init?.headers);if(init?.body)headers.set('content-type','application/json');
   for(const [name,value] of Object.entries(adminAuthorization()))headers.set(name,value);
-  const response=await fetch(API+path,{...init,headers});
+  const response=await fetch(API+path,{...init,credentials:'include',headers});
+  if(response.status===401)notifyAuthenticationRequired();
   if(!response.ok)throw new Error((await response.json().catch(()=>({}))).message??response.statusText);
   return response.status===204?null as T:response.json();
 }

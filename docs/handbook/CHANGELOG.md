@@ -1,5 +1,44 @@
 # Handbook Changelog
 
+## 1.24 — 2026-08-12
+
+- consigne la validation explicite du Lot 4.4 sur Windows et VPS ;
+- sécurise la recette Windows en bootstrapant le compte dans l'API déjà
+  démarrée, sans réexécuter le service de migration ;
+- applique le même bootstrap et la même origine `127.0.0.1` à la CI Chromium ;
+- aligne les URL locales sur `127.0.0.1` et la version affichée par l'API et
+  l'interface sur `8.1.0-alpha.2-lot.4.4` ;
+- conserve la CI verte sur le SHA final comme prérequis de fusion.
+
+## 1.23 — 2026-08-12
+
+- prépare le Lot 4.4 comme candidat de validation finale ;
+- ajoute les recettes finales Windows et VPS pour l'authentification ;
+- rappelle que la CI et la fusion ne valent pas validation mainteneur.
+
+## 1.22 — 2026-08-11
+
+- clôt le Lot 4 fonctionnel et retire la duplication du périmètre futur ;
+- consigne les décisions fonctionnelles d'authentification humaine du Lot 4.4 ;
+- propose Argon2id, sessions PostgreSQL opaques et CSRF signé lié à la session ;
+- conserve le HMAC comme mécanisme technique séparé ;
+- ajoute l'ADR-0014 et le plan proposé de migration `0006`.
+- consigne la validation explicite de la Phase 0 et accepte l'ADR-0014 ;
+- autorise le démarrage ultérieur de l'implémentation, encore à 0 %.
+- implémente l'étape 1 : migration `0006`, Argon2id et bootstrap/récupération
+  du compte administrateur singleton, sans route ni interface de connexion.
+- consigne la réussite de la recette Docker VPS et la validation explicite de
+  l'étape 1 par le mainteneur.
+- implémente l'étape 2 API : login/session/logout, sessions PostgreSQL opaques,
+  expirations, anti-bruteforce, CSRF, audit et coexistence HMAC.
+- consigne la réussite de la recette API Docker VPS et la validation explicite
+  de l'étape 2 par le mainteneur.
+- implémente l'étape 3 Web : `/login`, restauration de session, navigation
+  protégée, client cookie/CSRF et déconnexion sans stockage de jeton JavaScript.
+- migre les recettes Chromium historiques vers la connexion humaine.
+- consigne la réussite de la recette Chromium VPS et la validation explicite
+  de l'étape 3 par le mainteneur.
+
 ## 1.21 — 2026-08-11
 
 - consigne la validation utilisateur explicite du Lot 4.3 ;
