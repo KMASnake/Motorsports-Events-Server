@@ -19,8 +19,9 @@
   },
   "current": {
     "lot": "4.4",
+    "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "prepared-not-started",
+    "status": "functional-decisions-approved-specification-pending",
     "updated_at": "2026-08-11",
     "implementation_percent": 0,
     "architecture_percent": 0,
@@ -31,52 +32,60 @@
     "merge_authorized": false,
     "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
   },
-  "lot_4_3_closure": {
-    "status": "closed-after-merge",
-    "merge_pr": 27,
-    "merge_commit": "d16e2bbe5698913e2046c1f645819057ed9196b8",
-    "implementation_percent": 100,
-    "architecture_percent": 100,
-    "documentation_readiness_percent": 100,
+  "lot_4_closure": {
+    "status": "functionally-complete",
+    "last_lot": "4.3",
     "user_validation": "confirmed-2026-08-11",
-    "windows_validation": "passed-with-11-chromium-scenarios",
-    "isolated_vps_validation": "passed",
-    "exact_sha_ci": "b055ec8-all-six-github-actions-checks-passed",
-    "final_audit": "docs/handoff/LOT-4.3-FINAL-AUDIT.md",
-    "final_handoff": "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
-    "post_merge_closure": "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md",
-    "accepted_model": "One Event represents one Session; Event has one optional editable/createable session_title and no official multi-session workflow."
+    "note": "Existing Event duplication is satisfactory to the maintainer and requires no dedicated follow-up lot."
   },
-  "lot_4_4_preparation": {
-    "status": "prepared-not-started",
-    "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
-    "scope": [
-      "Advanced Event duplication through the existing Event workflow"
+  "lot_4_4_authentication": {
+    "status": "functional-decisions-approved-specification-pending",
+    "implementation_started": false,
+    "decisions": [
+      "One administrator account for the initial version",
+      "Initial account created with a dedicated initialization command",
+      "Password stored only as a secure hash",
+      "Login uses username and password",
+      "Authenticated state uses a server-side session",
+      "Browser receives an HttpOnly Secure SameSite session cookie",
+      "No JavaScript-readable authentication JWT or HMAC secret",
+      "Unauthenticated administration access redirects to login",
+      "Logout immediately invalidates the server-side session",
+      "Absolute session lifetime is eight hours",
+      "Idle timeout is one hour and activity may renew idle expiry without extending beyond absolute lifetime",
+      "Five failed logins in fifteen minutes trigger a fifteen-minute temporary block",
+      "Login failures use a generic message and do not disclose account existence",
+      "Failures and lockouts are audited without password or secrets",
+      "Successful login resets failed-attempt counters",
+      "No CAPTCHA, permanent lockout or IP-only blocking in this version",
+      "Existing HMAC authentication remains a separate technical/API mechanism"
     ],
-    "explicitly_out_of_scope": [
-      "Recurrence",
-      "Recurring or series creation",
-      "Conflict management",
-      "Overlap detection or warnings"
+    "out_of_scope": [
+      "Multiple accounts",
+      "User management UI",
+      "Complex roles and permissions",
+      "Provider synchronization"
     ],
-    "phase_0_required_deliverables": [
-      "Lot 4.4 functional duplication specification",
-      "Lot 4.4 acceptance criteria",
-      "Impact analysis covering database, API, UI, providers, corrections, calendar and tests",
-      "Architecture decision only if duplication requires a permanent architecture change",
+    "next_required_deliverables": [
+      "Authentication functional and technical specification",
+      "Acceptance criteria",
+      "Impact analysis for database, API, Web, Docker, security, audit and tests",
+      "ADR only if a durable architecture decision requires one",
       "Migration plan only if a schema change is demonstrated to be necessary"
     ],
-    "constraints": [
-      "Preserve the Lot 4.3 Event-as-Session model",
-      "Keep session_title as the single session business label",
-      "Do not reintroduce the superseded multi-session administration UI",
-      "Prefer pre-filling the existing Event form and persisting only after explicit user confirmation",
-      "A duplicated provider Event must become an independent manual Event without provider identifiers or copied corrections",
-      "No functional implementation before Phase 0 review",
-      "No production test data or production mutation during validation"
-    ],
-    "implementation_started": false,
     "user_validation": null
+  },
+  "planned_after_authentication": {
+    "name": "Providers and API synchronization core",
+    "status": "concept-discussion-required",
+    "known_intent": [
+      "Providers page",
+      "Synchronization engine",
+      "Monthly API quotas",
+      "Per-minute API quotas",
+      "Persistent synchronization cursor and resume"
+    ],
+    "governance": "Discuss concepts and decisions with the maintainer before detailed roadmap updates or implementation."
   },
   "quality_baseline": {
     "lot_4_3_unit_tests": "99-passed-in-final-audit",
@@ -92,8 +101,7 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Prepare Lot 4.4 Phase 0 for Event duplication only: specification, acceptance criteria and impact analysis. Do not implement functional code until the framing is explicitly reviewed.",
-    "reference": "docs/handoff/LOT-4.4-KICKOFF.md",
+    "task": "Prepare the Lot 4.4 administration authentication specification, acceptance criteria and impact analysis from the maintainer-approved decisions. Do not implement functional code until the framing is explicitly reviewed.",
     "target_visual_fidelity": 98
   }
 }
