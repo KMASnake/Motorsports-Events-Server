@@ -20,6 +20,11 @@ export async function createInitialAdministrator(usernameInput: string, password
       `insert into admin_login_guard(singleton_key) values(true)
        on conflict(singleton_key) do nothing`
     );
+    await client.query(
+      `insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,old_value,new_value)
+       values($1,'auth.admin_created','authentication',null,$2,null,$3::jsonb)`,
+      [username, `cli-${randomUUID()}`, JSON.stringify({ auth_method: 'bootstrap_cli' })]
+    );
   });
 }
 
@@ -39,6 +44,11 @@ export async function resetAdministratorPassword(usernameInput: string, password
       `insert into admin_login_guard(singleton_key) values(true)
        on conflict(singleton_key) do update set
          failed_attempts=0, window_started_at=null, blocked_until=null, updated_at=now()`
+    );
+    await client.query(
+      `insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,old_value,new_value)
+       values($1,'auth.password_reset','authentication',null,$2,null,$3::jsonb)`,
+      [usernameNormalized, `cli-${randomUUID()}`, JSON.stringify({ auth_method: 'bootstrap_cli', sessions_revoked: true })]
     );
   });
 }

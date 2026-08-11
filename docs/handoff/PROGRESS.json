@@ -21,9 +21,9 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-1-validated-ready-for-step-2",
+    "status": "step-2-api-implemented-awaiting-maintainer-validation",
     "updated_at": "2026-08-11",
-    "implementation_percent": 25,
+    "implementation_percent": 50,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -44,7 +44,7 @@
     "note": "Existing Event duplication is satisfactory to the maintainer and requires no dedicated follow-up lot."
   },
   "lot_4_4_authentication": {
-    "status": "step-1-validated-ready-for-step-2",
+    "status": "step-2-api-implemented-awaiting-maintainer-validation",
     "implementation_started": true,
     "decisions": [
       "One administrator account for the initial version",
@@ -79,7 +79,8 @@
       "docs/handbook/architecture/ADR-0014-ADMIN-CONSOLE-AUTHENTICATION.md"
     ],
     "user_validation": "step-1-confirmed-2026-08-11",
-    "step_1_evidence": "docs/handoff/LOT-4.4-STEP-1-VALIDATION.md"
+    "step_1_evidence": "docs/handoff/LOT-4.4-STEP-1-VALIDATION.md",
+    "step_2_evidence": "docs/handoff/LOT-4.4-STEP-2-VALIDATION.md"
   },
   "planned_after_authentication": {
     "name": "Providers and API synchronization core",
@@ -107,7 +108,7 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Implement and independently validate step 2: login/session/logout API, expiry, brute-force protection, CSRF and authentication audit.",
+    "task": "Run and explicitly validate the isolated Lot 4.4 step 2 API recipe before any React login implementation.",
     "target_visual_fidelity": 98
   }
 }

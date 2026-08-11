@@ -33,6 +33,10 @@ services:
       API_PORT: 3001
       NODE_ENV: development
       ADMIN_AUTH_SECRET: ${ADMIN_AUTH_SECRET:-development-only-admin-auth-secret-change-me}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-development-only-session-secret-change-me}
+      ADMIN_WEB_ORIGIN: ${ADMIN_WEB_ORIGIN:-http://localhost:3000}
+      ADMIN_COOKIE_SECURE: ${ADMIN_COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
     ports:
       - "${API_HOST_PORT:-3001}:3001"
     depends_on:

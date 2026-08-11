@@ -13,6 +13,8 @@
   du compte administrateur singleton, sans route ni interface de connexion.
 - consigne la réussite de la recette Docker VPS et la validation explicite de
   l'étape 1 par le mainteneur.
+- implémente l'étape 2 API : login/session/logout, sessions PostgreSQL opaques,
+  expirations, anti-bruteforce, CSRF, audit et coexistence HMAC.
 
 ## 1.21 — 2026-08-11
 

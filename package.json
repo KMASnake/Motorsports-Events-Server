@@ -38,7 +38,8 @@
     "test:lot43:corrections": "./scripts/test-lot43-corrections.sh",
     "test:lot43:ui": "./scripts/test-lot43-ui.sh",
     "admin": "npm run admin --workspace @mse/api --",
-    "test:lot44:foundation": "./scripts/test-lot44-auth-foundation.sh"
+    "test:lot44:foundation": "./scripts/test-lot44-auth-foundation.sh",
+    "test:lot44:api": "./scripts/test-lot44-auth-api.sh"
   },
   "engines": {
     "node": ">=22.0.0",
