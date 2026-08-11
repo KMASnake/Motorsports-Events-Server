@@ -24,6 +24,8 @@
 - [x] ajouter la combobox créable au formulaire Événement ;
 - [x] retirer du parcours UI la sous-liste et le CRUD multi-sessions ;
 - [x] remplacer les fixtures et scénarios Chromium devenus obsolètes ;
+- [x] valider visuellement sur VPS la création puis la réutilisation d'un
+  intitulé inédit dans la combobox explicite ;
 - [ ] exécuter la recette VPS autonome et la validation visuelle mainteneur ;
 - [ ] réaliser l'audit final du Lot 4.3 ;
 - [ ] obtenir une CI verte sur le SHA candidat exact ;
@@ -35,8 +37,8 @@
 Critère de passage révisé le 2026-08-11 : l'interface multi-sessions a réussi
 ses tests techniques mais ne correspond pas au modèle métier mainteneur. Elle
 est remplacée par un champ unique sur l'Événement. La nouvelle cible est
-techniquement validée à 95 % ; le prochain point d'arrêt est sa recette VPS et
-sa validation visuelle explicite.
+techniquement validée à 96 % ; sa combobox corrigée est validée visuellement
+sur VPS et le prochain point d'arrêt est l'audit final avec la recette globale.
 Les sections
 suivantes sont conservées comme historique des jalons précédents.
 

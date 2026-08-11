@@ -6,6 +6,8 @@
   tout en conservant la saisie d'un intitulé inédit ;
 - affiche l'intitulé de session dans les aperçus calendrier, semaine, jour,
   agenda, liste et détail de l'Événement ;
+- consigne la validation visuelle VPS de la création d'un intitulé inédit puis
+  de sa réapparition dans les propositions ;
 - consigne la décision mainteneur « un Événement = une Session » ;
 - planifie `events.session_title` et sa combobox éditable/créable ;
 - conserve les tables et routes multi-sessions comme compatibilité technique ;

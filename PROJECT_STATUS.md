@@ -6,8 +6,9 @@ La liste des intitulés de session est désormais une combobox explicite et
 ouvrable, avec filtrage lors de la saisie et prise en charge des valeurs
 inédites. L'intitulé effectif apparaît dans les aperçus Événement. Le
 typecheck, les 99 tests unitaires, les builds API/Web/Types, l'audit npm sans
-vulnérabilité et les 11 scénarios Chromium sont réussis. La validation visuelle
-du mainteneur reste requise.
+vulnérabilité et les 11 scénarios Chromium sont réussis. Le mainteneur a validé
+sur VPS le 2026-08-11 qu'un intitulé inédit est conservé puis reproposé dans la
+liste. Cette validation ciblée ne remplace pas l'audit final du Lot 4.3.
 
 ## Architecture 8.1 — état courant
 
@@ -26,9 +27,8 @@ du mainteneur reste requise.
 - ADR-0013 et migration réversible `0005_event_session_title` implémentés ;
 - API Événement et suggestions, combobox créable et retrait de l'interface
   multi-sessions techniquement validés ;
-- implémentation fonctionnelle : 95 % ;
-- prochain point d'arrêt : recette VPS et validation visuelle explicite avant
-  l'audit final.
+- implémentation fonctionnelle : 96 % ;
+- prochain point d'arrêt : audit final, CI du SHA exact et recette globale.
 
 L'état canonique de l'architecture 8.1 reste `PROJECT-STATUS.json`. Les sections
 2.7.0 ci-dessous sont conservées comme historique de production.

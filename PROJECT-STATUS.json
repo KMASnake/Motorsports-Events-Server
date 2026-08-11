@@ -10,8 +10,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.3-sessions",
-    "status": "lot-4.3-event-session-technically-validated",
-    "reason": "Lot 4.2 remains the validated baseline. ADR-0013, migration 0005, Event APIs, the explicit editable title combobox and session-title previews are technically validated and await maintainer VPS/visual validation."
+    "status": "lot-4.3-event-session-vps-visual-correction-validated",
+    "reason": "Lot 4.2 remains the validated baseline. The maintainer validated on the isolated VPS that a newly created session title is persisted and then appears in the explicit suggestion dropdown. Final audit, exact-SHA CI and complete Lot 4.3 validation remain pending."
   },
   "independent_audit": {
     "date": "2026-08-03",
@@ -53,11 +53,11 @@
   "working_lot": {
     "lot": "4.3",
     "target_version": "8.1.0-alpha.2-lot.4.3",
-    "status": "event-session-technically-validated-awaiting-maintainer",
-    "implementation_percent": 95,
+    "status": "event-session-vps-visual-correction-validated-awaiting-final-audit",
+    "implementation_percent": 96,
     "architecture_percent": 100,
     "validated_on_user_workstation": false,
-    "validated_on_vps": false,
+    "validated_on_vps": true,
     "merged_to_main": false,
     "implemented_or_partially_implemented": [
       "Validated ADR-0012 and reversible migration plan",
@@ -78,7 +78,6 @@
       "Explicit session-title dropdown and title display in Event previews"
     ],
     "mandatory_gaps": [
-      "Run isolated VPS and visual maintainer acceptance for ADR-0013",
       "Run final audit, exact-SHA CI and Windows acceptance",
       "Obtain final explicit maintainer validation"
     ],
