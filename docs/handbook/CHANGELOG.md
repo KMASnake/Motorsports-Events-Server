@@ -20,6 +20,8 @@
 - implémente l'étape 3 Web : `/login`, restauration de session, navigation
   protégée, client cookie/CSRF et déconnexion sans stockage de jeton JavaScript.
 - migre les recettes Chromium historiques vers la connexion humaine.
+- consigne la réussite de la recette Chromium VPS et la validation explicite
+  de l'étape 3 par le mainteneur.
 
 ## 1.21 — 2026-08-11
 

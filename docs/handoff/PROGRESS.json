@@ -21,7 +21,7 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-3-ui-implemented-awaiting-maintainer-validation",
+    "status": "step-3-validated-ready-for-step-4",
     "updated_at": "2026-08-11",
     "implementation_percent": 75,
     "architecture_percent": 100,
@@ -38,6 +38,9 @@
     "step_2_validated_by_maintainer": true,
     "step_2_validation_date": "2026-08-11",
     "step_2_validation_environment": "isolated-vps-docker",
+    "step_3_validated_by_maintainer": true,
+    "step_3_validation_date": "2026-08-11",
+    "step_3_validation_environment": "isolated-vps-chromium",
     "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
   },
   "lot_4_closure": {
@@ -47,7 +50,7 @@
     "note": "Existing Event duplication is satisfactory to the maintainer and requires no dedicated follow-up lot."
   },
   "lot_4_4_authentication": {
-    "status": "step-3-ui-implemented-awaiting-maintainer-validation",
+    "status": "step-3-validated-ready-for-step-4",
     "implementation_started": true,
     "decisions": [
       "One administrator account for the initial version",
@@ -81,7 +84,7 @@
       "docs/handoff/LOT-4.4-AUTH-MIGRATION-PLAN.md",
       "docs/handbook/architecture/ADR-0014-ADMIN-CONSOLE-AUTHENTICATION.md"
     ],
-    "user_validation": "step-2-confirmed-2026-08-11",
+    "user_validation": "step-3-confirmed-2026-08-11",
     "step_1_evidence": "docs/handoff/LOT-4.4-STEP-1-VALIDATION.md",
     "step_2_evidence": "docs/handoff/LOT-4.4-STEP-2-VALIDATION.md",
     "step_3_evidence": "docs/handoff/LOT-4.4-STEP-3-VALIDATION.md"
@@ -112,7 +115,7 @@
   ],
   "next_action": {
     "owner": "Codex",
-    "task": "Run and explicitly validate the isolated Chromium recipe for Lot 4.4 step 3 before final hardening.",
+    "task": "Perform Lot 4.4 step 4 hardening and final validation without changing the validated functional contracts.",
     "target_visual_fidelity": 98
   }
 }

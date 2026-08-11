@@ -2,7 +2,10 @@
 
 Date : 2026-08-11
 
-Statut : `awaiting-maintainer-validation`
+Statut : `maintainer-validated`
+
+Validation mainteneur : confirmée le 2026-08-11 après réussite de la recette
+Chromium sur le VPS.
 
 ## Périmètre
 
@@ -46,7 +49,7 @@ et vérifier la page de connexion, le retour à la page demandée, l'identifiant
 dans la barre supérieure et la déconnexion. La recette automatisée ferme sa
 pile à la fin ; pour ce contrôle, démarrer une pile dédiée séparément.
 
-## Point d'arrêt
+## Levée du point d'arrêt
 
-Ne pas commencer la finalisation/hardening de l'étape 4 avant validation
-explicite de cette étape par le mainteneur.
+Le mainteneur a explicitement validé cette étape le 2026-08-11. La
+finalisation/hardening de l'étape 4 peut désormais commencer séparément.

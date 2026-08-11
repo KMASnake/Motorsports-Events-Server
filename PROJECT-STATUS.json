@@ -12,8 +12,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-4.4",
-    "status": "step-3-ui-implemented-awaiting-maintainer-validation",
-    "reason": "Steps 0, 1 and 2 are maintainer-validated. React login, protected navigation, cookie/CSRF browser client and logout UX are implemented and locally validated in Chromium; final hardening has not started."
+    "status": "step-3-validated-ready-for-step-4",
+    "reason": "Steps 0 through 3 are maintainer-validated. The authentication UI Chromium recipe passed on the isolated VPS on 2026-08-11; final hardening and release validation have not started."
   },
   "last_fully_validated_lot": {
     "lot": "4.3",
@@ -58,7 +58,7 @@
     "lot": "4.4",
     "name": "Administration authentication",
     "target_version": "8.1.0-alpha.2-lot.4.4",
-    "status": "step-3-ui-implemented-awaiting-maintainer-validation",
+    "status": "step-3-validated-ready-for-step-4",
     "implementation_percent": 75,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -73,6 +73,9 @@
     "step_2_validated_by_maintainer": true,
     "step_2_validation_date": "2026-08-11",
     "step_2_validation_environment": "isolated-vps-docker",
+    "step_3_validated_by_maintainer": true,
+    "step_3_validation_date": "2026-08-11",
+    "step_3_validation_environment": "isolated-vps-chromium",
     "scope": [
       "Single administrator account",
       "Initial administrator creation through a dedicated CLI/bootstrap command",
@@ -130,5 +133,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Have the maintainer run and visually inspect the isolated Chromium recipe for Lot 4.4 step 3 before final hardening and release validation."
+  "next_action": "Perform Lot 4.4 step 4 hardening and final validation: complete acceptance matrix, production cookie/proxy checks, full regression, CI recipe, final handoff and release candidate status."
 }
