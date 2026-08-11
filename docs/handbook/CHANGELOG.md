@@ -7,6 +7,8 @@
 - propose Argon2id, sessions PostgreSQL opaques et CSRF signé lié à la session ;
 - conserve le HMAC comme mécanisme technique séparé ;
 - ajoute l'ADR-0014 et le plan proposé de migration `0006`.
+- consigne la validation explicite de la Phase 0 et accepte l'ADR-0014 ;
+- autorise le démarrage ultérieur de l'implémentation, encore à 0 %.
 
 ## 1.21 — 2026-08-11
 

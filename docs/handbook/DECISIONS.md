@@ -7,8 +7,8 @@
 - les durées validées sont une heure d'inactivité et huit heures absolues ;
 - cinq échecs en quinze minutes bloquent quinze minutes ;
 - le Bearer HMAC reste réservé aux usages techniques ;
-- Argon2id, PostgreSQL et le double-submit CSRF signé constituent la proposition
-  technique soumise à validation dans l'ADR-0014.
+- Argon2id, PostgreSQL et le double-submit CSRF signé constituent la décision
+  technique validée par le mainteneur le 2026-08-11 dans l'ADR-0014.
 
 Voir `architecture/ADR-0014-ADMIN-CONSOLE-AUTHENTICATION.md`.
 

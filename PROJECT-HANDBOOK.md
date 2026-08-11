@@ -35,8 +35,8 @@ que leur lecture reste publique.
 
 Le Lot 4.4 prépare une connexion humaine distincte du HMAC technique : compte
 administrateur unique, mot de passe Argon2id, session opaque côté serveur dans
-PostgreSQL et cookie HttpOnly. Les décisions fonctionnelles sont acquises ;
-l'architecture détaillée reste proposée jusqu'à validation de l'ADR-0014.
+PostgreSQL et cookie HttpOnly. Les décisions fonctionnelles et l'architecture
+détaillée de l'ADR-0014 ont été validées par le mainteneur le 2026-08-11.
 
 La session expire après une heure d'inactivité et au plus tard après huit
 heures. Le logout révoque côté serveur. Les mutations par cookie utilisent une

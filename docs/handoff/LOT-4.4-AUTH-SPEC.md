@@ -2,7 +2,7 @@
 
 Date : 2026-08-11
 
-Statut : `phase-0-specification-complete-awaiting-maintainer-validation`
+Statut : `phase-0-validated-ready-for-implementation`
 
 ## Objectif
 
@@ -240,7 +240,8 @@ CSRF, secret HMAC et en-tête Authorization.
   mutations ;
 - suppression du parcours humain basé sur `sessionStorage`.
 
-## Point d'arrêt
+## Validation de la Phase 0
 
-Aucune implémentation ne commence avant validation explicite de cette
-spécification, de l'ADR et du plan de migration.
+Le mainteneur a explicitement validé cette spécification, l'ADR et le plan de
+migration le 2026-08-11. L'implémentation peut commencer par étapes vérifiées ;
+elle reste à 0 % au moment de cette consignation.

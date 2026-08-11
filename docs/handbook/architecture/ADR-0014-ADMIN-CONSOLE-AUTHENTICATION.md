@@ -1,6 +1,6 @@
 # ADR-0014 — Authentification de la console d'administration
 
-Statut : Proposé, validation mainteneur requise
+Statut : Accepté
 
 Date : 2026-08-11
 
@@ -12,7 +12,7 @@ ne constitue pas une authentification humaine acceptable. Le mainteneur a
 validé un compte unique, une connexion identifiant/mot de passe, des sessions
 serveur et des durées précises.
 
-## Décision proposée
+## Décision
 
 - mot de passe hashé avec Argon2id et paramètres versionnés dans la chaîne PHC ;
 - compte administrateur singleton initialisé uniquement par CLI ;
@@ -59,8 +59,8 @@ configuration de cookie non Secure.
 - OWASP Cross-Site Request Forgery Prevention Cheat Sheet ;
 - MDN — attributs de `Set-Cookie`.
 
-## Validation requise
+## Validation
 
-Le mainteneur doit valider Argon2id et ses paramètres initiaux, le double-submit
-CSRF signé, le modèle PostgreSQL, les variables proxy/cookie et la coexistence
-HMAC/session avant toute migration ou implémentation.
+Le mainteneur a explicitement validé le 2026-08-11 Argon2id et ses paramètres
+initiaux, le double-submit CSRF signé, le modèle PostgreSQL, les variables
+proxy/cookie et la coexistence HMAC/session.

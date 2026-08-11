@@ -2,7 +2,7 @@
 
 Date : 2026-08-11
 
-Statut : `functional-decisions-approved-specification-pending`
+Statut : `phase-0-validated-ready-for-implementation`
 
 ## État de référence
 
@@ -41,5 +41,6 @@ Produire et faire valider avant tout code :
 - `docs/handoff/LOT-4.4-AUTH-MIGRATION-PLAN.md` ;
 - `docs/handbook/architecture/ADR-0014-ADMIN-CONSOLE-AUTHENTICATION.md`.
 
-La Phase 0 n'ajoute ni migration SQL, ni route, ni dépendance, ni composant
-React. Après rédaction : arrêt obligatoire et validation du mainteneur.
+La Phase 0 n'a ajouté ni migration SQL, ni route, ni dépendance, ni composant
+React. Le mainteneur l'a explicitement validée le 2026-08-11 ; l'implémentation
+peut désormais commencer par étapes vérifiées.
