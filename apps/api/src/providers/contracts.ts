@@ -26,6 +26,8 @@ export interface ProviderAdapterContext<ProviderConfig extends JsonObject> {
   readonly providerConfig: ProviderConfig;
   /** Credentials are supplied by the future secret service, never by source configuration. */
   readonly credentials: Readonly<Record<string, string>>;
+  /** Incremented by the adapter after every actual HTTP request. */
+  readonly requestCounter?: { increment(): void; readonly value: number };
 }
 
 export interface ProviderStreamContext<
@@ -47,6 +49,7 @@ export interface DiscoveredChampionship<SourceConfig extends JsonObject> {
   readonly externalChampionshipId: string;
   readonly name: string;
   readonly sourceConfig: SourceConfig;
+  readonly metadata?: JsonObject;
 }
 
 export interface SeasonDiscoveryResult {

@@ -18,6 +18,9 @@ import { providerRoutes } from './routes/providers.js';
 import { ProviderSecretCipher } from './providers/providerSecrets.js';
 import { ProviderConfigurationService } from './providers/providerService.js';
 import { providerAdapterRegistry } from './providers/registry.js';
+import { registerBuiltInAdapters } from './providers/realAdapters.js';
+import { ProviderDiscoveryService } from './providers/discoveryService.js';
+import { providerDiscoveryRoutes } from './routes/providerDiscovery.js';
 
 const app = Fastify({ logger: true, trustProxy: process.env.TRUST_PROXY === 'true' });
 await verifyApplicationSchema();
@@ -54,9 +57,10 @@ await app.register(correctionRoutes);
 await app.register(auditRoutes);
 await app.register(sessionRoutes);
 await app.register(sessionCorrectionRoutes);
-await app.register(providerRoutes, {
-  service: new ProviderConfigurationService(providerAdapterRegistry, ProviderSecretCipher.fromEnvironment())
-});
+registerBuiltInAdapters(providerAdapterRegistry);
+const providerService=new ProviderConfigurationService(providerAdapterRegistry,ProviderSecretCipher.fromEnvironment());
+await app.register(providerRoutes,{service:providerService});
+await app.register(providerDiscoveryRoutes,{service:new ProviderDiscoveryService(providerService)});
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';
