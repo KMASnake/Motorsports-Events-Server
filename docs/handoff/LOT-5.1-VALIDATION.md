@@ -40,10 +40,14 @@ préservation des données Lot 4.4, reprise historique inactive, deux
 configurations distinctes pour une instance, troisième fournisseur, contrainte
 concurrente d’unicité du principal actif, descente M2 puis M1 et réapplication.
 
-Cette recette n’a pas été exécutée par Codex le 2026-08-12 : le démon Docker
-local n’était pas accessible et les deux demandes d’autorisation ont expiré.
-Elle reste obligatoire pour l’audit mainteneur avant toute autorisation du
-sous-lot 5.2.
+Résultat VPS communiqué par le mainteneur le 2026-08-12 :
+
+- migrations M1/M2 et reprise historique sûre : OK ;
+- seconde montée idempotente et données Lot 4.4 préservées : OK ;
+- deux configurations distinctes pour une même instance : OK ;
+- unicité concurrente du fournisseur principal actif : OK ;
+- descente M2/M1 et réapplication : OK ;
+- résultat final : `Tests Lot 5.1 fondations : OK`.
 
 ## Garanties de périmètre
 
@@ -56,5 +60,6 @@ sous-lot 5.2.
 
 ## État
 
-Implémentation du sous-lot 5.1 terminée. Validation mainteneur et recette
-PostgreSQL isolée requises. Le sous-lot 5.2 n’est pas commencé.
+Implémentation du sous-lot 5.1 et recette PostgreSQL isolée VPS terminées.
+L’audit explicite du mainteneur reste requis. Le sous-lot 5.2 n’est pas
+commencé et demeure non autorisé.

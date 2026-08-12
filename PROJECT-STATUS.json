@@ -67,7 +67,9 @@
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": false,
-      "docker_recipe_validated": false,
+      "docker_recipe_validated": true,
+      "docker_recipe_validation_environment": "isolated-vps",
+      "docker_recipe_validation_date": "2026-08-12",
       "evidence": "docs/handoff/LOT-5.1-VALIDATION.md"
     },
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
@@ -134,5 +136,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Maintainer must audit Lot 5.1 and run scripts/test-lot51-foundations.sh. Codex must STOP; sub-lot 5.2 is not authorized."
+  "next_action": "Maintainer must explicitly audit and validate Lot 5.1. Its isolated VPS PostgreSQL recipe is green. Codex must STOP; sub-lot 5.2 is not authorized."
 }
