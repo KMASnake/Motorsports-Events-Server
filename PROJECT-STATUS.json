@@ -12,12 +12,14 @@
     "lot_5_concept": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
     "lot_5_3_concept": "docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md",
     "lot_5_3_acceptance": "docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md",
+    "lot_5_4_concept": "docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md",
+    "lot_5_4_acceptance": "docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md",
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.3-implemented-awaiting-maintainer-audit",
-    "reason": "Lot 5.3 final manual-fallback audit correction is implemented and locally validated. Maintainer re-audit remains required before any Lot 5.4 work."
+    "status": "sub-lot-5.4-authorized-not-started",
+    "reason": "Lot 5.3 is maintainer validated after final manual fallback audit. Lot 5.4 scheduler/cursor/lease concept and acceptance rules are validated and implementation is explicitly authorized. Later sub-lots remain unauthorized."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -45,7 +47,7 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.3-implemented-awaiting-maintainer-audit",
+    "status": "sub-lot-5.4-authorized-not-started",
     "implementation_percent": 30,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -57,7 +59,7 @@
     "concept_validation_date": "2026-08-12",
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.4",
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": true,
@@ -77,11 +79,21 @@
       "implementation_percent": 100,
       "concept_validated": true,
       "concept_validation_date": "2026-08-12",
-      "maintainer_validated": false,
-      "authorized": false,
+      "maintainer_validated": true,
+      "maintainer_validation_date": "2026-08-12",
+      "authorized": true,
       "implementation_evidence": "docs/handoff/LOT-5.3-VALIDATION.md",
       "concept": "docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md",
       "acceptance": "docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"
+    },
+    "sub_lot_5_4": {
+      "implementation_percent": 0,
+      "concept_validated": true,
+      "concept_validation_date": "2026-08-12",
+      "maintainer_validated": false,
+      "authorized": true,
+      "concept": "docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md",
+      "acceptance": "docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md"
     },
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
     "scope": [
@@ -89,20 +101,20 @@
       "Provider adapters and adapter-specific configuration forms",
       "Encrypted provider secrets with key_version",
       "Real OCBlackTop and TheSportsDB championship discovery without event synchronization",
+      "Manual provider championship source configuration even without discovery",
       "Persistent unassociated provider discoveries requiring manual association or explicit championship creation",
       "Per-championship adapter-specific source configuration supporting different endpoints and strategies within the same provider",
       "Manual adoption of rediscovered source configuration divergences",
       "Periodic discovery model: enabled/disabled, 30-day default, 7-day minimum, execution wired to scheduler in 5.4",
-      "Discovery request accounting with conservative quota guard and no use of current-year reserve",
-      "Discovery history and not-found state after three complete discovery absences",
-      "Current-year-first bootstrap",
+      "Persistent scheduler with current/historical streams, recent catchup and deep-history classes",
+      "Sliding current window, seven days by default and configurable",
+      "Weighted global scheduling current/recent/deep at 3/2/1 by default",
+      "Persistent leases, heartbeat, fencing tokens and crash recovery",
+      "Global worker pool and provider concurrency limits",
+      "Automatic cadence calculation from short-term and monthly quotas in 5.5",
       "Historical backfill across all available seasons",
-      "Continuous current-year rescan from January 1 to end then restart",
-      "Round-robin scheduling across active championships",
-      "Persistent provider-specific synchronization cursors",
-      "Automatic cadence calculation from short-term and monthly quotas",
       "Preservation of local corrections",
-      "Public API suppression when a championship is disabled without deleting data",
+      "Public API suppression and synchronization stop when a championship is disabled without deleting data",
       "Structured synchronization history and rotating technical logs",
       "Local championship logo upload"
     ],
@@ -115,21 +127,33 @@
       "provider_missing_event_cycles_before_alert": 3,
       "provider_discovery_interval_days": 30,
       "provider_discovery_min_interval_days": 7,
-      "provider_missing_discovery_cycles_before_alert": 3
+      "provider_missing_discovery_cycles_before_alert": 3,
+      "current_window_days": 7,
+      "scheduler_weight_current": 3,
+      "scheduler_weight_recent_catchup": 2,
+      "scheduler_weight_deep_history": 1,
+      "lease_duration_seconds": 120,
+      "lease_heartbeat_seconds": 30,
+      "global_worker_pool_size": 4,
+      "sync_now_priority_boost_minutes": 15
     },
     "mandatory_constraints": [
       "Newly discovered championships never create a local championship automatically",
+      "Manual championship source configuration remains available even when discovery is unavailable",
       "Newly discovered championships are never synchronized automatically before explicit later activation",
       "A rediscovery never overwrites an approved source configuration automatically",
-      "Adopting a discovered source configuration is explicit, audited and never starts event synchronization",
       "WRC remains an OCBlackTop championship and not a separate provider adapter",
       "One provider is principal for a championship in V1 while alternative sources may remain inactive",
-      "Discovery must respect safe configured quotas and must not intentionally consume the current-year reserve",
-      "No standalone periodic scheduler is introduced in 5.3; scheduler integration belongs to 5.4",
-      "No provider event synchronization is implemented in 5.3",
+      "Current synchronization uses a sliding window rather than restarting at January 1",
+      "No worker may commit with an expired or superseded lease fencing token",
+      "Cursor advancement and corresponding durable result are atomic",
+      "Sync-now is a temporary priority boost and never bypasses quotas, reserve, backoff, leases or concurrency",
+      "Disabling a championship removes it from the public API and stops synchronization while retaining all stored data and cursors",
+      "No complete provider Event ingestion is implemented in 5.4",
+      "No full quota/cadence engine is implemented before 5.5",
       "Provider secrets are never returned after storage and never logged"
     ],
-    "validation_rule": "Lot 5.2 was explicitly validated by the maintainer. The Lot 5.3 concept was reviewed and validated on 2026-08-12. Only sub-lot 5.3 is authorized; Codex must stop for audit before 5.4."
+    "validation_rule": "Lots 5.1, 5.2 and 5.3 are maintainer validated. Sub-lot 5.4 concept and acceptance were explicitly validated on 2026-08-12 and only 5.4 is authorized. Codex must stop for maintainer audit before 5.5."
   },
   "technical_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -143,5 +167,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Maintainer audits and validates sub-lot 5.3. No Lot 5.4 work is authorized."
+  "next_action": "Codex may implement sub-lot 5.4 only, following LOT-5.4-SCHEDULER-CONCEPT.md and LOT-5.4-SCHEDULER-ACCEPTANCE.md. It must STOP for maintainer audit before any 5.5 work."
 }
