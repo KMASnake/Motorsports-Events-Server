@@ -393,7 +393,12 @@ interprétée comme illimitée.
 6. un hash canonique identique classe l'élément `unchanged` ;
 7. un changement appelle le service transactionnel de corrections existant :
    source mise à jour, override conservé, valeur effective locale ;
-8. l'audit n'est écrit que pour une mutation réelle.
+8. une convergence entre source et override est détectée et signalée. Le Lot 5
+   n'ajoute aucune suppression automatique : l'override reste conservé et
+   effectif tant qu'une règle Corrections déjà validée n'impose pas
+   explicitement sa suppression ; à défaut, la suppression reste une décision
+   administrative manuelle ;
+9. l'audit n'est écrit que pour une mutation réelle.
 
 La présence est évaluée seulement après un cycle complet confirmé. Une
 annulation explicite est un statut fournisseur normal, distinct d'une absence.
@@ -463,43 +468,122 @@ et alerte ne sont jamais ajoutées à `/api/v1` public.
 
 ## 10. Plan de migrations proposé (aucun SQL créé en Phase 0)
 
+### Procédure commune de rollback
+
+Avant tout DOWN, arrêter API et workers, acquérir un verrou d'exploitation,
+vérifier l'absence de lease actif puis produire : sauvegarde PostgreSQL complète,
+export tabulaire/JSON des seules tables du groupe, compteurs et sommes de
+contrôle, version de schéma et manifeste des fichiers éventuels. Le nettoyage
+préalable n'est permis que par une commande dédiée, avec cible explicite,
+confirmation et journal de ce qui a été exporté.
+
+Après le DOWN, démarrer la version applicative antérieure, vérifier sa révision
+de schéma, sa santé, les comptes de championnats/Événements/corrections et un
+échantillon d'API publique. La réapplication exécute le même UP, recharge si
+nécessaire l'export du groupe, compare compteurs/sommes de contrôle et relance
+les tests d'idempotence. Si une donnée ne peut pas être représentée sans perte
+dans l'ancien schéma, le DOWN s'arrête avant toute suppression : maintien sur
+la version courante ou restauration de la sauvegarde complète. Un DOWN protégé
+doit donc être réellement praticable en recette, mais n'est jamais forcé au
+prix d'une perte.
+
 ### M1 — Socle fournisseurs
 
-UP : créer instances, secrets, policies/états de quota et contraintes.
-DOWN : refuser si instances/secrets existent, puis retirer les objets.
+1. **UP** : créer instances, secrets, policies/états de quota et contraintes.
+2. **Condition DOWN** : aucune instance référencée par M2+, aucun worker, et
+   toutes les instances en `draft`/désactivées.
+3. **Sauvegarde/export** : exporter instances, policies, états et secrets sous
+   forme chiffrée avec leurs nonce, algorithme et `key_version` ; la clé maître
+   reste hors export.
+4. **Nettoyage contrôlé** : supprimer d'abord les secrets puis policies/états
+   et instances au moyen d'une commande qui vérifie les références.
+5. **DOWN** : retirer contraintes, index et tables M1, puis sa ligne de version.
+6. **Validation** : baseline Lot 4.4 saine et absence des objets M1.
+7. **Réapplication** : UP M1 puis import contrôlé ; si le secret ne peut pas
+   être restauré/déchiffré, interrompre et restaurer la sauvegarde, sans créer
+   un secret vide.
 
 ### M2 — Liens et configurations de source
 
-UP : créer liens et source configs ; convertir de façon conservatrice les
-`championships.provider_key` non nuls en instances/lien `inactive` identifiables,
-sans activer de synchronisation automatique. Conserver les colonnes historiques.
-DOWN : refuser si un lien a été modifié/activé après migration ; sinon retirer
-les liens migrés et les tables sans toucher aux colonnes historiques.
+1. **UP** : créer liens et source configs ; convertir conservativement les
+   `championships.provider_key` non nuls en liens `inactive`, sans synchroniser,
+   et conserver toutes les colonnes historiques.
+2. **Condition DOWN** : aucun objet M3+ et chaque lien possède encore une
+   représentation historique non ambiguë dans `championships`.
+3. **Sauvegarde/export** : exporter liens, états de découverte/activation,
+   source configs et rapport de correspondance vers les colonnes historiques.
+4. **Nettoyage contrôlé** : désactiver les liens ; recopier seulement les
+   identités certaines dans les colonnes historiques ; les configurations sans
+   équivalent restent dans l'export et interdisent le DOWN tant que leur perte
+   n'est pas explicitement acceptée hors procédure normale.
+5. **DOWN** : retirer source configs puis liens et objets M2, jamais les
+   colonnes historiques.
+6. **Validation** : comparer chaque championnat importé, vérifier qu'aucune
+   synchronisation n'est active et que l'API publique est inchangée.
+7. **Réapplication** : UP M2, backfill idempotent puis réimport des configs ;
+   toute collision laisse le lien inactif et bloque l'activation.
 
 ### M3 — Flux, quotas runtime et runs
 
-UP : créer `sync_streams`, `sync_runs`, index d'acquisition et contraintes de
-lease. Aucun flux actif n'est créé automatiquement.
-DOWN : refuser si run ou lease actif existe ; exporter/archiver les runs si la
-politique de conservation l'exige, puis retirer.
+1. **UP** : créer `sync_streams`, `sync_runs`, index et contraintes de lease ;
+   aucun flux n'est activé implicitement.
+2. **Condition DOWN** : scheduler arrêté, aucun lease non expiré, aucun run
+   `running` et tous les flux en pause/état terminal.
+3. **Sauvegarde/export** : exporter flux, curseurs avec version, leases, runs,
+   compteurs et états de quota runtime.
+4. **Nettoyage contrôlé** : marquer les runs abandonnés `interrupted`, libérer
+   les leases expirés, puis purger les runs/flux seulement après vérification de
+   l'archive et de ses sommes de contrôle.
+5. **DOWN** : retirer index, runs puis flux et objets runtime M3.
+6. **Validation** : version antérieure saine, aucune tâche en mémoire ou en
+   base et données métier inchangées.
+7. **Réapplication** : UP M3 puis réimport des flux/runs ; restaurer les
+   curseurs en pause et les rendre éligibles uniquement après validation. Un
+   curseur illisible bloque le flux au lieu de repartir silencieusement à zéro.
 
 ### M4 — Mappings, identité et présence
 
-UP : créer mappings/présence, ajouter à `events` le FK de lien et le hash ;
-backfill seulement lorsque `provider_key` correspond sans ambiguïté à un lien.
-Les ambiguïtés restent nulles et signalées, sans fusion. Ajouter le nouvel index
-unique après détection préalable des collisions.
-DOWN : refuser tant qu'un Événement dépend exclusivement de la nouvelle
-identité ; sinon retirer index/colonnes/tables en conservant les anciennes.
+1. **UP** : créer mappings/présence, ajouter FK de lien et hash aux Événements,
+   backfiller les cas certains et créer l'index après diagnostic des collisions.
+2. **Condition DOWN** : chaque Événement fournisseur possède une identité
+   historique suffisante et aucun mapping confirmé n'est l'unique trace d'une
+   association nécessaire à l'ancien runtime.
+3. **Sauvegarde/export** : exporter mappings, présence, nouvelles colonnes
+   Événements, collisions et alertes associées ; sauvegarder séparément les
+   corrections sans les modifier.
+4. **Nettoyage contrôlé** : recopier les identités certaines vers les colonnes
+   historiques, résoudre ou laisser hors DOWN les ambiguïtés, puis supprimer
+   présence/mappings uniquement après comparaison.
+5. **DOWN** : retirer index/FK, colonnes additives et tables M4 ; ne toucher ni
+   aux Événements, ni à `event_corrections`.
+6. **Validation** : comptes et identités historiques inchangés, corrections
+   présentes, contrat public identique.
+7. **Réapplication** : UP M4, backfill puis import ; mappings incompatibles
+   restent `pending`. Si une identité ne peut pas être préservée, interrompre
+   le DOWN et restaurer, jamais fusionner ou supprimer automatiquement.
 
 ### M5 — Alertes et assets logo
 
-UP : créer alertes et assets ; ajouter `championships.logo_asset_id` tout en
-conservant `logo_url`.
-DOWN : refuser si assets locaux existent, sauf export préalable explicite.
+1. **UP** : créer alertes/assets et ajouter `logo_asset_id` en conservant
+   `logo_url`.
+2. **Condition DOWN** : aucune alerte ouverte requise par l'exploitation et
+   chaque asset local possède un fallback `logo_url` ou un export restaurable.
+3. **Sauvegarde/export** : exporter alertes avec états/audit, métadonnées des
+   assets, fichiers binaires, MIME, tailles et sommes de contrôle.
+4. **Nettoyage contrôlé** : résoudre/archiver les alertes, recopier les URLs de
+   fallback quand possible, détacher les assets puis supprimer les fichiers
+   uniquement après validation de l'archive.
+5. **DOWN** : retirer FK/colonne additive, tables alertes/assets et objets M5 ;
+   conserver `logo_url`.
+6. **Validation** : championnats lisibles avec fallback, aucun fichier orphelin,
+   API publique et stockage antérieur sains.
+7. **Réapplication** : UP M5, import métadonnées/fichiers, vérification MIME et
+   sommes, puis rattachement. Un fichier manquant/invalide reste détaché avec
+   fallback ; aucune suppression silencieuse n'est autorisée.
 
 Chaque migration dépend de la précédente, vérifie `schema_migrations`, est
-idempotente, testée sur base vierge et Lot 4.4, puis rollback/réapplication.
+idempotente, testée sur base vierge et Lot 4.4, puis rollback/réapplication
+avec les exports ci-dessus.
 Le démarrage API reste en lecture seule. La suppression des colonnes historiques
 est exclue du Lot 5 et nécessitera une migration ultérieure distincte.
 

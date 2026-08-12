@@ -52,7 +52,7 @@ authentification, CSRF, absence de secret et rollback.
 | Normalisation | UTC ; références connues ; objet canonique stable ; fournisseur brut non exposé au public |
 | Mapping | `external_id` prioritaire ; clé métier sûre en repli ; ambiguïté `pending` ; décision réutilisée ; collision refusée |
 | Idempotence | hash identique = aucune écriture/audit ; changement réel = mise à jour unique ; double ingestion convergente |
-| Corrections | source actualisée ; override conservé et effectif ; conflit visible ; convergence supprime correction inutile |
+| Corrections | source actualisée ; override conservé et effectif ; conflit visible ; convergence détectée et signalée ; aucune suppression automatique ajoutée par le Lot 5 ; l'override reste conservé tant qu'une règle Corrections déjà validée n'impose pas explicitement sa suppression, sinon sa suppression reste une décision administrative manuelle |
 | Présence | absence comptée seulement après cycle complet ; alerte au 3e cycle par défaut ; réapparition résout ; jamais de suppression |
 | Annulation | statut explicite appliqué immédiatement et non confondu avec une absence |
 | Désactivation | stoppe flux ; conserve données/runs/corrections ; admin visible ; API publique exclut sans UPDATE massif |
@@ -124,7 +124,9 @@ authentification, CSRF, absence de secret et rollback.
 - M4 validée et collisions historiques diagnostiquées ;
 - external ID, clé métier, ambiguïté et mapping confirmé ;
 - hash inchangé évite écriture ;
-- correction locale reste effective sous mise à jour fournisseur ;
+- correction locale reste effective sous mise à jour fournisseur ; la
+  convergence source/override est détectée sans créer de nouvelle suppression
+  automatique dans le Lot 5 ;
 - seuil d'absence, réapparition et annulation explicite.
 
 ### 5.8 — Runs, logs et alertes

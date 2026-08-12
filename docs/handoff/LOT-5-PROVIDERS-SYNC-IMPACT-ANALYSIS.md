@@ -212,18 +212,23 @@ identités, quotas, source configs, mappings et alertes sont strictement admin.
 
 ## 10. Impact migrations et rollback
 
-| Migration proposée | Risque | Protection |
+| Migration proposée | Export et nettoyage avant DOWN | Validation et réapplication |
 |---|---|---|
-| M1 instances/secrets/quotas | clé/config incomplète | aucune activation, DOWN refuse données |
-| M2 liens/source configs | association héritée ambiguë | liens inactifs, rapport, colonnes conservées |
-| M3 streams/runs | lease/run actif au DOWN | pause, expiration, refus tant que données actives |
-| M4 identité/mappings/présence | collisions externes | diagnostic préalable, index après résolution |
-| M5 alertes/assets | fichiers hors DB | manifeste/export et refus de DOWN destructif |
+| M1 instances/secrets/quotas | export DB des configs, états et secrets chiffrés ; vérifier absence de référence puis supprimer par commande contrôlée | baseline Lot 4.4 saine ; UP puis réimport sans jamais substituer un secret vide |
+| M2 liens/source configs | exporter liens/configs et rapport de correspondance ; désactiver et recopier seulement les identités historiques certaines | API publique inchangée ; UP/backfill puis import, collisions laissées inactives |
+| M3 streams/runs | arrêter scheduler, expirer leases, marquer runs abandonnés, exporter curseurs/runs puis nettoyer après checksum | aucune tâche résiduelle ; UP/import en pause puis validation des curseurs avant reprise |
+| M4 identité/mappings/présence | exporter mappings/présence/nouvelles identités ; garantir une identité historique par Événement ; ne jamais toucher aux corrections | comptes, identités et corrections vérifiés ; UP/backfill/import, ambiguïtés `pending` |
+| M5 alertes/assets | exporter alertes, métadonnées et binaires avec checksum ; détacher après fallback et archive vérifiés | absence d'orphelin ; UP/import/MIME/checksum puis rattachement |
 
 Le rollback applicatif garde un mode de lecture des anciennes colonnes pendant
-tout le Lot 5. Une migration n'efface jamais un secret, run, mapping, correction
-ou asset sans procédure explicite et sauvegarde. Le ZIP/release doit inclure les
-scripts UP/DOWN et la vérification de schéma correspondante.
+tout le Lot 5. La procédure commune impose arrêt des workers, sauvegarde complète,
+exports ciblés, compteurs/sommes de contrôle, DOWN, démarrage de la version
+antérieure, tests de santé et API, puis UP/réimport et nouvelle comparaison.
+Une migration n'efface jamais un secret, run, mapping, correction ou asset sans
+cette procédure. Si l'ancien schéma ne peut représenter une donnée sans perte,
+le DOWN s'arrête avant suppression et l'exploitation conserve la version
+courante ou restaure la sauvegarde. Le ZIP/release doit inclure scripts UP/DOWN,
+commandes d'export/import, manifeste et vérification de schéma.
 
 ## 11. Jeux de données et environnements de recette
 
@@ -260,6 +265,18 @@ nettoyage suppriment uniquement la pile/les volumes nommés du test.
 | service Python historique divergent | moyen | tests de compatibilité, pas de couplage runtime implicite |
 
 ## 13. Documentation permanente
+
+### Suivi canonique et miroir historique
+
+La recherche exhaustive des références à `docs/handover/PROGRESS.json` ne
+trouve aucun script, test, workflow ou outil runtime qui le consomme. Il est
+seulement cité par des documents historiques, `CODEX.md` de manière
+conditionnelle et `HANDOVER-MANIFEST.json` comme fichier archivé. Le Cas A de
+l'audit s'applique donc : ce fichier est restauré exactement à son état de
+`main` et n'est plus synchronisé avec le lot courant. Le seul suivi vivant est
+`docs/handoff/PROGRESS.json`, déclaré canonique. Les outils futurs doivent lire
+ce chemin canonique et ne doivent pas réactiver le miroir sans décision
+documentée.
 
 La Phase 0 ne modifie pas le Handbook ni ne crée d'ADR permanent : elle propose
 des décisions de lot encore soumises à audit. Après validation du mainteneur et

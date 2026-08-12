@@ -3,36 +3,47 @@
   "canonical_path": "docs/handoff/PROGRESS.json",
   "role": "historical-mirror-kept-for-compatibility",
   "baseline": {
-    "lot": "4.4",
-    "version": "8.1.0-alpha.2-lot.4.4",
+    "lot": "4.3",
+    "version": "8.1.0-alpha.2-lot.4.3",
     "status": "merged-and-user-validated",
     "validated_on_user_workstation": true,
     "validated_on_vps": true,
-    "validation_date": "2026-08-12",
-    "merge_pr": 28,
-    "merge_commit": "b42a97129a8aa1cb9a42ce01ba0affb8e5a848a1"
+    "validation_date": "2026-08-11"
   },
   "current": {
-    "lot": "5",
-    "name": "Providers and API synchronization core",
-    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
+    "lot": "4.4",
+    "name": "Administration authentication",
+    "version": "8.1.0-alpha.2-lot.4.4",
+    "status": "maintainer-validated-ci-green-awaiting-merge",
     "updated_at": "2026-08-12",
-    "implementation_percent": 0,
+    "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
-    "validated_on_user_workstation": false,
-    "validated_on_vps": false,
+    "validated_on_user_workstation": true,
+    "validated_on_vps": true,
     "merged_to_main": false,
-    "merge_authorized": false,
-    "phase_0_deliverables": [
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md"
+    "phase_0_validated_by_maintainer": true,
+    "phase_0_validation_date": "2026-08-11",
+    "step_1_validated_by_maintainer": true,
+    "step_1_validation_date": "2026-08-11",
+    "step_2_validated_by_maintainer": true,
+    "step_2_validation_date": "2026-08-11",
+    "step_3_validated_by_maintainer": true,
+    "step_3_validation_date": "2026-08-11",
+    "step_4_candidate_date": "2026-08-12",
+    "step_4_validated_by_maintainer": true,
+    "step_4_validation_date": "2026-08-12",
+    "step_4_validation_environments": [
+      "windows-docker-desktop-chromium",
+      "isolated-vps-docker"
     ],
-    "validation_rule": "Phase 0 documentation requires explicit maintainer validation before application implementation."
+    "ci_validation_commit": "27b85ae467935d44e8d75841830e878eba3b9ea0",
+    "ci_validation_status": "ci-and-docker-build-green",
+    "validation_rule": "Merge, CI, build and deployment are technical states, not user validation."
   },
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Audit and explicitly validate the canonical Lot 5 Phase 0 deliverables in docs/handoff."
+    "owner": "Codex",
+    "task": "Review draft pull request #28 and wait for explicit merge authorization; use docs/handoff/PROGRESS.json as the canonical tracker.",
+    "target_visual_fidelity": 98
   }
 }

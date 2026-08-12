@@ -74,7 +74,7 @@
       "Encrypted provider secrets with key_version",
       "Automatic championship discovery with manual activation",
       "Manual championship configuration when discovery is unavailable",
-      "WRC-specific adapter behavior where required",
+      "Per-championship adapter-specific source configuration supporting different endpoints and strategies within the same provider; WRC is a known OCBlackTop example",
       "Current-year-first bootstrap",
       "Historical backfill across all available seasons",
       "Continuous current-year rescan from January 1 to end then restart",

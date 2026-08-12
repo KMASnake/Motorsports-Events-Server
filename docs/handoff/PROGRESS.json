@@ -40,7 +40,7 @@
     "provider_model": "Adapter plus provider instance plus provider/championship synchronization stream",
     "championship_discovery": "Automatic where possible, visible as discovered but never auto-synchronized before manual activation",
     "manual_configuration": "Adapter-specific form when automatic discovery is unavailable or insufficient",
-    "wrc": "Special adapter behavior where seasons/endpoints require it, normalized into the common core",
+    "per_championship_source_config": "Adapter-specific source configuration supports different endpoints and strategies within the same provider; WRC is a known OCBlackTop example, not an architectural exception",
     "bootstrap": "Current year first across active championships in round-robin, then historical backfill in background",
     "historical_depth": "Discover seasons where possible; otherwise N-1 recursively until a confirmed empty season, with optional manual start year",
     "current_loop": "Scan from January 1 through available current-year data, then restart from January 1 continuously",
