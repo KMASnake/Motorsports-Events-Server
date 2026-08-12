@@ -25,6 +25,7 @@ import { ManualChampionshipSourceService } from './providers/manualSourceService
 import { providerManualSourceRoutes } from './routes/providerManualSources.js';
 import { PersistentSchedulerService } from './providers/schedulerService.js';
 import { providerSchedulerRoutes } from './routes/providerScheduler.js';
+import { DiscoverySchedulerRuntime } from './providers/discoverySchedulerRuntime.js';
 
 const app = Fastify({ logger: true, trustProxy: process.env.TRUST_PROXY === 'true' });
 await verifyApplicationSchema();
@@ -64,9 +65,15 @@ await app.register(sessionCorrectionRoutes);
 registerBuiltInAdapters(providerAdapterRegistry);
 const providerService=new ProviderConfigurationService(providerAdapterRegistry,ProviderSecretCipher.fromEnvironment());
 await app.register(providerRoutes,{service:providerService});
-await app.register(providerDiscoveryRoutes,{service:new ProviderDiscoveryService(providerService)});
+const discoveryService=new ProviderDiscoveryService(providerService);
+await app.register(providerDiscoveryRoutes,{service:discoveryService});
 await app.register(providerManualSourceRoutes,{service:new ManualChampionshipSourceService(providerService)});
-await app.register(providerSchedulerRoutes,{service:new PersistentSchedulerService()});
+const schedulerService=new PersistentSchedulerService();
+await app.register(providerSchedulerRoutes,{service:schedulerService});
+const pollSeconds=Math.min(30,Math.max(10,Number(process.env.SCHEDULER_POLL_SECONDS)||15));
+const discoveryRuntime=new DiscoverySchedulerRuntime(schedulerService,discoveryService,app.log,pollSeconds*1000);
+app.addHook('onClose',async()=>discoveryRuntime.stop());
+discoveryRuntime.start();
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';
