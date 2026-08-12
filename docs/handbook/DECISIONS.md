@@ -1,5 +1,17 @@
 # Journal des décisions
 
+## 2026-08-12 — Scheduler de synchronisation persistant
+
+- deux flux persistants `current` et `historical` portent trois classes de
+  travail pondérées 3/2/1 ;
+- les leases PostgreSQL, heartbeats et générations de fencing empêchent un
+  worker périmé de valider ;
+- résultat, curseur, état et exécution sont validés dans une transaction unique ;
+- le pool global et la concurrence fournisseur sont tous deux appliqués ;
+- l'ingestion complète et le moteur de quotas restent hors du Lot 5.4.
+
+Voir `architecture/ADR-0015-PERSISTENT-SYNC-SCHEDULER.md`.
+
 ## 2026-08-11 — Authentification humaine de la console
 
 - un compte administrateur unique est initialisé par une commande dédiée ;

@@ -1,5 +1,15 @@
 # État du projet
 
+## Lot 5.4 — candidat à l'audit mainteneur (12 août 2026)
+
+Le scheduler persistant, ses curseurs, leases, tokens de fencing, mécanismes de
+reprise et commandes administrateur sont implémentés. La recette PostgreSQL
+isolée, le rollback `0011` et les tests ciblés passent. Aucune ingestion complète
+d'événements fournisseur ni aucun moteur de quota du Lot 5.5 n'a été ajouté.
+
+Preuve : `docs/handoff/LOT-5.4-VALIDATION.md`. Le Lot 5.4 n'est pas encore
+validé par le mainteneur et aucun développement 5.5 n'est autorisé.
+
 ## Lot 5.3 — implémenté, audit mainteneur requis — 2026-08-12
 
 La découverte OCBlackTop/TheSportsDB, les configurations de source proposées,

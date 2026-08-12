@@ -23,6 +23,8 @@ import { ProviderDiscoveryService } from './providers/discoveryService.js';
 import { providerDiscoveryRoutes } from './routes/providerDiscovery.js';
 import { ManualChampionshipSourceService } from './providers/manualSourceService.js';
 import { providerManualSourceRoutes } from './routes/providerManualSources.js';
+import { PersistentSchedulerService } from './providers/schedulerService.js';
+import { providerSchedulerRoutes } from './routes/providerScheduler.js';
 
 const app = Fastify({ logger: true, trustProxy: process.env.TRUST_PROXY === 'true' });
 await verifyApplicationSchema();
@@ -64,6 +66,7 @@ const providerService=new ProviderConfigurationService(providerAdapterRegistry,P
 await app.register(providerRoutes,{service:providerService});
 await app.register(providerDiscoveryRoutes,{service:new ProviderDiscoveryService(providerService)});
 await app.register(providerManualSourceRoutes,{service:new ManualChampionshipSourceService(providerService)});
+await app.register(providerSchedulerRoutes,{service:new PersistentSchedulerService()});
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';

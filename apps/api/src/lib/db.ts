@@ -48,6 +48,8 @@ export async function verifyApplicationSchema(): Promise<void> {
     provider_source_configs_table: string | null;
     provider_discoveries_table: string | null;
     provider_discovery_runs_table: string | null;
+    sync_streams_table: string | null;
+    sync_runs_table: string | null;
     applied_migrations: number;
   }>(`
     select
@@ -68,6 +70,8 @@ export async function verifyApplicationSchema(): Promise<void> {
       to_regclass('public.provider_championship_source_configs')::text as provider_source_configs_table,
       to_regclass('public.provider_discovered_championships')::text as provider_discoveries_table,
       to_regclass('public.provider_discovery_runs')::text as provider_discovery_runs_table,
+      to_regclass('public.sync_streams')::text as sync_streams_table,
+      to_regclass('public.sync_runs')::text as sync_runs_table,
       (select count(*)::int from schema_migrations
        where version in (
          '0001_event_corrections',
@@ -79,7 +83,8 @@ export async function verifyApplicationSchema(): Promise<void> {
          '0007_provider_instances',
          '0008_provider_championship_sources',
          '0009_provider_discovery',
-         '0010_provider_discovery_completeness'
+         '0010_provider_discovery_completeness',
+         '0011_persistent_sync_scheduler'
        )) as applied_migrations
   `);
 
@@ -101,7 +106,9 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.provider_source_configs_table ||
     !schema.provider_discoveries_table ||
     !schema.provider_discovery_runs_table ||
-    schema.applied_migrations !== 10
+    !schema.sync_streams_table ||
+    !schema.sync_runs_table ||
+    schema.applied_migrations !== 11
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }

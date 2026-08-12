@@ -173,6 +173,9 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
 validation utilisateur.
 
 ## État
+Le Lot 5.4 implémente le scheduler persistant décrit par l'ADR-0015 et attend
+l'audit explicite du mainteneur. Aucun travail du Lot 5.5 n'est autorisé.
+
 Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves
 VPS isolées des migrations, API, corrections et contrôles visuels avec la
 recette Windows complète réussie le 2026-08-11 (qualité, données synthétiques

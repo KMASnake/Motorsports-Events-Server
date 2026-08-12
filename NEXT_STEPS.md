@@ -1,17 +1,29 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur Lot 5.3
+## Priorité courante — audit mainteneur Lot 5.4
+
+- [x] valider le Lot 5.3 et autoriser explicitement le Lot 5.4 ;
+- [x] implémenter le scheduler PostgreSQL, les curseurs et les leases ;
+- [x] valider fencing, reprise après crash et atomicité résultat/curseur ;
+- [x] valider les commandes administrateur et la découverte périodique ;
+- [x] valider la migration `0011` aller/retour sur PostgreSQL réel ;
+- [ ] exécuter la recette `./scripts/test-lot54-scheduler.sh` sur le VPS ;
+- [ ] auditer puis valider explicitement le Lot 5.4.
+
+Point d’arrêt obligatoire : aucune tâche 5.5 n’est autorisée.
+
+## Historique — audit mainteneur Lot 5.3
 
 - [x] implémenter la migration `0009_provider_discovery` réversible ;
 - [x] implémenter la découverte réelle OCBlackTop et TheSportsDB sans Events ;
 - [x] valider lint, types, 118 tests API, 29 tests Web, builds et Docker ;
 - [x] corriger les constats de l’audit Lot 5.3 ;
 - [x] ajouter le fallback manuel complet, indépendant de la découverte et du réseau ;
-- [ ] exécuter la recette manuelle avec les credentials réels ;
-- [ ] auditer puis valider explicitement le Lot 5.3 ;
-- [ ] autoriser séparément le Lot 5.4 avant tout développement ultérieur.
+- [x] exécuter la recette manuelle avec les credentials réels ;
+- [x] auditer puis valider explicitement le Lot 5.3 ;
+- [x] autoriser séparément le Lot 5.4 avant tout développement ultérieur.
 
-Point d’arrêt obligatoire : aucune tâche 5.4 n’est autorisée.
+Le Lot 5.3 est validé par le mainteneur.
 
 ## Priorité courante — Lot 4.3 Sessions
 

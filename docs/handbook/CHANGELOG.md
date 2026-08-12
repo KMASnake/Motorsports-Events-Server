@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.26 — 2026-08-12
+
+- implémente le scheduler persistant approuvé du Lot 5.4 ;
+- ajoute curseurs, leases, fencing, reprise après crash et commandes auditées ;
+- maintient le Lot 5.5 hors périmètre jusqu'à validation mainteneur du Lot 5.4.
+
 ## 1.25 — 2026-08-12
 
 - ajoute la découverte réelle OCBlackTop et TheSportsDB sans ingestion d’événements ;
