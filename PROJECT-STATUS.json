@@ -13,9 +13,9 @@
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
-    "branch": "main",
-    "status": "lot-5-concept-approved-specification-pending",
-    "reason": "Lot 4.4 is merged and user-validated. The maintainer has completed and approved the functional and architectural discussion for Lot 5 Providers and API synchronization. Phase 0 specification is now authorized; implementation is not."
+    "branch": "codex/lot-5-providers-sync",
+    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
+    "reason": "Lot 4.4 is merged and user-validated. The Lot 5 Phase 0 specification, acceptance matrix, impact analysis, proposed database model, migration strategy and implementation breakdown are complete. Application implementation remains forbidden until explicit maintainer validation."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -51,10 +51,10 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "concept-approved-specification-pending",
+    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
     "implementation_percent": 0,
-    "architecture_percent": 0,
-    "documentation_readiness_percent": 20,
+    "architecture_percent": 100,
+    "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
     "validated_on_vps": false,
     "merged_to_main": false,
@@ -62,6 +62,12 @@
     "concept_validated_by_maintainer": true,
     "concept_validation_date": "2026-08-12",
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
+    "phase_0_completed_at": "2026-08-12",
+    "phase_0_deliverables": [
+      "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
+      "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
+      "docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md"
+    ],
     "scope": [
       "Providers administration and provider detail pages",
       "Provider adapters and adapter-specific configuration forms",
@@ -128,5 +134,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Codex may create a Lot 5 branch and perform Phase 0 documentation only: specification, acceptance criteria, impact analysis and implementation-step proposal. It must stop before writing application code."
+  "next_action": "Maintainer must audit and explicitly validate the Lot 5 Phase 0 deliverables. Codex must stop and must not start sub-lot 5.1 or write application code before that validation."
 }
