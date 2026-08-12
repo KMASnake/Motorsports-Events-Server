@@ -17,7 +17,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.3-implemented-awaiting-maintainer-audit",
+    "status": "sub-lot-5.4-authorized-not-started",
     "updated_at": "2026-08-12",
     "implementation_percent": 30,
     "architecture_percent": 100,
@@ -29,7 +29,7 @@
     "concept_validated_by_maintainer": true,
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.4",
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": true,
@@ -47,42 +47,65 @@
       "implementation_percent": 100,
       "concept_validated": true,
       "concept_validation_date": "2026-08-12",
-      "maintainer_validated": false,
-      "authorized": false,
+      "maintainer_validated": true,
+      "maintainer_validation_date": "2026-08-12",
+      "authorized": true,
       "implementation_evidence": "docs/handoff/LOT-5.3-VALIDATION.md",
       "concept": "docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md",
       "acceptance": "docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"
     },
-    "validation_rule": "Lot 5.2 is maintainer validated. Sub-lot 5.3 discovery and zero-network manual fallback corrections are implemented and await maintainer re-audit. No sub-lot 5.4 work is authorized."
+    "sub_lot_5_4": {
+      "implementation_percent": 0,
+      "concept_validated": true,
+      "concept_validation_date": "2026-08-12",
+      "maintainer_validated": false,
+      "authorized": true,
+      "concept": "docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md",
+      "acceptance": "docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md"
+    },
+    "validation_rule": "Lots 5.1, 5.2 and 5.3 are maintainer validated. Only sub-lot 5.4 is now authorized. Codex must stop for maintainer audit before 5.5."
   },
-  "lot_5_3_approved_concepts": {
-    "real_adapters": "OCBlackTop and TheSportsDB real adapters are used for connection testing and championship discovery only",
-    "no_event_sync": "No provider event synchronization, bootstrap or historical event import in 5.3",
-    "wrc": "WRC remains an OCBlackTop championship; provider/championship source config selects the appropriate strategy",
-    "unassociated_discoveries": "Provider discoveries are persisted separately before any local championship association",
-    "manual_validation": "A discovered championship never creates a local business championship automatically",
-    "alternative_sources": "Multiple provider sources may be associated with one local championship but only one principal source is active in V1",
-    "proposed_source_config": "Rediscovery stores proposed config separately and never overwrites approved config automatically",
-    "adopt_action": "Adopt discovered configuration is an explicit audited operation that never triggers synchronization",
-    "periodic_discovery": "Configurable per provider, 30 days default, 7 days minimum, can be disabled",
-    "periodic_execution": "5.3 implements eligibility/model; actual persistent periodic scheduling is wired in 5.4",
-    "quota_guard": "Discovery counts requests and applies conservative safe-limit guards without implementing the full 5.5 quota engine",
-    "current_reserve": "Discovery must not intentionally consume the 30 percent current-year reserve",
-    "not_found": "Three complete consecutive discovery absences mark a provider championship as not found; failures/partial runs do not count",
-    "history": "Minimal durable DISCOVERY history records origin, timing, status, request usage and result counters"
+  "lot_5_4_approved_concepts": {
+    "streams": "Two persistent streams current/historical; historical carries recent_catchup and deep_history logical classes",
+    "current_window": "Sliding current window from today minus 7 days by default, configurable, never forced back to January 1",
+    "historical": "Recent catchup covers data before current window; deep history descends N-1 until confirmed empty season",
+    "year_rollover": "Newly completed year enters recent catchup priority without losing deep-history progress",
+    "scheduler_weights": "Global weighted round-robin current/recent/deep = 3/2/1 by default, configurable, unused capacity redistributed",
+    "work_unit": "One bounded adapter-defined unit per scheduler turn; scheduler does not impose universal pagination",
+    "lease": "Persistent PostgreSQL lease, 120 seconds default, heartbeat about 30 seconds",
+    "fencing": "Monotonic lease generation/fencing token required; stale workers cannot commit",
+    "workers": "Global worker pool 4 by default plus provider max_concurrency 1 by default",
+    "atomicity": "Durable synthetic result, cursor, stream state and run outcome commit atomically; failure rolls all back",
+    "sync_now": "Temporary 15-minute priority boost, removed after first successful unit or expiry, never bypasses safety gates",
+    "reset": "Explicit audited current/historical reset separately; never deletes stored business data",
+    "disable": "Disabling a championship removes public publication and stops synchronization but retains all data and cursors",
+    "reactivate": "Reactivation republishes eligible data, recalculates current sliding window, resumes historical progress and boosts current",
+    "crash_recovery": "Expired lease recovered, previous run marked interrupted, resume at last committed cursor, stale worker fenced",
+    "error_boundary": "5.4 implements generic states/counters/suspension; exact 429 Retry-After exponential backoff jitter policy remains 5.5",
+    "periodic_discovery": "5.4 provides the single persistent scheduler integration for discovery eligibility created in 5.3"
   },
   "approved_defaults": {
     "current_year_monthly_quota_reserve_percent": 30,
     "provider_discovery_interval_days": 30,
     "provider_discovery_min_interval_days": 7,
-    "provider_missing_discovery_cycles_before_alert": 3
+    "provider_missing_discovery_cycles_before_alert": 3,
+    "current_window_days": 7,
+    "scheduler_weight_current": 3,
+    "scheduler_weight_recent_catchup": 2,
+    "scheduler_weight_deep_history": 1,
+    "lease_duration_seconds": 120,
+    "lease_heartbeat_seconds": 30,
+    "global_worker_pool_size": 4,
+    "provider_default_concurrency": 1,
+    "sync_now_priority_boost_minutes": 15
   },
   "quality_baseline": {
     "lot_5_1": "maintainer-validated",
-    "lot_5_2": "maintainer-validated-security-integration-green"
+    "lot_5_2": "maintainer-validated-security-integration-green",
+    "lot_5_3": "maintainer-validated-discovery-and-manual-fallback"
   },
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Audit and validate sub-lot 5.3. Do not authorize or begin Lot 5.4 implicitly."
+    "owner": "Codex",
+    "task": "Implement sub-lot 5.4 only according to LOT-5.4-SCHEDULER-CONCEPT.md and LOT-5.4-SCHEDULER-ACCEPTANCE.md, then STOP for maintainer audit."
   }
 }
