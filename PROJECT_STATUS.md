@@ -3,9 +3,12 @@
 ## Lot 5.3 — implémenté, audit mainteneur requis — 2026-08-12
 
 La découverte OCBlackTop/TheSportsDB, les configurations de source proposées,
-les associations manuelles, l’historique et la migration `0009` sont
-implémentés et validés localement. Le Lot global est à 30 %. Le Lot 5.3 n’est
-pas encore validé par le mainteneur et aucun travail 5.4 n’est autorisé.
+les associations manuelles, l’historique et les migrations `0009`/`0010` sont
+implémentés et validés localement. Les corrections demandées par l’audit
+(complétude explicite, quota inconnu bloquant, comptage en erreur et
+revalidation à l’adoption) sont intégrées. Le Lot global est à 30 %. Le Lot
+5.3 n’est pas encore validé par le mainteneur et aucun travail 5.4 n’est
+autorisé.
 
 Preuves : `docs/handoff/LOT-5.3-VALIDATION.md` et
 `docs/handoff/PROGRESS.json`.

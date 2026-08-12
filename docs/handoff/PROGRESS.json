@@ -53,7 +53,7 @@
       "concept": "docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md",
       "acceptance": "docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"
     },
-    "validation_rule": "Lot 5.2 is maintainer validated. Only sub-lot 5.3 is authorized. Codex must stop after 5.3 implementation and validation for maintainer audit before 5.4."
+    "validation_rule": "Lot 5.2 is maintainer validated. Sub-lot 5.3 audit corrections are implemented and await maintainer re-audit. No sub-lot 5.4 work is authorized."
   },
   "lot_5_3_approved_concepts": {
     "real_adapters": "OCBlackTop and TheSportsDB real adapters are used for connection testing and championship discovery only",

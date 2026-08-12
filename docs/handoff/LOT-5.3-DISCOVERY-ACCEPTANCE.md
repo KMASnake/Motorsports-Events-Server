@@ -9,6 +9,7 @@ Statut : concept validé, implémentation autorisée après validation 5.2
 - vrais adaptateurs OCBlackTop et TheSportsDB ;
 - WRC reste OCBlackTop avec stratégie/source config distincte si nécessaire ;
 - aucune logique générique codée en dur sur `WRC` ;
+- catalogue OCBlackTop déclaratif identifié comme `adapter-known-catalog`, sans endpoint `/sports` supposé ;
 - aucune découverte ne crée automatiquement un championnat métier ;
 - résultats non associés persistés séparément des `provider_championships` ;
 - association manuelle vers un championnat existant ou création explicite d'un nouveau championnat ;
@@ -28,6 +29,7 @@ Statut : concept validé, implémentation autorisée après validation 5.2
 - aucune récupération d'événements/calendriers pour remplir la base Events ;
 - nombre de requêtes mesuré ;
 - aucune boucle de synchronisation ;
+- complétude explicite dans le contrat ; un résultat partiel ne compte aucune absence ;
 - fixture/faux serveur pour tests reproductibles sans consommer les APIs réelles en CI.
 
 ## Découverte périodique
@@ -44,8 +46,9 @@ Statut : concept validé, implémentation autorisée après validation 5.2
 
 - découverte manuelle et logique périodique respectent les limites sûres configurées ;
 - découverte reportée/refusée si elle n'est pas sûre ;
+- quota sûr inconnu : report avant réseau et zéro requête ;
 - aucune commande manuelle ne contourne le quota ;
-- aucune consommation volontaire de la réserve 30 % année courante ;
+- aucune consommation volontaire de la réserve mensuelle de 30 % dédiée à l’année courante ;
 - pas de moteur complet de cadence/quota avant 5.5.
 
 ## Redécouverte et disparition

@@ -4,7 +4,8 @@
 
 - [x] implémenter la migration `0009_provider_discovery` réversible ;
 - [x] implémenter la découverte réelle OCBlackTop et TheSportsDB sans Events ;
-- [x] valider lint, types, 108 tests API, 29 tests Web, builds et Docker ;
+- [x] valider lint, types, 118 tests API, 29 tests Web, builds et Docker ;
+- [x] corriger les constats de l’audit Lot 5.3 ;
 - [ ] exécuter la recette manuelle avec les credentials réels ;
 - [ ] auditer puis valider explicitement le Lot 5.3 ;
 - [ ] autoriser séparément le Lot 5.4 avant tout développement ultérieur.

@@ -22,6 +22,16 @@ Les appels réseau sont limités au test de connexion et aux opérations de déc
 - la logique spécifique est portée par l'adaptateur et la `source_config` du lien fournisseur/championnat ;
 - le cœur générique ne branche jamais sur le nom WRC ou un autre nom de championnat.
 
+OCBlackTop ne documente pas d’endpoint global `/sports`. Son adaptateur utilise
+donc un catalogue déclaratif maintenable des séries prises en charge, avec une
+stratégie et un modèle d’endpoint par entrée. La provenance
+`adapter-known-catalog` est distincte d’une réponse dynamique fournisseur.
+Toutes les séries, y compris WRC, utilisent les mêmes mécanismes déclaratifs.
+
+TheSportsDB utilise `all_leagues.php`, mais le résultat n’est complet que si
+la configuration sûre du compte le garantit explicitement. À défaut, le run
+est `partial` et ne produit aucun constat d’absence.
+
 ## 3. Découverte sans création automatique
 
 Une découverte réelle crée ou met à jour une représentation fournisseur persistante, mais ne crée jamais automatiquement un championnat métier MEDS.
@@ -130,6 +140,9 @@ Ne comptent pas comme absence :
 - erreur réseau ou fournisseur.
 
 Une réapparition remet le compteur à zéro et résout l'état de disparition.
+
+Le contrat de découverte retourne conjointement les éléments, la provenance
+et `complete`. Seul `complete=true` autorise l’incrément des absences.
 
 ## 11. Historique des découvertes
 

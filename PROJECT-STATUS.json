@@ -17,7 +17,7 @@
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
     "status": "sub-lot-5.3-implemented-awaiting-maintainer-audit",
-    "reason": "Lot 5.3 discovery and source configuration are implemented and locally validated. Maintainer audit and real-provider validation are required before any Lot 5.4 work."
+    "reason": "Lot 5.3 audit corrections are implemented and locally validated. Maintainer re-audit and real-provider validation remain required before any Lot 5.4 work."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",

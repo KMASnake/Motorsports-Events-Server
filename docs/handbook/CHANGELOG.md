@@ -6,6 +6,8 @@
 - persiste les découvertes, divergences, absences et historiques séparément des liens validés ;
 - impose association, création locale et adoption de configuration comme actions explicites et auditées ;
 - conserve le scheduler, la synchronisation et le moteur complet de quotas hors du Lot 5.3.
+- corrige l’audit 5.3 : catalogue OCBlackTop déclaratif, complétude explicite,
+  quota inconnu bloquant, comptage des erreurs et revalidation à l’adoption.
 
 ## 1.24 — 2026-08-12
 
