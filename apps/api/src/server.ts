@@ -14,6 +14,10 @@ import { sessionRoutes } from './routes/sessions.js';
 import { sessionCorrectionRoutes } from './routes/sessionCorrections.js';
 import { authRoutes } from './routes/auth.js';
 import { adminCookieConfig } from './lib/adminCookies.js';
+import { providerRoutes } from './routes/providers.js';
+import { ProviderSecretCipher } from './providers/providerSecrets.js';
+import { ProviderConfigurationService } from './providers/providerService.js';
+import { providerAdapterRegistry } from './providers/registry.js';
 
 const app = Fastify({ logger: true, trustProxy: process.env.TRUST_PROXY === 'true' });
 await verifyApplicationSchema();
@@ -50,6 +54,9 @@ await app.register(correctionRoutes);
 await app.register(auditRoutes);
 await app.register(sessionRoutes);
 await app.register(sessionCorrectionRoutes);
+await app.register(providerRoutes, {
+  service: new ProviderConfigurationService(providerAdapterRegistry, ProviderSecretCipher.fromEnvironment())
+});
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';

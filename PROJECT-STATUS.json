@@ -14,8 +14,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.1-validated-sub-lot-5.2-authorized",
-    "reason": "Lot 5.1 DB and TypeScript contract foundations were explicitly validated by the maintainer on 2026-08-12. Sub-lot 5.2 secrets and provider instance configuration is authorized; later sub-lots are not."
+    "status": "sub-lot-5.2-implemented-awaiting-maintainer-audit",
+    "reason": "Lot 5.1 is maintainer validated. Lot 5.2 provider secrets and instance configuration are implemented with green Node and isolated PostgreSQL/Docker validation. Maintainer audit is required; sub-lot 5.3 is not authorized."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -51,8 +51,8 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.1-validated-sub-lot-5.2-authorized",
-    "implementation_percent": 10,
+    "status": "sub-lot-5.2-implemented-awaiting-maintainer-audit",
+    "implementation_percent": 20,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -63,7 +63,7 @@
     "concept_validation_date": "2026-08-12",
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": "5.2",
+    "authorized_sub_lot": null,
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": true,
@@ -72,6 +72,15 @@
       "docker_recipe_validation_environment": "isolated-vps",
       "docker_recipe_validation_date": "2026-08-12",
       "evidence": "docs/handoff/LOT-5.1-VALIDATION.md"
+    },
+    "sub_lot_5_2": {
+      "implementation_percent": 100,
+      "maintainer_validated": false,
+      "local_validation": true,
+      "docker_recipe_validated": true,
+      "docker_recipe_validation_environment": "local-isolated",
+      "validation_date": "2026-08-12",
+      "evidence": "docs/handoff/LOT-5.2-VALIDATION.md"
     },
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
     "phase_0_completed_at": "2026-08-12",
@@ -137,5 +146,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Codex may implement sub-lot 5.2 secrets and provider instance configuration only, then STOP for maintainer audit before 5.3."
+  "next_action": "Maintainer must audit sub-lot 5.2. Codex must STOP; sub-lot 5.3 is not started and not authorized."
 }
