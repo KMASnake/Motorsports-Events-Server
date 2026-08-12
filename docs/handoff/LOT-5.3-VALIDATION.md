@@ -23,17 +23,29 @@ Statut : implémenté, en attente d’audit mainteneur
 - trois absences lors de cycles complets avant l’état `not_found` ;
 - configuration 30 jours par défaut, minimum 7 jours, calcul d’échéance sans scheduler ;
 - endpoints administratifs authentifiés pour connexion, découverte, association, adoption et historique.
+- `GET /api/v1/admin/providers/:id/championship-form` expose uniquement les métadonnées sûres du formulaire de l'adaptateur ;
+- `POST /api/v1/admin/providers/:id/championship-sources/manual` lie un championnat existant ou en crée explicitement un, sans découverte ni réseau ;
+- les sources manuelles sont validées, versionnées, horodatées et laissées `manual`, `inactive`, `is_primary=false` ;
+- OCBlackTop accepte `future-series` avec `series-events-v1` et `/{series}/events` sans que son catalogue soit une whitelist ;
+- TheSportsDB accepte une ligue numérique connue sans appel à `all_leagues.php` ;
+- une redécouverte rattache le lien manuel existant, détecte la divergence et ne remplace pas la configuration approuvée.
+
+Manual championship source configuration remains available even when provider
+discovery is unavailable, partial or does not contain the requested
+championship.
 
 ## Validation exécutée
 
 - lint complet : OK ;
 - typecheck API, Web et types : OK ;
-- tests API : 118 réussis ;
+- tests API : 127 réussis ;
 - tests Web : 29 réussis ;
 - tests adaptateurs 5.3 : 3 réussis ;
 - builds API, Web et types : OK ;
 - migration PostgreSQL appliquée dans une pile Docker isolée : OK.
 - rollback puis réapplication de `0009_provider_discovery` et `0010_provider_discovery_completeness` : OK.
+- recette fallback manuel PostgreSQL : adaptateur sans découverte, championnat existant, création explicite, OCBlackTop `future-series`, TheSportsDB manuel, multi-provider, redécouverte et audit atomique : OK ;
+- preuve anti-synchronisation : compte Events inchangé, table `sync_streams` absente et aucune requête fournisseur pendant les créations manuelles : OK.
 
 ## Validation réelle des fournisseurs
 

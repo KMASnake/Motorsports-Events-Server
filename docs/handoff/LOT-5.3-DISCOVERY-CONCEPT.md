@@ -74,6 +74,22 @@ L'administrateur doit pouvoir :
 
 Aucune association ambiguë n'est automatique.
 
+La découverte reste uniquement une aide. La configuration manuelle d'une
+source de championnat reste disponible lorsque la découverte est absente,
+désactivée, partielle ou ne retourne pas le championnat recherché. Elle part
+directement du formulaire `championshipForm()` de l'adaptateur, valide
+localement la `source_config`, puis crée le lien et sa configuration sans ligne
+de découverte artificielle et sans appel réseau.
+
+Deux commandes administratives explicites sont disponibles : lier une source
+à un championnat métier existant, ou créer un championnat métier puis son lien
+dans la même transaction. Dans les deux cas, le lien est `manual`, `inactive`,
+non principal et son résultat est « Configuré — non synchronisé ».
+
+**Manual championship source configuration remains available even when
+provider discovery is unavailable, partial or does not contain the requested
+championship.**
+
 ## 6. Plusieurs fournisseurs pour un championnat
 
 Plusieurs découvertes provenant de fournisseurs différents peuvent être associées au même championnat métier.
@@ -85,6 +101,11 @@ Les autres liens peuvent rester enregistrés comme sources alternatives inactive
 ## 7. Redécouverte et divergence
 
 Une redécouverte ne doit jamais écraser automatiquement une `source_config` déjà validée manuellement.
+
+Lorsqu'un identifiant externe configuré manuellement apparaît ensuite dans une
+découverte, celle-ci est rattachée au lien existant sans duplication. Une
+configuration proposée différente est signalée comme divergence et reste
+séparée de la configuration manuelle validée.
 
 Si la configuration proposée par le fournisseur diffère de la configuration active :
 

@@ -20,6 +20,18 @@ Statut : concept validé, implémentation autorisée après validation 5.2
 - action explicite `Adopter la configuration découverte`, auditée ;
 - adoption de config ne déclenche aucune synchronisation ;
 - état final d'un lien validé : `Configuré — non synchronisé` ou équivalent sûr.
+- formulaire manuel issu de `adapter.championshipForm()`, sans secret ni champ générique étranger à l'adaptateur ;
+- configuration manuelle possible avec un adaptateur sans découverte et sans ligne `provider_discovered_championships` artificielle ;
+- lien manuel vers un championnat existant ou création explicite et atomique d'un championnat local ;
+- validation locale de la `source_config`, stockage versionné avec `validated_at`, état `manual`/`inactive` et `is_primary=false` ;
+- zéro appel fournisseur, zéro Event et zéro `sync_stream` lors de la configuration manuelle ;
+- un nouveau championnat OCBlackTop utilisant une stratégie existante sûre n'a pas à appartenir au catalogue intégré ;
+- une ligue TheSportsDB connue peut être configurée sans exécuter `all_leagues.php` ;
+- une redécouverte ultérieure rattache l'identifiant externe au lien existant, signale la divergence et n'adopte rien automatiquement.
+
+**Manual championship source configuration remains available even when
+provider discovery is unavailable, partial or does not contain the requested
+championship.**
 
 ## Découverte réseau
 

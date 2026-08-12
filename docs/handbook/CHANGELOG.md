@@ -8,6 +8,8 @@
 - conserve le scheduler, la synchronisation et le moteur complet de quotas hors du Lot 5.3.
 - corrige l’audit 5.3 : catalogue OCBlackTop déclaratif, complétude explicite,
   quota inconnu bloquant, comptage des erreurs et revalidation à l’adoption.
+- complète le Lot 5.3 avec la configuration manuelle de sources indépendante
+  de la découverte, inactive par défaut et sans synchronisation d’événements.
 
 ## 1.24 — 2026-08-12
 
