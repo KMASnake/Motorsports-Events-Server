@@ -1,5 +1,12 @@
 # Handbook Changelog
 
+## 1.25 — 2026-08-12
+
+- ajoute la découverte réelle OCBlackTop et TheSportsDB sans ingestion d’événements ;
+- persiste les découvertes, divergences, absences et historiques séparément des liens validés ;
+- impose association, création locale et adoption de configuration comme actions explicites et auditées ;
+- conserve le scheduler, la synchronisation et le moteur complet de quotas hors du Lot 5.3.
+
 ## 1.24 — 2026-08-12
 
 - consigne la validation explicite du Lot 4.4 sur Windows et VPS ;

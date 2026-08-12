@@ -17,9 +17,9 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.2-validated-sub-lot-5.3-authorized",
+    "status": "sub-lot-5.3-implemented-awaiting-maintainer-audit",
     "updated_at": "2026-08-12",
-    "implementation_percent": 20,
+    "implementation_percent": 30,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -29,7 +29,7 @@
     "concept_validated_by_maintainer": true,
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": "5.3",
+    "authorized_sub_lot": null,
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": true,
@@ -44,11 +44,12 @@
       "evidence": "docs/handoff/LOT-5.2-VALIDATION.md"
     },
     "sub_lot_5_3": {
-      "implementation_percent": 0,
+      "implementation_percent": 100,
       "concept_validated": true,
       "concept_validation_date": "2026-08-12",
       "maintainer_validated": false,
-      "authorized": true,
+      "authorized": false,
+      "implementation_evidence": "docs/handoff/LOT-5.3-VALIDATION.md",
       "concept": "docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md",
       "acceptance": "docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"
     },
@@ -81,7 +82,7 @@
     "lot_5_2": "maintainer-validated-security-integration-green"
   },
   "next_action": {
-    "owner": "Codex",
-    "task": "Implement sub-lot 5.3 discovery and source configuration only, validate it, push, then STOP for maintainer audit before 5.4."
+    "owner": "Maintainer",
+    "task": "Audit and validate sub-lot 5.3. Do not authorize or begin Lot 5.4 implicitly."
   }
 }

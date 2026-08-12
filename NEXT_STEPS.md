@@ -1,5 +1,16 @@
 # Prochaines étapes
 
+## Priorité courante — audit mainteneur Lot 5.3
+
+- [x] implémenter la migration `0009_provider_discovery` réversible ;
+- [x] implémenter la découverte réelle OCBlackTop et TheSportsDB sans Events ;
+- [x] valider lint, types, 108 tests API, 29 tests Web, builds et Docker ;
+- [ ] exécuter la recette manuelle avec les credentials réels ;
+- [ ] auditer puis valider explicitement le Lot 5.3 ;
+- [ ] autoriser séparément le Lot 5.4 avant tout développement ultérieur.
+
+Point d’arrêt obligatoire : aucune tâche 5.4 n’est autorisée.
+
 ## Priorité courante — Lot 4.3 Sessions
 
 - [x] spécifier le périmètre et les critères d'acceptation ;
