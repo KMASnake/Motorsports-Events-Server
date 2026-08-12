@@ -5,7 +5,7 @@
 - Lot 4.3 : validé utilisateur, fusionné dans `main` via PR #27 le 2026-08-11
 - Lot 4 : terminé fonctionnellement
 - Lot 4.4 : authentification de la console d'administration, validée utilisateur et fusionnée dans `main` via PR #28 le 2026-08-12
-- Lot 5 : Fournisseurs et moteur de synchronisation API — conception fonctionnelle et technique validée, Phase 0 de spécification à produire avant implémentation
+- Lot 5 : Fournisseurs et moteur de synchronisation API — Phase 0 validée ; 5.1 validé ; 5.2 validé ; concept 5.3 validé et autorisé
 
 ## Lot 4.4 — Authentification administration — TERMINÉ
 
@@ -34,11 +34,18 @@ La clôture post-fusion est consignée dans `docs/handoff/LOT-4.4-POST-MERGE-CLO
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
-Statut : `concept-approved-specification-pending`.
+Statut : `sub-lot-5.3-concept-validated-authorized`.
 
-La conception détaillée validée avec le mainteneur est consignée dans `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`. Ce document prime sur les valeurs décoratives présentes dans les maquettes.
+La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Le périmètre détaillé de 5.3 est précisé par `docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md` et `docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md`, qui priment pour 5.3 en cas de contradiction avec les formulations de Phase 0.
 
-### Objectif
+### État des sous-lots
+
+- 5.1 — DB + contrats : validé mainteneur ;
+- 5.2 — secrets et configuration fournisseur : validé mainteneur ;
+- 5.3 — découverte championnats et source config : concept validé, implémentation autorisée ;
+- 5.4+ : non autorisés tant que 5.3 n'est pas audité et validé.
+
+### Objectif global
 
 - récupérer le maximum de données disponibles sur toutes les années et sessions possibles ;
 - synchroniser d'abord l'année courante lors de l'activation d'un championnat ;
@@ -55,126 +62,87 @@ La conception détaillée validée avec le mainteneur est consignée dans `docs/
 - ajout d'une instance d'un adaptateur connu depuis l'administration ;
 - nouvelle API inconnue = nouvel adaptateur dans le code ;
 - formulaire de configuration spécifique à chaque adaptateur ;
-- découverte automatique des championnats lorsque possible ;
-- ajout manuel lorsque nécessaire : identifiant, endpoint/slug ou autre paramètre spécifique ;
-- traitement WRC spécifique encapsulé dans son adaptateur, notamment pour les saisons ;
-- un seul fournisseur principal actif par championnat en V1.
+- un même fournisseur peut utiliser plusieurs endpoints/stratégies selon le championnat ;
+- WRC est fourni par OCBlackTop et reste un flux OCBlackTop, jamais un adaptateur autonome ;
+- un seul fournisseur principal actif par championnat en V1 ; les sources alternatives peuvent rester enregistrées inactives.
 
-### Championnats
+### Lot 5.3 — Découverte et source config
 
-- championnat découvert = affiché `Découvert — non synchronisé` ;
-- activation manuelle obligatoire ;
-- possibilité de désactiver/réactiver ;
-- désactivation : conservation en base et administration, arrêt de synchro et exclusion de l'API publique ;
-- réactivation : republication des données éligibles et passage prioritaire sur l'année courante ;
-- import d'un logo local lié au championnat métier, jamais écrasé par le fournisseur.
+5.3 utilise les vrais adaptateurs OCBlackTop et TheSportsDB pour le test de connexion et la découverte, sans lancer de synchronisation d'événements.
 
-### Bootstrap et historique
+Règles validées :
+
+- une découverte réelle persiste le résultat fournisseur sans créer automatiquement de championnat métier ;
+- un résultat non associé reste `À associer / à créer` jusqu'à validation manuelle ;
+- un mapping déjà explicitement validé peut être réutilisé ;
+- l'administrateur choisit d'associer à un championnat existant ou de créer explicitement un nouveau championnat à partir des données préremplies ;
+- les résultats non associés sont persistés dans une entité dédiée distincte de `provider_championships` ;
+- la `source_config` proposée est conservée séparément de la configuration validée ;
+- une redécouverte ne remplace jamais automatiquement la configuration active ;
+- en cas de divergence, l'administration propose l'action explicite `Adopter la configuration découverte` ;
+- cette adoption est auditée et ne déclenche aucune synchronisation ;
+- état d'un lien validé : `Configuré — non synchronisé` ou équivalent sûr.
+
+### Découverte périodique
+
+- activable/désactivable par fournisseur ;
+- intervalle par défaut : 30 jours ;
+- minimum : 7 jours ;
+- `last_discovery_at` persistant ;
+- prochaine échéance calculée par le système ;
+- bouton de redécouverte manuelle disponible ;
+- 5.3 implémente le modèle et l'éligibilité ;
+- l'exécution périodique effective est branchée sur le scheduler persistant en 5.4, sans créer de scheduler parallèle en 5.3.
+
+### Coût API et quotas pour la découverte
+
+- comptabiliser toutes les requêtes de découverte ;
+- utiliser les limites sûres configurées en 5.2 ;
+- refuser ou reporter une découverte non sûre ;
+- ne jamais contourner les limites via une commande manuelle ;
+- ne pas consommer volontairement la réserve de 30 % dédiée à l'année courante ;
+- ne pas anticiper le moteur complet de quotas/cadence de 5.5.
+
+### Championnat non retrouvé
+
+- aucune suppression automatique ;
+- après 3 découvertes complètes consécutives sans retrouver un championnat connu : état `Non retrouvé chez le fournisseur` ;
+- échec, interruption, quota, résultat partiel ou erreur ne comptent pas comme absence ;
+- réapparition remet le compteur à zéro et résout l'état.
+
+### Historique DISCOVERY
+
+Chaque opération de découverte conserve un historique minimal durable avec origine manuelle/périodique, timestamps, durée, statut, nombre de requêtes, trouvés, nouveaux, non retrouvés, divergences, erreur expurgée ou motif de report. Cette traçabilité devra converger vers l'infrastructure commune runs/logs de 5.8 sans l'anticiper entièrement.
+
+### Bootstrap, historique et synchronisation — lots suivants
 
 - premier passage année courante prioritaire ;
 - round-robin entre championnats actifs ;
 - historique ensuite en arrière-plan ;
 - découverte des saisons si disponible ;
 - sinon exploration `N-1`, `N-2`, etc. jusqu'à une saison réellement vide ;
-- année de départ manuelle possible pour forcer la profondeur ;
-- une erreur, un quota ou une page intermédiaire vide ne vaut jamais saison vide.
+- année de départ manuelle possible ;
+- boucle permanente de l'année courante ;
+- scheduler persistant, leases et curseurs ;
+- moteur de quota/cadence complet ;
+- normalisation, idempotence, corrections, présence événements ;
+- logs/runs/alertes complets ;
+- UI finale fidèle aux maquettes validées.
 
-### Boucle année courante
+### Valeurs par défaut déjà validées
 
-- parcourir du 1er janvier jusqu'à la fin des données disponibles ;
-- à la fin, revenir au 1er janvier de l'année courante ;
-- recommencer en permanence pour capter horaires, statuts, annulations et nouvelles sessions.
-
-### Scheduler et curseurs
-
-- scheduler persistant ;
-- curseur sérialisé spécifique à l'adaptateur ;
-- phase `current` / `historical`, saison et curseur persistés ;
-- round-robin entre flux actifs ;
-- lease/verrou persistant par flux ;
-- aucun double traitement d'un même flux ;
-- reprise automatique après crash/redémarrage ;
-- concurrence configurable par fournisseur, valeur par défaut : `1`.
-
-### Quotas et cadence
-
-- cadence calculée automatiquement par le serveur ;
-- prise en compte quotas court terme, mensuels, quota restant, temps avant reset, flux actifs, réserve et concurrence ;
-- headers fournisseur prioritaires lorsqu'ils donnent un état fiable ;
-- sinon compteur local ;
-- aucune synchronisation automatique si les limites sûres sont inconnues ;
-- réserve du quota mensuel dédiée à l'année courante : `30 %` par défaut, configurable ;
-- l'historique consomme uniquement le surplus disponible ;
-- `quota journalier` et `réserve annuelle` vus dans certaines maquettes ne sont pas des exigences métier.
-
-### Retry et erreurs
-
-- `429`, timeouts, réseau, DNS, `5xx` : retry automatique avec backoff exponentiel + jitter ;
-- `401`, `403`, secret/configuration invalide : suspension et alerte administrateur ;
-- `Synchroniser maintenant` ne contourne jamais les quotas, il priorise seulement le travail.
-
-### Secrets
-
-- secrets fournisseur chiffrés en base ;
-- clé maître fournie uniquement par l'environnement ;
-- chiffrement authentifié moderne ;
-- nonce/IV unique ;
-- `key_version` enregistré dès la V1 ;
-- le secret n'est jamais relu par le navigateur après enregistrement ;
-- aucun secret dans logs, audit ou réponses.
-
-### Normalisation, idempotence et corrections
-
-- normalisation par adaptateur ;
-- mappings permanents pour rapprochements connus ;
-- ambiguïtés = `À associer`, jamais de fusion hasardeuse silencieuse ;
-- rapprochement prioritaire par `external_id`, puis clé métier sûre ;
-- hash de représentation fournisseur normalisée pour éviter les écritures inutiles ;
-- les corrections manuelles restent prioritaires sur la valeur fournisseur ;
-- la nouvelle valeur fournisseur continue d'être conservée en arrière-plan.
-
-### Disparitions fournisseur
-
-- aucune suppression automatique ;
-- signaler un événement après `3` cycles complets consécutifs d'absence par défaut ;
-- seuil configurable ;
-- une annulation explicitement fournie reste une mise à jour réelle de statut.
-
-### Historique et logs
-
-- historique synthétique durable par exécution en PostgreSQL ;
-- logs techniques détaillés structurés ;
-- compatibilité stdout/stderr Docker ;
-- persistance dédiée pour consultation lorsque configurée ;
-- rotation quotidienne ou à `100 Mo`, premier seuil atteint ;
-- compression ;
-- rétention détaillée par défaut : `30 jours` ;
-- aucun secret dans les journaux.
+- réserve quota mensuel année courante : 30 % ;
+- concurrence fournisseur : 1 ;
+- seuil d'événement absent : 3 cycles complets ;
+- rétention logs détaillés : 30 jours ;
+- rotation logs : quotidienne ou 100 Mo, premier seuil atteint ;
+- découverte automatique : 30 jours par défaut, minimum 7 jours ;
+- championnat fournisseur non retrouvé : 3 découvertes complètes consécutives.
 
 ### Interface validée
 
-Les concepts visuels ont été validés pour :
+Les concepts visuels ont été validés pour page Fournisseurs, détail fournisseur, Configuration, Quotas, Championnats, Synchronisation, Historique & logs et import logo championnat. L'implémentation UI complète reste prévue en 5.9 et doit respecter `docs/handoff/UI_CONTRACT.md` et `docs/ui-reference/validated-mockups`.
 
-- page Fournisseurs ;
-- détail fournisseur ;
-- Configuration ;
-- Quotas ;
-- Championnats ;
-- Synchronisation ;
-- Historique & logs ;
-- import logo championnat.
+### Stop rule
 
-L'implémentation doit conserver le design MEDS existant et respecter `docs/handoff/UI_CONTRACT.md` et `docs/ui-reference/validated-mockups`.
-
-### Phase 0 obligatoire
-
-Avant tout code applicatif, Codex doit produire :
-
-- `docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md` ;
-- `docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md` ;
-- `docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md` ;
-- découpage du Lot 5 en étapes d'implémentation et de validation ;
-- ADR uniquement si nécessaire ;
-- plan de migration détaillé si le schéma doit évoluer.
-
-Après cette Phase 0, Codex doit s'arrêter et attendre la validation explicite du mainteneur avant toute implémentation.
+Après chaque sous-lot, Codex doit s'arrêter pour audit et validation explicite du mainteneur. L'autorisation de 5.3 n'autorise ni 5.4 ni les sous-lots suivants.
