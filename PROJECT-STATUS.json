@@ -9,12 +9,13 @@
     "lot_4_3_final_handoff": "docs/handoff/LOT-4.3-FINAL-HANDOFF.md",
     "lot_4_3_post_merge_closure": "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md",
     "lot_4_4_post_merge_closure": "docs/handoff/LOT-4.4-POST-MERGE-CLOSURE.md",
+    "lot_5_concept": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
     "branch": "main",
-    "status": "lot-4.4-merged-and-user-validated",
-    "reason": "Lot 4.4 administration authentication was explicitly validated by the maintainer on Windows and isolated VPS, passed CI and Docker build on the final branch SHA, and was merged into main through PR #28 on commit b42a97129a8aa1cb9a42ce01ba0affb8e5a848a1."
+    "status": "lot-5-concept-approved-specification-pending",
+    "reason": "Lot 4.4 is merged and user-validated. The maintainer has completed and approved the functional and architectural discussion for Lot 5 Providers and API synchronization. Phase 0 specification is now authorized; implementation is not."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -45,36 +46,75 @@
     "validated_on_vps": true,
     "merged_to_main": true,
     "ci_validation_commit": "5428c1bc2c65193e2b0b623297ea366c2ddd196e",
-    "ci_validation_status": "ci-and-docker-build-green",
-    "validated_capabilities": [
-      "Single administrator account",
-      "Initial administrator creation through a dedicated CLI command",
-      "Argon2id password hashing",
-      "Server-side opaque authenticated sessions",
-      "HttpOnly Secure SameSite session cookie",
-      "CSRF protection",
-      "Protected administration navigation and login redirect",
-      "Server-side logout invalidation",
-      "Eight-hour absolute session lifetime",
-      "One-hour inactivity expiration",
-      "Five failed attempts in fifteen minutes followed by a fifteen-minute temporary login block",
-      "Authentication audit without secrets",
-      "Coexistence with existing technical HMAC authentication",
-      "Windows Docker Desktop Chromium acceptance",
-      "Isolated VPS Docker acceptance"
-    ]
+    "ci_validation_status": "ci-and-docker-build-green"
   },
-  "planned_after_current": {
+  "working_lot": {
+    "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "concept-discussion-required-before-roadmap-detail",
-    "known_intent": [
-      "Providers administration page",
-      "API synchronization engine",
-      "Monthly quota management",
-      "Per-minute rate quota management",
-      "Persistent synchronization cursor and resume"
+    "status": "concept-approved-specification-pending",
+    "implementation_percent": 0,
+    "architecture_percent": 0,
+    "documentation_readiness_percent": 20,
+    "validated_on_user_workstation": false,
+    "validated_on_vps": false,
+    "merged_to_main": false,
+    "merge_authorized": false,
+    "concept_validated_by_maintainer": true,
+    "concept_validation_date": "2026-08-12",
+    "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
+    "scope": [
+      "Providers administration and provider detail pages",
+      "Provider adapters and adapter-specific configuration forms",
+      "Encrypted provider secrets with key_version",
+      "Automatic championship discovery with manual activation",
+      "Manual championship configuration when discovery is unavailable",
+      "WRC-specific adapter behavior where required",
+      "Current-year-first bootstrap",
+      "Historical backfill across all available seasons",
+      "Continuous current-year rescan from January 1 to end then restart",
+      "Round-robin scheduling across active championships",
+      "Persistent provider-specific synchronization cursors",
+      "Persistent scheduler leases and crash recovery",
+      "Automatic cadence calculation from short-term and monthly quotas",
+      "Thirty-percent monthly quota reserve for current-year synchronization by default",
+      "Retry with exponential backoff and jitter for transient failures",
+      "Provider suspension for durable auth/configuration failures",
+      "Normalization, mappings, idempotence and deduplication",
+      "Preservation of local corrections",
+      "Missing-provider-event signaling without automatic deletion",
+      "Public API suppression when a championship is disabled without deleting data",
+      "Structured synchronization history and rotating technical logs",
+      "Local championship logo upload"
     ],
-    "rule": "Discuss and explicitly validate functional and architectural concepts with the maintainer before updating detailed roadmap or implementation specifications."
+    "approved_defaults": {
+      "current_year_monthly_quota_reserve_percent": 30,
+      "detailed_log_retention_days": 30,
+      "log_rotation_max_size_mb": 100,
+      "log_rotation_daily": true,
+      "provider_default_concurrency": 1,
+      "provider_missing_event_cycles_before_alert": 3
+    },
+    "mandatory_constraints": [
+      "Newly discovered championships are never synchronized automatically before manual activation",
+      "One provider is principal for a championship in V1",
+      "No synchronization starts automatically when safe quota limits are unknown",
+      "Manual synchronization never bypasses quotas",
+      "Provider secrets are never returned after storage and never logged",
+      "Local corrections always remain effective over provider values",
+      "No automatic deletion of provider events that disappear",
+      "Disabled championships remain in the database and administration but are excluded from the public API",
+      "Decorative values present in generated mockups do not override the approved concept document",
+      "No application implementation before Phase 0 specification acceptance"
+    ],
+    "required_phase_0_deliverables": [
+      "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
+      "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
+      "docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md",
+      "Implementation and validation step breakdown",
+      "ADR only where durable decisions are not already captured",
+      "Detailed migration plan if schema changes are required"
+    ],
+    "validation_rule": "Phase 0 must be explicitly reviewed by the maintainer before any application code is written. Merge, CI, build or deployment do not constitute user validation."
   },
   "technical_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -88,5 +128,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Discuss and validate the Providers and API synchronization concepts with the maintainer before changing the detailed roadmap or starting implementation."
+  "next_action": "Codex may create a Lot 5 branch and perform Phase 0 documentation only: specification, acceptance criteria, impact analysis and implementation-step proposal. It must stop before writing application code."
 }
