@@ -89,7 +89,6 @@
     "Championship local logo upload"
   ],
   "phase_0_required": {
-    "implementation_started": false,
     "documentation_complete": true,
     "maintainer_validation_pending": false,
     "maintainer_validation_complete": true,
@@ -102,7 +101,7 @@
       "Migration plan if schema changes are necessary",
       "ADR only for durable new architecture decisions"
     ],
-    "stop_rule": "Phase 0 is validated and Lot 5.1 is implemented. Codex must stop for maintainer audit and PostgreSQL recipe validation before 5.2."
+    "stop_rule": "Phase 0 is validated and Lot 5.1 is implemented. Codex must stop for maintainer audit and explicit validation before 5.2."
   },
   "quality_baseline": {
     "lot_4_4_node_tests": "110-passed",

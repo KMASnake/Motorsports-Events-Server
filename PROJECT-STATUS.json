@@ -15,7 +15,7 @@
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
     "status": "sub-lot-5.1-implemented-awaiting-maintainer-audit",
-    "reason": "Lot 5.1 DB and TypeScript contract foundations are implemented without real provider networking. Node validation is green; the isolated PostgreSQL recipe must be run by the maintainer before 5.2 can be authorized."
+    "reason": "Lot 5.1 DB and TypeScript contract foundations are implemented. Node validation and the isolated VPS PostgreSQL recipe are green. Maintainer code/documentation audit is now the only remaining gate. Sub-lot 5.2 is not authorized."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
