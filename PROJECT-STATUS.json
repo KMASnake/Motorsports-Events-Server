@@ -14,8 +14,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
-    "reason": "Lot 4.4 is merged and user-validated. The Lot 5 Phase 0 specification, acceptance matrix, impact analysis, proposed database model, migration strategy and implementation breakdown are complete. Application implementation remains forbidden until explicit maintainer validation."
+    "status": "phase-0-validated-sub-lot-5.1-authorized",
+    "reason": "Lot 5 Phase 0 specification, acceptance matrix, impact analysis, database model, migration strategy and implementation breakdown were audited and explicitly validated by the maintainer on 2026-08-12. Only sub-lot 5.1 is authorized next."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -51,7 +51,7 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
+    "status": "phase-0-validated-sub-lot-5.1-authorized",
     "implementation_percent": 0,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -61,6 +61,9 @@
     "merge_authorized": false,
     "concept_validated_by_maintainer": true,
     "concept_validation_date": "2026-08-12",
+    "phase_0_validated_by_maintainer": true,
+    "phase_0_validation_date": "2026-08-12",
+    "authorized_sub_lot": "5.1",
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
     "phase_0_completed_at": "2026-08-12",
     "phase_0_deliverables": [
@@ -109,18 +112,9 @@
       "Local corrections always remain effective over provider values",
       "No automatic deletion of provider events that disappear",
       "Disabled championships remain in the database and administration but are excluded from the public API",
-      "Decorative values present in generated mockups do not override the approved concept document",
-      "No application implementation before Phase 0 specification acceptance"
+      "Decorative values present in generated mockups do not override the approved concept document"
     ],
-    "required_phase_0_deliverables": [
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md",
-      "Implementation and validation step breakdown",
-      "ADR only where durable decisions are not already captured",
-      "Detailed migration plan if schema changes are required"
-    ],
-    "validation_rule": "Phase 0 must be explicitly reviewed by the maintainer before any application code is written. Merge, CI, build or deployment do not constitute user validation."
+    "validation_rule": "Phase 0 was explicitly reviewed and validated by the maintainer on 2026-08-12. Only sub-lot 5.1 is authorized; later sub-lots require their own audit and explicit authorization."
   },
   "technical_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -134,5 +128,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Maintainer must audit and explicitly validate the Lot 5 Phase 0 deliverables. Codex must stop and must not start sub-lot 5.1 or write application code before that validation."
+  "next_action": "Codex may implement sub-lot 5.1 DB + contracts only. It must stop after 5.1 implementation, tests, documentation and push, then wait for maintainer audit before starting 5.2."
 }
