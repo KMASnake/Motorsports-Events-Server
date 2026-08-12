@@ -93,6 +93,42 @@ Résultats :
 - sentinelle `SUPER_SECRET_SENTINEL_5_2` absente de la base d’audit, des réponses
   et des représentations fournisseur : OK.
 
+### Real integration sentinel test
+
+La recette `npm run test:lot52` traverse réellement :
+
+```text
+Fastify inject HTTP
+→ routes /api/v1/admin/providers réelles
+→ authentification administrateur réelle
+→ ProviderConfigurationService réel
+→ ProviderSecretCipher réel
+→ PostgreSQL réel
+→ admin_audit_log réel
+```
+
+Elle écrit successivement `SUPER_SECRET_SENTINEL_5_2_A` avec la clé active v1,
+puis `SUPER_SECRET_SENTINEL_5_2_B` avec une trousse v1+v2 active v2. Elle
+vérifie une seule ligne active, des nonce et ciphertext différents, la lecture
+de l’ancienne version, puis `key_version=2` après remplacement.
+
+Les corps HTTP, le JSON fournisseur, `admin_audit_log.old_value/new_value`,
+`provider_instances.config`, `provider_quota_policies` et les erreurs
+sérialisées sont inspectés et ne contiennent aucune sentinelle. Le ciphertext
+n’est jamais affiché par le test. Les audits `provider.secret_configured`,
+`provider.secret_replaced` et `provider.secret_removed` sont présents avec des
+métadonnées uniquement.
+
+Une altération directe du ciphertext PostgreSQL provoque un
+`ProviderMasterKeyError` contrôlé sans révéler clé, secret, ciphertext, nonce ou
+AAD. La valeur chiffrée saine est restaurée uniquement pour terminer la recette.
+
+Sans variables de clé, une seconde application réelle conserve GET, POST et
+PATCH fournisseur, retourne 503 sur PUT secret, refuse la lecture interne et
+n’écrit aucune ligne plaintext. Les configurations partielles ou invalides
+(JSON, version absente/inconnue/invalide, base64 invalide et taille différente
+de 32 octets) échouent sûrement ; aucune clé par défaut n’est générée.
+
 ## Recette VPS
 
 ```sh

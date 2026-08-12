@@ -17,7 +17,16 @@ const providerBody = z.object({
   missing_cycles_threshold: z.number().int().min(1).max(1000).default(3),
   log_retention_days: z.number().int().min(1).max(3650).default(30)
 }).strict();
-const providerPatch = providerBody.partial().strict();
+const providerPatch = z.object({
+  name: providerBody.shape.name.optional(),
+  adapter_key: providerBody.shape.adapter_key.optional(),
+  config: z.record(z.string(), z.json()).optional(),
+  enabled: z.boolean().optional(),
+  max_concurrency: z.number().int().min(1).max(100).optional(),
+  current_year_reserve_percent: z.number().min(0).max(100).optional(),
+  missing_cycles_threshold: z.number().int().min(1).max(1000).optional(),
+  log_retention_days: z.number().int().min(1).max(3650).optional()
+}).strict();
 const secretBody = z.object({ value: z.string().min(1).max(8192) }).strict();
 const secretParams = z.object({ id: uuid, name: z.string().regex(/^[a-z][a-z0-9_-]{0,63}$/) });
 const quotaBody = z.object({

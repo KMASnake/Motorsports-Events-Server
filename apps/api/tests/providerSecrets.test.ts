@@ -48,7 +48,12 @@ describe('ProviderSecretCipher', () => {
   it('fails safely for missing or invalid environment keys', () => {
     expect(ProviderSecretCipher.fromEnvironment({})).toBeNull();
     expect(() => ProviderSecretCipher.fromEnvironment({ PROVIDER_ACTIVE_KEY_VERSION: '1' })).toThrow(ProviderMasterKeyError);
+    expect(() => ProviderSecretCipher.fromEnvironment({ PROVIDER_MASTER_KEYS: '{', PROVIDER_ACTIVE_KEY_VERSION: '1' })).toThrow(ProviderMasterKeyError);
     expect(() => ProviderSecretCipher.fromEnvironment({ PROVIDER_MASTER_KEYS: '{}', PROVIDER_ACTIVE_KEY_VERSION: '1' })).toThrow(ProviderMasterKeyError);
+    expect(() => ProviderSecretCipher.fromEnvironment({ PROVIDER_MASTER_KEYS: '{"1":"not-base64"}', PROVIDER_ACTIVE_KEY_VERSION: '1' })).toThrow(ProviderMasterKeyError);
+    expect(() => ProviderSecretCipher.fromEnvironment({ PROVIDER_MASTER_KEYS: '{"1":"YQ=="}', PROVIDER_ACTIVE_KEY_VERSION: '1' })).toThrow(ProviderMasterKeyError);
+    expect(() => ProviderSecretCipher.fromEnvironment({ PROVIDER_MASTER_KEYS: '{"1":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}', PROVIDER_ACTIVE_KEY_VERSION: 'invalid' })).toThrow(ProviderMasterKeyError);
+    expect(() => ProviderSecretCipher.fromEnvironment({ PROVIDER_MASTER_KEYS: '{"0":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}', PROVIDER_ACTIVE_KEY_VERSION: '0' })).toThrow(ProviderMasterKeyError);
   });
 
   it('redacts the sentinel and all sensitive descendants', () => {
