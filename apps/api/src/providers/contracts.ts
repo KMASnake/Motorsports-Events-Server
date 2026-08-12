@@ -1,0 +1,215 @@
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonValue[] | JsonObject;
+export type JsonObject = { readonly [key: string]: JsonValue };
+
+export type ProviderFieldType = 'text' | 'url' | 'integer' | 'boolean' | 'select' | 'secret';
+
+export interface ProviderFieldSchema {
+  readonly key: string;
+  readonly label: string;
+  readonly type: ProviderFieldType;
+  readonly required: boolean;
+  readonly secret?: boolean;
+  readonly options?: readonly { readonly value: string; readonly label: string }[];
+  readonly help?: string;
+}
+
+export interface ProviderAdapterCapabilities {
+  readonly supportsChampionshipDiscovery: boolean;
+  readonly supportsSeasonDiscovery: boolean;
+  readonly supportsQuotaHeaders: boolean;
+  readonly supportsConnectionTest: boolean;
+}
+
+export interface ProviderAdapterContext<ProviderConfig extends JsonObject> {
+  readonly providerInstanceId: string;
+  readonly providerConfig: ProviderConfig;
+  /** Credentials are supplied by the future secret service, never by source configuration. */
+  readonly credentials: Readonly<Record<string, string>>;
+}
+
+export interface ProviderStreamContext<
+  ProviderConfig extends JsonObject,
+  SourceConfig extends JsonObject
+> extends ProviderAdapterContext<ProviderConfig> {
+  readonly providerChampionshipId: string;
+  readonly championshipId: string;
+  readonly sourceConfig: SourceConfig;
+}
+
+export interface ConnectionResult {
+  readonly ok: boolean;
+  readonly message: string;
+  readonly checkedAt: string;
+}
+
+export interface DiscoveredChampionship<SourceConfig extends JsonObject> {
+  readonly externalChampionshipId: string;
+  readonly name: string;
+  readonly sourceConfig: SourceConfig;
+}
+
+export interface SeasonDiscoveryResult {
+  readonly seasons: readonly number[];
+  readonly complete: boolean;
+}
+
+export interface WorkSelection<SourceConfig extends JsonObject> {
+  readonly phase: 'current' | 'historical';
+  readonly season: number;
+  readonly sourceConfig: SourceConfig;
+}
+
+export interface FetchWorkUnitInput<
+  ProviderConfig extends JsonObject,
+  SourceConfig extends JsonObject,
+  Cursor extends JsonObject
+> extends ProviderStreamContext<ProviderConfig, SourceConfig> {
+  readonly phase: 'current' | 'historical';
+  readonly season: number;
+  readonly cursor: Cursor;
+  readonly signal: AbortSignal;
+}
+
+export type FetchWorkUnitStatus =
+  | 'progress'
+  | 'end_of_cycle'
+  | 'confirmed_empty_season'
+  | 'transient_failure'
+  | 'durable_failure';
+
+export interface FetchWorkUnitResult<Raw, Cursor extends JsonObject> {
+  readonly status: FetchWorkUnitStatus;
+  readonly items: readonly Raw[];
+  readonly nextCursor: Cursor;
+  readonly requestCount: number;
+  readonly errorCode?: string;
+}
+
+export interface ProviderResponseMetadata {
+  readonly status: number;
+  readonly headers: Readonly<Record<string, string | undefined>>;
+}
+
+export interface QuotaObservation {
+  readonly limit: number | null;
+  readonly remaining: number | null;
+  readonly resetsAt: string | null;
+  readonly reliable: boolean;
+}
+
+export interface NormalizationContext {
+  readonly providerInstanceId: string;
+  readonly providerChampionshipId: string;
+  readonly championshipId: string;
+}
+
+export interface NormalizedProviderEvent {
+  readonly externalId: string | null;
+  readonly name: string;
+  readonly sessionTitle: string | null;
+  readonly startsAt: string;
+  readonly endsAt: string | null;
+  readonly status: 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'postponed';
+  readonly published: boolean;
+  readonly description: string | null;
+  readonly normalizedProviderHash: string;
+}
+
+export interface NormalizationResult<Normalized> {
+  readonly accepted: readonly Normalized[];
+  readonly rejected: readonly { readonly reason: string }[];
+}
+
+export interface EmptySeasonEvidence<Cursor extends JsonObject> {
+  readonly season: number;
+  readonly cursor: Cursor;
+  readonly completedTraversal: boolean;
+  readonly receivedSuccessfulResponses: number;
+  readonly receivedItems: number;
+}
+
+export interface EmptySeasonDecision {
+  readonly confirmedEmpty: boolean;
+  readonly reason: string;
+}
+
+export interface ProviderAdapter<
+  ProviderConfig extends JsonObject,
+  SourceConfig extends JsonObject,
+  Cursor extends JsonObject,
+  Raw,
+  Normalized = NormalizedProviderEvent
+> {
+  readonly key: string;
+  readonly capabilities: ProviderAdapterCapabilities;
+  readonly providerConfigVersion: number;
+  readonly sourceConfigVersion: number;
+  readonly cursorVersion: number;
+
+  providerForm(): readonly ProviderFieldSchema[];
+  championshipForm(context: { readonly providerConfig: ProviderConfig }): readonly ProviderFieldSchema[];
+  validateProviderConfig(value: unknown): ProviderConfig;
+  validateSourceConfig(value: unknown, context: { readonly providerConfig: ProviderConfig }): SourceConfig;
+
+  testConnection?(context: ProviderAdapterContext<ProviderConfig>): Promise<ConnectionResult>;
+  discoverChampionships?(
+    context: ProviderAdapterContext<ProviderConfig>
+  ): AsyncIterable<DiscoveredChampionship<SourceConfig>>;
+  discoverSeasons?(
+    context: ProviderStreamContext<ProviderConfig, SourceConfig>
+  ): Promise<SeasonDiscoveryResult>;
+
+  initialCursor(selection: WorkSelection<SourceConfig>): Cursor;
+  validateCursor(value: unknown): Cursor;
+  serializeCursor(cursor: Cursor): JsonObject;
+  restoreCursor(value: unknown, version: number): Cursor;
+  fetchWorkUnit(
+    input: FetchWorkUnitInput<ProviderConfig, SourceConfig, Cursor>
+  ): Promise<FetchWorkUnitResult<Raw, Cursor>>;
+
+  observeQuota?(response: ProviderResponseMetadata): QuotaObservation | null;
+  normalize(raw: Raw, context: NormalizationContext): NormalizationResult<Normalized>;
+  confirmEmptySeason(evidence: EmptySeasonEvidence<Cursor>): Promise<EmptySeasonDecision>;
+}
+
+/**
+ * A source configuration describes how an adapter addresses one championship.
+ * Its URL-like values are data only: validating this object never authorizes or
+ * performs an HTTP request. Runtime SSRF controls belong to a later sub-lot.
+ */
+export function assertProviderAdapterContract(
+  adapter: ProviderAdapter<JsonObject, JsonObject, JsonObject, unknown, unknown>
+): void {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(adapter.key)) {
+    throw new Error('Provider adapter key must be a non-empty kebab-case identifier.');
+  }
+  for (const [name, version] of [
+    ['provider config', adapter.providerConfigVersion],
+    ['source config', adapter.sourceConfigVersion],
+    ['cursor', adapter.cursorVersion]
+  ] as const) {
+    if (!Number.isSafeInteger(version) || version < 1) {
+      throw new Error(`${name} version must be a positive integer.`);
+    }
+  }
+
+  const capabilityMethods = [
+    ['supportsChampionshipDiscovery', adapter.discoverChampionships],
+    ['supportsSeasonDiscovery', adapter.discoverSeasons],
+    ['supportsQuotaHeaders', adapter.observeQuota],
+    ['supportsConnectionTest', adapter.testConnection]
+  ] as const;
+  for (const [capability, method] of capabilityMethods) {
+    if (adapter.capabilities[capability] !== (typeof method === 'function')) {
+      throw new Error(`Capability ${capability} does not match its adapter method.`);
+    }
+  }
+
+}
+
+export function assertChampionshipSourceFields(fields: readonly ProviderFieldSchema[]): void {
+  if (fields.some((field) => field.type === 'secret' || field.secret)) {
+    throw new Error('Championship source configuration must not contain credentials.');
+  }
+}

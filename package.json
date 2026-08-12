@@ -41,7 +41,8 @@
     "test:lot44:foundation": "./scripts/test-lot44-auth-foundation.sh",
     "test:lot44:api": "./scripts/test-lot44-auth-api.sh",
     "test:lot44:ui": "./scripts/test-lot44-auth-ui.sh",
-    "test:lot44:final": "./scripts/test-lot44-final.sh"
+    "test:lot44:final": "./scripts/test-lot44-final.sh",
+    "test:lot51:foundations": "./scripts/test-lot51-foundations.sh"
   },
   "engines": {
     "node": ">=22.0.0",

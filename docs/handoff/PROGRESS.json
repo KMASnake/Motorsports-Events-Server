@@ -17,9 +17,9 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "phase-0-validated-sub-lot-5.1-authorized",
+    "status": "sub-lot-5.1-implemented-awaiting-maintainer-audit",
     "updated_at": "2026-08-12",
-    "implementation_percent": 0,
+    "implementation_percent": 10,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -29,7 +29,13 @@
     "concept_validated_by_maintainer": true,
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": "5.1",
+    "authorized_sub_lot": null,
+    "sub_lot_5_1": {
+      "implementation_percent": 100,
+      "maintainer_validated": false,
+      "docker_recipe_validated": false,
+      "evidence": "docs/handoff/LOT-5.1-VALIDATION.md"
+    },
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
     "phase_0_completed_at": "2026-08-12",
     "phase_0_deliverables": [
@@ -85,7 +91,7 @@
     "documentation_complete": true,
     "maintainer_validation_pending": false,
     "maintainer_validation_complete": true,
-    "authorized_sub_lot": "5.1",
+    "authorized_sub_lot": null,
     "deliverables": [
       "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
       "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
@@ -94,7 +100,7 @@
       "Migration plan if schema changes are necessary",
       "ADR only for durable new architecture decisions"
     ],
-    "stop_rule": "Phase 0 is validated. Codex may implement sub-lot 5.1 only and must stop after its tests, documentation, commit and push for maintainer audit before 5.2."
+    "stop_rule": "Phase 0 is validated and Lot 5.1 is implemented. Codex must stop for maintainer audit and PostgreSQL recipe validation before 5.2."
   },
   "quality_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -104,7 +110,7 @@
     "lot_4_4_docker_build": "success-on-5428c1bc2c65193e2b0b623297ea366c2ddd196e"
   },
   "next_action": {
-    "owner": "Codex",
-    "task": "Implement sub-lot 5.1 DB + contracts only, run its validation, update documentation, push, then STOP for maintainer audit before 5.2."
+    "owner": "Maintainer",
+    "task": "Audit Lot 5.1 and run scripts/test-lot51-foundations.sh. Sub-lot 5.2 remains not authorized."
   }
 }
