@@ -12,10 +12,11 @@ docker compose up -d --wait postgres >/dev/null
 docker compose run --rm migrate >/dev/null
 docker compose build api >/dev/null
 docker compose run --rm -T -v "$PWD/scripts:/app/scripts:ro" api node scripts/validate-lot53.mjs
+docker compose run --rm -T -v "$PWD/scripts:/app/scripts:ro" api node scripts/validate-lot53-manual.mjs
 docker run --rm -v "$PWD:/source:ro" -w /work node:22-alpine sh -lc '
   cp -a /source/. /work/ && npm ci >/dev/null &&
   npm run typecheck --workspace @mse/api &&
-  npm test --workspace @mse/api -- providerDiscoveryAdapters.test.ts
+  npm test --workspace @mse/api -- providerDiscoveryAdapters.test.ts providerManualSourceRoutes.test.ts
 '
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
   do \$\$ begin if (select count(*) from information_schema.tables where table_schema='public' and table_name in ('provider_discovered_championships','provider_discovery_runs')) <> 2 then raise exception 'Schéma découverte incomplet'; end if; end \$\$;
