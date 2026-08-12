@@ -78,7 +78,8 @@ export async function verifyApplicationSchema(): Promise<void> {
          '0006_admin_console_authentication',
          '0007_provider_instances',
          '0008_provider_championship_sources',
-         '0009_provider_discovery'
+         '0009_provider_discovery',
+         '0010_provider_discovery_completeness'
        )) as applied_migrations
   `);
 
@@ -100,7 +101,7 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.provider_source_configs_table ||
     !schema.provider_discoveries_table ||
     !schema.provider_discovery_runs_table ||
-    schema.applied_migrations !== 9
+    schema.applied_migrations !== 10
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }

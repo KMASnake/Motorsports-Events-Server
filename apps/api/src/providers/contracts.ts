@@ -52,6 +52,13 @@ export interface DiscoveredChampionship<SourceConfig extends JsonObject> {
   readonly metadata?: JsonObject;
 }
 
+export interface ChampionshipDiscoveryResult<SourceConfig extends JsonObject> {
+  readonly items: readonly DiscoveredChampionship<SourceConfig>[];
+  /** True only when the provider or adapter can prove the returned catalog exhaustive. */
+  readonly complete: boolean;
+  readonly provenance: 'provider-discovered' | 'adapter-known-catalog';
+}
+
 export interface SeasonDiscoveryResult {
   readonly seasons: readonly number[];
   readonly complete: boolean;
@@ -158,7 +165,7 @@ export interface ProviderAdapter<
   testConnection?(context: ProviderAdapterContext<ProviderConfig>): Promise<ConnectionResult>;
   discoverChampionships?(
     context: ProviderAdapterContext<ProviderConfig>
-  ): AsyncIterable<DiscoveredChampionship<SourceConfig>>;
+  ): Promise<ChampionshipDiscoveryResult<SourceConfig>>;
   discoverSeasons?(
     context: ProviderStreamContext<ProviderConfig, SourceConfig>
   ): Promise<SeasonDiscoveryResult>;
