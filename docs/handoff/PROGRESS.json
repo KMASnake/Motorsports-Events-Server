@@ -17,7 +17,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.1-implemented-awaiting-maintainer-audit",
+    "status": "sub-lot-5.1-validated-sub-lot-5.2-authorized",
     "updated_at": "2026-08-12",
     "implementation_percent": 10,
     "architecture_percent": 100,
@@ -29,10 +29,11 @@
     "concept_validated_by_maintainer": true,
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.2",
     "sub_lot_5_1": {
       "implementation_percent": 100,
-      "maintainer_validated": false,
+      "maintainer_validated": true,
+      "maintainer_validation_date": "2026-08-12",
       "docker_recipe_validated": true,
       "docker_recipe_validation_environment": "isolated-vps",
       "docker_recipe_validation_date": "2026-08-12",
@@ -92,7 +93,7 @@
     "documentation_complete": true,
     "maintainer_validation_pending": false,
     "maintainer_validation_complete": true,
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.2",
     "deliverables": [
       "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
       "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
@@ -101,7 +102,7 @@
       "Migration plan if schema changes are necessary",
       "ADR only for durable new architecture decisions"
     ],
-    "stop_rule": "Phase 0 is validated and Lot 5.1 is implemented. Codex must stop for maintainer audit and explicit validation before 5.2."
+    "stop_rule": "Phase 0 and Lot 5.1 are validated. Codex may implement sub-lot 5.2 only, then must stop for maintainer audit before 5.3."
   },
   "quality_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -111,7 +112,7 @@
     "lot_4_4_docker_build": "success-on-5428c1bc2c65193e2b0b623297ea366c2ddd196e"
   },
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Explicitly audit and validate Lot 5.1. Its isolated VPS PostgreSQL recipe is green. Sub-lot 5.2 remains not authorized."
+    "owner": "Codex",
+    "task": "Implement sub-lot 5.2 secrets and provider instance configuration only, then stop for maintainer audit before 5.3."
   }
 }

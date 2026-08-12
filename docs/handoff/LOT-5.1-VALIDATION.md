@@ -60,6 +60,5 @@ Résultat VPS communiqué par le mainteneur le 2026-08-12 :
 
 ## État
 
-Implémentation du sous-lot 5.1 et recette PostgreSQL isolée VPS terminées.
-L’audit explicite du mainteneur reste requis. Le sous-lot 5.2 n’est pas
-commencé et demeure non autorisé.
+Implémentation et recette PostgreSQL isolée VPS terminées. Le mainteneur a
+explicitement validé le sous-lot 5.1 le 2026-08-12 et autorisé le sous-lot 5.2.
