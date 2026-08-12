@@ -24,12 +24,23 @@ async function make(label, maxConcurrency = 4) {
 async function finish(lease) {
   await scheduler.commit({ streamId: lease.stream.id, runId: lease.run_id, workerId: lease.stream.lease_owner, generation: lease.lease_generation, cursorAfter: { audit: true } });
 }
+async function activationSnapshot(link) {
+  const state = (await pool.query('select sync_state,sync_state_before_championship_disable from provider_championships where id=$1', [link])).rows[0];
+  const streams = await scheduler.streams(link);
+  return { state, streams: streams.map(row => ({ phase: row.phase, state: row.state, cursor: row.cursor, current_window_start: row.current_window_start, priority_boost_until: row.priority_boost_until, historical_state: row.historical_state })) };
+}
 
 try {
   const active = await make('active'), inactive = await make('inactive'), paused = await make('paused');
+  const initiallyActive = await activationSnapshot(active.link);
+  assert.equal((await scheduler.setChampionshipActive(active.link, true, context)).noop, true);
+  assert.deepEqual(await activationSnapshot(active.link), initiallyActive);
   const historicalBefore = (await scheduler.streams(active.link)).find(row => row.phase === 'historical').historical_state;
   await scheduler.setChampionshipActive(active.link, false, context);
   assert.equal((await pool.query('select sync_state_before_championship_disable from provider_championships where id=$1', [active.link])).rows[0].sync_state_before_championship_disable, 'active');
+  const disabledSnapshot = await activationSnapshot(active.link);
+  assert.equal((await scheduler.setChampionshipActive(active.link, false, context)).noop, true);
+  assert.deepEqual(await activationSnapshot(active.link), disabledSnapshot);
   await scheduler.setChampionshipActive(active.link, true, context);
   const activeRows = await scheduler.streams(active.link);
   assert.equal((await pool.query('select sync_state from provider_championships where id=$1', [active.link])).rows[0].sync_state, 'active');
@@ -37,15 +48,32 @@ try {
   assert.equal(new Date(activeRows.find(row => row.phase === 'current').current_window_start).toISOString().slice(0, 10), '2027-02-03');
   assert.ok(activeRows.find(row => row.phase === 'current').priority_boost_until);
   assert.deepEqual(activeRows.find(row => row.phase === 'historical').historical_state, historicalBefore);
+  const reactivatedSnapshot = await activationSnapshot(active.link);
+  assert.equal((await scheduler.setChampionshipActive(active.link, true, context)).noop, true);
+  assert.deepEqual(await activationSnapshot(active.link), reactivatedSnapshot);
 
   await scheduler.deactivate(inactive.link, context);
+  const inactiveNoop = await activationSnapshot(inactive.link);
+  await scheduler.setChampionshipActive(inactive.link, true, context);
+  assert.deepEqual(await activationSnapshot(inactive.link), inactiveNoop);
   await scheduler.setChampionshipActive(inactive.link, false, context);
   await scheduler.setChampionshipActive(inactive.link, true, context);
   assert.equal((await pool.query('select sync_state from provider_championships where id=$1', [inactive.link])).rows[0].sync_state, 'inactive');
   await scheduler.pause(paused.link, context);
+  const pausedNoop = await activationSnapshot(paused.link);
+  await scheduler.setChampionshipActive(paused.link, true, context);
+  assert.deepEqual(await activationSnapshot(paused.link), pausedNoop);
   await scheduler.setChampionshipActive(paused.link, false, context);
   await scheduler.setChampionshipActive(paused.link, true, context);
   assert.equal((await pool.query('select sync_state from provider_championships where id=$1', [paused.link])).rows[0].sync_state, 'paused');
+  for (const state of ['error', 'suspended']) {
+    await pool.query('update provider_championships set sync_state=$2 where id=$1', [paused.link, state]);
+    await pool.query('update sync_streams set state=$2 where provider_championship_id=$1', [paused.link, state]);
+    const before = await activationSnapshot(paused.link);
+    await scheduler.setChampionshipActive(paused.link, true, context);
+    assert.deepEqual(await activationSnapshot(paused.link), before);
+  }
+  assert.ok(Number((await pool.query("select count(*) from admin_audit_log where actor='lot54-audit' and action='championship.activation_noop'")).rows[0].count) >= 5);
 
   const stale = await scheduler.acquire('stale-A'); assert.ok(stale);
   const providerBefore = (await pool.query('select state from provider_instances where id=(select provider_instance_id from provider_championships where id=$1)', [stale.stream.provider_championship_id])).rows[0].state;

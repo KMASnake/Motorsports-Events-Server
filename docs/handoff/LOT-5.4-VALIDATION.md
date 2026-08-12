@@ -39,6 +39,19 @@ peuvent poller : le verrou transactionnel sur la configuration et les lignes
 `FOR UPDATE SKIP LOCKED` garantissent une acquisition unique. Aucun cron ni
 scheduler mémoire parallèle n'est introduit.
 
+### Idempotence activation championnat
+
+Un appel `active=true` sur un championnat déjà actif est un no-op fonctionnel
+audité sous `championship.activation_noop`. Il conserve exactement l'état de
+synchronisation, les streams, les curseurs current/historical, la fenêtre
+current, l'état d'historique profond et `priority_boost_until`; il ne crée donc
+ni reset ni second boost. Les états `inactive`, `paused`, `error` et `suspended`
+ne sont jamais masqués ou activés par cet appel redondant.
+
+De même, `active=false` sur un championnat déjà désactivé est un no-op audité :
+l'état mémorisé avant la première désactivation reste intact. Une vraie
+transition `false → true` peut ainsi restaurer fidèlement l'état initial.
+
 ## Recette automatisée
 
 ```sh
