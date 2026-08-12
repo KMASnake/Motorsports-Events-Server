@@ -10,6 +10,11 @@ d'événements fournisseur ni aucun moteur de quota du Lot 5.5 n'a été ajouté
 Preuve : `docs/handoff/LOT-5.4-VALIDATION.md`. Le Lot 5.4 n'est pas encore
 validé par le mainteneur et aucun développement 5.5 n'est autorisé.
 
+Les corrections demandées à l'audit sont intégrées : restauration durable de
+l'état antérieur, fencing de tous les échecs worker, capacité commune aux
+sync/discoveries, round-robin 3/2/1 prouvé en PostgreSQL et runtime minimal de
+découverte périodique. Une nouvelle validation mainteneur reste obligatoire.
+
 ## Lot 5.3 — implémenté, audit mainteneur requis — 2026-08-12
 
 La découverte OCBlackTop/TheSportsDB, les configurations de source proposées,

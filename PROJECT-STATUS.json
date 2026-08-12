@@ -19,7 +19,7 @@
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
     "status": "sub-lot-5.4-implemented-awaiting-maintainer-audit",
-    "reason": "Lot 5.4 persistent scheduler, cursors and leases are implemented and locally validated. Maintainer validation is still required and later sub-lots remain unauthorized."
+    "reason": "Lot 5.4 audit corrections are implemented and locally validated: state restoration, stale fail fencing, shared discovery capacity, PostgreSQL weighted scheduling and periodic discovery runtime. Maintainer re-audit is required and later sub-lots remain unauthorized."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -59,7 +59,7 @@
     "concept_validation_date": "2026-08-12",
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": "5.4",
+    "authorized_sub_lot": null,
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": true,

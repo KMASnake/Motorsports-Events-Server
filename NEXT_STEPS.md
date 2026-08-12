@@ -7,6 +7,7 @@
 - [x] valider fencing, reprise après crash et atomicité résultat/curseur ;
 - [x] valider les commandes administrateur et la découverte périodique ;
 - [x] valider la migration `0011` aller/retour sur PostgreSQL réel ;
+- [x] corriger les constats d'audit 5.4 et valider la migration additive `0012` ;
 - [ ] exécuter la recette `./scripts/test-lot54-scheduler.sh` sur le VPS ;
 - [ ] auditer puis valider explicitement le Lot 5.4.
 

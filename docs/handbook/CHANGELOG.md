@@ -5,6 +5,8 @@
 - implémente le scheduler persistant approuvé du Lot 5.4 ;
 - ajoute curseurs, leases, fencing, reprise après crash et commandes auditées ;
 - maintient le Lot 5.5 hors périmètre jusqu'à validation mainteneur du Lot 5.4.
+- corrige l'audit 5.4 : restauration d'état, stale fail, budget commun,
+  heartbeat discovery, preuve PostgreSQL 3/2/1 et runtime périodique minimal.
 
 ## 1.25 — 2026-08-12
 

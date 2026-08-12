@@ -16,7 +16,8 @@ fencing. Une génération expirée ou remplacée ne peut jamais valider de résu
 Résultat durable, curseur, état du flux et résultat d'exécution sont atomiques.
 
 Le pool global vaut quatre workers par défaut et respecte également la limite
-de concurrence de chaque fournisseur. La fenêtre courante est glissante sur
+de concurrence de chaque fournisseur. Les discoveries périodiques et les flux
+de synchronisation partagent ces deux plafonds. La fenêtre courante est glissante sur
 sept jours par défaut. Un changement d'année alimente le rattrapage récent sans
 perdre le curseur d'historique profond.
 
@@ -28,5 +29,10 @@ n'implémente pas le moteur de quotas/cadences réservé au Lot 5.5.
 ## Conséquences
 
 Les commandes activation, pause, reprise, reset ciblé et sync-now sont auditées.
-La désactivation conserve données et curseurs. La reprise après crash repart du
+La désactivation conserve données, curseurs et état de synchronisation antérieur ;
+la réactivation restaure cet état sans activer un lien auparavant inactif ou
+en pause. La reprise après crash repart du
 dernier curseur validé et marque l'exécution abandonnée comme interrompue.
+
+Une boucle de polling bornée pilote la discovery périodique à travers ce même
+scheduler persistant. Elle ne constitue ni un cron séparé ni un second moteur.

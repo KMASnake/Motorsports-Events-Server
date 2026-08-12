@@ -29,7 +29,7 @@
     "concept_validated_by_maintainer": true,
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": "5.4",
+    "authorized_sub_lot": null,
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": true,

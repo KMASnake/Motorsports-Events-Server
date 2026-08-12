@@ -8,6 +8,9 @@
   worker périmé de valider ;
 - résultat, curseur, état et exécution sont validés dans une transaction unique ;
 - le pool global et la concurrence fournisseur sont tous deux appliqués ;
+- discovery et sync partagent les mêmes plafonds, leases et règles de fencing ;
+- la désactivation mémorise puis restaure l'état exact sans auto-activer un
+  flux inactif ou en pause ;
 - l'ingestion complète et le moteur de quotas restent hors du Lot 5.4.
 
 Voir `architecture/ADR-0015-PERSISTENT-SYNC-SCHEDULER.md`.
