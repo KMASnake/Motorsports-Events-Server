@@ -17,7 +17,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "phase-0-specification-complete-awaiting-maintainer-validation",
+    "status": "phase-0-validated-sub-lot-5.1-authorized",
     "updated_at": "2026-08-12",
     "implementation_percent": 0,
     "architecture_percent": 100,
@@ -27,6 +27,9 @@
     "merged_to_main": false,
     "merge_authorized": false,
     "concept_validated_by_maintainer": true,
+    "phase_0_validated_by_maintainer": true,
+    "phase_0_validation_date": "2026-08-12",
+    "authorized_sub_lot": "5.1",
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
     "phase_0_completed_at": "2026-08-12",
     "phase_0_deliverables": [
@@ -34,7 +37,7 @@
       "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
       "docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md"
     ],
-    "validation_rule": "Phase 0 documentation must be explicitly reviewed by the maintainer before application implementation starts."
+    "validation_rule": "Phase 0 was explicitly reviewed and validated by the maintainer. Sub-lot 5.1 is authorized; later sub-lots require their own audit and explicit authorization."
   },
   "lot_5_approved_concepts": {
     "provider_model": "Adapter plus provider instance plus provider/championship synchronization stream",
@@ -80,7 +83,9 @@
   "phase_0_required": {
     "implementation_started": false,
     "documentation_complete": true,
-    "maintainer_validation_pending": true,
+    "maintainer_validation_pending": false,
+    "maintainer_validation_complete": true,
+    "authorized_sub_lot": "5.1",
     "deliverables": [
       "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
       "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
@@ -89,7 +94,7 @@
       "Migration plan if schema changes are necessary",
       "ADR only for durable new architecture decisions"
     ],
-    "stop_rule": "Phase 0 documentation is complete. Codex must stop after commit and push and wait for explicit maintainer validation before sub-lot 5.1."
+    "stop_rule": "Phase 0 is validated. Codex may implement sub-lot 5.1 only and must stop after its tests, documentation, commit and push for maintainer audit before 5.2."
   },
   "quality_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -99,7 +104,7 @@
     "lot_4_4_docker_build": "success-on-5428c1bc2c65193e2b0b623297ea366c2ddd196e"
   },
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Audit and explicitly validate the Lot 5 Phase 0 specification, acceptance matrix and impact analysis. No application implementation is authorized before that validation."
+    "owner": "Codex",
+    "task": "Implement sub-lot 5.1 DB + contracts only, run its validation, update documentation, push, then STOP for maintainer audit before 5.2."
   }
 }
