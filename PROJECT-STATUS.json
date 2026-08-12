@@ -10,12 +10,14 @@
     "lot_4_3_post_merge_closure": "docs/handoff/LOT-4.3-POST-MERGE-CLOSURE.md",
     "lot_4_4_post_merge_closure": "docs/handoff/LOT-4.4-POST-MERGE-CLOSURE.md",
     "lot_5_concept": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
+    "lot_5_3_concept": "docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md",
+    "lot_5_3_acceptance": "docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md",
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.2-implemented-awaiting-maintainer-audit",
-    "reason": "Lot 5.1 is maintainer validated. Lot 5.2 provider secrets and instance configuration are implemented with green Node and isolated PostgreSQL/Docker validation. Maintainer audit is required; sub-lot 5.3 is not authorized."
+    "status": "sub-lot-5.2-validated-sub-lot-5.3-authorized",
+    "reason": "Lot 5.2 provider secrets and instance configuration were audited and validated by the maintainer. The Lot 5.3 discovery/source-config concept was reviewed and explicitly validated; only sub-lot 5.3 is authorized next."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -28,15 +30,7 @@
     "merged_to_main": true,
     "merge_pr": 28,
     "merge_commit": "b42a97129a8aa1cb9a42ce01ba0affb8e5a848a1",
-    "final_branch_sha": "5428c1bc2c65193e2b0b623297ea366c2ddd196e",
-    "evidence": [
-      "docs/handoff/LOT-4.4-AUTH-ACCEPTANCE.md",
-      "docs/handoff/LOT-4.4-STEP-1-VALIDATION.md",
-      "docs/handoff/LOT-4.4-STEP-2-VALIDATION.md",
-      "docs/handoff/LOT-4.4-STEP-3-VALIDATION.md",
-      "docs/handoff/LOT-4.4-STEP-4-VALIDATION.md",
-      "docs/handoff/LOT-4.4-POST-MERGE-CLOSURE.md"
-    ]
+    "final_branch_sha": "5428c1bc2c65193e2b0b623297ea366c2ddd196e"
   },
   "completed_lot_4_4": {
     "implementation_percent": 100,
@@ -51,7 +45,7 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.2-implemented-awaiting-maintainer-audit",
+    "status": "sub-lot-5.2-validated-sub-lot-5.3-authorized",
     "implementation_percent": 20,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -63,52 +57,50 @@
     "concept_validation_date": "2026-08-12",
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.3",
     "sub_lot_5_1": {
       "implementation_percent": 100,
       "maintainer_validated": true,
       "maintainer_validation_date": "2026-08-12",
       "docker_recipe_validated": true,
-      "docker_recipe_validation_environment": "isolated-vps",
-      "docker_recipe_validation_date": "2026-08-12",
       "evidence": "docs/handoff/LOT-5.1-VALIDATION.md"
     },
     "sub_lot_5_2": {
       "implementation_percent": 100,
-      "maintainer_validated": false,
-      "local_validation": true,
+      "maintainer_validated": true,
+      "maintainer_validation_date": "2026-08-12",
       "docker_recipe_validated": true,
-      "docker_recipe_validation_environment": "local-isolated",
-      "validation_date": "2026-08-12",
+      "security_integration_validated": true,
       "evidence": "docs/handoff/LOT-5.2-VALIDATION.md"
     },
+    "sub_lot_5_3": {
+      "implementation_percent": 0,
+      "concept_validated": true,
+      "concept_validation_date": "2026-08-12",
+      "maintainer_validated": false,
+      "authorized": true,
+      "concept": "docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md",
+      "acceptance": "docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"
+    },
     "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
-    "phase_0_completed_at": "2026-08-12",
-    "phase_0_deliverables": [
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md"
-    ],
     "scope": [
       "Providers administration and provider detail pages",
       "Provider adapters and adapter-specific configuration forms",
       "Encrypted provider secrets with key_version",
-      "Automatic championship discovery with manual activation",
-      "Manual championship configuration when discovery is unavailable",
-      "Per-championship adapter-specific source configuration supporting different endpoints and strategies within the same provider; WRC is a known OCBlackTop example",
+      "Real OCBlackTop and TheSportsDB championship discovery without event synchronization",
+      "Persistent unassociated provider discoveries requiring manual association or explicit championship creation",
+      "Per-championship adapter-specific source configuration supporting different endpoints and strategies within the same provider",
+      "Manual adoption of rediscovered source configuration divergences",
+      "Periodic discovery model: enabled/disabled, 30-day default, 7-day minimum, execution wired to scheduler in 5.4",
+      "Discovery request accounting with conservative quota guard and no use of current-year reserve",
+      "Discovery history and not-found state after three complete discovery absences",
       "Current-year-first bootstrap",
       "Historical backfill across all available seasons",
       "Continuous current-year rescan from January 1 to end then restart",
       "Round-robin scheduling across active championships",
       "Persistent provider-specific synchronization cursors",
-      "Persistent scheduler leases and crash recovery",
       "Automatic cadence calculation from short-term and monthly quotas",
-      "Thirty-percent monthly quota reserve for current-year synchronization by default",
-      "Retry with exponential backoff and jitter for transient failures",
-      "Provider suspension for durable auth/configuration failures",
-      "Normalization, mappings, idempotence and deduplication",
       "Preservation of local corrections",
-      "Missing-provider-event signaling without automatic deletion",
       "Public API suppression when a championship is disabled without deleting data",
       "Structured synchronization history and rotating technical logs",
       "Local championship logo upload"
@@ -119,20 +111,24 @@
       "log_rotation_max_size_mb": 100,
       "log_rotation_daily": true,
       "provider_default_concurrency": 1,
-      "provider_missing_event_cycles_before_alert": 3
+      "provider_missing_event_cycles_before_alert": 3,
+      "provider_discovery_interval_days": 30,
+      "provider_discovery_min_interval_days": 7,
+      "provider_missing_discovery_cycles_before_alert": 3
     },
     "mandatory_constraints": [
-      "Newly discovered championships are never synchronized automatically before manual activation",
-      "One provider is principal for a championship in V1",
-      "No synchronization starts automatically when safe quota limits are unknown",
-      "Manual synchronization never bypasses quotas",
-      "Provider secrets are never returned after storage and never logged",
-      "Local corrections always remain effective over provider values",
-      "No automatic deletion of provider events that disappear",
-      "Disabled championships remain in the database and administration but are excluded from the public API",
-      "Decorative values present in generated mockups do not override the approved concept document"
+      "Newly discovered championships never create a local championship automatically",
+      "Newly discovered championships are never synchronized automatically before explicit later activation",
+      "A rediscovery never overwrites an approved source configuration automatically",
+      "Adopting a discovered source configuration is explicit, audited and never starts event synchronization",
+      "WRC remains an OCBlackTop championship and not a separate provider adapter",
+      "One provider is principal for a championship in V1 while alternative sources may remain inactive",
+      "Discovery must respect safe configured quotas and must not intentionally consume the current-year reserve",
+      "No standalone periodic scheduler is introduced in 5.3; scheduler integration belongs to 5.4",
+      "No provider event synchronization is implemented in 5.3",
+      "Provider secrets are never returned after storage and never logged"
     ],
-    "validation_rule": "Phase 0 was explicitly reviewed and validated by the maintainer on 2026-08-12. Only sub-lot 5.1 is authorized; later sub-lots require their own audit and explicit authorization."
+    "validation_rule": "Lot 5.2 was explicitly validated by the maintainer. The Lot 5.3 concept was reviewed and validated on 2026-08-12. Only sub-lot 5.3 is authorized; Codex must stop for audit before 5.4."
   },
   "technical_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -146,5 +142,5 @@
     "status": "validated-production-history",
     "details": "PROJECT_STATUS.md"
   },
-  "next_action": "Maintainer must audit sub-lot 5.2. Codex must STOP; sub-lot 5.3 is not started and not authorized."
+  "next_action": "Codex may implement sub-lot 5.3 only, then must STOP for maintainer audit before any 5.4 work."
 }
