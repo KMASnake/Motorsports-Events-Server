@@ -46,7 +46,8 @@
     "test:lot52:secrets": "./scripts/test-lot52-secrets.sh",
     "test:lot52": "./scripts/test-lot52-secrets.sh"
     ,"test:lot53": "./scripts/test-lot53-discovery.sh",
-    "test:lot54": "./scripts/test-lot54-scheduler.sh"
+    "test:lot54": "./scripts/test-lot54-scheduler.sh",
+    "test:security": "npm run test --workspace @mse/api -- securityHardening.test.ts adminAuth.test.ts adminSession.test.ts adminQuery.test.ts providerSecrets.test.ts schedulerPolicy.test.ts"
   },
   "engines": {
     "node": ">=22.0.0",
