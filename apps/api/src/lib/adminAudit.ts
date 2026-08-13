@@ -5,7 +5,7 @@ import type { AdminPrincipal } from './adminAuth.js';
 type AuditContext = { actor: string; action: string; resourceType: string; resourceId: string | null; oldValue: unknown };
 const contexts = new WeakMap<FastifyRequest, AuditContext>();
 const atomicallyAudited = new WeakSet<FastifyRequest>();
-const sensitive = /authorization|token|secret|password|cookie/i;
+const sensitive = /authorization|token|secret|password|cookie|api[_-]?key|master[_-]?key/i;
 
 function sanitize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sanitize);

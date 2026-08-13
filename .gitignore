@@ -17,3 +17,6 @@ sanitized-snapshots/
 .env.production
 __pycache__/
 *.py[cod]
+*.key
+*.pem
+credentials*.json

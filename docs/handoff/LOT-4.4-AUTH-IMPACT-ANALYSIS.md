@@ -63,7 +63,7 @@ Variables futures proposées :
 - `ADMIN_COOKIE_SECURE` : `true` obligatoire en production ;
 - `ADMIN_SESSION_SECRET` : secret séparé pour la signature CSRF, 32 octets ou
   plus ;
-- `TRUST_PROXY` : proxy explicitement approuvé ;
+- `TRUST_PROXY_CIDRS` : adresses/CIDR des proxies explicitement approuvés ; vide par défaut, jamais `true` ou `*` ;
 - durées et seuils restent des constantes métier dans cette version afin
   d'éviter une configuration incohérente.
 

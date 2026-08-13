@@ -4,7 +4,11 @@ import { z } from 'zod';
 import { pool } from '../lib/db.js';
 
 const nullableText = z.union([z.string().trim().max(500), z.null()]).optional();
-const championshipBody = z.object({
+const nullableHttpUrl = z.union([
+  z.string().trim().max(500).url().refine((value) => ['http:', 'https:'].includes(new URL(value).protocol)),
+  z.literal(''), z.null()
+]).optional();
+export const championshipBody = z.object({
   name: z.string().trim().min(2).max(120),
   slug: z.string().trim().min(2).max(120).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   short_name: nullableText,
@@ -15,9 +19,9 @@ const championshipBody = z.object({
   sync_enabled: z.boolean().default(false),
   provider_key: nullableText,
   external_id: nullableText,
-  logo_url: nullableText,
+  logo_url: nullableHttpUrl,
   description: nullableText
-});
+}).strict();
 
 const updateBody = championshipBody.partial();
 

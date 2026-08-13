@@ -26,8 +26,10 @@ import { providerManualSourceRoutes } from './routes/providerManualSources.js';
 import { PersistentSchedulerService } from './providers/schedulerService.js';
 import { providerSchedulerRoutes } from './routes/providerScheduler.js';
 import { DiscoverySchedulerRuntime } from './providers/discoverySchedulerRuntime.js';
+import { registerSecurityHeaders, secureFastifyOptions } from './lib/httpSecurity.js';
 
-const app = Fastify({ logger: true, trustProxy: process.env.TRUST_PROXY === 'true' });
+const app = Fastify(secureFastifyOptions());
+registerSecurityHeaders(app);
 await verifyApplicationSchema();
 const webOrigin = process.env.ADMIN_WEB_ORIGIN ?? 'http://localhost:3000';
 const sessionSecret = process.env.ADMIN_SESSION_SECRET;

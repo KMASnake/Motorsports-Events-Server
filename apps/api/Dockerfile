@@ -16,5 +16,6 @@ COPY apps/api/package.json apps/api/package.json
 RUN npm install --omit=dev --workspace @mse/api
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY infra/postgres/migrations infra/postgres/migrations
+USER node
 EXPOSE 3001
 CMD ["node","apps/api/dist/server.js"]
