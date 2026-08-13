@@ -27,6 +27,11 @@ uploads, paths et headers. Aucun appel fournisseur réel n’a été effectué.
 | SEC-08 | P2 | Contexte Docker pouvait inclure `.env`, Git et artefacts ; API exécutée root. | `.dockerignore` et utilisateur `node` dans l’image API. | build requis — corrigé |
 | SEC-09 | P3 | Le blocage vise les IP littérales ; une résolution DNS hostile pourrait évoluer vers une IP privée. | Risque accepté : hosts fixes des adaptateurs, aucune URL arbitraire ; resolver réseau différé. | documenté |
 | SEC-10 | P3 | Les lectures publiques coûteuses n’ont pas de rate limit global. | Accepté avant 5.5 : login déjà borné, mutations admin protégées, pas de moteur quota anticipé. | documenté |
+| SEC-11 | P1 | Les lectures publiques des championnats exposaient les lignes désactivées et une projection `c.*`. | Projection publique explicite et filtre `active=true` obligatoires ; lectures administratives distinctes. | tests unitaires et recette PostgreSQL/API — corrigé |
+| SEC-12 | P1 | Les headers Fastify ne protégeaient pas l’ACP statique servi par Nginx. | Headers Nginx réels et CSP construite avec l’origine API configurée ; cache HTML et assets conservés séparément. | conteneur Nginx et Chromium — corrigé |
+| SEC-13 | P2 | L’absence de fuite du JSON public n’était pas vérifiée transversalement. | Parcours récursif des réponses championnats, événements, catalogues et sessions contre une liste de clés interdites. | 8 tests dédiés — corrigé |
+| SEC-14 | P2 | Certains paramètres UUID pouvaient atteindre PostgreSQL sans validation uniforme. | Validation commune 400/404 sur les routes dont l’identité est réellement UUID ; compatibilité texte conservée pour Events/Sessions historiques. | quatre charges invalides avant DB — corrigé |
+| SEC-15 | P2 | Des mutations historiques auditaient après commit via `onSend`. | Championnats, événements et corrections migrés vers mutation + audit transactionnels ; Sessions déjà atomiques ; marquage anti-double audit. | panne d’audit injectée, mutation rollbackée — corrigé |
 
 Aucun P0 n’a été trouvé. Aucun upload binaire de logo n’existe dans le socle
 Node : seul un champ URL est présent et il est désormais limité à HTTP(S).
@@ -51,27 +56,51 @@ Node : seul un champ URL est présent et il est désormais limité à HTTP(S).
 - Le scheduler conserve leases, fencing, pool global/fournisseur, stale commit,
   stale fail et stale discovery. Sync-now reste un boost et ne contourne pas ces
   protections ; désactiver conserve les données.
-- Les audits applicatifs sont append-only ; mutations et audits atomiques
-  existants restent inchangés.
+- Les audits applicatifs sont append-only. Les mutations sensibles de
+  championnats, événements, sessions et corrections écrivent désormais leur
+  audit dans la transaction métier et empêchent le double audit `onSend`.
+
+## Corrections après audit mainteneur
+
+Les lectures publiques de championnats ne renvoient que les lignes actives et
+une projection métier explicite. L’ACP utilise les lectures
+`/api/v1/admin/championships`, qui conservent la visibilité des lignes inactives
+et des champs nécessaires à l’administration. Désactiver un championnat ne
+supprime ni Events, ni Sessions, ni mappings fournisseur, ni streams.
+
+Le Web Nginx sert CSP, `nosniff`, `no-referrer`, protection de frame et
+Permissions-Policy. `connect-src` est produit à partir de `VITE_API_URL` au
+build sans secret. Le HTML reste `no-store`; les assets Vite hashés conservent
+leur cache immutable. HSTS reste la responsabilité de la terminaison TLS en
+production ; le conteneur HTTP interne ne l’émet pas.
+
+La convention UUID est `400` pour un format invalide et `404` pour un UUID
+valide absent. Elle s’applique aux championnats et ressources fournisseur dont
+la colonne est UUID. Les identifiants Events, Sessions et Corrections issus du
+socle historique restent volontairement textuels et sont toujours transmis à
+PostgreSQL par paramètres, sans concaténation utilisateur.
 
 ## Validation exécutée
 
 - `npm run lint` : OK
 - `npm run typecheck` : OK
-- `npm test` : 29 tests Web + 148 tests API, OK
+- `npm test` : 29 tests Web + 157 tests API, OK
 - `npm run build` : Web, API et types, OK
-- `npm run test:security` : 44 tests ciblés, OK
+- `npm run test:security` : 52 tests ciblés, OK
+- `npm run test:web-security` : headers servis par le conteneur Nginx, OK
+- `npm run test:public-security` : masquage, conservation et rollback réel PostgreSQL/API, OK
+- `npm run test:security-visual` : login, tableau de bord, championnats et fournisseurs sur `http://127.0.0.1:3800`, 1 test Chromium, aucune violation CSP ni erreur après authentification, OK
 - `npm run test:lot54` : recette PostgreSQL/Docker, 8 tests ciblés et invariants, OK
 - `./scripts/validate-repository.sh` : 51 tests historiques, 33 réussis et 18 ignorés faute de dépendances optionnelles, OK
 - `git diff --check` : OK
 - `npm audit --audit-level=low` : 0 vulnérabilité
-- `docker compose --project-name mse-pre55-security build api web` : deux images construites, OK
+- `docker compose --project-name mse-pre55-final-build build api web` : deux images construites, OK
 
 Tests uniquement sur fixtures, transport mocké et PostgreSQL Docker local :
 `REAL PROVIDER REQUESTS = 0`, `PROVIDER CREDITS CONSUMED = 0`.
 
 ## Limites et arrêt
 
-La baseline n’est pas déclarée validée :
+Les corrections demandées sont implémentées, mais la baseline n’est pas déclarée validée :
 `security_consolidation_maintainer_validated = false`. Le Lot 5.5 reste
 `NOT STARTED` et `NOT AUTHORIZED`. Prochaine action : audit mainteneur, puis STOP.

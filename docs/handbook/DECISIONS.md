@@ -4,6 +4,13 @@
 
 - la confiance proxy est fermée par défaut et limitée à `TRUST_PROXY_CIDRS` ;
 - Fastify impose headers de sécurité, redaction des secrets et corps de 1 Mio ;
+- Nginx impose les headers de l’ACP et une CSP dont `connect-src` est aligné
+  sur l’origine API configurée au build ;
+- HSTS appartient à la terminaison qui voit réellement le HTTPS public ;
+- les réponses publiques de championnats sont actives uniquement et utilisent
+  une projection explicite, distincte du contrat administratif ;
+- les mutations sensibles historiques écrivent mutation et audit dans une
+  même transaction ;
 - les transports fournisseurs exigent HTTPS, allowlist exacte et lecture
   streaming bornée, sans redirection ni destination privée ;
 - ces règles ne démarrent aucune fonctionnalité du Lot 5.5.

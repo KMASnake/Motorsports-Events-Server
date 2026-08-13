@@ -174,7 +174,8 @@ validation utilisateur.
 
 ## État
 Le Lot 5.4 et son scheduler persistant décrit par l'ADR-0015 sont validés par
-le mainteneur. La consolidation sécurité pré‑5.5 attend son audit explicite.
+le mainteneur. Les corrections demandées lors de l’audit de la consolidation
+sécurité pré‑5.5 sont implémentées et attendent l’audit final explicite.
 Aucun travail du Lot 5.5 n'est autorisé.
 
 Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves
@@ -193,3 +194,9 @@ La frontière HTTP applique les règles permanentes de l’ADR-0016 : confiance
 proxy fermée par défaut et explicitement bornée par CIDR, corps de requête
 limité, headers de sécurité, redaction des secrets, et sorties fournisseur
 HTTPS limitées à une allowlist avec timeout et streaming borné.
+
+Les projections publiques sont explicites et séparées des projections
+administratives. Un championnat désactivé est absent des API publiques sans
+suppression de ses données. Nginx protège l’ACP par une CSP alignée sur
+l’origine API du build ; la terminaison TLS de production reste propriétaire
+de HSTS.

@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.28 — 2026-08-14
+
+- corrige l’audit mainteneur pré‑5.5 : championnats publics actifs uniquement,
+  projection explicite et lectures ACP séparées ;
+- applique la CSP et les headers de sécurité au conteneur Nginx Web réel ;
+- ajoute les recettes anti-fuite, UUID, conservation de données, rollback
+  d’audit et validation Chromium sans démarrer le Lot 5.5.
+
 ## 1.27 — 2026-08-14
 
 - consolide la sécurité transversale des Lots 1 à 5.4 avant le Lot 5.5 ;
