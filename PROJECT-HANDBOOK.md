@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.22
+## Version 1.27
 
 Ce document est la source de vérité permanente du projet.
 
@@ -173,8 +173,9 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une
 validation utilisateur.
 
 ## État
-Le Lot 5.4 implémente le scheduler persistant décrit par l'ADR-0015 et attend
-l'audit explicite du mainteneur. Aucun travail du Lot 5.5 n'est autorisé.
+Le Lot 5.4 et son scheduler persistant décrit par l'ADR-0015 sont validés par
+le mainteneur. La consolidation sécurité pré‑5.5 attend son audit explicite.
+Aucun travail du Lot 5.5 n'est autorisé.
 
 Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves
 VPS isolées des migrations, API, corrections et contrôles visuels avec la
@@ -186,3 +187,9 @@ fusion ne constitue pas elle-même la validation, déjà acquise explicitement.
 Avant toute modification : lire ce Handbook, `CODEX.md`,
 `PROJECT-STATUS.json`, `docs/handoff/PROGRESS.json`, tous les ADR du Handbook
 et les spécifications du lot dans `docs/handoff/`.
+# Sécurité HTTP transversale
+
+La frontière HTTP applique les règles permanentes de l’ADR-0016 : confiance
+proxy fermée par défaut et explicitement bornée par CIDR, corps de requête
+limité, headers de sécurité, redaction des secrets, et sorties fournisseur
+HTTPS limitées à une allowlist avec timeout et streaming borné.

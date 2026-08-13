@@ -1,5 +1,12 @@
 # Handbook Changelog
 
+## 1.27 — 2026-08-14
+
+- consolide la sécurité transversale des Lots 1 à 5.4 avant le Lot 5.5 ;
+- ferme la confiance proxy, borne les corps et réponses fournisseurs, ajoute
+  headers et redaction globale ;
+- documente l’ADR-0016 et maintient le Lot 5.5 non commencé et non autorisé.
+
 ## 1.26 — 2026-08-12
 
 - implémente le scheduler persistant approuvé du Lot 5.4 ;

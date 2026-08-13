@@ -1,5 +1,15 @@
 # Journal des décisions
 
+## 2026-08-14 — Frontière de sécurité HTTP pré‑5.5
+
+- la confiance proxy est fermée par défaut et limitée à `TRUST_PROXY_CIDRS` ;
+- Fastify impose headers de sécurité, redaction des secrets et corps de 1 Mio ;
+- les transports fournisseurs exigent HTTPS, allowlist exacte et lecture
+  streaming bornée, sans redirection ni destination privée ;
+- ces règles ne démarrent aucune fonctionnalité du Lot 5.5.
+
+Voir `architecture/ADR-0016-HTTP-SECURITY-BOUNDARY.md`.
+
 ## 2026-08-12 — Scheduler de synchronisation persistant
 
 - deux flux persistants `current` et `historical` portent trois classes de
