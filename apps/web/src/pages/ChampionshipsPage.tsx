@@ -76,7 +76,7 @@ export function ChampionshipsPage() {
 
   async function load() {
     setLoading(true);
-    try { setRows(await request<Championship[]>('/api/v1/championships')); }
+    try { setRows(await request<Championship[]>('/api/v1/admin/championships')); }
     catch (error) { setMessage({ text: (error as Error).message, error: true }); }
     finally { setLoading(false); }
   }

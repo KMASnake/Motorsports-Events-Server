@@ -21,7 +21,7 @@ const toIso = (value: string) => value ? new Date(value).toISOString() : null;
 export async function loadEventWorkspace() {
   const [events, championships, circuits, sessionTitles] = await Promise.all([
     request<EventRow[]>('/api/v1/admin/events'),
-    request<Championship[]>('/api/v1/championships'),
+    request<Championship[]>('/api/v1/admin/championships'),
     request<Circuit[]>('/api/v1/circuits'),
     request<SessionTitleSuggestion[]>('/api/v1/admin/session-titles')
   ]);

@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
+import type { PoolClient } from 'pg';
 import { pool } from './db.js';
 import type { AdminPrincipal } from './adminAuth.js';
 
@@ -9,9 +10,28 @@ const sensitive = /authorization|token|secret|password|cookie|api[_-]?key|master
 
 function sanitize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sanitize);
+  if (value instanceof Date) return value.toISOString();
   if (!value || typeof value !== 'object') return value;
   return Object.fromEntries(Object.entries(value as Record<string, unknown>)
     .filter(([key]) => !sensitive.test(key)).map(([key, child]) => [key, sanitize(child)]));
+}
+
+export async function writeAdminAudit(client: Pick<PoolClient, 'query'>, input: {
+  request: FastifyRequest;
+  resourceType: string;
+  resourceId: string | null;
+  oldValue: unknown;
+  newValue: unknown;
+  action?: string;
+}): Promise<void> {
+  const principal = (input.request as FastifyRequest & { adminPrincipal?: AdminPrincipal }).adminPrincipal;
+  await client.query(
+    `insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,old_value,new_value)
+     values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb)`,
+    [principal?.sub ?? 'unknown', input.action ?? `${input.request.method} ${input.request.url.split('?', 1)[0]}`,
+      input.resourceType, input.resourceId, input.request.id,
+      JSON.stringify(sanitize(input.oldValue)), JSON.stringify(sanitize(input.newValue))]
+  );
 }
 function target(request: FastifyRequest): { type: string; id: string | null; table: string | null } | null {
   const path = request.url.split('?', 1)[0];

@@ -11,6 +11,7 @@ import {
   type CorrectableEventPatch
 } from '../lib/eventCorrections.js';
 import { adminEventQuery, paginated, publicEventQuery } from '../lib/adminQuery.js';
+import { markAtomicallyAudited, writeAdminAudit } from '../lib/adminAudit.js';
 
 const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional();
 const nullableSessionTitle = z.union([z.string().trim().min(1).max(160), z.null()]).optional();
@@ -167,8 +168,10 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
           id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,
           origin,provider_key,external_id,session_title,description
         ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *`, [randomUUID(), ...values(complete)]);
+        await writeAdminAudit(client, { request, resourceType: 'event', resourceId: result.rows[0].id, oldValue: null, newValue: result.rows[0] });
         return result.rows[0];
       });
+      markAtomicallyAudited(request);
       return reply.code(201).send(created);
     } catch (error: unknown) {
       const code=(error as {code?:string}).code;
@@ -203,9 +206,11 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         const result = await client.query(`update events set championship_id=$2,circuit_id=$3,name=$4,slug=$5,
           category=$6,starts_at=$7,ends_at=$8,timezone=$9,status=$10,published=$11,origin=$12,
           provider_key=$13,external_id=$14,session_title=$15,description=$16,updated_at=now() where id=$1 returning *`, [id, ...values(merged)]);
+        await writeAdminAudit(client, { request, resourceType: 'event', resourceId: id, oldValue: current, newValue: result.rows[0] });
         return result.rows[0];
       });
       if (!updated) return reply.code(404).send({ message: 'Événement introuvable.' });
+      markAtomicallyAudited(request);
       return updated;
     } catch (error: unknown) {
       if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
@@ -233,8 +238,10 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
           id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,
           origin,provider_key,external_id,session_title,description
         ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *`, [randomUUID(), ...values(complete)]);
+        await writeAdminAudit(client, { request, resourceType: 'provider-event', resourceId: result.rows[0].id, oldValue: null, newValue: result.rows[0] });
         return result.rows[0];
       });
+      markAtomicallyAudited(request);
       return reply.code(201).send(created);
     } catch (error: unknown) {
       const code=(error as {code?:string}).code;
@@ -260,9 +267,12 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         });
         const dateError = validateDates(merged);
         if (dateError) throw new EventValidationError(dateError);
-        return updateEventFields(client, id, effectivePatch);
+        const result = await updateEventFields(client, id, effectivePatch);
+        await writeAdminAudit(client, { request, resourceType: 'event', resourceId: id, oldValue: current, newValue: result });
+        return result;
       });
       if (!updated) return reply.code(404).send({ message: 'Événement introuvable.' });
+      markAtomicallyAudited(request);
       return updated;
     } catch (error) {
       if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
@@ -273,8 +283,15 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
 
   app.delete('/api/v1/admin/events/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
-    const result = await pool.query('delete from events where id=$1 returning id', [id]);
-    if (!result.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
+    const deleted = await withTransaction(async (client) => {
+      const current = await client.query('select * from events where id=$1 for update', [id]);
+      if (!current.rowCount) return false;
+      await client.query('delete from events where id=$1', [id]);
+      await writeAdminAudit(client, { request, resourceType: 'event', resourceId: id, oldValue: current.rows[0], newValue: null });
+      return true;
+    });
+    if (!deleted) return reply.code(404).send({ message: 'Événement introuvable.' });
+    markAtomicallyAudited(request);
     return reply.code(204).send();
   });
 }

@@ -55,7 +55,7 @@ export function CorrectionsPage(){
   const [editingId,setEditingId]=useState<string|null>(null);const [draft,setDraft]=useState('');const [error,setError]=useState('');
   const setFilter=<K extends keyof CorrectionFilters>(key:K,value:CorrectionFilters[K])=>{setFilters((current)=>({...current,[key]:value}));setPage(1)};
   const load=()=>Promise.all([
-    call<CorrectionRow[]>('/api/v1/admin/corrections'),call<Championship[]>('/api/v1/championships'),call<Circuit[]>('/api/v1/circuits')
+    call<CorrectionRow[]>('/api/v1/admin/corrections'),call<Championship[]>('/api/v1/admin/championships'),call<Circuit[]>('/api/v1/circuits')
   ]).then(([corrections,championships,circuits])=>{
     setRows(corrections);setReferences({championships:new Map(championships.map((item)=>[item.id,item.name])),circuits:new Map(circuits.map((item)=>[item.id,item.name]))});setError('');
   }).catch((reason:Error)=>setError(reason.message));

@@ -27,9 +27,11 @@ import { PersistentSchedulerService } from './providers/schedulerService.js';
 import { providerSchedulerRoutes } from './routes/providerScheduler.js';
 import { DiscoverySchedulerRuntime } from './providers/discoverySchedulerRuntime.js';
 import { registerSecurityHeaders, secureFastifyOptions } from './lib/httpSecurity.js';
+import { registerUuidParamValidation } from './lib/routeParams.js';
 
 const app = Fastify(secureFastifyOptions());
 registerSecurityHeaders(app);
+registerUuidParamValidation(app);
 await verifyApplicationSchema();
 const webOrigin = process.env.ADMIN_WEB_ORIGIN ?? 'http://localhost:3000';
 const sessionSecret = process.env.ADMIN_SESSION_SECRET;
