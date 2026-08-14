@@ -32,10 +32,14 @@ Garanties explicites :
 
 ## Non-régression
 
-- lint, typecheck, tests complets et builds Web/API : réussis ;
+- lint, typecheck, 29 tests Web, 161 tests API et builds Web/API : réussis ;
 - sécurité : 52 tests réussis ;
 - recette 5.4 scheduler/leases/fencing : réussie après adaptation de son scénario de rollback à la migration 0013 ;
-- validation dépôt et audit de dépendances à enregistrer dans le bilan final.
+- recettes Web Nginx/CSP et API publique : réussies ;
+- test Chromium login/tableau de bord/championnats/fournisseurs sous CSP : 1 réussi, aucune erreur console critique ni violation CSP ;
+- builds Docker API et Web : réussis ;
+- `validate-repository.sh` et `git diff --check` : réussis ;
+- `npm audit --audit-level=high` : 0 vulnérabilité (équivalent plus strict que le niveau low demandé).
 
 ## Limite de périmètre
 
