@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.27
+## Version 1.29
 
 Ce document est la source de vérité permanente du projet.
 
@@ -174,9 +174,19 @@ validation utilisateur.
 
 ## État
 Le Lot 5.4 et son scheduler persistant décrit par l'ADR-0015 sont validés par
-le mainteneur. Les corrections demandées lors de l’audit de la consolidation
-sécurité pré‑5.5 sont implémentées et attendent l’audit final explicite.
-Aucun travail du Lot 5.5 n'est autorisé.
+le mainteneur. La consolidation sécurité pré‑5.5 décrite par l'ADR-0016 a été
+auditée, corrigée et **validée explicitement par le mainteneur le 2026-08-14**.
+
+Le Concept et l'Acceptance du Lot **5.5 — Quotas et cadence** ont été audités
+contre les invariants 5.4 et la baseline sécurité, corrigés puis validés par le
+mainteneur. L'implémentation du **seul Lot 5.5 est explicitement autorisée** ;
+`authorized_sub_lot = 5.5`. Voir
+`docs/handbook/architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
+
+Cette autorisation ne vaut pas validation de l'implémentation 5.5. Codex doit
+s'arrêter après implémentation et preuves de validation pour audit mainteneur.
+Les **Lots 5.6 et suivants restent non autorisés** jusqu'à une nouvelle
+validation explicite du mainteneur.
 
 Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves
 VPS isolées des migrations, API, corrections et contrôles visuels avec la
@@ -188,6 +198,7 @@ fusion ne constitue pas elle-même la validation, déjà acquise explicitement.
 Avant toute modification : lire ce Handbook, `CODEX.md`,
 `PROJECT-STATUS.json`, `docs/handoff/PROGRESS.json`, tous les ADR du Handbook
 et les spécifications du lot dans `docs/handoff/`.
+
 # Sécurité HTTP transversale
 
 La frontière HTTP applique les règles permanentes de l’ADR-0016 : confiance
