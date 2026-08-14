@@ -3,8 +3,10 @@
 ## Statut
 
 - Conception fonctionnelle revue avec le mainteneur le 2026-08-14.
-- Ce document formalise le Lot 5.6 mais **n'autorise pas son implémentation**.
-- Le Lot 5.6 reste à 0 % tant que son Acceptance, ses maquettes et l'audit croisé avec 5.4/5.5/5.7/sécurité n'ont pas été validés explicitement par le mainteneur.
+- Concept, contrat UI, Acceptance et audit croisé ont été consolidés.
+- Le mainteneur a **explicitement autorisé l'implémentation du Lot 5.6 le 2026-08-14**.
+- Cette autorisation ne vaut ni validation finale de l'implémentation, ni autorisation du Lot 5.7+, ni fusion dans `main`.
+- Voir `docs/handbook/architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`.
 
 ## Objectif
 
@@ -234,6 +236,8 @@ Lorsque le fournisseur expose :
 
 5.6 conserve les deux niveaux et leurs identités source.
 
+Cette structure est **strictement un graphe source technique d'acquisition**. Elle ne réintroduit jamais un modèle métier `Event → Sessions`. Le modèle métier permanent reste celui de l'ADR-0013 : un Événement métier représente directement une Session métier.
+
 Lorsqu'un provider n'expose qu'un seul niveau, 5.6 n'en invente pas un.
 
 L'harmonisation entre structures F1/MotoGP/WRC/WSBK/etc. reste 5.7.
@@ -263,13 +267,13 @@ Exemple : si un horaire fournisseur passe de 14:00 à 15:00 puis 15:30, le journ
 
 Une acquisition fournisseur peut mettre à jour la valeur source mais ne doit jamais supprimer ou écraser une correction manuelle existante.
 
+Dès 5.6, la protection de l'override, la mise à jour source et l'audit requis respectent les garanties transactionnelles permanentes du Handbook. La décision de réconciliation métier définitive reste 5.7 ; la protection technique de l'override ne peut pas être différée.
+
 Le journal doit pouvoir signaler :
 
 - changement source avec correction locale active ;
 - convergence éventuelle source/correction ;
 - origine provider/admin.
-
-La décision de réconciliation métier finale reste 5.7.
 
 ## Checkpoints et reprise
 
@@ -403,6 +407,10 @@ Pour l'estimation par éléments comparables :
 Toute fin calculée doit être marquée `estimated`, avec sa provenance, par exemple `provider_peer_duration`.
 
 Cette estimation sert au cycle acquisition/finalization 5.6 et ne devient pas silencieusement une donnée métier définitive.
+
+## Temporalité déterministe
+
+Les instants persistés et comparés sont normalisés en UTC. Lorsqu'une règle dépend d'une date civile ou d'un fuseau, le fuseau pertinent est déterminé explicitement par la donnée/adaptateur puis converti en UTC. J→J+30 n'est pas réduit à `30 × 24 h` lorsqu'il s'agit d'une règle civile. Les classifications doivent être identiques entre workers, y compris à minuit, lors des transitions DST et pour les dates pré-1970.
 
 ## Anomalie de finalisation
 
@@ -594,18 +602,21 @@ Elles doivent respecter `docs/handoff/UI_CONTRACT.md` et les maquettes Providers
 
 ## Sécurité
 
-Réutiliser intégralement les garanties existantes 5.2 + pré-5.5 :
+Réutiliser intégralement les garanties existantes 5.2 + pré-5.5 et l'ADR-0016 :
 
 - secrets chiffrés ;
-- HTTPS ;
+- HTTPS uniquement pour les appels fournisseur ;
 - SSRF protection ;
-- allowlists ;
-- timeout ;
-- bounded streaming ;
-- redaction ;
+- allowlists strictes ;
+- aucune redirection hors frontière autorisée ;
+- timeout borné ;
+- bounded streaming et tailles bornées ;
+- validation de schéma et parsing défensif ;
+- redaction y compris dans erreurs/traces ;
 - admin auth/CSRF ;
 - SQL paramétré ;
-- audit sans secret.
+- audit sans secret ;
+- pagination hostile/bouclante détectée.
 
 La représentation source et les logs ne doivent jamais devenir un moyen détourné de persister des réponses sensibles.
 
@@ -624,15 +635,16 @@ La représentation source et les logs ne doivent jamais devenir un moyen détour
 
 ## Gate
 
-La présence de ce Concept ne vaut pas autorisation d'implémentation.
+Le gate de conception du Lot 5.6 a été passé : Concept, contrat UI, Acceptance, audit croisé, corrections et revue post-corrections sont consolidés.
 
-Avant tout code 5.6, il faut encore :
+Le mainteneur a explicitement déclaré le 2026-08-14 : **« Je valide et j'autorise l'implémentation du lot 5.6 »**.
 
-1. produire les maquettes/contrats UI 5.6 ;
-2. produire `LOT-5.6-ACQUISITION-ACCEPTANCE.md` ;
-3. effectuer un audit croisé Concept ↔ Acceptance ↔ 5.4 ↔ 5.5 ↔ frontière 5.7 ↔ sécurité ;
-4. corriger tout finding ;
-5. obtenir une validation explicite du mainteneur ;
-6. seulement ensuite mettre à jour `authorized_sub_lot` pour autoriser 5.6.
+État courant :
 
-Tant que ce gate n'est pas passé : **Lot 5.6 NOT AUTHORIZED**.
+- `authorized_sub_lot = 5.6` ;
+- **Lot 5.6 AUTORISÉ À L'IMPLÉMENTATION** ;
+- validation finale de l'implémentation : à venir après preuves et audit ;
+- fusion dans `main` : non autorisée par cette décision ;
+- **Lots 5.7+ NON AUTORISÉS À L'IMPLÉMENTATION**.
+
+Voir `docs/handbook/architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`.
