@@ -5,7 +5,7 @@
 - Lot 4.3 : validé utilisateur, fusionné dans `main` via PR #27 le 2026-08-11
 - Lot 4 : terminé fonctionnellement
 - Lot 4.4 : authentification de la console d'administration, validée utilisateur et fusionnée dans `main` via PR #28 le 2026-08-12
-- Lot 5 : Fournisseurs et moteur de synchronisation API — Phase 0 validée ; 5.1 validé ; 5.2 validé ; 5.3 validé ; 5.4 validé ; baseline sécurité pré-5.5 validée ; Concept + Acceptance 5.5 validés après audit croisé ; implémentation 5.5 autorisée
+- Lot 5 : Fournisseurs et moteur de synchronisation API — 5.1 à 5.4 validés ; baseline sécurité pré-5.5 validée ; 5.5 implémenté et en attente de validation mainteneur
 
 ## Lot 4.4 — Authentification administration — TERMINÉ
 
@@ -15,7 +15,7 @@ Capacités validées : authentification administrateur, Argon2id, sessions serve
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
-Statut : `sub-lot-5.5-authorized-ready-for-implementation`.
+Statut : `sub-lot-5.5-implemented-awaiting-maintainer-validation`.
 
 La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Les documents dédiés des sous-lots priment lorsqu'ils amendent explicitement les formulations Phase 0.
 
@@ -26,7 +26,7 @@ La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-C
 - 5.3 — découverte championnats et source config : validé mainteneur ;
 - 5.4 — scheduler persistant, curseurs et leases : validé mainteneur ;
 - consolidation générale et sécurité pré-5.5 : validée mainteneur ;
-- 5.5 — quotas et cadence : Concept + Acceptance validés après audit croisé avec 5.4 et sécurité ; **implémentation autorisée** ;
+- 5.5 — quotas et cadence : implémentation et recette locale terminées ; **validation mainteneur requise** ;
 - 5.6+ : non autorisés.
 
 ### Lot 5.4 — Scheduler, curseurs et leases
@@ -35,7 +35,7 @@ Documents normatifs : `docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md` et `docs/hando
 
 Invariants conservés : streams current/historical, fenêtre current glissante 7 jours par défaut, recent/deep history, round-robin 3/2/1, work units bornées, pool global 4, concurrence provider 1, leases PostgreSQL 120 s, heartbeat ~30 s, fencing obligatoire, reprise après crash, reset non destructif, Sync now comme boost uniquement, désactivation sans suppression, discovery périodique via le scheduler unique.
 
-### Lot 5.5 — Quotas et cadence — AUTORISÉ
+### Lot 5.5 — Quotas et cadence — IMPLÉMENTÉ, À VALIDER
 
 Documents normatifs validés :
 
@@ -68,7 +68,7 @@ Règles autorisées :
 
 ### Lots suivants
 
-- 5.5 — **autorisé maintenant** ; implémenter uniquement le moteur quotas/cadence et produire les preuves d'acceptation ;
+- 5.5 — implémenté ; recette et preuves dans `docs/handoff/LOT-5.5-VALIDATION.md`, validation mainteneur attendue ;
 - 5.6 — bootstrap métier, historique et boucle de synchronisation : non autorisé ;
 - 5.7 — normalisation, idempotence, mappings, corrections et présence fournisseur : non autorisé ;
 - 5.8 — runs/logs/alertes complets : non autorisé ;

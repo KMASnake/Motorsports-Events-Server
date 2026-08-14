@@ -77,6 +77,16 @@ Voir `architecture/ADR-0013-EVENT-AS-SESSION.md`.
 
 Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
 
+## 2026-08-14 — Quota gate fournisseur atomique
+
+- le scheduler conserve la sélection et les leases ; le quota gate décide et charge séparément avant tout outbound ;
+- les fenêtres minute/heure/jour/mois et l'intervalle minimal s'appliquent simultanément ;
+- le compteur local est conservateur et les observations fournisseur normalisées ne réécrivent pas la policy ;
+- seule la classe current accède à la réserve, après application de la marge ;
+- seule une non-émission prouvée permet une compensation ; une émission reste chargée malgré timeout ou stale fencing.
+
+Voir `architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
+
 ## 2026-08-10 — Projection publique des Sessions
 
 - les Sessions publiques sont lues sous leur Événement ou par identifiant ;

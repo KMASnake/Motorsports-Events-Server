@@ -13,12 +13,13 @@
     "lot_5_4_validation": "docs/handoff/LOT-5.4-VALIDATION.md",
     "lot_5_5_concept": "docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md",
     "lot_5_5_acceptance": "docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md",
+    "lot_5_5_validation": "docs/handoff/LOT-5.5-VALIDATION.md",
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.5-authorized-ready-for-implementation",
-    "reason": "Lots 5.1 through 5.4 and the pre-5.5 security baseline are maintainer validated. Lot 5.5 Concept and Acceptance passed the cross-audit against 5.4 and security, corrections were applied, and the maintainer explicitly authorized implementation on 2026-08-14."
+    "status": "sub-lot-5.5-implemented-awaiting-maintainer-validation",
+    "reason": "Lot 5.5 is implemented with its 43-case PostgreSQL recipe green. Maintainer validation remains required and Lot 5.6 is not authorized."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -36,8 +37,8 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.5-authorized-ready-for-implementation",
-    "implementation_percent": 40,
+    "status": "sub-lot-5.5-implemented-awaiting-maintainer-validation",
+    "implementation_percent": 50,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "validated_on_user_workstation": false,
@@ -56,7 +57,7 @@
     "sub_lot_5_2": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-12","docker_recipe_validated":true,"security_integration_validated":true,"evidence":"docs/handoff/LOT-5.2-VALIDATION.md"},
     "sub_lot_5_3": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"implementation_evidence":"docs/handoff/LOT-5.3-VALIDATION.md","concept":"docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md","acceptance":"docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"},
     "sub_lot_5_4": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"local_validation_passed":true,"validation_evidence":"docs/handoff/LOT-5.4-VALIDATION.md","concept":"docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md","acceptance":"docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md"},
-    "sub_lot_5_5": {"implementation_percent":0,"concept_reviewed":true,"concept_review_date":"2026-08-14","normative_docs_created":true,"concept_validated":true,"concept_validation_date":"2026-08-14","acceptance_validated":true,"acceptance_validation_date":"2026-08-14","cross_audit_passed":true,"cross_audit_date":"2026-08-14","authorized":true,"authorization_date":"2026-08-14","maintainer_validated":false,"concept":"docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md","acceptance":"docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md"},
+    "sub_lot_5_5": {"implementation_percent":100,"concept_reviewed":true,"concept_review_date":"2026-08-14","normative_docs_created":true,"concept_validated":true,"concept_validation_date":"2026-08-14","acceptance_validated":true,"acceptance_validation_date":"2026-08-14","cross_audit_passed":true,"cross_audit_date":"2026-08-14","authorized":true,"authorization_date":"2026-08-14","local_validation_passed":true,"maintainer_validated":false,"validation_evidence":"docs/handoff/LOT-5.5-VALIDATION.md","concept":"docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md","acceptance":"docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md"},
     "scope": [
       "Providers administration and provider detail pages",
       "Provider adapters and adapter-specific configuration forms",
@@ -133,6 +134,6 @@
   "historical_production": {"version":"2.7.0","status":"validated-production-history","details":"PROJECT_STATUS.md"},
   "next_action": {
     "owner": "Codex",
-    "task": "Implement authorized sub-lot 5.5 only, following LOT-5.5-QUOTA-CADENCE-CONCEPT.md and LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md. Stop after implementation and validation evidence; do not start 5.6."
+    "task": "Audit and maintainer validation of implemented sub-lot 5.5. Do not start 5.6."
   }
 }

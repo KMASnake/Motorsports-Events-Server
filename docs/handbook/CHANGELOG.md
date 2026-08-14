@@ -134,6 +134,13 @@
 - refuse les mutations silencieuses des Sessions fournisseur avant Corrections ;
 - applique l'audit atomique prévu par l'ADR-0012.
 
+## 1.16 — 2026-08-14
+
+- implémente le quota gate atomique PostgreSQL du Lot 5.5 ;
+- ajoute les fenêtres multiples, marge, réserve current, observations normalisées et backoffs ;
+- ajoute la recette isolée de 43 cas et son plan de rollback ;
+- maintient le Lot 5.5 en attente de validation mainteneur et interdit le démarrage du Lot 5.6.
+
 ## 1.15 — 2026-08-10
 
 - définit le modèle relationnel et temporel des Sessions ;
