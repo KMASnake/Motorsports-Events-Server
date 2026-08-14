@@ -14,14 +14,14 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.6-implementation-authorized",
-    "reason": "Lot 5.6 Concept, UI Contract and Acceptance were cross-audited and consolidated. Maintainer explicitly authorized Lot 5.6 implementation on 2026-08-14. Lot 5.7+ remain unauthorized."
+    "status": "sub-lot-5.6-a-implemented-awaiting-maintainer-validation",
+    "reason": "Lot 5.6-A persistence and source-storage contracts are implemented and tested. STOP before 5.6-B pending maintainer validation. Lot 5.7+ remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-implementation-authorized",
-    "implementation_percent": 50,
+    "status": "sub-lot-5.6-a-implemented-awaiting-maintainer-validation",
+    "implementation_percent": 51,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "merged_to_main": false,
@@ -33,7 +33,8 @@
     "sub_lot_5_4": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
     "sub_lot_5_5": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-14","authorized":true},
     "sub_lot_5_6": {
-      "implementation_percent": 0,
+      "implementation_percent": 11,
+      "completed_technical_sub_lots": ["5.6-A"],
       "concept_validated": true,
       "concept_validation_date": "2026-08-14",
       "ui_contract_validated": true,
@@ -69,6 +70,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Implement Lot 5.6 strictly from the consolidated Concept, UI Contract and Acceptance. Stop before any Lot 5.7 work."
+    "task": "Maintainer validates Lot 5.6-A before any Lot 5.6-B implementation. Lot 5.7+ remain unauthorized."
   }
 }
