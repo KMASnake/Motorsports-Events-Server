@@ -28,7 +28,7 @@ Le quota utilise un modèle hybride :
 
 En cas de contradiction, la valeur la plus restrictive est utilisée sauf reset fournisseur explicite ou observation suffisamment fiable permettant un recalage. Une observation ne modifie jamais silencieusement la configuration administrateur.
 
-Aucun header brut sensible, credential ou body fournisseur ne doit être stocké ou journalisé. Seules les métadonnées normalisées utiles au quota peuvent être persistées.
+Aucun header brut sensible, credential ou body fournisseur ne doit être stocké ou journalisé. Seules les métadonnées quota normalisées explicitement nécessaires peuvent être persistées, par exemple `limit`, `remaining`, `reset_at`, `window` et `source`. Sont notamment interdits dans quota state, observations, diagnostics, logs et audits : `Authorization`, `Cookie`, `Set-Cookie`, `x-api-key`, API keys/tokens, URL contenant des credentials, dumps de headers bruts et bodies fournisseur.
 
 ## 4. Quota inconnu
 
@@ -93,7 +93,7 @@ L'adaptateur peut classifier le scope. En cas d'ambiguïté, le moteur choisit p
 
 Règles :
 
-- `401/403` : suspension/authentication_error fournisseur, sans retries automatiques répétés ;
+- `401/403` provenant d'un endpoint que l'adaptateur qualifie comme authentifié : suspension/authentication_error immédiate de l'instance fournisseur, sans attendre plusieurs répétitions et sans retries automatiques répétés ;
 - `429 + Retry-After` : blocage jusqu'à l'échéance annoncée ; support délai en secondes et date HTTP ;
 - `429` sans Retry-After : backoff progressif par défaut ~1 min, ~5 min, ~15 min, ~1 h avec jitter ;
 - `5xx`, réseau, timeout : backoff progressif avec jitter, sans déclarer le quota épuisé ;
@@ -111,6 +111,8 @@ Invariant de concurrence : si une seule unité reste, deux workers concurrents n
 Le mécanisme est distinct des leases 5.4 : le lease protège un stream contre le double travail ; la charge quota protège le budget fournisseur entre plusieurs streams et plusieurs instances.
 
 Une erreur purement locale avant toute émission HTTP peut annuler la charge si cela peut être prouvé sans ambiguïté. Une tentative réellement envoyée n'est pas recréditée automatiquement.
+
+La perte du lease ou le rejet ultérieur du commit par fencing ne rembourse jamais une tentative déjà envoyée : `stale fencing rejection != quota refund`. Le quota décrit la consommation fournisseur réelle/potentielle ; le fencing décrit uniquement le droit à committer le résultat métier.
 
 ## 11. Horloge et reset
 
@@ -172,7 +174,9 @@ Les tests Provider utilisent fixtures/mocks : **0 appel fournisseur réel et 0 c
 10. Quota inconnu fonctionne prudemment au lieu de bloquer globalement.
 11. Provider et stream backoff sont distincts.
 12. Retry-After est prioritaire quand valide.
-13. 401/403 suspendent le fournisseur.
+13. 401/403 authentifiés suspendent immédiatement le fournisseur.
 14. La charge quota est atomique PostgreSQL et sûre multi-instance.
-15. Policy et observations sont séparées.
-16. Le scheduler 5.4 reste propriétaire de l'ordonnancement.
+15. Une tentative envoyée reste chargée même si son commit est ensuite rejeté par fencing.
+16. Policy et observations sont séparées.
+17. Les observations quota persistées sont normalisées et exemptes de secrets/headers bruts.
+18. Le scheduler 5.4 reste propriétaire de l'ordonnancement.
