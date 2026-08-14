@@ -18,8 +18,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.5-implemented-awaiting-maintainer-validation",
-    "reason": "Lot 5.5 is implemented with its 43-case PostgreSQL recipe green. Maintainer validation remains required and Lot 5.6 is not authorized."
+    "status": "sub-lot-5.5-corrected-awaiting-maintainer-re-audit",
+    "reason": "Lot 5.5 is implemented, its four maintainer-audit findings are corrected, and its 55-case PostgreSQL recipe is green. Maintainer re-audit remains required and Lot 5.6 is not authorized."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -37,7 +37,7 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.5-implemented-awaiting-maintainer-validation",
+    "status": "sub-lot-5.5-corrected-awaiting-maintainer-re-audit",
     "implementation_percent": 50,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,

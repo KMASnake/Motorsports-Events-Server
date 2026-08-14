@@ -20,7 +20,7 @@ Statut : implémentation terminée, validation mainteneur requise.
 
 Commande : `npm run test:lot55`.
 
-Résultat local : 43 cas réussis avec PostgreSQL réel, rollback/réapplication de la migration réussis.
+Résultat local : 55 cas réussis avec PostgreSQL réel, rollback/réapplication des migrations réussis.
 
 Garanties explicites :
 
@@ -29,6 +29,33 @@ Garanties explicites :
 - deux workers pour un dernier crédit donnent exactement une autorisation ;
 - un appel émis n'est jamais remboursé après timeout ou rejet par fencing ;
 - les observations et diagnostics ne persistent ni header brut, ni body, ni secret.
+
+## Corrections après audit mainteneur
+
+- le `remaining` fiable annoncé par le fournisseur borne désormais toute
+  disponibilité positive, après déduction des charges locales postérieures à
+  l'observation ; la valeur la plus restrictive entre compteur local et
+  fournisseur gagne, y compris pour `current` dans sa réserve protégée ;
+- `QuotaObservation` porte son vrai `windowKind` et un adaptateur peut retourner
+  une ou plusieurs observations `minute`, `hour`, `day` et `month` ; chacune
+  est persistée et diagnostiquée séparément, sans header brut ;
+- une observation arrivée à son `resetsAt` cesse de contraindre la nouvelle
+  fenêtre ; la comptabilité locale reste inchangée ;
+- `ProviderHttpError` conserve la raison et `nextEligibleAt` d'un refus avant
+  émission ; une discovery différée enregistre ces deux valeurs, conserve
+  `request_count=0`, libère son lease et n'est plus réacquise avant l'échéance ;
+- un blocker sans date connue domine maintenant toute échéance finie et sa
+  raison reste celle exposée par le diagnostic.
+
+La migration additive et réversible `0014_lot55_audit_fixes` ajoute uniquement
+l'échéance persistante de discovery aux instances et aux runs. Son rollback
+refuse de perdre une échéance encore active.
+
+Tests ajoutés : remaining fournisseur positif plus restrictif, compteur local
+plus restrictif, exhaustion avec et sans reset, réserve current bornée,
+observations multi-fenêtres, expiration au reset, propagation HTTP, report
+persistant d'une discovery et sélection d'un blocker indéfini. La recette
+PostgreSQL contient désormais 55 cas.
 
 ## Non-régression
 

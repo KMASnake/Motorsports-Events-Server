@@ -109,6 +109,7 @@ export interface ProviderResponseMetadata {
 }
 
 export interface QuotaObservation {
+  readonly windowKind: 'minute' | 'hour' | 'day' | 'month';
   readonly limit: number | null;
   readonly remaining: number | null;
   readonly resetsAt: string | null;
@@ -185,7 +186,7 @@ export interface ProviderAdapter<
     input: FetchWorkUnitInput<ProviderConfig, SourceConfig, Cursor>
   ): Promise<FetchWorkUnitResult<Raw, Cursor>>;
 
-  observeQuota?(response: ProviderResponseMetadata): QuotaObservation | null;
+  observeQuota?(response: ProviderResponseMetadata): QuotaObservation | readonly QuotaObservation[] | null;
   normalize(raw: Raw, context: NormalizationContext): NormalizationResult<Normalized>;
   confirmEmptySeason(evidence: EmptySeasonEvidence<Cursor>): Promise<EmptySeasonDecision>;
 }

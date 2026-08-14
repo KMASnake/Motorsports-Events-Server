@@ -15,7 +15,7 @@ Capacités validées : authentification administrateur, Argon2id, sessions serve
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
-Statut : `sub-lot-5.5-implemented-awaiting-maintainer-validation`.
+Statut : `sub-lot-5.5-corrected-awaiting-maintainer-re-audit`.
 
 La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Les documents dédiés des sous-lots priment lorsqu'ils amendent explicitement les formulations Phase 0.
 

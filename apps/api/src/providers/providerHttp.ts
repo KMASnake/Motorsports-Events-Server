@@ -1,7 +1,13 @@
 import type { JsonValue, ProviderRequestGate } from './contracts.js';
 
 export class ProviderHttpError extends Error {
-  constructor(readonly code: string, message: string, readonly statusCode?: number) { super(message); }
+  constructor(
+    readonly code: string,
+    message: string,
+    readonly statusCode?: number,
+    readonly reason: string | null = null,
+    readonly nextEligibleAt: string | null = null
+  ) { super(message); }
 }
 
 export type ProviderFetch = typeof fetch;
@@ -58,7 +64,13 @@ export async function fetchProviderJson(input: {
     throw new ProviderHttpError('unsafe_endpoint','Endpoint fournisseur refusé.');
   }
   const authorization=await input.gate?.beforeRequest();
-  if(authorization&&!authorization.allowed)throw new ProviderHttpError('quota_deferred',authorization.reason??'Appel fournisseur différé.');
+  if(authorization&&!authorization.allowed)throw new ProviderHttpError(
+    'quota_deferred',
+    authorization.reason??'Appel fournisseur différé.',
+    undefined,
+    authorization.reason??null,
+    authorization.nextEligibleAt??null
+  );
   const chargeId=authorization?.chargeId;
   input.counter?.increment();
   const controller = new AbortController();

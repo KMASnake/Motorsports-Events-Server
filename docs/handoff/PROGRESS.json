@@ -17,7 +17,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.5-implemented-awaiting-maintainer-validation",
+    "status": "sub-lot-5.5-corrected-awaiting-maintainer-re-audit",
     "updated_at": "2026-08-14",
     "implementation_percent": 50,
     "architecture_percent": 100,
