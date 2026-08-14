@@ -88,19 +88,57 @@ export interface FetchWorkUnitInput<
   readonly signal: AbortSignal;
 }
 
-export type FetchWorkUnitStatus =
-  | 'progress'
-  | 'end_of_cycle'
-  | 'confirmed_empty_season'
-  | 'transient_failure'
-  | 'durable_failure';
+export type FetchWorkUnitStatus = 'progress' | 'complete' | 'cursor_invalid';
+
+export type ProviderSourceEntityKind = 'meeting' | 'event' | 'session';
+
+export interface AcquiredProviderSourceItem {
+  readonly entityKind: ProviderSourceEntityKind;
+  readonly externalId: string;
+  readonly identityIsSynthetic: boolean;
+  readonly parentExternalId: string | null;
+  readonly season: number;
+  readonly sourceData: JsonObject;
+}
+
+export interface ProviderItemAnomaly {
+  readonly scope: 'item';
+  readonly index: number;
+  readonly code: string;
+  readonly message: string;
+  readonly externalId: string | null;
+}
+
+export interface ProviderBlockingAnomaly {
+  readonly scope: 'stream';
+  readonly code: string;
+  readonly message: string;
+}
+
+export interface SafeAcquisitionRestart {
+  readonly scope: 'season';
+  readonly season: number;
+}
 
 export interface FetchWorkUnitResult<Raw, Cursor extends JsonObject> {
   readonly status: FetchWorkUnitStatus;
   readonly items: readonly Raw[];
+  readonly itemAnomalies: readonly ProviderItemAnomaly[];
   readonly nextCursor: Cursor;
   readonly requestCount: number;
-  readonly errorCode?: string;
+  /** True only when the adapter has certain provider-side termination evidence. */
+  readonly complete: boolean;
+  readonly completionReason: 'end_of_collection' | 'explicit_empty_scope' | null;
+  readonly safeRestart?: SafeAcquisitionRestart;
+}
+
+export class ProviderAcquisitionError extends Error {
+  readonly complete = false;
+  readonly anomaly: ProviderBlockingAnomaly;
+  constructor(code: string, message: string) {
+    super(message);
+    this.anomaly = { scope: 'stream', code, message };
+  }
 }
 
 export interface ProviderResponseMetadata {

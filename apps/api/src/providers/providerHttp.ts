@@ -1,6 +1,7 @@
 import type { JsonValue, ProviderRequestGate } from './contracts.js';
 
 export class ProviderHttpError extends Error {
+  readonly complete = false;
   constructor(
     readonly code: string,
     message: string,
@@ -55,6 +56,7 @@ export async function fetchProviderJson(input: {
   timeoutMs?: number;
   maxBytes?: number;
   gate?: ProviderRequestGate;
+  signal?: AbortSignal;
 }): Promise<JsonValue> {
   const { url } = input;
   const validProtocol = url.protocol === 'https:' || (input.allowTestHttp === true && url.protocol === 'http:');
@@ -74,6 +76,9 @@ export async function fetchProviderJson(input: {
   const chargeId=authorization?.chargeId;
   input.counter?.increment();
   const controller = new AbortController();
+  const abortFromCaller = () => controller.abort();
+  input.signal?.addEventListener('abort', abortFromCaller, { once: true });
+  if (input.signal?.aborted) controller.abort();
   const timeout = setTimeout(() => controller.abort(), input.timeoutMs ?? 8_000);
   try {
     const response = await (input.fetchImpl ?? fetch)(url, { headers: input.headers, redirect:'error', signal:controller.signal });
@@ -92,8 +97,8 @@ export async function fetchProviderJson(input: {
     if (!response.ok) throw new ProviderHttpError(`http_${response.status}`,`Le fournisseur a répondu HTTP ${response.status}.`,response.status);
     return value as JsonValue;
   } catch (error) {
-    const normalized=error instanceof ProviderHttpError?error:(error as Error).name==='AbortError'?new ProviderHttpError('timeout','Délai fournisseur dépassé.'):new ProviderHttpError('network_error','Connexion au fournisseur impossible.');
+    const normalized=error instanceof ProviderHttpError?error:(error as Error).name==='AbortError'?(input.signal?.aborted?new ProviderHttpError('aborted','Acquisition fournisseur interrompue.'):new ProviderHttpError('timeout','Délai fournisseur dépassé.')):new ProviderHttpError('network_error','Connexion au fournisseur impossible.');
     if(chargeId&&normalized.code!=='quota_deferred')await input.gate?.afterError(chargeId,normalized);
     throw normalized;
-  } finally { clearTimeout(timeout); }
+  } finally { clearTimeout(timeout); input.signal?.removeEventListener('abort', abortFromCaller); }
 }

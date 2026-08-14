@@ -60,8 +60,11 @@ function adapter(key: string, strategy: string): ProviderAdapter<JsonObject, Jso
       return {
         status: 'progress',
         items: [],
+        itemAnomalies: [],
         nextCursor: { ...input.cursor, position: input.cursor.position + 1 },
-        requestCount: 1
+        requestCount: 1,
+        complete: false,
+        completionReason: null
       };
     },
     normalize: () => ({ accepted: [], rejected: [] }),
