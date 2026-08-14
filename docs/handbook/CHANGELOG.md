@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.29 — 2026-08-14
+
+- consigne la validation explicite de la baseline sécurité pré‑5.5 ;
+- consigne la validation du Concept et de l'Acceptance 5.5 après audit croisé avec 5.4 et sécurité ;
+- autorise explicitement l'implémentation du seul Lot 5.5 via l'ADR-0017 ;
+- maintient les Lots 5.6 et suivants non autorisés jusqu'à une nouvelle validation mainteneur ;
+- aligne le Handbook permanent avec `PROJECT-STATUS.json`, `PROGRESS.json` et la roadmap.
+
 ## 1.28 — 2026-08-14
 
 - corrige l’audit mainteneur pré‑5.5 : championnats publics actifs uniquement,
