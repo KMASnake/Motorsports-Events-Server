@@ -1,7 +1,7 @@
 # Lot 5.6-A — Validation des fondations de persistance
 
 Date : 2026-08-15  
-Statut : **CORRIGÉ APRÈS AUDIT — EN ATTENTE DE RÉ-AUDIT MAINTENEUR**
+Statut : **VALIDÉ PAR LE MAINTENEUR**
 
 ## Périmètre livré
 
@@ -58,5 +58,6 @@ suivants.
 
 ## Gate
 
-STOP avant 5.6-B. Le Lot 5.6 reste non validé, non clôturé et non fusionnable.
-Les Lots 5.7+ restent non autorisés.
+Le mainteneur a validé le sous-lot technique 5.6-A le 15 août 2026 et autorisé
+le seul sous-lot 5.6-B. Cette validation technique ne valide ni ne clôture le
+Lot 5.6 global. Les Lots 5.7+ restent non autorisés et `main` non fusionnable.

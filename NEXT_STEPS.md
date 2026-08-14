@@ -1,5 +1,18 @@
 # Prochaines étapes
 
+## Priorité courante — audit mainteneur Lot 5.6-B
+
+- [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
+- [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
+- [x] implémenter pagination, terminaison certaine et curseur borné ;
+- [x] séparer anomalies élémentaires isolables et flux bloquants ;
+- [x] réutiliser exclusivement `providerHttp.ts` et le quota gate 5.5 ;
+- [x] valider API, sécurité, Docker et non-régression PostgreSQL 5.6-A ;
+- [ ] obtenir l'audit et l'autorisation explicite du mainteneur avant 5.6-C.
+
+Point d'arrêt obligatoire : ne commencer ni le moteur transactionnel 5.6-C,
+ni aucune fonctionnalité 5.7+ avant décision explicite du mainteneur.
+
 ## Priorité courante — audit mainteneur Lot 5.4
 
 - [x] valider le Lot 5.3 et autoriser explicitement le Lot 5.4 ;
