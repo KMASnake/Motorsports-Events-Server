@@ -22,11 +22,13 @@ end $$;
 drop table provider_acquisition_anomalies;
 drop table provider_source_changes;
 drop table provider_source_observations;
+drop function enforce_provider_source_observation_scope();
 drop table provider_source_entities;
 drop table provider_acquisition_traversals;
 drop table provider_acquisition_state;
 
 alter table provider_championships
+  drop constraint provider_championships_id_provider_unique,
   drop constraint provider_championships_history_mode_start_check,
   drop column acquisition_finalization_grace_days,
   drop column acquisition_current_hot_days,
@@ -35,4 +37,3 @@ alter table provider_championships
   drop column acquisition_history_mode;
 
 delete from schema_migrations where version='0016_lot56_durable_acquisition';
-

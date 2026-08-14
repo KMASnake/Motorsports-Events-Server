@@ -21,6 +21,8 @@ where exists(select 1 from schema_migrations where version='0016_lot56_durable_a
 
 insert into provider_instances(id,adapter_key,name,enabled,state)
 values('56000000-0000-0000-0000-000000000001','lot56-fixture','Lot 5.6 Fixture',true,'active');
+insert into provider_instances(id,adapter_key,name,enabled,state)
+values('56000000-0000-0000-0000-000000000010','lot56-other','Lot 5.6 Other',true,'active');
 insert into provider_championships(
   id,provider_instance_id,championship_id,external_championship_id,
   discovery_state,sync_state,is_primary
@@ -28,6 +30,20 @@ insert into provider_championships(
   '56000000-0000-0000-0000-000000000002',
   '56000000-0000-0000-0000-000000000001','f1','fixture-f1',
   'configured','active',true
+);
+insert into provider_championships(
+  id,provider_instance_id,championship_id,external_championship_id,
+  discovery_state,sync_state,is_primary
+) values(
+  '56000000-0000-0000-0000-000000000011',
+  '56000000-0000-0000-0000-000000000010','motogp','fixture-motogp',
+  'configured','active',true
+);
+insert into sync_streams(
+  id,provider_championship_id,phase,state,cursor_version,cursor
+) values(
+  '56000000-0000-0000-0000-000000000020',
+  '56000000-0000-0000-0000-000000000002','current','ready',1,'{}'
 );
 insert into provider_source_entities(
   id,provider_instance_id,provider_championship_id,entity_kind,external_id,
@@ -42,14 +58,77 @@ insert into provider_source_entities(
   '1950-05-13T12:00:00+01:00','1950-05-13T14:00:00+01:00',
   now(),now(),now()
 );
+insert into provider_source_entities(
+  id,provider_instance_id,provider_championship_id,entity_kind,external_id,
+  source_data,source_hash,provider_started_at,
+  first_observed_at,last_observed_at,last_changed_at
+) values
+  ('56000000-0000-0000-0000-000000000006','56000000-0000-0000-0000-000000000001',
+   '56000000-0000-0000-0000-000000000002','session','1969-fixture','{}','1969',
+   '1969-12-31T23:30:00-01:00',now(),now(),now()),
+  ('56000000-0000-0000-0000-000000000007','56000000-0000-0000-0000-000000000001',
+   '56000000-0000-0000-0000-000000000002','meeting','1900-fixture','{}','1900',
+   '1900-01-01T00:00:00Z',now(),now(),now()),
+  ('56000000-0000-0000-0000-000000000012','56000000-0000-0000-0000-000000000010',
+   '56000000-0000-0000-0000-000000000011','meeting','other-parent','{}','other',
+   '2026-01-01T00:00:00Z',now(),now(),now());
 
-select 'Pré-1970 et unicité source : OK'
+insert into provider_acquisition_traversals(
+  id,stream_id,work_class,safe_unit_key,status,complete,finished_at
+) values
+  ('56000000-0000-0000-0000-000000000021','56000000-0000-0000-0000-000000000020',
+   'current_future','complete-page','complete',true,now()),
+  ('56000000-0000-0000-0000-000000000022','56000000-0000-0000-0000-000000000020',
+   'current_future','partial-page','partial',false,null);
+
+insert into provider_source_observations(traversal_id,source_entity_id,observation_kind,observed_at)
+values
+  ('56000000-0000-0000-0000-000000000022','56000000-0000-0000-0000-000000000003','present',now()),
+  ('56000000-0000-0000-0000-000000000021','56000000-0000-0000-0000-000000000006','not_observed',now());
+
+insert into provider_acquisition_anomalies(
+  id,provider_championship_id,anomaly_key,anomaly_type,scope,state,
+  first_seen_at,last_seen_at
+) values(
+  '56000000-0000-0000-0000-000000000030','56000000-0000-0000-0000-000000000002',
+  'cycle-key','invalid_date','entity','active',now(),now()
+);
+update provider_acquisition_anomalies set state='resolved',resolved_at=now()
+where id='56000000-0000-0000-0000-000000000030';
+insert into provider_acquisition_anomalies(
+  id,provider_championship_id,anomaly_key,anomaly_type,scope,state,
+  first_seen_at,last_seen_at
+) values(
+  '56000000-0000-0000-0000-000000000031','56000000-0000-0000-0000-000000000002',
+  'cycle-key','invalid_date','entity','active',now(),now()
+);
+update provider_acquisition_anomalies set state='resolved',resolved_at=now()
+where id='56000000-0000-0000-0000-000000000031';
+insert into provider_acquisition_anomalies(
+  id,provider_championship_id,anomaly_key,anomaly_type,scope,state,
+  first_seen_at,last_seen_at
+) values(
+  '56000000-0000-0000-0000-000000000032','56000000-0000-0000-0000-000000000002',
+  'cycle-key','invalid_date','entity','active',now(),now()
+);
+
+select 'Dates 1950, 1969 et 1900 : OK'
 where (select provider_started_at='1950-05-13T11:00:00Z'::timestamptz
        from provider_source_entities where external_id='pre-1970-fixture')
-  and exists(
-    select 1 from pg_constraint
-    where conrelid='provider_source_entities'::regclass and contype='u'
-  );
+  and (select provider_started_at='1970-01-01T00:30:00Z'::timestamptz
+       from provider_source_entities where external_id='1969-fixture')
+  and (select provider_started_at='1900-01-01T00:00:00Z'::timestamptz
+       from provider_source_entities where external_id='1900-fixture');
+
+select 'Présence et non-observation durable : OK'
+where (select count(*)=1 from provider_source_observations where observation_kind='present')
+  and (select count(*)=1 from provider_source_observations where observation_kind='not_observed');
+
+select 'Deux cycles anomalie puis nouvelle occurrence active : OK'
+where (select count(*)=2 from provider_acquisition_anomalies
+       where anomaly_key='cycle-key' and state='resolved')
+  and (select count(*)=1 from provider_acquisition_anomalies
+       where anomaly_key='cycle-key' and state='active');
 SQL
 
 if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
@@ -66,6 +145,50 @@ if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR
   exit 1
 fi
 echo 'Doublon source refusé : OK'
+
+if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
+  insert into provider_source_entities(
+    id,provider_instance_id,provider_championship_id,entity_kind,external_id,
+    source_data,source_hash,first_observed_at,last_observed_at,last_changed_at
+  ) values(
+    '56000000-0000-0000-0000-000000000013',
+    '56000000-0000-0000-0000-000000000001',
+    '56000000-0000-0000-0000-000000000011',
+    'session','wrong-provider','{}','wrong-provider',now(),now(),now()
+  );" >/dev/null 2>&1; then
+  echo 'L incohérence provider/championnat aurait dû être refusée.' >&2
+  exit 1
+fi
+echo 'Incohérence provider/championnat refusée : OK'
+
+if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
+  insert into provider_source_entities(
+    id,provider_instance_id,provider_championship_id,parent_source_entity_id,
+    entity_kind,external_id,source_data,source_hash,
+    first_observed_at,last_observed_at,last_changed_at
+  ) values(
+    '56000000-0000-0000-0000-000000000014',
+    '56000000-0000-0000-0000-000000000001',
+    '56000000-0000-0000-0000-000000000002',
+    '56000000-0000-0000-0000-000000000012',
+    'session','cross-scope-child','{}','cross-scope',now(),now(),now()
+  );" >/dev/null 2>&1; then
+  echo 'La relation parent hors périmètre aurait dû être refusée.' >&2
+  exit 1
+fi
+echo 'Relation parent hors périmètre refusée : OK'
+
+if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
+  insert into provider_source_observations(
+    traversal_id,source_entity_id,observation_kind,observed_at
+  ) values(
+    '56000000-0000-0000-0000-000000000022',
+    '56000000-0000-0000-0000-000000000007','not_observed',now()
+  );" >/dev/null 2>&1; then
+  echo 'La non-observation après traversal partiel aurait dû être refusée.' >&2
+  exit 1
+fi
+echo 'Non-observation après traversal partiel refusée : OK'
 
 if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
   insert into provider_source_entities(
@@ -90,7 +213,7 @@ fi
 echo 'Down destructif refusé par défaut : OK'
 
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 \
-  -c 'truncate provider_source_entities cascade; truncate provider_acquisition_traversals cascade;'
+  -c 'truncate provider_acquisition_anomalies, provider_source_entities, provider_acquisition_traversals cascade;'
 docker compose run --rm migrate sh /migrations/migrate.sh down 0016_lot56_durable_acquisition >/dev/null
 docker compose run --rm migrate >/dev/null
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 \

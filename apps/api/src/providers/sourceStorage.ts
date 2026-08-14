@@ -4,34 +4,29 @@ export const MAX_PROVIDER_SOURCE_BYTES = 256 * 1024;
 
 const sensitiveKeys = new Set([
   'authorization',
-  'proxy-authorization',
+  'proxyauthorization',
   'cookie',
-  'set-cookie',
-  'api-key',
-  'x-api-key',
-  'api_key',
-  'x_api_key',
+  'setcookie',
   'apikey',
-  'access-token',
-  'access_token',
-  'refresh-token',
-  'refresh_token',
+  'xapikey',
+  'accesstoken',
+  'refreshtoken',
   'token',
   'password',
-  'client-secret',
-  'client_secret',
+  'clientsecret',
   'secret',
   'credentials'
 ]);
 
-const normalizedKey = (key: string) => key.trim().toLowerCase();
+const canonicalKey = (key: string) => key.toLowerCase().replace(/[^a-z0-9]/g, '');
+const isSensitiveKey = (key: string) => sensitiveKeys.has(canonicalKey(key));
 
 function sanitizeValue(value: JsonValue): JsonValue {
   if (typeof value === 'string') {
     let url: URL;
     try { url = new URL(value); }
     catch { return value; }
-    if (url.username || url.password) {
+    if (url.username || url.password || [...url.searchParams.keys()].some(isSensitiveKey)) {
       throw new Error('Credentialized provider URLs cannot be persisted.');
     }
     return value;
@@ -40,7 +35,7 @@ function sanitizeValue(value: JsonValue): JsonValue {
   if (value && typeof value === 'object') {
     const sanitized: Record<string, JsonValue> = {};
     for (const [key, nested] of Object.entries(value)) {
-      if (sensitiveKeys.has(normalizedKey(key))) continue;
+      if (isSensitiveKey(key)) continue;
       sanitized[key] = sanitizeValue(nested);
     }
     return sanitized;

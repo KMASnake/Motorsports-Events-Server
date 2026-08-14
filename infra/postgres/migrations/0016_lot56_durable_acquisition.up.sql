@@ -17,7 +17,8 @@ alter table provider_championships
   add constraint provider_championships_history_mode_start_check check(
     (acquisition_history_mode='from_season' and acquisition_history_from_season is not null)
     or (acquisition_history_mode<>'from_season' and acquisition_history_from_season is null)
-  );
+  ),
+  add constraint provider_championships_id_provider_unique unique(id,provider_instance_id);
 
 create table provider_acquisition_state (
   provider_championship_id uuid primary key references provider_championships(id) on delete cascade,
@@ -64,11 +65,11 @@ create index provider_acquisition_traversals_stream_idx
 create table provider_source_entities (
   id uuid primary key,
   provider_instance_id uuid not null references provider_instances(id) on delete cascade,
-  provider_championship_id uuid not null references provider_championships(id) on delete cascade,
+  provider_championship_id uuid not null,
   entity_kind text not null check(btrim(entity_kind) <> '' and length(entity_kind) <= 64),
   external_id text not null check(btrim(external_id) <> '' and length(external_id) <= 512),
   identity_is_synthetic boolean not null default false,
-  parent_source_entity_id uuid references provider_source_entities(id) on delete set null,
+  parent_source_entity_id uuid,
   season integer,
   source_data jsonb not null check(jsonb_typeof(source_data)='object'),
   source_hash text not null check(btrim(source_hash) <> '' and length(source_hash) <= 256),
@@ -95,6 +96,14 @@ create table provider_source_entities (
     (not end_estimated and (end_provenance is null or end_provenance='provider'))
     or (end_estimated and end_provenance is not null and end_provenance<>'provider')
   ),
+  constraint provider_source_entities_provider_scope_fk
+    foreign key(provider_championship_id,provider_instance_id)
+    references provider_championships(id,provider_instance_id) on delete cascade,
+  unique(id,provider_instance_id,provider_championship_id),
+  constraint provider_source_entities_parent_scope_fk
+    foreign key(parent_source_entity_id,provider_instance_id,provider_championship_id)
+    references provider_source_entities(id,provider_instance_id,provider_championship_id)
+    on delete set null (parent_source_entity_id),
   unique(provider_championship_id,entity_kind,external_id)
 );
 create index provider_source_entities_provider_idx
@@ -105,9 +114,37 @@ create index provider_source_entities_temporal_idx
 create table provider_source_observations (
   traversal_id uuid not null references provider_acquisition_traversals(id) on delete cascade,
   source_entity_id uuid not null references provider_source_entities(id) on delete cascade,
+  observation_kind text not null check(observation_kind in ('present','not_observed')),
   observed_at timestamptz not null,
   primary key(traversal_id,source_entity_id)
 );
+
+create function enforce_provider_source_observation_scope()
+returns trigger language plpgsql as $$
+declare
+  traversal_complete boolean;
+  traversal_championship_id uuid;
+  entity_championship_id uuid;
+begin
+  select t.complete,s.provider_championship_id
+    into traversal_complete,traversal_championship_id
+    from provider_acquisition_traversals t
+    join sync_streams s on s.id=t.stream_id
+    where t.id=new.traversal_id;
+  select provider_championship_id into entity_championship_id
+    from provider_source_entities where id=new.source_entity_id;
+  if traversal_championship_id is distinct from entity_championship_id then
+    raise exception 'Observation and source entity must share the same provider championship scope';
+  end if;
+  if new.observation_kind='not_observed' and traversal_complete is not true then
+    raise exception 'Non-observation requires a complete traversal';
+  end if;
+  return new;
+end $$;
+
+create trigger provider_source_observations_scope_guard
+before insert or update on provider_source_observations
+for each row execute function enforce_provider_source_observation_scope();
 
 create table provider_source_changes (
   id bigserial primary key,
@@ -145,9 +182,11 @@ create table provider_acquisition_anomalies (
   constraint provider_acquisition_anomalies_dates_check check(last_seen_at >= first_seen_at),
   constraint provider_acquisition_anomalies_resolution_check check(
     (state='active' and resolved_at is null) or (state='resolved' and resolved_at is not null)
-  ),
-  unique(provider_championship_id,anomaly_key,state)
+  )
 );
+create unique index provider_acquisition_anomalies_one_active_key_idx
+  on provider_acquisition_anomalies(provider_championship_id,anomaly_key)
+  where state='active';
 create index provider_acquisition_anomalies_active_idx
   on provider_acquisition_anomalies(provider_championship_id,anomaly_type,last_seen_at desc)
   where state='active';
