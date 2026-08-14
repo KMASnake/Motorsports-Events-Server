@@ -5,7 +5,7 @@
 - Lot 4.3 : validé utilisateur, fusionné dans `main` via PR #27 le 2026-08-11
 - Lot 4 : terminé fonctionnellement
 - Lot 4.4 : authentification de la console d'administration, validée utilisateur et fusionnée dans `main` via PR #28 le 2026-08-12
-- Lot 5 : Fournisseurs et moteur de synchronisation API — Phase 0 validée ; 5.1 validé ; 5.2 validé ; 5.3 validé ; concept/acceptance 5.4 validés et 5.4 autorisé
+- Lot 5 : Fournisseurs et moteur de synchronisation API — Phase 0 validée ; 5.1 validé ; 5.2 validé ; 5.3 validé ; 5.4 validé ; baseline sécurité pré-5.5 validée ; conception 5.5 revue, documentation normative à créer avant toute autorisation d'implémentation
 
 ## Lot 4.4 — Authentification administration — TERMINÉ
 
@@ -34,17 +34,19 @@ La clôture post-fusion est consignée dans `docs/handoff/LOT-4.4-POST-MERGE-CLO
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
-Statut : `sub-lot-5.4-authorized-not-started`.
+Statut : `sub-lot-5.5-concept-reviewed-awaiting-normative-docs`.
 
-La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Les décisions détaillées de 5.3 et 5.4 sont normatives via leurs documents dédiés et priment sur les formulations Phase 0 lorsqu'elles les amendent explicitement.
+La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Les décisions détaillées de 5.3 et 5.4 sont normatives via leurs documents dédiés et priment sur les formulations Phase 0 lorsqu'elles les amendent explicitement. La revue complète de conception 5.5 est validée au niveau mainteneur, mais l'implémentation reste non autorisée tant que les documents normatifs Concept + Acceptance 5.5 ne sont pas créés et validés.
 
 ### État des sous-lots
 
 - 5.1 — DB + contrats : validé mainteneur ;
 - 5.2 — secrets et configuration fournisseur : validé mainteneur ;
 - 5.3 — découverte championnats et source config : validé mainteneur ;
-- 5.4 — scheduler persistant, curseurs et leases : concept + acceptance validés, implémentation autorisée ;
-- 5.5+ : non autorisés tant que 5.4 n'est pas audité et validé.
+- 5.4 — scheduler persistant, curseurs et leases : validé mainteneur ;
+- consolidation générale et sécurité pré-5.5 : validée mainteneur ;
+- 5.5 — quotas et cadence : conception revue ; documents normatifs à créer ; implémentation NON autorisée ;
+- 5.6+ : non autorisés.
 
 ### Lot 5.3 — état validé
 
@@ -58,7 +60,7 @@ Règles conservées :
 - configuration source manuelle possible même sans discovery ;
 - catalogue OCBlackTop non bloquant pour un nouvel external_id utilisant une stratégie déjà supportée ;
 - découverte périodique 30 jours par défaut, minimum 7 jours, exécution effective branchée sur le scheduler 5.4 ;
-- quota inconnu bloque les appels de découverte ;
+- en 5.5, un quota inconnu n'empêchera plus systématiquement les appels : fonctionnement prudent avec compteur local et intervalle minimal recommandé ;
 - aucune suppression automatique d'un championnat fournisseur disparu.
 
 ### Lot 5.4 — Scheduler, curseurs et leases
@@ -91,9 +93,31 @@ Règles validées :
 - le scheduler 5.4 devient l'unique mécanisme persistant pouvant déclencher la découverte périodique de 5.3 ;
 - aucune ingestion métier complète des Events en 5.4.
 
+### Lot 5.5 — Quotas et cadence — conception revue
+
+Décisions validées pour formalisation dans les futurs documents normatifs 5.5 :
+
+- plusieurs fenêtres simultanées possibles : minute, heure, jour, mois et intervalle minimal ;
+- modèle hybride : headers/metadata fournisseur fiables prioritaires, compteur local en fallback et garde de sécurité ;
+- toute requête réellement envoyée est comptée comme potentiellement consommée ; un blocage local avant envoi compte zéro ;
+- compteur fournisseur commun à current, recent, deep history, discovery manuelle/périodique et test connexion ;
+- marge de sécurité : 5 % par défaut, configurable de 0 à 20 % ;
+- réserve globale current : 20 % par défaut, configurable de 0 à 50 % ou en valeur absolue ;
+- seule la classe `current` peut utiliser la réserve ; `Sync now` peut l'utiliser uniquement pour `current` et ne contourne aucune règle de sécurité ;
+- quota inconnu : fonctionnement prudent autorisé avec compteur local et intervalle minimal recommandé, état ACP `Quota inconnu`, pas de réserve % sans limite chiffrée ;
+- cadence dynamique calculée à partir du budget restant et du temps avant reset, surtout pour recent/deep ; burst contrôlé permis dans les limites court terme ;
+- distinction `provider_backoff` / `stream_backoff` ; scope inconnu traité conservativement au niveau fournisseur ;
+- `429` avec `Retry-After` prioritaire ; sans `Retry-After`, backoff progressif avec jitter ;
+- `401/403` : suspension immédiate du fournisseur, sans retries automatiques répétés ;
+- la contrainte la plus restrictive détermine `next_eligible_at` et une raison de blocage explicite ;
+- réservation/charge quota atomique PostgreSQL avant appel pour garantir la sûreté multi-instance ;
+- configuration administrateur séparée des observations fournisseur ; une observation ne modifie jamais silencieusement la policy ;
+- restauration des valeurs recommandées de l'adaptateur sans remise à zéro des compteurs ;
+- UI finale Quotas & cadence reste prévue en 5.9 ; 5.5 fournit d'abord moteur, données, API et diagnostics.
+
 ### Lots suivants
 
-- 5.5 — moteur complet quotas/cadence, 429, Retry-After, backoff exponentiel et jitter ;
+- 5.5 — moteur complet quotas/cadence selon les décisions ci-dessus, après création et validation de ses documents normatifs ;
 - 5.6 — bootstrap métier, historique et boucle de synchronisation utilisant la fenêtre current glissante définie par 5.4 ;
 - 5.7 — normalisation, idempotence, mappings, corrections et présence fournisseur ;
 - 5.8 — runs/logs/alertes complets ;
@@ -102,7 +126,9 @@ Règles validées :
 
 ### Valeurs par défaut validées
 
-- réserve quota mensuel année courante : 30 % ;
+- marge de sécurité quota : 5 % ;
+- réserve globale quota `current` : 20 % ;
+- réserve configurable : 0 à 50 % ou valeur absolue ;
 - concurrence fournisseur : 1 ;
 - pool global workers : 4 ;
 - fenêtre current : 7 jours ;
@@ -122,4 +148,4 @@ Les concepts visuels restent validés pour page Fournisseurs, détail fournisseu
 
 ### Stop rule
 
-Après chaque sous-lot, Codex doit s'arrêter pour audit et validation explicite du mainteneur. L'autorisation actuelle porte uniquement sur 5.4 et n'autorise ni 5.5 ni les sous-lots suivants.
+Après chaque sous-lot, Codex doit s'arrêter pour audit et validation explicite du mainteneur. Aucun sous-lot n'est actuellement autorisé à l'implémentation. La prochaine étape est la création et validation de `LOT-5.5-QUOTA-CADENCE-CONCEPT.md` et `LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md`.
