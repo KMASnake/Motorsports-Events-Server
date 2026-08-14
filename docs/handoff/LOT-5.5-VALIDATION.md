@@ -20,7 +20,7 @@ Statut : implémentation terminée, validation mainteneur requise.
 
 Commande : `npm run test:lot55`.
 
-Résultat local : 55 cas réussis avec PostgreSQL réel, rollback/réapplication des migrations réussis.
+Résultat local : 61 cas réussis avec PostgreSQL réel, rollback/réapplication des migrations réussis.
 
 Garanties explicites :
 
@@ -47,21 +47,38 @@ Garanties explicites :
 - un blocker sans date connue domine maintenant toute échéance finie et sa
   raison reste celle exposée par le diagnostic.
 
-La migration additive et réversible `0014_lot55_audit_fixes` ajoute uniquement
-l'échéance persistante de discovery aux instances et aux runs. Son rollback
-refuse de perdre une échéance encore active.
+Les migrations additives et réversibles `0014_lot55_audit_fixes` et
+`0015_lot55_final_audit_fixes` ajoutent respectivement l'échéance persistante
+de discovery, puis l'échéance générique du quota gate et la séquence monotone
+des charges. Le rollback refuse de perdre une échéance ou une association
+d'observation encore active.
 
 Tests ajoutés : remaining fournisseur positif plus restrictif, compteur local
 plus restrictif, exhaustion avec et sans reset, réserve current bornée,
 observations multi-fenêtres, expiration au reset, propagation HTTP, report
 persistant d'une discovery et sélection d'un blocker indéfini. La recette
-PostgreSQL contient désormais 55 cas.
+PostgreSQL contient désormais 61 cas.
+
+## Corrections finales de ré-audit
+
+- toute décision bloquée persiste désormais dans
+  `provider_quota_runtime` la raison sélectionnée et son échéance générique ;
+  le diagnostic restitue exactement cette paire pour les quotas, l'intervalle
+  minimal, la cadence dynamique, les observations fournisseur et les
+  backoffs ; une échéance indéterminée écrase correctement une ancienne date ;
+- toute autorisation réussie efface la raison et l'échéance génériques ;
+- chaque charge reçoit une séquence PostgreSQL monotone et l'observation issue
+  de sa réponse mémorise cette séquence ; le remaining fournisseur est diminué
+  par les charges de séquence postérieure, sans dépendre de l'ordre des
+  timestamps ;
+- la preuve dédiée maintient volontairement `Clock.now()` constant pendant
+  plusieurs autorisations et bloque exactement après les deux crédits annoncés.
 
 ## Non-régression
 
 - lint, typecheck, 29 tests Web, 161 tests API et builds Web/API : réussis ;
 - sécurité : 52 tests réussis ;
-- recette 5.4 scheduler/leases/fencing : réussie après adaptation de son scénario de rollback à la migration 0013 ;
+- recette 5.4 scheduler/leases/fencing : réussie avec rollback puis réapplication des migrations 0011 à 0015 ;
 - recettes Web Nginx/CSP et API publique : réussies ;
 - test Chromium login/tableau de bord/championnats/fournisseurs sous CSP : 1 réussi, aucune erreur console critique ni violation CSP ;
 - builds Docker API et Web : réussis ;

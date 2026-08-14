@@ -15,7 +15,7 @@ Capacités validées : authentification administrateur, Argon2id, sessions serve
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
-Statut : `sub-lot-5.5-corrected-awaiting-maintainer-re-audit`.
+Statut : `sub-lot-5.5-final-corrections-awaiting-maintainer-validation`.
 
 La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Les documents dédiés des sous-lots priment lorsqu'ils amendent explicitement les formulations Phase 0.
 
@@ -43,6 +43,13 @@ Documents normatifs validés :
 - `docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md`.
 
 Audit croisé Concept ↔ Acceptance ↔ 5.4 ↔ sécurité effectué et corrections appliquées le 2026-08-14.
+
+La correction finale de ré-audit persiste une échéance générique cohérente
+avec la raison réellement choisie par le quota gate. La consommation suivant
+une observation fournisseur repose sur une séquence PostgreSQL monotone et
+reste donc correcte lorsque plusieurs requêtes partagent le même timestamp.
+La recette PostgreSQL dédiée compte 61 cas réussis. Une nouvelle validation
+explicite du mainteneur reste obligatoire.
 
 Règles autorisées :
 

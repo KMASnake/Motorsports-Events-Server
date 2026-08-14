@@ -1,5 +1,15 @@
 # Handbook Changelog
 
+## 1.30 — 2026-08-14
+
+- corrige les deux constats finaux du ré-audit du Lot 5.5 ;
+- aligne les diagnostics sur la raison et l'échéance génériques réellement
+  décidées par le quota gate ;
+- rend le décompte post-observation indépendant des timestamps grâce à une
+  séquence PostgreSQL monotone ;
+- porte la recette PostgreSQL à 61 cas sans appel fournisseur réel ;
+- maintient le Lot 5.5 non validé par le mainteneur et le Lot 5.6 interdit.
+
 ## 1.29 — 2026-08-14
 
 - consigne la validation explicite de la baseline sécurité pré‑5.5 ;
