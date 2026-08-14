@@ -1,5 +1,19 @@
 # Journal des décisions
 
+## 2026-08-14 — Validation mainteneur du Lot 5.5
+
+- l'audit initial de l'implémentation 5.5 et ses ré-audits ont été menés à
+  terme ;
+- les corrections P1, P2 et P3 sont closes et le ré-audit final est PASS ;
+- la recette PostgreSQL dédiée compte 61 cas réussis ;
+- la sécurité et la non-régression du scheduler 5.4 sont validées ;
+- `REAL PROVIDER REQUESTS = 0` et `PROVIDER CREDITS CONSUMED = 0` ;
+- l'implémentation du Lot 5.5 est validée par le mainteneur le 2026-08-14 ;
+- le Lot 5.6 reste non autorisé : seules sa conception, son Acceptance et leur
+  audit peuvent être préparés avant un nouveau gate mainteneur.
+
+Voir `architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
+
 ## 2026-08-14 — Autorisation du Lot 5.5 Quotas et cadence
 
 - la baseline sécurité pré-5.5 est explicitement validée par le mainteneur ;

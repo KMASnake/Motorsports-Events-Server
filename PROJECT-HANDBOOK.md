@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.29
+## Version 1.31
 
 Ce document est la source de vérité permanente du projet.
 
@@ -179,14 +179,17 @@ auditée, corrigée et **validée explicitement par le mainteneur le 2026-08-14*
 
 Le Concept et l'Acceptance du Lot **5.5 — Quotas et cadence** ont été audités
 contre les invariants 5.4 et la baseline sécurité, corrigés puis validés par le
-mainteneur. L'implémentation du **seul Lot 5.5 est explicitement autorisée** ;
-`authorized_sub_lot = 5.5`. Voir
-`docs/handbook/architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
+mainteneur. Son implémentation a ensuite été auditée, les constats P1/P2/P3 ont
+été clos et le ré-audit final a réussi. Le **Lot 5.5 est validé par le
+mainteneur depuis le 2026-08-14**. Les preuves sont consignées dans
+`docs/handoff/LOT-5.5-MAINTAINER-VALIDATION.md` et la décision permanente dans
+`docs/handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
 
-Cette autorisation ne vaut pas validation de l'implémentation 5.5. Codex doit
-s'arrêter après implémentation et preuves de validation pour audit mainteneur.
-Les **Lots 5.6 et suivants restent non autorisés** jusqu'à une nouvelle
-validation explicite du mainteneur.
+`authorized_sub_lot = 5.5` désigne ici le dernier sous-lot dont
+l'implémentation a été autorisée puis validée ; il n'ouvre aucun nouveau
+travail. Les **Lots 5.6 et suivants restent non autorisés**. Seules leur
+discussion, leur conception et leur documentation peuvent être préparées avant
+un nouveau gate et une autorisation explicite du mainteneur.
 
 Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves
 VPS isolées des migrations, API, corrections et contrôles visuels avec la

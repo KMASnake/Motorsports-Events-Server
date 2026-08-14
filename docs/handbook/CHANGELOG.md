@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.31 — 2026-08-14
+
+- formalise la validation mainteneur finale du Lot 5.5 ;
+- clôt les audits P1/P2/P3 et consigne les 61 cas PostgreSQL réussis ;
+- aligne le Handbook, `PROJECT-STATUS.json`, `PROGRESS.json` et la roadmap ;
+- référence l'ADR-0018 et la preuve de validation mainteneur ;
+- maintient le Lot 5.6 non autorisé, hors conception et documentation.
+
 ## 1.30 — 2026-08-14
 
 - corrige les deux constats finaux du ré-audit du Lot 5.5 ;

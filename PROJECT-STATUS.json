@@ -14,12 +14,14 @@
     "lot_5_5_concept": "docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md",
     "lot_5_5_acceptance": "docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md",
     "lot_5_5_validation": "docs/handoff/LOT-5.5-VALIDATION.md",
+    "lot_5_5_maintainer_validation": "docs/handoff/LOT-5.5-MAINTAINER-VALIDATION.md",
+    "lot_5_5_maintainer_validation_adr": "docs/handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md",
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.5-final-corrections-awaiting-maintainer-validation",
-    "reason": "Lot 5.5 final re-audit findings are corrected: generic blocker diagnostics are persisted coherently and provider remaining is sequence-safe for identical timestamps. The 61-case PostgreSQL recipe is green. Maintainer re-audit remains required and Lot 5.6 is not authorized."
+    "status": "sub-lot-5.5-maintainer-validated",
+    "reason": "Lot 5.5 is maintainer validated on 2026-08-14 after closure of all P1/P2/P3 findings. Its 61-case PostgreSQL recipe, security checks and Lot 5.4 non-regression are validated. Lot 5.6 implementation remains unauthorized."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -37,7 +39,7 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.5-final-corrections-awaiting-maintainer-validation",
+    "status": "sub-lot-5.5-maintainer-validated",
     "implementation_percent": 50,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -57,7 +59,7 @@
     "sub_lot_5_2": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-12","docker_recipe_validated":true,"security_integration_validated":true,"evidence":"docs/handoff/LOT-5.2-VALIDATION.md"},
     "sub_lot_5_3": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"implementation_evidence":"docs/handoff/LOT-5.3-VALIDATION.md","concept":"docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md","acceptance":"docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"},
     "sub_lot_5_4": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"local_validation_passed":true,"validation_evidence":"docs/handoff/LOT-5.4-VALIDATION.md","concept":"docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md","acceptance":"docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md"},
-    "sub_lot_5_5": {"implementation_percent":100,"concept_reviewed":true,"concept_review_date":"2026-08-14","normative_docs_created":true,"concept_validated":true,"concept_validation_date":"2026-08-14","acceptance_validated":true,"acceptance_validation_date":"2026-08-14","cross_audit_passed":true,"cross_audit_date":"2026-08-14","authorized":true,"authorization_date":"2026-08-14","local_validation_passed":true,"maintainer_validated":false,"validation_evidence":"docs/handoff/LOT-5.5-VALIDATION.md","concept":"docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md","acceptance":"docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md"},
+    "sub_lot_5_5": {"implementation_percent":100,"concept_reviewed":true,"concept_review_date":"2026-08-14","normative_docs_created":true,"concept_validated":true,"concept_validation_date":"2026-08-14","acceptance_validated":true,"acceptance_validation_date":"2026-08-14","cross_audit_passed":true,"cross_audit_date":"2026-08-14","authorized":true,"authorization_date":"2026-08-14","local_validation_passed":true,"maintainer_validated":true,"maintainer_validation_date":"2026-08-14","maintainer_validation_evidence":"docs/handoff/LOT-5.5-MAINTAINER-VALIDATION.md","validation_evidence":"docs/handoff/LOT-5.5-VALIDATION.md","concept":"docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md","acceptance":"docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md"},
     "scope": [
       "Providers administration and provider detail pages",
       "Provider adapters and adapter-specific configuration forms",
@@ -121,7 +123,7 @@
       "No complete provider Event ingestion is implemented in 5.5",
       "Provider secrets are never returned after storage and never logged"
     ],
-    "validation_rule": "Lot 5.5 Concept and Acceptance are maintainer validated after cross-audit with 5.4 and the pre-5.5 security baseline. Implementation of sub-lot 5.5 is explicitly authorized. Lot 5.6 and later remain unauthorized until a new maintainer gate."
+    "validation_rule": "Lot 5.5 Concept, Acceptance and implementation are maintainer validated on 2026-08-14 after final re-audit with no open P1/P2/P3. Lot 5.6 and later remain unauthorized until a new explicit maintainer gate."
   },
   "technical_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -134,6 +136,6 @@
   "historical_production": {"version":"2.7.0","status":"validated-production-history","details":"PROJECT_STATUS.md"},
   "next_action": {
     "owner": "Codex",
-    "task": "Audit and maintainer validation of implemented sub-lot 5.5. Do not start 5.6."
+    "task": "Prepare and audit Lot 5.6 Concept and Acceptance only. Lot 5.6 implementation remains unauthorized."
   }
 }

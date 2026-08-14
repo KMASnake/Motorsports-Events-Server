@@ -2,7 +2,7 @@
 
 Date : 2026-08-14  
 Branche : `codex/lot-5-providers-sync`  
-Statut : implémentation terminée, validation mainteneur requise.
+Statut : implémentation validée par le mainteneur le 2026-08-14.
 
 ## Livré
 
@@ -89,4 +89,7 @@ PostgreSQL contient désormais 61 cas.
 
 Aucune ingestion réelle d'Events, aucun appel à OCBlackTop ou TheSportsDB, aucune refonte UI et aucun travail du Lot 5.6.
 
-`maintainer_validated` demeure `false` jusqu'à validation explicite.
+La validation mainteneur explicite est consignée dans
+`LOT-5.5-MAINTAINER-VALIDATION.md` et dans
+`../handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
+Elle n'autorise aucune implémentation du Lot 5.6.
