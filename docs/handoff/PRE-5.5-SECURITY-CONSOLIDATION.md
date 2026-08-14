@@ -1,6 +1,6 @@
 # Consolidation sécurité pré‑Lot 5.5
 
-Statut : implémentée, audit mainteneur requis  
+Statut : **validée par le mainteneur le 2026-08-14**  
 Périmètre : Lots 1 à 5.4, sans fonctionnalité Lot 5.5  
 Date : 2026-08-14
 
@@ -26,7 +26,7 @@ uploads, paths et headers. Aucun appel fournisseur réel n’a été effectué.
 | SEC-07 | P2 | Le schéma championnat acceptait des propriétés inconnues et des protocoles de logo non HTTP. | Schéma strict, URL `http`/`https` uniquement. | typecheck et tests globaux — corrigé |
 | SEC-08 | P2 | Contexte Docker pouvait inclure `.env`, Git et artefacts ; API exécutée root. | `.dockerignore` et utilisateur `node` dans l’image API. | build requis — corrigé |
 | SEC-09 | P3 | Le blocage vise les IP littérales ; une résolution DNS hostile pourrait évoluer vers une IP privée. | Risque accepté : hosts fixes des adaptateurs, aucune URL arbitraire ; resolver réseau différé. | documenté |
-| SEC-10 | P3 | Les lectures publiques coûteuses n’ont pas de rate limit global. | Accepté avant 5.5 : login déjà borné, mutations admin protégées, pas de moteur quota anticipé. | documenté |
+| SEC-10 | P3 | Les lectures publiques coûteuses n’ont pas de rate limit global. | Accepté avant 5.5 : login déjà borné, mutations admin protégées. | documenté |
 | SEC-11 | P1 | Les lectures publiques des championnats exposaient les lignes désactivées et une projection `c.*`. | Projection publique explicite et filtre `active=true` obligatoires ; lectures administratives distinctes. | tests unitaires et recette PostgreSQL/API — corrigé |
 | SEC-12 | P1 | Les headers Fastify ne protégeaient pas l’ACP statique servi par Nginx. | Headers Nginx réels et CSP construite avec l’origine API configurée ; cache HTML et assets conservés séparément. | conteneur Nginx et Chromium — corrigé |
 | SEC-13 | P2 | L’absence de fuite du JSON public n’était pas vérifiée transversalement. | Parcours récursif des réponses championnats, événements, catalogues et sessions contre une liste de clés interdites. | 8 tests dédiés — corrigé |
@@ -38,47 +38,24 @@ Node : seul un champ URL est présent et il est désormais limité à HTTP(S).
 
 ## Garanties vérifiées
 
-- Toutes les routes `/api/v1/admin/**` passent par le hook global ; les
-  mutations historiques `/api/v1/championships` sont également protégées.
-- Les mutations par session humaine exigent Origin exact, token CSRF signé et
-  comparaison constante ; un Bearer technique admin reste indépendant du CSRF.
+- Toutes les routes `/api/v1/admin/**` passent par le hook global ; les mutations historiques `/api/v1/championships` sont également protégées.
+- Les mutations par session humaine exigent Origin exact, token CSRF signé et comparaison constante ; un Bearer technique admin reste indépendant du CSRF.
 - HMAC SHA-256, payload strict, expiration et rôle admin restent obligatoires.
-- Sessions aléatoires, expirations idle/absolue, logout et révocation restent
-  couverts. Les cookies `__Host-*` de production sont Secure, sans Domain.
+- Sessions aléatoires, expirations idle/absolue, logout et révocation restent couverts. Les cookies `__Host-*` de production sont Secure, sans Domain.
 - CORS reste limité à `ADMIN_WEB_ORIGIN`, avec credentials.
-- AES-256-GCM, nonce 12 octets, tag, AAD, version de clé, rotation et absence de
-  fallback plaintext sont couverts.
-- Les requêtes SQL utilisent des valeurs paramétrées ; les rares identifiants
-  dynamiques proviennent d’allowlists internes. Aucun étalement direct de body
-  dans les écritures n’a été trouvé.
-- React échappe les textes fournisseurs et aucun `dangerouslySetInnerHTML`
-  n’existe. L’API publique ne publie pas les secrets, curseurs, leases ou audits.
-- Le scheduler conserve leases, fencing, pool global/fournisseur, stale commit,
-  stale fail et stale discovery. Sync-now reste un boost et ne contourne pas ces
-  protections ; désactiver conserve les données.
-- Les audits applicatifs sont append-only. Les mutations sensibles de
-  championnats, événements, sessions et corrections écrivent désormais leur
-  audit dans la transaction métier et empêchent le double audit `onSend`.
+- AES-256-GCM, nonce 12 octets, tag, AAD, version de clé, rotation et absence de fallback plaintext sont couverts.
+- Les requêtes SQL utilisent des valeurs paramétrées ; les rares identifiants dynamiques proviennent d’allowlists internes. Aucun étalement direct de body dans les écritures n’a été trouvé.
+- React échappe les textes fournisseurs et aucun `dangerouslySetInnerHTML` n’existe. L’API publique ne publie pas les secrets, curseurs, leases ou audits.
+- Le scheduler conserve leases, fencing, pool global/fournisseur, stale commit, stale fail et stale discovery. Sync-now reste un boost et ne contourne pas ces protections ; désactiver conserve les données.
+- Les audits applicatifs sont append-only. Les mutations sensibles de championnats, événements, sessions et corrections écrivent désormais leur audit dans la transaction métier et empêchent le double audit `onSend`.
 
 ## Corrections après audit mainteneur
 
-Les lectures publiques de championnats ne renvoient que les lignes actives et
-une projection métier explicite. L’ACP utilise les lectures
-`/api/v1/admin/championships`, qui conservent la visibilité des lignes inactives
-et des champs nécessaires à l’administration. Désactiver un championnat ne
-supprime ni Events, ni Sessions, ni mappings fournisseur, ni streams.
+Les lectures publiques de championnats ne renvoient que les lignes actives et une projection métier explicite. L’ACP utilise les lectures `/api/v1/admin/championships`, qui conservent la visibilité des lignes inactives et des champs nécessaires à l’administration. Désactiver un championnat ne supprime ni Events, ni Sessions, ni mappings fournisseur, ni streams.
 
-Le Web Nginx sert CSP, `nosniff`, `no-referrer`, protection de frame et
-Permissions-Policy. `connect-src` est produit à partir de `VITE_API_URL` au
-build sans secret. Le HTML reste `no-store`; les assets Vite hashés conservent
-leur cache immutable. HSTS reste la responsabilité de la terminaison TLS en
-production ; le conteneur HTTP interne ne l’émet pas.
+Le Web Nginx sert CSP, `nosniff`, `no-referrer`, protection de frame et Permissions-Policy. `connect-src` est produit à partir de `VITE_API_URL` au build sans secret. Le HTML reste `no-store`; les assets Vite hashés conservent leur cache immutable. HSTS reste la responsabilité de la terminaison TLS en production ; le conteneur HTTP interne ne l’émet pas.
 
-La convention UUID est `400` pour un format invalide et `404` pour un UUID
-valide absent. Elle s’applique aux championnats et ressources fournisseur dont
-la colonne est UUID. Les identifiants Events, Sessions et Corrections issus du
-socle historique restent volontairement textuels et sont toujours transmis à
-PostgreSQL par paramètres, sans concaténation utilisateur.
+La convention UUID est `400` pour un format invalide et `404` pour un UUID valide absent. Elle s’applique aux championnats et ressources fournisseur dont la colonne est UUID. Les identifiants Events, Sessions et Corrections issus du socle historique restent volontairement textuels et sont toujours transmis à PostgreSQL par paramètres, sans concaténation utilisateur.
 
 ## Validation exécutée
 
@@ -96,11 +73,12 @@ PostgreSQL par paramètres, sans concaténation utilisateur.
 - `npm audit --audit-level=low` : 0 vulnérabilité
 - `docker compose --project-name mse-pre55-final-build build api web` : deux images construites, OK
 
-Tests uniquement sur fixtures, transport mocké et PostgreSQL Docker local :
-`REAL PROVIDER REQUESTS = 0`, `PROVIDER CREDITS CONSUMED = 0`.
+Tests uniquement sur fixtures, transport mocké et PostgreSQL Docker local : `REAL PROVIDER REQUESTS = 0`, `PROVIDER CREDITS CONSUMED = 0`.
 
-## Limites et arrêt
+## Validation mainteneur et gate
 
-Les corrections demandées sont implémentées, mais la baseline n’est pas déclarée validée :
-`security_consolidation_maintainer_validated = false`. Le Lot 5.5 reste
-`NOT STARTED` et `NOT AUTHORIZED`. Prochaine action : audit mainteneur, puis STOP.
+Audit mainteneur terminé et baseline sécurité pré-5.5 **validée le 2026-08-14**.
+
+`security_consolidation_maintainer_validated = true`.
+
+Cette validation lève uniquement le gate de consolidation sécurité. Elle n'autorise pas à elle seule l'implémentation 5.5 : l'autorisation 5.5 reste soumise à son Concept, son Acceptance, leur audit croisé et la mise à jour explicite de `authorized_sub_lot`.
