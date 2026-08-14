@@ -1,5 +1,16 @@
 # Journal des décisions
 
+## 2026-08-14 — Autorisation du Lot 5.5 Quotas et cadence
+
+- la baseline sécurité pré-5.5 est explicitement validée par le mainteneur ;
+- le Concept et l'Acceptance 5.5 ont passé l'audit croisé avec 5.4 et sécurité après corrections ;
+- l'implémentation du seul Lot 5.5 est autorisée avec `authorized_sub_lot = 5.5` ;
+- cette autorisation ne vaut pas validation finale de 5.5 ;
+- Codex doit s'arrêter après implémentation et preuves de validation pour audit mainteneur ;
+- les Lots 5.6 et suivants restent non autorisés jusqu'à une nouvelle décision explicite.
+
+Voir `architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
+
 ## 2026-08-14 — Frontière de sécurité HTTP pré‑5.5
 
 - la confiance proxy est fermée par défaut et limitée à `TRUST_PROXY_CIDRS` ;
