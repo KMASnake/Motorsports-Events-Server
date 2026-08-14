@@ -190,6 +190,39 @@ if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR
 fi
 echo 'Non-observation après traversal partiel refusée : OK'
 
+docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
+  update provider_acquisition_traversals
+  set complete=true,status='complete',finished_at=now()
+  where id='56000000-0000-0000-0000-000000000022';
+  insert into provider_source_observations(
+    traversal_id,source_entity_id,observation_kind,observed_at
+  ) values(
+    '56000000-0000-0000-0000-000000000022',
+    '56000000-0000-0000-0000-000000000007','not_observed',now()
+  );
+  select 'Traversal incomplet devenu complet : OK'
+  where (select complete and status='complete'
+         from provider_acquisition_traversals
+         where id='56000000-0000-0000-0000-000000000022');"
+
+if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
+  update provider_acquisition_traversals
+  set complete=false,status='partial',finished_at=null
+  where id='56000000-0000-0000-0000-000000000021';" >/dev/null 2>&1; then
+  echo 'La régression d un traversal complet aurait dû être refusée.' >&2
+  exit 1
+fi
+docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
+  select 'Complétude historique immuable et non-observation préservée : OK'
+  where (select complete and status='complete'
+         from provider_acquisition_traversals
+         where id='56000000-0000-0000-0000-000000000021')
+    and exists(
+      select 1 from provider_source_observations
+      where traversal_id='56000000-0000-0000-0000-000000000021'
+        and observation_kind='not_observed'
+    );"
+
 if docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 -c "
   insert into provider_source_entities(
     id,provider_instance_id,provider_championship_id,entity_kind,external_id,

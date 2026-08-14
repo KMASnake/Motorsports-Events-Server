@@ -62,6 +62,20 @@ create table provider_acquisition_traversals (
 create index provider_acquisition_traversals_stream_idx
   on provider_acquisition_traversals(stream_id,started_at desc);
 
+create function enforce_provider_acquisition_traversal_completeness()
+returns trigger language plpgsql as $$
+begin
+  if old.complete
+    and (new.complete is not true or new.status is distinct from old.status) then
+    raise exception 'A completed acquisition traversal is historically immutable';
+  end if;
+  return new;
+end $$;
+
+create trigger provider_acquisition_traversals_completeness_guard
+before update on provider_acquisition_traversals
+for each row execute function enforce_provider_acquisition_traversal_completeness();
+
 create table provider_source_entities (
   id uuid primary key,
   provider_instance_id uuid not null references provider_instances(id) on delete cascade,

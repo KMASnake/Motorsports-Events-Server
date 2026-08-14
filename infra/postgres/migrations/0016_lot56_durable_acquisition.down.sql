@@ -25,6 +25,7 @@ drop table provider_source_observations;
 drop function enforce_provider_source_observation_scope();
 drop table provider_source_entities;
 drop table provider_acquisition_traversals;
+drop function enforce_provider_acquisition_traversal_completeness();
 drop table provider_acquisition_state;
 
 alter table provider_championships
