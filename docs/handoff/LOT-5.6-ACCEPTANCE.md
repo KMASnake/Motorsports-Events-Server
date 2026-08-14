@@ -1,7 +1,9 @@
 # Lot 5.6 — Acceptance — Acquisition durable fournisseur
 
 Date : 2026-08-14
-Statut : **ACCEPTANCE CONSOLIDÉE POST-AUDIT — IMPLÉMENTATION NON AUTORISÉE**
+Statut : **ACCEPTANCE CONSOLIDÉE POST-AUDIT — IMPLÉMENTATION AUTORISÉE**
+
+Autorisation mainteneur : **accordée explicitement le 2026-08-14**. Voir `docs/handbook/architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`.
 
 Documents normatifs associés :
 - `docs/handoff/LOT-5.6-ACQUISITION-CONCEPT.md`
@@ -13,7 +15,7 @@ Documents normatifs associés :
 
 ## 1. Objet du gate
 
-Le Lot 5.6 est accepté uniquement si l'implémentation future démontre une acquisition fournisseur durable, idempotente, reprenable, observable et sûre, sans empiéter sur la transformation métier définitive réservée au Lot 5.7. Le présent document consolide directement les corrections C1 à C4 de l'audit croisé. Il **n'autorise pas l'implémentation**.
+Le Lot 5.6 est accepté uniquement si l'implémentation démontre une acquisition fournisseur durable, idempotente, reprenable, observable et sûre, sans empiéter sur la transformation métier définitive réservée au Lot 5.7. Le présent document consolide directement les corrections C1 à C4 de l'audit croisé. **L'implémentation du Lot 5.6 est autorisée ; sa validation finale ne l'est pas encore.**
 
 ## 2. Frontière normative 5.6 / 5.7
 
@@ -52,7 +54,7 @@ J→J+30 est la fenêtre chaude par défaut, configurable, servant à la priorit
 5.6 n'impose aucun `refresh_interval` fixe ; la cadence réelle provient de 5.4/5.5.
 
 ### AC-5.6-023 — Temps déterministe
-Les instants persistés/comparés sont normalisés en UTC. Toute notion civile de J, J+30 ou fin de journée utilise explicitement le fuseau pertinent déterminé par la donnée/adaptateur avant conversion en UTC. J→J+30 n'est pas assimilé à `30 × 24 h` lorsque la règle est civile. La finalisation de 30 jours suit une règle unique documentée et déterministe entre workers. Minuit, DST et TZ système différentes ne doivent pas modifier incohérément la classification. Les dates pré-1970 restent valides.
+Les instants persistés/comparés sont normalisés en UTC. Toute notion civile de J, J+30 ou fin de journée utilise explicitement le fuseau pertinent déterminé par la donnée/adaptateur avant conversion en UTC. J→J+30 n'est pas assimilé à `30 × 24 h` lorsque la règle est civile. La finalisation de 30 jours suit une règle unique documentée et déterministe entre workers. Minuit, DST et TZ système différentes ne doivent pas modifier incohérement la classification. Les dates pré-1970 restent valides.
 
 ## 5. Priorités
 
@@ -332,11 +334,14 @@ Refus notamment si : futur limité J+30 ; fréquence fixe contournant 5.5 ; part
 - audit croisé : **EFFECTUÉ** ;
 - corrections audit : **INTÉGRÉES NORMATIVEMENT** ;
 - revue post-corrections : **PASS FONCTIONNEL** ;
-- validation mainteneur autorisant l'implémentation : **NON ACCORDÉE** ;
+- validation mainteneur autorisant l'implémentation : **ACCORDÉE LE 2026-08-14** ;
+- `authorized_sub_lot = 5.6` ;
 - Lots 5.7+ : **NON AUTORISÉS**.
 
-## 22. Interdiction normative
+## 22. Autorisation normative
 
-**Aucun code du Lot 5.6 ne doit être développé tant qu'une autorisation mainteneur explicite post-audit n'a pas été accordée et propagée dans les sources de vérité du projet.**
+**Le code du Lot 5.6 peut être développé dans le strict respect de cette Acceptance, du Concept, du contrat UI, du Handbook, de l'ADR-0019 et des invariants 5.4/5.5/sécurité.**
+
+Cette autorisation ne vaut pas validation finale de l'implémentation et n'autorise pas le Lot 5.7+ ni une fusion dans `main`.
 
 `LOT-5.6-AUDIT-CORRECTIONS.md` reste conservé comme preuve historique de l'audit ; les exigences C1–C4 sont désormais directement présentes dans cette Acceptance consolidée.
