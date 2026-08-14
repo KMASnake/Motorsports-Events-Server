@@ -44,6 +44,7 @@ export class QuotaCadenceService{
         const start=windowStart(now,kind,provider.provider_timezone);const count=Number((await client.query(`select consumed from provider_quota_windows where provider_instance_id=$1 and window_kind=$2 and window_started_at=$3`,[providerId,kind,start])).rows[0]?.consumed??0);(snapshot.consumed as Record<string,unknown>)[kind]=count;
         let ceiling=usable(limit,Number(provider.safety_margin_percent));
         if(kind==='month'&&workClass!=='current'){const reserve=provider.current_reserve_mode==='absolute'?Number(provider.current_reserve_value):Math.ceil(ceiling*Number(provider.current_reserve_value)/100);ceiling=Math.max(0,ceiling-reserve);}
+        if(kind==='month'&&(workClass==='recent_catchup'||workClass==='deep_history')&&provider.last_request_at&&count<ceiling){const reset=addWindow(start,kind),delay=pacingDelayMs(ceiling-count,reset,now,workClass);(snapshot as any).pacing_delay_ms=delay;const next=new Date(new Date(provider.last_request_at).getTime()+delay);if(next>now)blockers.push({reason:'dynamic_pacing',next});}
         if(count>=ceiling)blockers.push({reason:kind==='month'&&workClass!=='current'?'current_reserve':'quota_'+kind,next:addWindow(start,kind)});
       }
       if(blockers.length){const selected=blockers.reduce((best,item)=>best.next===null||item.next===null?best:item.next>best.next?item:best);return await block(selected.reason,selected.next);}
