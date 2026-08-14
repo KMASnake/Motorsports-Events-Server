@@ -1,12 +1,21 @@
 # Handbook Changelog
 
+## 1.32 — 2026-08-14
+
+- formalise l'autorisation mainteneur d'implémenter le Lot 5.6 — Acquisition fournisseur durable ;
+- fixe `authorized_sub_lot = 5.6` après Concept, contrat UI, Acceptance, audit croisé, corrections et revue post-corrections ;
+- ajoute l'ADR-0019 comme décision permanente d'autorisation ;
+- précise que cette autorisation ne vaut ni validation finale de 5.6 ni fusion dans `main` ;
+- maintient les Lots 5.7 et suivants non autorisés à l'implémentation ;
+- rend historiques les anciens gates « 5.6 non autorisé » antérieurs à cette décision.
+
 ## 1.31 — 2026-08-14
 
 - formalise la validation mainteneur finale du Lot 5.5 ;
 - clôt les audits P1/P2/P3 et consigne les 61 cas PostgreSQL réussis ;
 - aligne le Handbook, `PROJECT-STATUS.json`, `PROGRESS.json` et la roadmap ;
 - référence l'ADR-0018 et la preuve de validation mainteneur ;
-- maintient le Lot 5.6 non autorisé, hors conception et documentation.
+- maintient le Lot 5.6 non autorisé, hors conception et documentation **à l'état de la version 1.31** ; cet état est remplacé en 1.32 par l'ADR-0019.
 
 ## 1.30 — 2026-08-14
 
@@ -16,7 +25,7 @@
 - rend le décompte post-observation indépendant des timestamps grâce à une
   séquence PostgreSQL monotone ;
 - porte la recette PostgreSQL à 61 cas sans appel fournisseur réel ;
-- maintient le Lot 5.5 non validé par le mainteneur et le Lot 5.6 interdit.
+- maintient le Lot 5.5 non validé par le mainteneur et le Lot 5.6 interdit à cet état historique.
 
 ## 1.29 — 2026-08-14
 
@@ -157,7 +166,7 @@
 - implémente le quota gate atomique PostgreSQL du Lot 5.5 ;
 - ajoute les fenêtres multiples, marge, réserve current, observations normalisées et backoffs ;
 - ajoute la recette isolée de 43 cas et son plan de rollback ;
-- maintient le Lot 5.5 en attente de validation mainteneur et interdit le démarrage du Lot 5.6.
+- maintient le Lot 5.5 en attente de validation mainteneur et interdit le démarrage du Lot 5.6 à cet état historique.
 
 ## 1.15 — 2026-08-10
 
