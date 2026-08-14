@@ -15,8 +15,8 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "pre-5.5-security-audit-corrections-implemented-awaiting-final-audit",
-    "reason": "Lot 5.4 remains maintainer validated. Requested pre-5.5 security audit corrections are implemented but not maintainer validated. Lot 5.5 remains unimplemented and unauthorized."
+    "status": "sub-lot-5.5-concept-reviewed-awaiting-normative-docs",
+    "reason": "Lots 5.1 through 5.4 and the pre-5.5 security baseline are maintainer validated. Lot 5.5 design has been reviewed, but implementation remains unauthorized until dedicated concept and acceptance documents are created and explicitly validated."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -34,7 +34,7 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "pre-5.5-security-audit-corrections-implemented-awaiting-final-audit",
+    "status": "sub-lot-5.5-concept-reviewed-awaiting-normative-docs",
     "implementation_percent": 40,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -48,11 +48,13 @@
     "phase_0_validation_date": "2026-08-12",
     "authorized_sub_lot": null,
     "security_consolidation_implemented": true,
-    "security_consolidation_maintainer_validated": false,
+    "security_consolidation_maintainer_validated": true,
+    "security_consolidation_validation_date": "2026-08-14",
     "sub_lot_5_1": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-12","docker_recipe_validated":true,"evidence":"docs/handoff/LOT-5.1-VALIDATION.md"},
     "sub_lot_5_2": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-12","docker_recipe_validated":true,"security_integration_validated":true,"evidence":"docs/handoff/LOT-5.2-VALIDATION.md"},
     "sub_lot_5_3": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"implementation_evidence":"docs/handoff/LOT-5.3-VALIDATION.md","concept":"docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md","acceptance":"docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"},
     "sub_lot_5_4": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"local_validation_passed":true,"validation_evidence":"docs/handoff/LOT-5.4-VALIDATION.md","concept":"docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md","acceptance":"docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md"},
+    "sub_lot_5_5": {"implementation_percent":0,"concept_reviewed":true,"concept_review_date":"2026-08-14","normative_docs_created":false,"concept_validated":false,"acceptance_validated":false,"authorized":false,"maintainer_validated":false},
     "scope": [
       "Providers administration and provider detail pages",
       "Provider adapters and adapter-specific configuration forms",
@@ -68,7 +70,7 @@
       "Weighted global scheduling current/recent/deep at 3/2/1 by default",
       "Persistent leases, heartbeat, fencing tokens and crash recovery",
       "Global worker pool and provider concurrency limits shared with discovery",
-      "Automatic cadence calculation from short-term and monthly quotas in 5.5",
+      "Hybrid multi-window quota and pacing engine designed for 5.5",
       "Historical backfill across all available seasons",
       "Preservation of local corrections",
       "Public API suppression and synchronization stop when a championship is disabled without deleting data",
@@ -76,11 +78,13 @@
       "Local championship logo upload"
     ],
     "approved_defaults": {
-      "current_year_monthly_quota_reserve_percent": 30,
+      "quota_safety_margin_percent": 5,
+      "current_quota_reserve_percent": 20,
+      "current_quota_reserve_percent_min": 0,
+      "current_quota_reserve_percent_max": 50,
       "detailed_log_retention_days": 30,
       "log_rotation_max_size_mb": 100,
       "log_rotation_daily": true,
-      "provider_default_concurrency": 1,
       "provider_missing_event_cycles_before_alert": 3,
       "provider_discovery_interval_days": 30,
       "provider_discovery_min_interval_days": 7,
@@ -108,22 +112,25 @@
       "Sync-now is a temporary priority boost and never bypasses quotas, reserve, backoff, leases or concurrency",
       "Disabling a championship removes it from the public API and stops synchronization while retaining all stored data and cursors",
       "Redundant championship activation/deactivation is idempotent",
-      "No complete provider Event ingestion is implemented in 5.4",
-      "No full quota/cadence engine is implemented before 5.5",
+      "Quota unknown in 5.5 means conservative operation with local accounting and adapter minimum interval, not an automatic total block",
+      "Only current work may consume the protected quota reserve",
+      "All real outbound requests share the provider budget and are conservatively counted once sent",
+      "No complete provider Event ingestion is implemented in 5.5",
       "Provider secrets are never returned after storage and never logged"
     ],
-    "validation_rule": "Lots 5.1, 5.2, 5.3 and 5.4 are maintainer validated. Lot 5.5 implementation is not authorized until its concept and acceptance criteria are explicitly reviewed and validated."
+    "validation_rule": "Lots 5.1, 5.2, 5.3 and 5.4 plus the pre-5.5 security baseline are maintainer validated. Lot 5.5 design is reviewed, but implementation is not authorized until LOT-5.5-QUOTA-CADENCE-CONCEPT.md and LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md are created and explicitly validated."
   },
   "technical_baseline": {
     "lot_4_4_node_tests": "110-passed",
     "lot_4_4_ci": "CI-198-success-on-5428c1b",
     "lot_4_4_docker_build": "Docker-build-74-success-on-5428c1b",
     "lot_4_4_windows_validation": "passed-2026-08-12",
-    "lot_4_4_isolated_vps_validation": "passed-2026-08-12"
+    "lot_4_4_isolated_vps_validation": "passed-2026-08-12",
+    "pre_5_5_security_baseline": "maintainer-validated-2026-08-14"
   },
   "historical_production": {"version":"2.7.0","status":"validated-production-history","details":"PROJECT_STATUS.md"},
   "next_action": {
     "owner": "Maintainer",
-    "task": "Perform final audit of pre-5.5 security corrections. Lot 5.5 remains not started and not authorized."
+    "task": "Create and validate LOT-5.5-QUOTA-CADENCE-CONCEPT.md and LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md. Lot 5.5 implementation remains not authorized."
   }
 }
