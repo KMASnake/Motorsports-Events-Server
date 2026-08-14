@@ -28,6 +28,13 @@ export interface ProviderAdapterContext<ProviderConfig extends JsonObject> {
   readonly credentials: Readonly<Record<string, string>>;
   /** Incremented by the adapter after every actual HTTP request. */
   readonly requestCounter?: { increment(): void; readonly value: number };
+  readonly requestGate?: ProviderRequestGate;
+}
+
+export interface ProviderRequestGate {
+  beforeRequest(): Promise<{ allowed: boolean; chargeId?: string; nextEligibleAt?: string | null; reason?: string | null }>;
+  afterResponse(chargeId: string, response: ProviderResponseMetadata): Promise<void>;
+  afterError(chargeId: string, error: { code: string; statusCode?: number }): Promise<void>;
 }
 
 export interface ProviderStreamContext<

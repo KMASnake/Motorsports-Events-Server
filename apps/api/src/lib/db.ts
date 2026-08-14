@@ -51,6 +51,7 @@ export async function verifyApplicationSchema(): Promise<void> {
     sync_streams_table: string | null;
     sync_runs_table: string | null;
     sync_restore_column: string | null;
+    quota_runtime_table:string|null;
     applied_migrations: number;
   }>(`
     select
@@ -76,6 +77,7 @@ export async function verifyApplicationSchema(): Promise<void> {
       (select column_name from information_schema.columns
         where table_schema='public' and table_name='provider_championships'
           and column_name='sync_state_before_championship_disable') as sync_restore_column,
+      to_regclass('public.provider_quota_runtime')::text as quota_runtime_table,
       (select count(*)::int from schema_migrations
        where version in (
          '0001_event_corrections',
@@ -89,7 +91,8 @@ export async function verifyApplicationSchema(): Promise<void> {
          '0009_provider_discovery',
          '0010_provider_discovery_completeness',
          '0011_persistent_sync_scheduler',
-         '0012_scheduler_audit_fixes'
+         '0012_scheduler_audit_fixes',
+         '0013_provider_quota_cadence'
        )) as applied_migrations
   `);
 
@@ -114,7 +117,8 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.sync_streams_table ||
     !schema.sync_runs_table ||
     !schema.sync_restore_column ||
-    schema.applied_migrations !== 12
+    !schema.quota_runtime_table ||
+    schema.applied_migrations !== 13
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }
