@@ -1,7 +1,7 @@
 # Lot 5.6-A — Corrections après audit mainteneur
 
 Date : 2026-08-15  
-Statut : **CORRIGÉ — EN ATTENTE DE RÉ-AUDIT MAINTENEUR**
+Statut : **CORRIGÉ — EN ATTENTE DU RÉ-AUDIT FINAL MAINTENEUR**
 
 ## P1 — Cycle de vie des anomalies
 
@@ -40,11 +40,21 @@ Une FK composite garantit la cohérence entre `provider_instance_id` et
 `provider_championship_id`. Une seconde FK composite garantit qu'un parent et
 son enfant appartiennent exactement au même périmètre fournisseur/championnat.
 
+## P2 — Immutabilité de la complétude
+
+Un trigger PostgreSQL interdit toute régression d'un traversal déjà déclaré
+complet. `complete=true` ne peut plus redevenir faux et le statut
+`complete`/`empty_confirmed` ne peut plus être réécrit en statut partiel,
+échoué ou actif. Les autres métadonnées qui ne changent pas cette preuve
+historique restent modifiables.
+
+Un traversal incomplet peut toujours devenir complet lorsque son parcours se
+termine avec succès. Tout replay ultérieur doit créer un nouveau traversal.
+
 ## Gate
 
-- 5.6-A : corrigé, en attente de ré-audit ;
+- 5.6-A : corrigé, en attente du ré-audit final ;
 - 5.6-B : non commencé ;
 - `maintainer_validated` : inchangé à `false` ;
 - fusion dans `main` : non autorisée ;
 - 5.7+ : non autorisés.
-

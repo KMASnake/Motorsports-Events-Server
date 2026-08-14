@@ -41,6 +41,9 @@ anomalies 5.6 ; cette opération est donc bloquée par défaut.
 - présence durable : PASS ;
 - non-observation après traversal complet : PASS ;
 - non-observation après traversal partiel : refusée ;
+- traversal incomplet évoluant vers complet : PASS ;
+- régression complet vers partiel : refusée et preuve de non-observation
+  préservée ;
 - secrets camelCase/snake_case/kebab-case : supprimés ;
 - URL user/password et query-string credentialisée : refusées ;
 - down destructif avec données : refusé, PASS ;

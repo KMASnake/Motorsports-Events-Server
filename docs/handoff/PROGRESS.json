@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-a-corrected-awaiting-maintainer-reaudit",
+    "status": "sub-lot-5.6-a-corrected-awaiting-final-maintainer-reaudit",
     "updated_at": "2026-08-15",
     "implementation_percent": 51,
     "architecture_percent": 100,
@@ -20,7 +20,7 @@
     "sub_lot_5_6": {
       "implementation_percent": 11,
       "completed_technical_sub_lots": ["5.6-A"],
-      "audit_status": "corrected-awaiting-maintainer-reaudit",
+      "audit_status": "corrected-awaiting-final-maintainer-reaudit",
       "concept_validated": true,
       "ui_contract_validated": true,
       "acceptance_validated": true,
@@ -54,6 +54,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "STOP before Lot 5.6-B. Await maintainer re-audit of corrected Lot 5.6-A. Lot 5.7+ remain unauthorized."
+    "task": "STOP before Lot 5.6-B. Await final maintainer re-audit of corrected Lot 5.6-A. Lot 5.7+ remain unauthorized."
   }
 }
