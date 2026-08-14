@@ -1,13 +1,14 @@
 # Lot 5.6 — Contrat UI ACP acquisition durable
 
 Date : 2026-08-14
-Statut : **VALIDÉ EN CONCEPTION — IMPLÉMENTATION NON AUTORISÉE**
+Statut : **VALIDÉ EN CONCEPTION — IMPLÉMENTATION 5.6 AUTORISÉE**
 
 Document associé : `docs/handoff/LOT-5.6-ACQUISITION-CONCEPT.md`
+Autorisation : `docs/handbook/architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`
 
 ## 1. Objet
 
-Ce document formalise le contrat UI validé pour la supervision ACP du Lot 5.6. Il décrit ce que l'administrateur doit voir et pouvoir demander. Il n'autorise aucune implémentation du Lot 5.6.
+Ce document formalise le contrat UI validé pour la supervision ACP du Lot 5.6. Il décrit ce que l'administrateur doit voir et pouvoir demander. **Le mainteneur a autorisé l'implémentation du Lot 5.6 le 2026-08-14.** Cette autorisation ne vaut ni validation finale ni autorisation du Lot 5.7+.
 
 L'interface étend naturellement la fiche championnat/provider existante. Elle ne crée pas un univers graphique séparé et doit rester cohérente avec l'ACP existant.
 
@@ -162,7 +163,7 @@ Un drawer ou panneau de détail doit permettre d'inspecter :
 - correction manuelle active oui/non ;
 - journal fonctionnel des changements.
 
-L'UI ne doit pas présenter un rapprochement potentiel entre deux IDs fournisseur comme une fusion confirmée. La réconciliation définitive appartient au Lot 5.7.
+Toute hiérarchie `meeting/event → sessions` montrée ici est explicitement une **structure source technique fournisseur**, jamais le modèle métier officiel. L'UI ne doit pas présenter un rapprochement potentiel entre deux IDs fournisseur comme une fusion confirmée. La réconciliation définitive appartient au Lot 5.7.
 
 ## 10. Journal fonctionnel
 
@@ -304,7 +305,7 @@ Ce contrat n'autorise pas :
 - l'écrasement des corrections manuelles ;
 - un pourcentage historique inventé ;
 - des fréquences fixes contournant 5.5 ;
-- l'implémentation du Lot 5.6 avant gate mainteneur.
+- toute implémentation des Lots 5.7 et suivants.
 
 ## 20. Maquette textuelle de référence
 
@@ -342,10 +343,14 @@ Ce contrat n'autorise pas :
 
 ## 21. Gate
 
-Ce contrat UI est **validé en conception**.
+Ce contrat UI est **validé en conception** et fait partie du périmètre d'implémentation autorisé du Lot 5.6.
 
-Il constitue une entrée de l'Acceptance 5.6 avec `LOT-5.6-ACQUISITION-CONCEPT.md`.
+État courant :
 
-**Lot 5.6 reste NON AUTORISÉ pour l'implémentation.**
+- `authorized_sub_lot = 5.6` ;
+- Lot 5.6 : **AUTORISÉ À L'IMPLÉMENTATION** ;
+- validation finale : à venir après implémentation, preuves et audit ;
+- fusion dans `main` : non autorisée par ce gate ;
+- Lots 5.7+ : **NON AUTORISÉS**.
 
-Étape suivante : rédaction de l'Acceptance 5.6, puis audit croisé Concept ↔ UI ↔ Acceptance ↔ 5.4 ↔ 5.5 ↔ sécurité avant toute décision mainteneur d'autorisation.
+Voir ADR-0019.
