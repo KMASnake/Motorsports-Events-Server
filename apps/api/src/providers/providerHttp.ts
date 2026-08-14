@@ -1,4 +1,4 @@
-import type { JsonValue } from './contracts.js';
+import type { JsonValue, ProviderRequestGate } from './contracts.js';
 
 export class ProviderHttpError extends Error {
   constructor(readonly code: string, message: string, readonly statusCode?: number) { super(message); }
@@ -48,6 +48,7 @@ export async function fetchProviderJson(input: {
   allowTestHttp?: boolean;
   timeoutMs?: number;
   maxBytes?: number;
+  gate?: ProviderRequestGate;
 }): Promise<JsonValue> {
   const { url } = input;
   const validProtocol = url.protocol === 'https:' || (input.allowTestHttp === true && url.protocol === 'http:');
@@ -56,6 +57,9 @@ export async function fetchProviderJson(input: {
     || !allowedHosts.includes(url.hostname.toLowerCase())) {
     throw new ProviderHttpError('unsafe_endpoint','Endpoint fournisseur refusé.');
   }
+  const authorization=await input.gate?.beforeRequest();
+  if(authorization&&!authorization.allowed)throw new ProviderHttpError('quota_deferred',authorization.reason??'Appel fournisseur différé.');
+  const chargeId=authorization?.chargeId;
   input.counter?.increment();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), input.timeoutMs ?? 8_000);
@@ -72,11 +76,12 @@ export async function fetchProviderJson(input: {
     let value: unknown;
     try { value = JSON.parse(new TextDecoder().decode(bytes)); }
     catch { throw new ProviderHttpError('invalid_json','Réponse fournisseur invalide.'); }
+    if(chargeId)await input.gate?.afterResponse(chargeId,{status:response.status,headers:Object.fromEntries(response.headers.entries())});
     if (!response.ok) throw new ProviderHttpError(`http_${response.status}`,`Le fournisseur a répondu HTTP ${response.status}.`,response.status);
     return value as JsonValue;
   } catch (error) {
-    if (error instanceof ProviderHttpError) throw error;
-    if ((error as Error).name === 'AbortError') throw new ProviderHttpError('timeout','Délai fournisseur dépassé.');
-    throw new ProviderHttpError('network_error','Connexion au fournisseur impossible.');
+    const normalized=error instanceof ProviderHttpError?error:(error as Error).name==='AbortError'?new ProviderHttpError('timeout','Délai fournisseur dépassé.'):new ProviderHttpError('network_error','Connexion au fournisseur impossible.');
+    if(chargeId&&normalized.code!=='quota_deferred')await input.gate?.afterError(chargeId,normalized);
+    throw normalized;
   } finally { clearTimeout(timeout); }
 }

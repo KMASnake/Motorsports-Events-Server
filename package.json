@@ -47,6 +47,7 @@
     "test:lot52": "./scripts/test-lot52-secrets.sh",
     "test:lot53": "./scripts/test-lot53-discovery.sh",
     "test:lot54": "./scripts/test-lot54-scheduler.sh",
+    "test:lot55": "./scripts/test-lot55-quota-cadence.sh",
     "test:security": "npm run test --workspace @mse/api -- securityHardening.test.ts publicApiSecurity.test.ts adminAuth.test.ts adminSession.test.ts adminQuery.test.ts providerSecrets.test.ts schedulerPolicy.test.ts",
     "test:web-security": "./scripts/test-web-security.sh",
     "test:public-security": "./scripts/test-public-api-security.sh",

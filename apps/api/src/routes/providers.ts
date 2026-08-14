@@ -5,15 +5,17 @@ import { markAtomicallyAudited } from '../lib/adminAudit.js';
 import type { JsonObject } from '../providers/contracts.js';
 import { ProviderMasterKeyError } from '../providers/providerSecrets.js';
 import { ProviderConfigurationService } from '../providers/providerService.js';
+import type { QuotaCadenceService } from '../providers/quotaCadenceService.js';
 
 const uuid = z.string().uuid();
+const validTimezone=(value:string)=>{try{new Intl.DateTimeFormat('fr-FR',{timeZone:value}).format();return true;}catch{return false;}};
 const providerBody = z.object({
   name: z.string().trim().min(1).max(160),
   adapter_key: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   config: z.record(z.string(), z.json()).default({}),
   enabled: z.boolean().default(false),
   max_concurrency: z.number().int().min(1).max(100).default(1),
-  current_year_reserve_percent: z.number().min(0).max(100).default(30),
+  current_year_reserve_percent: z.number().min(0).max(50).default(20),
   missing_cycles_threshold: z.number().int().min(1).max(1000).default(3),
   log_retention_days: z.number().int().min(1).max(3650).default(30)
 }).strict();
@@ -23,7 +25,7 @@ const providerPatch = z.object({
   config: z.record(z.string(), z.json()).optional(),
   enabled: z.boolean().optional(),
   max_concurrency: z.number().int().min(1).max(100).optional(),
-  current_year_reserve_percent: z.number().min(0).max(100).optional(),
+  current_year_reserve_percent: z.number().min(0).max(50).optional(),
   missing_cycles_threshold: z.number().int().min(1).max(1000).optional(),
   log_retention_days: z.number().int().min(1).max(3650).optional()
 }).strict();
@@ -36,9 +38,18 @@ const quotaBody = z.object({
   limits_source: z.enum(['configured','provider_headers','hybrid']).default('configured'),
   reset_timezone: z.string().trim().min(1).max(80).nullable().default(null),
   reset_at: z.string().datetime({ offset: true }).nullable().default(null)
+  ,minute_limit:z.number().int().positive().nullable().default(null)
+  ,hourly_limit:z.number().int().positive().nullable().default(null)
+  ,daily_limit:z.number().int().positive().nullable().default(null)
+  ,minimum_interval_seconds:z.number().int().min(0).max(86400).default(1)
+  ,safety_margin_percent:z.number().min(0).max(20).default(5)
+  ,current_reserve_mode:z.enum(['percent','absolute']).default('percent')
+  ,current_reserve_value:z.number().int().min(0).default(20)
+  ,provider_timezone:z.string().trim().min(1).max(80).default('UTC')
 }).strict().refine((value) => (value.short_window_seconds === null) === (value.short_limit === null), {
   message: 'La fenêtre et la limite court terme doivent être fournies ensemble.'
-});
+}).refine(value=>value.current_reserve_mode!=='percent'||value.current_reserve_value<=50,{message:'La réserve en pourcentage doit être comprise entre 0 et 50.'
+}).refine(value=>validTimezone(value.provider_timezone),{message:'Fuseau fournisseur invalide.'});
 
 const mutationContext = (request: FastifyRequest) => ({
   principal: (request as FastifyRequest & { adminPrincipal: AdminPrincipal }).adminPrincipal,
@@ -56,7 +67,7 @@ const fail = (reply: { code(status: number): { send(value: unknown): unknown } }
   throw error;
 };
 
-export async function providerRoutes(app: FastifyInstance, options: { service: ProviderConfigurationService }): Promise<void> {
+export async function providerRoutes(app: FastifyInstance, options: { service: ProviderConfigurationService; quota?:QuotaCadenceService }): Promise<void> {
   const service = options.service;
   app.get('/api/v1/admin/providers', async () => service.list());
   app.get('/api/v1/admin/providers/:id', async (request, reply) => {
@@ -98,12 +109,13 @@ export async function providerRoutes(app: FastifyInstance, options: { service: P
   app.get('/api/v1/admin/providers/:id/quota-policy', async (request, reply) => {
     const id = uuid.safeParse((request.params as {id:string}).id); if (!id.success) return reply.code(400).send({message:'Identifiant fournisseur invalide.'});
     if (!await service.get(id.data)) return reply.code(404).send({message:'Fournisseur introuvable.'});
-    return await service.quotaPolicy(id.data) ?? { provider_instance_id:id.data, short_window_seconds:null, short_limit:null, monthly_limit:null, limits_source:'configured', reset_timezone:null, reset_at:null };
+    return await service.quotaPolicy(id.data) ?? { provider_instance_id:id.data, short_window_seconds:null, short_limit:null, minute_limit:null,hourly_limit:null,daily_limit:null,monthly_limit:null, limits_source:'configured', reset_timezone:null, reset_at:null,minimum_interval_seconds:1,safety_margin_percent:5,current_reserve_mode:'percent',current_reserve_value:20,provider_timezone:'UTC' };
   });
   app.put('/api/v1/admin/providers/:id/quota-policy', async (request, reply) => {
     const id = uuid.safeParse((request.params as {id:string}).id); const body = quotaBody.safeParse(request.body);
     if (!id.success || !body.success) return reply.code(400).send({message:'Politique de quota invalide.'});
-    const value = body.data; const result = await service.setQuotaPolicy(id.data,{shortWindowSeconds:value.short_window_seconds,shortLimit:value.short_limit,monthlyLimit:value.monthly_limit,limitsSource:value.limits_source,resetTimezone:value.reset_timezone,resetAt:value.reset_at},mutationContext(request));
+    const value = body.data; const result = await service.setQuotaPolicy(id.data,{shortWindowSeconds:value.short_window_seconds,shortLimit:value.short_limit,monthlyLimit:value.monthly_limit,limitsSource:value.limits_source,resetTimezone:value.reset_timezone,resetAt:value.reset_at,minuteLimit:value.minute_limit,hourlyLimit:value.hourly_limit,dailyLimit:value.daily_limit,minimumIntervalSeconds:value.minimum_interval_seconds,safetyMarginPercent:value.safety_margin_percent,currentReserveMode:value.current_reserve_mode,currentReserveValue:value.current_reserve_value,providerTimezone:value.provider_timezone},mutationContext(request));
     if (!result) return reply.code(404).send({message:'Fournisseur introuvable.'}); markAtomicallyAudited(request); return result;
   });
+  app.get('/api/v1/admin/providers/:id/quota-diagnostics',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id);if(!id.success)return reply.code(400).send({message:'Identifiant fournisseur invalide.'});if(!options.quota)return reply.code(503).send({message:'Diagnostic quota indisponible.'});if(!await service.get(id.data))return reply.code(404).send({message:'Fournisseur introuvable.'});return options.quota.diagnostics(id.data);});
 }

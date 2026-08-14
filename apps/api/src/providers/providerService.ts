@@ -24,6 +24,9 @@ export type QuotaPolicyInput = {
   limitsSource: 'configured' | 'provider_headers' | 'hybrid';
   resetTimezone: string | null;
   resetAt: string | null;
+  minuteLimit?: number | null; hourlyLimit?: number | null; dailyLimit?: number | null;
+  minimumIntervalSeconds?: number; safetyMarginPercent?: number;
+  currentReserveMode?: 'percent'|'absolute'; currentReserveValue?: number; providerTimezone?: string;
 };
 
 async function transaction<T>(operation: (client: PoolClient) => Promise<T>): Promise<T> {
@@ -131,10 +134,12 @@ export class ProviderConfigurationService {
     return transaction(async (client) => {
       if (!(await client.query('select 1 from provider_instances where id=$1 for update',[id])).rowCount) return null;
       const before = (await client.query('select * from provider_quota_policies where provider_instance_id=$1',[id])).rows[0] ?? null;
-      const after = (await client.query(`insert into provider_quota_policies(provider_instance_id,short_window_seconds,short_limit,monthly_limit,limits_source,reset_timezone,reset_at)
-        values($1,$2,$3,$4,$5,$6,$7) on conflict(provider_instance_id) do update set short_window_seconds=excluded.short_window_seconds,
-        short_limit=excluded.short_limit,monthly_limit=excluded.monthly_limit,limits_source=excluded.limits_source,reset_timezone=excluded.reset_timezone,reset_at=excluded.reset_at,updated_at=now() returning *`,
-      [id,value.shortWindowSeconds,value.shortLimit,value.monthlyLimit,value.limitsSource,value.resetTimezone,value.resetAt])).rows[0];
+      const after = (await client.query(`insert into provider_quota_policies(provider_instance_id,short_window_seconds,short_limit,monthly_limit,limits_source,reset_timezone,reset_at,minute_limit,hourly_limit,daily_limit,minimum_interval_seconds,safety_margin_percent,current_reserve_mode,current_reserve_value,provider_timezone)
+        values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) on conflict(provider_instance_id) do update set short_window_seconds=excluded.short_window_seconds,
+        short_limit=excluded.short_limit,monthly_limit=excluded.monthly_limit,limits_source=excluded.limits_source,reset_timezone=excluded.reset_timezone,reset_at=excluded.reset_at,
+        minute_limit=excluded.minute_limit,hourly_limit=excluded.hourly_limit,daily_limit=excluded.daily_limit,minimum_interval_seconds=excluded.minimum_interval_seconds,
+        safety_margin_percent=excluded.safety_margin_percent,current_reserve_mode=excluded.current_reserve_mode,current_reserve_value=excluded.current_reserve_value,provider_timezone=excluded.provider_timezone,updated_at=now() returning *`,
+      [id,value.shortWindowSeconds,value.shortLimit,value.monthlyLimit,value.limitsSource,value.resetTimezone,value.resetAt,value.minuteLimit??null,value.hourlyLimit??null,value.dailyLimit??null,value.minimumIntervalSeconds??1,value.safetyMarginPercent??5,value.currentReserveMode??'percent',value.currentReserveValue??20,value.providerTimezone??'UTC'])).rows[0];
       await audit(client, context, 'provider.quota_configuration_changed', id, before, after); return after;
     });
   }
