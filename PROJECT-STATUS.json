@@ -11,12 +11,14 @@
     "lot_5_4_concept": "docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md",
     "lot_5_4_acceptance": "docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md",
     "lot_5_4_validation": "docs/handoff/LOT-5.4-VALIDATION.md",
+    "lot_5_5_concept": "docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md",
+    "lot_5_5_acceptance": "docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md",
     "roadmap": "docs/handbook/roadmap/ROADMAP.md"
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.5-concept-reviewed-awaiting-normative-docs",
-    "reason": "Lots 5.1 through 5.4 and the pre-5.5 security baseline are maintainer validated. Lot 5.5 design has been reviewed, but implementation remains unauthorized until dedicated concept and acceptance documents are created and explicitly validated."
+    "status": "sub-lot-5.5-authorized-ready-for-implementation",
+    "reason": "Lots 5.1 through 5.4 and the pre-5.5 security baseline are maintainer validated. Lot 5.5 Concept and Acceptance passed the cross-audit against 5.4 and security, corrections were applied, and the maintainer explicitly authorized implementation on 2026-08-14."
   },
   "last_fully_validated_lot": {
     "lot": "4.4",
@@ -34,7 +36,7 @@
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.5-concept-reviewed-awaiting-normative-docs",
+    "status": "sub-lot-5.5-authorized-ready-for-implementation",
     "implementation_percent": 40,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -46,7 +48,7 @@
     "concept_validation_date": "2026-08-12",
     "phase_0_validated_by_maintainer": true,
     "phase_0_validation_date": "2026-08-12",
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.5",
     "security_consolidation_implemented": true,
     "security_consolidation_maintainer_validated": true,
     "security_consolidation_validation_date": "2026-08-14",
@@ -54,7 +56,7 @@
     "sub_lot_5_2": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-12","docker_recipe_validated":true,"security_integration_validated":true,"evidence":"docs/handoff/LOT-5.2-VALIDATION.md"},
     "sub_lot_5_3": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"implementation_evidence":"docs/handoff/LOT-5.3-VALIDATION.md","concept":"docs/handoff/LOT-5.3-DISCOVERY-CONCEPT.md","acceptance":"docs/handoff/LOT-5.3-DISCOVERY-ACCEPTANCE.md"},
     "sub_lot_5_4": {"implementation_percent":100,"concept_validated":true,"concept_validation_date":"2026-08-12","maintainer_validated":true,"maintainer_validation_date":"2026-08-12","authorized":true,"local_validation_passed":true,"validation_evidence":"docs/handoff/LOT-5.4-VALIDATION.md","concept":"docs/handoff/LOT-5.4-SCHEDULER-CONCEPT.md","acceptance":"docs/handoff/LOT-5.4-SCHEDULER-ACCEPTANCE.md"},
-    "sub_lot_5_5": {"implementation_percent":0,"concept_reviewed":true,"concept_review_date":"2026-08-14","normative_docs_created":false,"concept_validated":false,"acceptance_validated":false,"authorized":false,"maintainer_validated":false},
+    "sub_lot_5_5": {"implementation_percent":0,"concept_reviewed":true,"concept_review_date":"2026-08-14","normative_docs_created":true,"concept_validated":true,"concept_validation_date":"2026-08-14","acceptance_validated":true,"acceptance_validation_date":"2026-08-14","cross_audit_passed":true,"cross_audit_date":"2026-08-14","authorized":true,"authorization_date":"2026-08-14","maintainer_validated":false,"concept":"docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md","acceptance":"docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md"},
     "scope": [
       "Providers administration and provider detail pages",
       "Provider adapters and adapter-specific configuration forms",
@@ -70,7 +72,7 @@
       "Weighted global scheduling current/recent/deep at 3/2/1 by default",
       "Persistent leases, heartbeat, fencing tokens and crash recovery",
       "Global worker pool and provider concurrency limits shared with discovery",
-      "Hybrid multi-window quota and pacing engine designed for 5.5",
+      "Hybrid multi-window quota and pacing engine authorized for 5.5",
       "Historical backfill across all available seasons",
       "Preservation of local corrections",
       "Public API suppression and synchronization stop when a championship is disabled without deleting data",
@@ -118,7 +120,7 @@
       "No complete provider Event ingestion is implemented in 5.5",
       "Provider secrets are never returned after storage and never logged"
     ],
-    "validation_rule": "Lots 5.1, 5.2, 5.3 and 5.4 plus the pre-5.5 security baseline are maintainer validated. Lot 5.5 design is reviewed, but implementation is not authorized until LOT-5.5-QUOTA-CADENCE-CONCEPT.md and LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md are created and explicitly validated."
+    "validation_rule": "Lot 5.5 Concept and Acceptance are maintainer validated after cross-audit with 5.4 and the pre-5.5 security baseline. Implementation of sub-lot 5.5 is explicitly authorized. Lot 5.6 and later remain unauthorized until a new maintainer gate."
   },
   "technical_baseline": {
     "lot_4_4_node_tests": "110-passed",
@@ -130,7 +132,7 @@
   },
   "historical_production": {"version":"2.7.0","status":"validated-production-history","details":"PROJECT_STATUS.md"},
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Create and validate LOT-5.5-QUOTA-CADENCE-CONCEPT.md and LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md. Lot 5.5 implementation remains not authorized."
+    "owner": "Codex",
+    "task": "Implement authorized sub-lot 5.5 only, following LOT-5.5-QUOTA-CADENCE-CONCEPT.md and LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md. Stop after implementation and validation evidence; do not start 5.6."
   }
 }
