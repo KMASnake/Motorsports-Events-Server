@@ -1,13 +1,13 @@
 # Lot 5.6 — Corrections issues de l'audit croisé
 
 Date : 2026-08-14
-Statut : **CORRECTIONS NORMATIVES APPLIQUÉES — IMPLÉMENTATION NON AUTORISÉE**
+Statut : **CORRECTIONS NORMATIVES APPLIQUÉES — PREUVE HISTORIQUE D'AUDIT**
 
 Ce document ferme les constats de l'audit croisé :
 
 `Concept 5.6 ↔ UI Contract 5.6 ↔ Acceptance 5.6 ↔ scheduler 5.4 ↔ quotas/cadence 5.5 ↔ sécurité ↔ frontière 5.7 ↔ Project Handbook`.
 
-En cas d'ambiguïté dans les documents 5.6 antérieurs, les précisions ci-dessous s'appliquent conjointement au `PROJECT-HANDBOOK.md` et prévalent sur toute lecture incompatible du Concept, du contrat UI ou de l'Acceptance 5.6.
+Les corrections ci-dessous restent normatives. Leur ancien gate « implémentation non autorisée » décrivait l'état **au moment de l'audit**. Le mainteneur a ensuite explicitement autorisé l'implémentation du Lot 5.6 le 2026-08-14 ; voir `docs/handbook/architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`.
 
 ## C1 — Graphe source épreuve/session ≠ modèle métier
 
@@ -22,7 +22,7 @@ Conséquences obligatoires :
 - aucune projection source 5.6 ne doit être utilisée comme justification pour modifier le modèle métier permanent ;
 - aucune UI 5.6 ne doit présenter le graphe source comme la structure métier officielle ;
 - la transformation d'un graphe fournisseur vers les Événements métier reste au Lot 5.7 ;
-- l'implémentation 5.6 devra contenir un test de non-régression démontrant qu'elle ne réintroduit pas un workflow métier Event→Sessions.
+- l'implémentation 5.6 doit contenir un test de non-régression démontrant qu'elle ne réintroduit pas un workflow métier Event→Sessions.
 
 **Constat P1 : FERMÉ.**
 
@@ -39,7 +39,7 @@ Dès 5.6 :
 
 5.7 reste responsable de la **décision métier définitive de réconciliation**, pas de la protection technique de l'override.
 
-Critère d'acceptation ajouté : un test concurrent source + override doit démontrer qu'aucune acquisition 5.6 ne détruit ou n'écrase l'override et que la valeur effective reste conforme au modèle permanent.
+Critère d'acceptation : un test concurrent source + override doit démontrer qu'aucune acquisition 5.6 ne détruit ou n'écrase l'override et que la valeur effective reste conforme au modèle permanent.
 
 **Constat P2 overrides : FERMÉ.**
 
@@ -56,14 +56,7 @@ Règles :
 - aucun comportement ne doit varier de façon incohérente à minuit ou lors des passages heure d'été/heure d'hiver ;
 - une date pré-1970 reste valide après conversion et comparaison.
 
-Tests d'acceptation ajoutés :
-
-1. événement autour de minuit ;
-2. passage heure d'été ;
-3. passage heure d'hiver ;
-4. workers exécutés avec environnements/fuseaux système différents produisant la même classification ;
-5. `civil_day_fallback` correctement converti vers UTC ;
-6. combinaison pré-1970 + fuseau.
+Tests d'acceptation ajoutés : événement autour de minuit, DST été/hiver, workers avec TZ système différentes, `civil_day_fallback` vers UTC et pré-1970 + fuseau.
 
 **Constat P2 temporalité : FERMÉ.**
 
@@ -71,47 +64,13 @@ Tests d'acceptation ajoutés :
 
 5.6 hérite sans exception de la baseline HTTP permanente du Handbook/ADR-0016.
 
-Tout appel fournisseur réel 5.6 doit donc respecter au minimum :
-
-- HTTPS uniquement ;
-- destination/host soumis à l'allowlist fournisseur autorisée ;
-- aucune redirection permettant de sortir de la frontière autorisée ;
-- timeout borné ;
-- streaming/réponse borné ;
-- limites de taille ;
-- parsing défensif et validation de schéma ;
-- redaction des secrets ;
-- aucun credential dans URL, logs, erreurs, journal fonctionnel, ACP ou données source persistées ;
-- protection contre pagination infinie/bouclante et épuisement incontrôlé des ressources.
-
-Critères d'acceptation ajoutés :
-
-- refus HTTP non TLS ;
-- refus d'un host hors allowlist ;
-- refus d'une redirection vers un host non autorisé ;
-- timeout fournisseur ;
-- réponse/stream dépassant les limites ;
-- vérification de redaction sur erreurs et traces.
+Tout appel fournisseur réel 5.6 doit respecter au minimum : HTTPS uniquement, allowlist fournisseur, aucune redirection hors frontière, timeout borné, streaming/réponse/taille bornés, parsing défensif et validation de schéma, redaction des secrets, aucun credential dans URL/logs/erreurs/journal/ACP/source persistée, protection contre pagination infinie et épuisement des ressources.
 
 **Constat P3 sécurité HTTP : FERMÉ.**
 
 ## Compléments à la matrice Acceptance 5.6
 
-Les scénarios suivants deviennent obligatoires en plus des scénarios déjà listés dans `LOT-5.6-ACCEPTANCE.md` :
-
-35. graphe source meeting/session sans réintroduction du modèle métier Event→Sessions ;
-36. acquisition concurrente à un override sans destruction de l'override ;
-37. classification `current-hot/current-future` stable à minuit ;
-38. classification stable aux transitions DST été/hiver ;
-39. classification identique entre workers malgré des TZ système différentes ;
-40. `civil_day_fallback` converti correctement en UTC ;
-41. cas pré-1970 avec conversion de fuseau ;
-42. appel HTTP fournisseur non TLS refusé ;
-43. host fournisseur hors allowlist refusé ;
-44. redirection hors allowlist refusée ;
-45. timeout fournisseur borné ;
-46. réponse/stream fournisseur surdimensionné arrêté proprement ;
-47. absence de secret dans les erreurs/traces après échec HTTP.
+Les scénarios 35 à 47 sont intégrés directement dans `LOT-5.6-ACCEPTANCE.md` et restent obligatoires.
 
 ## Résultat de l'audit corrigé
 
@@ -120,21 +79,21 @@ Les scénarios suivants deviennent obligatoires en plus des scénarios déjà li
 - Quotas/cadence 5.5 : **CONFORME** ;
 - Temporalité / pré-1970 : **CONFORME après C3** ;
 - Sécurité fournisseur : **CONFORME après C4** ;
-- Contrat UI : **CONFORME**, sous réserve de respecter C1 dans les libellés du graphe source ;
-- Gate documentaire : **CORRECTIONS D'AUDIT FERMÉES**.
+- Contrat UI : **CONFORME** ;
+- Gate documentaire d'audit : **PASS**.
 
-## Gate
+## Gate courant
 
-La fermeture documentaire de ces constats **n'autorise pas l'implémentation du Lot 5.6**.
+La fermeture de l'audit n'était pas, à elle seule, une autorisation d'implémenter. **Cette autorisation a ensuite été accordée explicitement par le mainteneur le 2026-08-14.**
 
-État :
+État courant :
 
-- Concept 5.6 : formalisé ;
-- UI Contract 5.6 : formalisé ;
-- Acceptance 5.6 : formalisée ;
-- audit croisé : effectué ;
-- constats audit : corrigés par le présent addendum normatif ;
-- validation mainteneur autorisant l'implémentation : **NON ACCORDÉE** ;
+- audit croisé : effectué et PASS après corrections ;
+- constats : fermés ;
+- revue post-corrections : PASS ;
+- `authorized_sub_lot = 5.6` ;
+- Lot 5.6 : **AUTORISÉ À L'IMPLÉMENTATION** ;
+- validation finale 5.6 : **À VENIR** ;
 - Lots 5.7+ : **NON AUTORISÉS**.
 
-La prochaine étape est une **revue post-corrections** puis, uniquement si elle est concluante, une décision explicite du mainteneur sur l'autorisation du Lot 5.6.
+Voir ADR-0019. Toute mention historique contraire à ce gate doit être comprise comme décrivant un état antérieur à l'autorisation.
