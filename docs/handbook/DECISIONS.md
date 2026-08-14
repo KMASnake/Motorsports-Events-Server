@@ -1,5 +1,19 @@
 # Journal des décisions
 
+> Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
+
+## 2026-08-14 — Autorisation d'implémentation du Lot 5.6
+
+- le Concept, le contrat UI et l'Acceptance consolidée du Lot 5.6 ont été audités contre 5.4, 5.5, la baseline sécurité et la frontière 5.7 ;
+- les constats de l'audit ont été corrigés et la revue post-corrections est PASS ;
+- le mainteneur a explicitement déclaré : « Je valide et j'autorise l'implémentation du lot 5.6 » ;
+- `authorized_sub_lot = 5.6` ;
+- l'implémentation du seul Lot 5.6 est autorisée ;
+- cette autorisation ne vaut ni validation finale du Lot 5.6, ni autorisation de fusion dans `main` ;
+- les Lots 5.7 et suivants restent non autorisés à l'implémentation.
+
+Voir `architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`.
+
 ## 2026-08-14 — Validation mainteneur du Lot 5.5
 
 - l'audit initial de l'implémentation 5.5 et ses ré-audits ont été menés à
@@ -9,8 +23,7 @@
 - la sécurité et la non-régression du scheduler 5.4 sont validées ;
 - `REAL PROVIDER REQUESTS = 0` et `PROVIDER CREDITS CONSUMED = 0` ;
 - l'implémentation du Lot 5.5 est validée par le mainteneur le 2026-08-14 ;
-- le Lot 5.6 reste non autorisé : seules sa conception, son Acceptance et leur
-  audit peuvent être préparés avant un nouveau gate mainteneur.
+- **à la date de cette décision**, le Lot 5.6 restait non autorisé ; cet état historique a ensuite été remplacé par l'autorisation formalisée dans l'ADR-0019.
 
 Voir `architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
 
@@ -21,7 +34,7 @@ Voir `architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
 - l'implémentation du seul Lot 5.5 est autorisée avec `authorized_sub_lot = 5.5` ;
 - cette autorisation ne vaut pas validation finale de 5.5 ;
 - Codex doit s'arrêter après implémentation et preuves de validation pour audit mainteneur ;
-- les Lots 5.6 et suivants restent non autorisés jusqu'à une nouvelle décision explicite.
+- **à la date de cette décision**, les Lots 5.6 et suivants restaient non autorisés ; le Lot 5.6 a ensuite été autorisé par l'ADR-0019, tandis que 5.7+ restent non autorisés.
 
 Voir `architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
 
@@ -269,6 +282,7 @@ Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
   continuent d'utiliser le service transactionnel unique.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
+
 ## 2026-08-09 — Protection de l'API d'administration
 
 - toute route `/api/v1/admin/` exige un Bearer HMAC valide et non expiré ;
@@ -279,6 +293,7 @@ Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
   chemin public existant.
 
 Voir `architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.
+
 ## 2026-08-09 — Pagination et audit administratifs
 
 - filtres et tris sont validés et exécutés avant la pagination serveur ;
