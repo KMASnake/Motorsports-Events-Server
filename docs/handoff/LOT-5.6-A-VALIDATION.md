@@ -1,7 +1,7 @@
 # Lot 5.6-A — Validation des fondations de persistance
 
 Date : 2026-08-15  
-Statut : **IMPLÉMENTÉ — EN ATTENTE DE VALIDATION MAINTENEUR**
+Statut : **CORRIGÉ APRÈS AUDIT — EN ATTENTE DE RÉ-AUDIT MAINTENEUR**
 
 ## Périmètre livré
 
@@ -11,6 +11,10 @@ Statut : **IMPLÉMENTÉ — EN ATTENTE DE VALIDATION MAINTENEUR**
 - traversals et observations de complétude ;
 - journal fonctionnel des changements ;
 - anomalies agrégées ;
+- cycles illimités résolution/réapparition avec une seule occurrence active ;
+- présence et non-observation durable, cette dernière uniquement après un
+  traversal complet ;
+- cohérence relationnelle fournisseur/championnat et parent/enfant ;
 - paramètres current-hot, finalization et deep history ;
 - sanitization récursive et taille source limitée à 256 Kio ;
 - refus des URL credentialisées ;
@@ -27,21 +31,29 @@ anomalies 5.6 ; cette opération est donc bloquée par défaut.
 
 - syntaxe shell : PASS ;
 - typecheck API : PASS ;
-- tests unitaires sanitization : 3/3 PASS ;
+- tests unitaires sanitization : 6/6 PASS ;
 - PostgreSQL réel : migration 0016 PASS ;
-- date 1950 avec conversion UTC : PASS ;
-- unicité de l'identité source : PASS ;
+- dates 1950, 1969 et 1900 avec conversion UTC : PASS ;
+- unicité réelle de l'identité source : PASS ;
+- incohérence fournisseur/championnat : refusée ;
+- parent hors périmètre : refusé ;
+- deux cycles anomalie complets puis réapparition : PASS ;
+- présence durable : PASS ;
+- non-observation après traversal complet : PASS ;
+- non-observation après traversal partiel : refusée ;
+- secrets camelCase/snake_case/kebab-case : supprimés ;
+- URL user/password et query-string credentialisée : refusées ;
 - down destructif avec données : refusé, PASS ;
 - cycle up/down/up sur base jetable : PASS.
 
 ## Acceptance couverte à ce stade
 
-Fondations de AC-5.6-010 à 013, 023, 041, 070, 080 à 083, 092, 100 à 102,
-120 à 123 et 151 à 155. Les comportements d'acquisition correspondants restent
-à prouver dans les sous-lots suivants.
+Fondations relationnelles réellement prouvées de AC-5.6-010 à 013, 023, 041,
+070, 080 à 083, 092, 100 à 102, 120 à 123, 151, 153, 155 et 161. Les
+comportements d'acquisition correspondants restent à prouver dans les sous-lots
+suivants.
 
 ## Gate
 
 STOP avant 5.6-B. Le Lot 5.6 reste non validé, non clôturé et non fusionnable.
 Les Lots 5.7+ restent non autorisés.
-

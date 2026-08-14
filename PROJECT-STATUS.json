@@ -14,13 +14,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.6-a-implemented-awaiting-maintainer-validation",
-    "reason": "Lot 5.6-A persistence and source-storage contracts are implemented and tested. STOP before 5.6-B pending maintainer validation. Lot 5.7+ remain unauthorized."
+    "status": "sub-lot-5.6-a-corrected-awaiting-maintainer-reaudit",
+    "reason": "Lot 5.6-A audit findings are corrected and tested. STOP before 5.6-B pending maintainer re-audit. Lot 5.7+ remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-a-implemented-awaiting-maintainer-validation",
+    "status": "sub-lot-5.6-a-corrected-awaiting-maintainer-reaudit",
     "implementation_percent": 51,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -35,6 +35,7 @@
     "sub_lot_5_6": {
       "implementation_percent": 11,
       "completed_technical_sub_lots": ["5.6-A"],
+      "audit_status": "corrected-awaiting-maintainer-reaudit",
       "concept_validated": true,
       "concept_validation_date": "2026-08-14",
       "ui_contract_validated": true,
@@ -70,6 +71,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Maintainer validates Lot 5.6-A before any Lot 5.6-B implementation. Lot 5.7+ remain unauthorized."
+    "task": "Maintainer re-audits corrected Lot 5.6-A before any Lot 5.6-B implementation. Lot 5.7+ remain unauthorized."
   }
 }
