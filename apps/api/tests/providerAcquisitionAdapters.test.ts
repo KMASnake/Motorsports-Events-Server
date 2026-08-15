@@ -148,43 +148,42 @@ describe('Lot 5.6-B provider acquisition adapters', () => {
     });
   });
 
-  it('uses TheSportsDB v2 header authentication without exposing or retaining the canary', async () => {
+  it('uses the maintainer-approved TheSportsDB v1 credential path without retaining the canary', async () => {
     const secret = 'THESPORTSDB_CANARY_NEVER_OBSERVABLE';
     const transport = vi.fn(async (_url: URL | RequestInfo, init?: RequestInit) => {
-      expect(init?.headers).toMatchObject({ 'x-api-key': secret });
+      expect(init?.headers).toEqual({ accept: 'application/json' });
       return response({ events: [{ idEvent: 'tsdb-1', apiKey: secret, dateEvent: '1950-01-01' }] });
     });
     const adapter = new TheSportsDbAdapter(transport);
     const result = await adapter.fetchWorkUnit({
       ...ocInput(),
       credentials: { api_key: secret },
-      providerConfig: { base_url: 'https://www.thesportsdb.com/api/v2/json' },
-      sourceConfig: { strategy: 'league-season-v2', external_id: '4380' },
+      providerConfig: { base_url: 'https://www.thesportsdb.com/api/v1/json' },
+      sourceConfig: { strategy: 'league-season-v1', external_id: '4380' },
       cursor: { page: 1, visited: [] }
     });
     expect(result).toMatchObject({ status: 'complete', complete: true, completionReason: 'end_of_collection' });
     const calledUrl = transport.mock.calls[0]?.[0];
-    expect(String(calledUrl)).toContain('/api/v2/json/schedule/league/4380/2026');
-    expect(String(calledUrl)).not.toContain(secret);
+    expect(String(calledUrl)).toContain(`/api/v1/json/${secret}/eventsseason.php?id=4380&s=2026`);
     expect(JSON.stringify(result)).not.toContain(secret);
     expect(result.items[0]?.sourceData).not.toHaveProperty('apiKey');
   });
 
-  it('keeps TheSportsDB error surfaces free of the header credential', async () => {
+  it('keeps TheSportsDB v1 error surfaces free of its path credential', async () => {
     const secret = 'THESPORTSDB_ERROR_CANARY';
     const adapter = new TheSportsDbAdapter(async () => response({ message: secret }, 401));
     let failure: unknown;
-    try { await adapter.fetchWorkUnit({ ...ocInput(), credentials: { api_key: secret }, providerConfig: { base_url: 'https://www.thesportsdb.com/api/v2/json' }, sourceConfig: { strategy: 'league-season-v2', external_id: '4380' } }); }
+    try { await adapter.fetchWorkUnit({ ...ocInput(), credentials: { api_key: secret }, providerConfig: { base_url: 'https://www.thesportsdb.com/api/v1/json' }, sourceConfig: { strategy: 'league-season-v1', external_id: '4380' } }); }
     catch (error) { failure = error; }
     expect(failure).toMatchObject({ code: 'http_401', complete: false });
     expect(JSON.stringify(failure)).not.toContain(secret);
   });
 
-  it('marks an explicitly empty TheSportsDB v2 season complete', async () => {
+  it('marks an explicitly empty TheSportsDB v1 season complete', async () => {
     const adapter = new TheSportsDbAdapter(async () => response({ events: [] }));
     const result = await adapter.fetchWorkUnit({
-      ...ocInput(), providerConfig: { base_url: 'https://www.thesportsdb.com/api/v2/json' },
-      sourceConfig: { strategy: 'league-season-v2', external_id: '4380' }
+      ...ocInput(), providerConfig: { base_url: 'https://www.thesportsdb.com/api/v1/json' },
+      sourceConfig: { strategy: 'league-season-v1', external_id: '4380' }
     });
     expect(result).toMatchObject({ status: 'complete', complete: true, completionReason: 'explicit_empty_scope' });
   });
