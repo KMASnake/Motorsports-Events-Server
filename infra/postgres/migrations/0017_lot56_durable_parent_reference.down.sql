@@ -11,3 +11,5 @@ alter table provider_source_entities
   drop constraint provider_source_entities_parent_reference_complete_ck,
   drop column parent_entity_kind,
   drop column parent_external_id;
+
+delete from schema_migrations where version='0017_lot56_durable_parent_reference';

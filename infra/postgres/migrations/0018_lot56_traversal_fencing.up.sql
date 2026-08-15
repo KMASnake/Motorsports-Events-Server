@@ -21,3 +21,6 @@ alter table provider_acquisition_traversals
 create index provider_acquisition_traversals_ownership_idx
   on provider_acquisition_traversals(id,run_id,lease_generation)
   where complete=false;
+
+insert into schema_migrations(version)
+values('0018_lot56_traversal_fencing') on conflict do nothing;

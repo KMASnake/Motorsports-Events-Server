@@ -18,3 +18,6 @@ alter table provider_source_entities
 create index provider_source_entities_parent_reference_idx
   on provider_source_entities(provider_championship_id,parent_entity_kind,parent_external_id)
   where parent_external_id is not null;
+
+insert into schema_migrations(version)
+values('0017_lot56_durable_parent_reference') on conflict do nothing;
