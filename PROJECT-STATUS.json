@@ -15,7 +15,7 @@
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
     "status": "sub-lot-5.6-b-corrected-awaiting-maintainer-reaudit",
-    "reason": "Lot 5.6-A is maintainer-validated. Lot 5.6-B audit corrections for WRC strategy, pagination evidence, TheSportsDB v2 authentication and cursor invalidation are implemented and tested. STOP before 5.6-C pending maintainer re-audit. Lot 5.7+ remain unauthorized."
+    "reason": "Lot 5.6-A is maintainer-validated. Lot 5.6-B audit corrections for WRC strategy, pagination evidence, maintainer-approved TheSportsDB v1 credential-path exception and cursor invalidation are implemented and tested. STOP before 5.6-C pending maintainer re-audit. Lot 5.7+ remain unauthorized."
   },
   "working_lot": {
     "lot": "5",

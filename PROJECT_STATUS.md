@@ -14,8 +14,9 @@ global reste non validé et non fusionnable, et les Lots 5.7+ sont interdits.
 
 Les corrections d’audit attribuent au WRC la stratégie saisonnière OCBlackTop,
 refusent toute complétude issue d’une page vide contradictoire, réservent
-`cursor_invalid` aux preuves fournisseur explicites et basculent TheSportsDB
-sur v2 avec secret en header. Le sous-lot attend un ré-audit mainteneur.
+`cursor_invalid` aux preuves fournisseur explicites et conservent TheSportsDB
+v1 selon l’exception mainteneur ADR-0020. Le sous-lot attend un ré-audit
+mainteneur.
 
 ## Lot 5.4 — candidat à l'audit mainteneur (12 août 2026)
 

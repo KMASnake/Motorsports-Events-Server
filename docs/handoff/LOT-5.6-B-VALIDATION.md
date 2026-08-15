@@ -32,10 +32,9 @@ Statut : **CORRIGÉ APRÈS AUDIT — EN ATTENTE DE RÉ-AUDIT MAINTENEUR**
   si ces preuves se contredisent ;
 - les HTTP 400, 404 et 410 génériques ne deviennent plus `cursor_invalid` ;
   le restart saison exige une preuve d’invalidation fournisseur explicite ;
-- TheSportsDB v1 impose une clé dans le chemin et est donc incompatible avec
-  AC-5.6-161. L’adaptateur utilise l’API v2 documentée, `X-API-KEY`,
-  `/all/leagues` et `/schedule/league/{league}/{season}`. Les configurations
-  v1 historiques sont normalisées en mémoire vers v2 avant le transport.
+- le mainteneur impose TheSportsDB v1 et accepte explicitement sa clé gratuite
+  dans le segment de chemin. L’adaptateur utilise `/all_leagues.php` et
+  `/eventsseason.php`, conformément à l’exception bornée ADR-0020.
 
 ## Sécurité HTTP
 
@@ -43,9 +42,8 @@ Les deux adaptateurs utilisent exclusivement `fetchProviderJson` dans
 `providerHttp.ts`. Cette frontière conserve HTTPS obligatoire, allowlist exacte,
 refus des redirections, timeout de huit secondes, lecture streaming bornée à
 1 000 000 octets, compteur de requêtes et quota gate 5.5. Les erreurs
-normalisées n'incorporent ni réponse fournisseur ni credential. La décision
-TheSportsDB est fondée sur la documentation officielle :
-<https://www.thesportsdb.com/docs_api_guide>.
+normalisées n'incorporent ni réponse fournisseur ni credential. L’URL
+credentialisée TheSportsDB reste confinée à l’appel de transport.
 
 ## Preuves exécutées
 
@@ -67,8 +65,8 @@ TheSportsDB est fondée sur la documentation officielle :
 - page vide avec `next_page` ou `has_next_page=true` : non terminale, PASS ;
 - métadonnées de pagination contradictoires : bloquées, PASS ;
 - HTTP 400/404/410 génériques : jamais `cursor_invalid`, PASS ;
-- TheSportsDB v2 : secret uniquement dans `X-API-KEY`, absent de l’URL, du
-  résultat sanitizé et de l’erreur sérialisée, PASS.
+- TheSportsDB v1 : clé canari présente uniquement dans l’URL remise au
+  transport, absente du résultat sanitizé et de l’erreur sérialisée, PASS.
 
 ## Acceptance couverte à ce stade
 

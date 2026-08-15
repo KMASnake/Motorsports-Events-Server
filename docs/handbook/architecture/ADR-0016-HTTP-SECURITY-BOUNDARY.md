@@ -31,11 +31,9 @@ lues en streaming avec une limite de 1 000 000 octets et un timeout de huit
 secondes.
 
 Une clé placée dans un segment de chemin ou un paramètre reste un credential
-dans l’URL et est interdite. Si le fournisseur propose une version authentifiée
-par header, l’adaptateur doit employer cette version. TheSportsDB v1 place la
-clé dans le chemin ; les appels d’acquisition et de découverte utilisent donc
-TheSportsDB v2 avec `X-API-KEY`, conformément à sa documentation officielle :
-<https://www.thesportsdb.com/docs_api_guide>.
+dans l’URL et est interdite, sauf décision mainteneur permanente explicite.
+ADR-0020 porte l’unique exception actuelle pour le segment de chemin imposé
+par TheSportsDB v1 ; aucune autre garantie de cette frontière n’est relâchée.
 
 ## Conséquences
 
@@ -43,9 +41,7 @@ TheSportsDB v2 avec `X-API-KEY`, conformément à sa documentation officielle :
   explicitement approuvé ;
 - les réponses JSON chunked ne peuvent plus provoquer un buffering illimité ;
 - les providers Internet restent limités à leurs hosts fixes ;
-- TheSportsDB nécessite un accès v2 compatible avec l’authentification par
-  header ; une configuration v1 historique est normalisée vers la frontière
-  v2 avant tout appel ;
+- l’exception TheSportsDB v1 est bornée et documentée par ADR-0020 ;
 - une modification de l’origine API impose de reconstruire l’image Web afin
   que le bundle et `connect-src` restent alignés ;
 - les headers Fastify ne sont jamais considérés comme une protection du

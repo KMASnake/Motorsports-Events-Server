@@ -20,11 +20,10 @@ le flux avec `pagination_inconsistent` et `complete=false`.
 
 ## P1 — TheSportsDB / AC-5.6-161
 
-La documentation officielle confirme que v1 authentifie par une clé dans le
-chemin et que v2 utilise `X-API-KEY`. Tous les appels du nouvel adaptateur sont
-donc forcés vers les endpoints v2 officiels, sans secret dans l’URL. La v2 est
-réservée aux abonnements compatibles ; une installation limitée à la clé v1
-gratuite devra obtenir un accès v2 plutôt que contourner ADR-0016.
+Le mainteneur décide de conserver v1 et accepte explicitement l’apparition de
+la clé gratuite dans le segment de chemin imposé. ADR-0020 borne cette exception
+à TheSportsDB v1. La clé et l’URL complète restent interdites dans toute surface
+observable hors appel réseau.
 
 ## P2 — Cursor invalid
 

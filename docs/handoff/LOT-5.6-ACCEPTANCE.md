@@ -251,7 +251,11 @@ Timeout fournisseur explicitement borné.
 Flux, réponse et tailles sont bornés ; dépassement arrêté proprement sans épuisement incontrôlé des ressources.
 
 ### AC-5.6-161 — Redaction
-Secrets/credentials sont redacted y compris dans erreurs, exceptions et traces d'échec HTTP ; aucune URL credentialisée.
+Secrets/credentials sont redacted y compris dans erreurs, exceptions et traces
+d'échec HTTP. Une URL credentialisée est interdite, à l’unique exception du
+segment de chemin TheSportsDB v1 explicitement accepté par le mainteneur dans
+ADR-0020. Cette URL ne doit jamais quitter la primitive HTTP ni être loggée,
+persistée, auditée ou retournée.
 
 ## 18. Tests d'acceptation minimum
 

@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.33
+## Version 1.34
 
 Ce document est la source de vérité permanente du projet.
 
@@ -122,9 +122,10 @@ Avant toute modification : lire ce Handbook, `CODEX.md`, `PROJECT-STATUS.json`, 
 La frontière HTTP applique les règles permanentes de l’ADR-0016 : confiance proxy fermée par défaut et explicitement bornée par CIDR, corps de requête limité, headers de sécurité, redaction des secrets, et sorties fournisseur HTTPS limitées à une allowlist avec timeout et streaming borné.
 
 Une API fournisseur qui impose un secret dans le chemin ou les paramètres
-d’URL ne peut pas être utilisée sous cette forme. Lorsqu’une version sécurisée
-avec authentification par header existe, elle est obligatoire. TheSportsDB
-utilise donc son API v2 avec `X-API-KEY` ; l’API v1 à clé dans le chemin est
-interdite par la frontière HTTP.
+d’URL ne peut normalement pas être utilisée sous cette forme. L’unique
+exception approuvée est la clé gratuite TheSportsDB dans le segment imposé de
+l’API v1. Elle n’autorise ni secret en query string, ni URL user/password, ni
+fuite de l’URL credentialisée dans les logs, erreurs, audits, traces, données
+persistées ou surfaces retournées. Voir ADR-0020.
 
 Les projections publiques sont explicites et séparées des projections administratives. Un championnat désactivé est absent des API publiques sans suppression de ses données. Nginx protège l’ACP par une CSP alignée sur l’origine API du build ; la terminaison TLS de production reste propriétaire de HSTS.

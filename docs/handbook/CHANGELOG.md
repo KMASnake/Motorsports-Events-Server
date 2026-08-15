@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.34 — 2026-08-15
+
+- consigne l’autorisation explicite du mainteneur de conserver TheSportsDB v1 ;
+- limite strictement l’exception au segment de chemin contenant sa clé gratuite ;
+- maintient la redaction totale hors appel réseau et toutes les autres
+  protections d’ADR-0016 ;
+- ajoute ADR-0020 sans valider globalement le Lot 5.6 ni autoriser 5.6-C.
+
 ## 1.33 — 2026-08-15
 
 - précise qu’une version d’API plaçant un secret dans l’URL est interdite ;

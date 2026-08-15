@@ -2,6 +2,17 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-15 — Exception mainteneur TheSportsDB v1
+
+- le mainteneur impose le maintien de TheSportsDB v1 et accepte explicitement
+  que sa clé gratuite apparaisse dans le segment de chemin de l’appel réseau ;
+- cette exception ne s’étend à aucun autre fournisseur ni à une query string ;
+- le secret et l’URL credentialisée restent interdits dans logs, erreurs,
+  traces, audits, stockage et surfaces applicatives ;
+- ADR-0016 reste applicable pour toutes les autres garanties.
+
+Voir `architecture/ADR-0020-THESPORTSDB-V1-CREDENTIAL-PATH.md`.
+
 ## 2026-08-15 — Application d’ADR-0016 aux versions d’API fournisseur
 
 - aucune compatibilité fournisseur ne justifie un secret dans une URL ;
