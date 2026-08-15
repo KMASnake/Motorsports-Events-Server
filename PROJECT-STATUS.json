@@ -14,13 +14,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.6-b-corrected-awaiting-maintainer-reaudit",
-    "reason": "Lot 5.6-A is maintainer-validated. Lot 5.6-B audit corrections for WRC strategy, pagination evidence, maintainer-approved TheSportsDB v1 credential-path exception and cursor invalidation are implemented and tested. STOP before 5.6-C pending maintainer re-audit. Lot 5.7+ remain unauthorized."
+    "status": "sub-lot-5.6-b-maintainer-validatable-candidate",
+    "reason": "Lot 5.6-A is maintainer-validated. Lot 5.6-B audit corrections, including rejection of the phantom TheSportsDB v2 strategy, are implemented and tested. Lot 5.6-B is a maintainer-validatable candidate. STOP before 5.6-C. Lot 5.7+ remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-b-corrected-awaiting-maintainer-reaudit",
+    "status": "sub-lot-5.6-b-maintainer-validatable-candidate",
     "implementation_percent": 52,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -36,7 +36,7 @@
       "implementation_percent": 22,
       "completed_technical_sub_lots": ["5.6-A", "5.6-B"],
       "maintainer_validated_technical_sub_lots": ["5.6-A"],
-      "audit_status": "5.6-b-corrected-awaiting-maintainer-reaudit",
+      "audit_status": "5.6-b-maintainer-validatable-candidate",
       "concept_validated": true,
       "concept_validation_date": "2026-08-14",
       "ui_contract_validated": true,
@@ -72,6 +72,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Maintainer re-audits corrected Lot 5.6-B. STOP before 5.6-C. Lot 5.7+ remain unauthorized."
+    "task": "Maintainer performs final validation of the Lot 5.6-B candidate. STOP before 5.6-C. Lot 5.7+ remain unauthorized."
   }
 }

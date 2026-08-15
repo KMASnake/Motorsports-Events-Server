@@ -1,7 +1,7 @@
 # Lot 5.6-B — Acquisition adaptateur sécurisée
 
 Date : 2026-08-15  
-Statut : **CORRIGÉ APRÈS AUDIT — EN ATTENTE DE RÉ-AUDIT MAINTENEUR**
+Statut : **CANDIDAT VALIDABLE PAR LE MAINTENEUR**
 
 ## Périmètre livré
 
@@ -34,7 +34,10 @@ Statut : **CORRIGÉ APRÈS AUDIT — EN ATTENTE DE RÉ-AUDIT MAINTENEUR**
   le restart saison exige une preuve d’invalidation fournisseur explicite ;
 - le mainteneur impose TheSportsDB v1 et accepte explicitement sa clé gratuite
   dans le segment de chemin. L’adaptateur utilise `/all_leagues.php` et
-  `/eventsseason.php`, conformément à l’exception bornée ADR-0020.
+  `/eventsseason.php`, conformément à l’exception bornée ADR-0020 ;
+- `league-season-v1` est la seule stratégie TheSportsDB acceptée ; la valeur
+  fantôme `league-season-v2`, les stratégies inconnues, les modèles endpoint
+  et les identifiants non numériques sont refusés.
 
 ## Sécurité HTTP
 
@@ -49,8 +52,8 @@ credentialisée TheSportsDB reste confinée à l’appel de transport.
 
 - typecheck API : PASS ;
 - build API : PASS ;
-- suite API complète : 190/190 PASS ;
-- suite ciblée acquisition/sécurité : 71/71 PASS ;
+- suite API complète : 191/191 PASS ;
+- suite ciblée acquisition/sécurité : 72/72 PASS ;
 - pagination OCBlackTop multi-pages et terminaison explicite : PASS ;
 - collection TheSportsDB vide explicitement complète : PASS ;
 - anomalie élément isolée sans perte des éléments valides : PASS ;
@@ -67,6 +70,8 @@ credentialisée TheSportsDB reste confinée à l’appel de transport.
 - HTTP 400/404/410 génériques : jamais `cursor_invalid`, PASS ;
 - TheSportsDB v1 : clé canari présente uniquement dans l’URL remise au
   transport, absente du résultat sanitizé et de l’erreur sérialisée, PASS.
+- stratégie TheSportsDB v1 acceptée et v2/inconnue/endpoint/non numérique
+  refusés explicitement : PASS.
 
 ## Acceptance couverte à ce stade
 

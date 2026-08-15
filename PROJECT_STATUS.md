@@ -1,12 +1,12 @@
 # État du projet
 
-## Lot 5.6-B — corrigé après audit mainteneur (15 août 2026)
+## Lot 5.6-B — candidat validable par le mainteneur (15 août 2026)
 
 Le sous-lot 5.6-A est validé par le mainteneur. Les contrats d'acquisition,
 la pagination bornée, la complétude explicite, l'isolation des anomalies et la
 reprise saison sur curseur refusé sont implémentés pour OCBlackTop et
 TheSportsDB via l'unique frontière HTTP sécurisée. La suite API complète
-(175 tests), la recette ciblée Docker (56 tests) et la recette PostgreSQL 5.6-A
+(191 tests), la recette ciblée Docker (72 tests) et la recette PostgreSQL 5.6-A
 sont vertes.
 
 Preuve : `docs/handoff/LOT-5.6-B-VALIDATION.md`. STOP avant 5.6-C : le Lot 5.6
@@ -15,8 +15,8 @@ global reste non validé et non fusionnable, et les Lots 5.7+ sont interdits.
 Les corrections d’audit attribuent au WRC la stratégie saisonnière OCBlackTop,
 refusent toute complétude issue d’une page vide contradictoire, réservent
 `cursor_invalid` aux preuves fournisseur explicites et conservent TheSportsDB
-v1 selon l’exception mainteneur ADR-0020. Le sous-lot attend un ré-audit
-mainteneur.
+v1 selon l’exception mainteneur ADR-0020. La stratégie v2 fantôme est refusée.
+Le sous-lot est candidat à la validation finale du mainteneur.
 
 ## Lot 5.4 — candidat à l'audit mainteneur (12 août 2026)
 

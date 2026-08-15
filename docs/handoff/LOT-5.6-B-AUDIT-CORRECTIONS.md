@@ -1,7 +1,7 @@
 # Lot 5.6-B — Corrections après audit mainteneur
 
 Date : 2026-08-15
-Statut : **CORRIGÉ — RÉ-AUDIT MAINTENEUR REQUIS**
+Statut : **CANDIDAT VALIDABLE PAR LE MAINTENEUR**
 
 ## P1 — OCBlackTop / WRC
 
@@ -31,6 +31,13 @@ Les statuts HTTP génériques ne sont plus interprétés comme une invalidation.
 Le résultat `cursor_invalid` et son restart saison nécessitent une preuve
 fournisseur explicite et non vide. Aucun endpoint actuel n’invente une telle
 preuve lorsqu’elle n’est pas documentée.
+
+## P2 — Stratégie TheSportsDB v2 fantôme
+
+`league-season-v1` est désormais la seule stratégie acceptée. La valeur
+`league-season-v2` n’est ni normalisée ni anticipée : elle est refusée comme
+toute stratégie inconnue. Les modèles endpoint et identifiants non numériques
+restent également refusés.
 
 ## Gate
 
