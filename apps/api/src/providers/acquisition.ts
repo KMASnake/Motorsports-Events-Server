@@ -171,6 +171,7 @@ export function validateProviderSourceItems(input: {
   entityKind: ProviderSourceEntityKind;
   idKeys: readonly string[];
   parentIdKeys?: readonly string[];
+  parentEntityKind?: ProviderSourceEntityKind;
 }): { items: AcquiredProviderSourceItem[]; anomalies: ProviderItemAnomaly[] } {
   const items: AcquiredProviderSourceItem[] = [];
   const anomalies: ProviderItemAnomaly[] = [];
@@ -193,11 +194,13 @@ export function validateProviderSourceItems(input: {
       const end = sourceString(row, ['ends_at', 'end_at']);
       if (start && end && !Number.isNaN(Date.parse(start)) && !Number.isNaN(Date.parse(end))
         && Date.parse(end) < Date.parse(start)) throw new Error('Fin source antérieure au début.');
+      const parentExternalId = input.parentIdKeys ? sourceString(row, input.parentIdKeys) : null;
       items.push({
         entityKind: input.entityKind,
         externalId,
         identityIsSynthetic: false,
-        parentExternalId: input.parentIdKeys ? sourceString(row, input.parentIdKeys) : null,
+        parentExternalId,
+        parentEntityKind: parentExternalId ? input.parentEntityKind ?? null : null,
         season: input.season,
         sourceData: sanitizeProviderSourceData(row as JsonObject)
       });

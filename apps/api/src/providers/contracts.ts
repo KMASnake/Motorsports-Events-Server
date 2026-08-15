@@ -97,6 +97,7 @@ export interface AcquiredProviderSourceItem {
   readonly externalId: string;
   readonly identityIsSynthetic: boolean;
   readonly parentExternalId: string | null;
+  readonly parentEntityKind: ProviderSourceEntityKind | null;
   readonly season: number;
   readonly sourceData: JsonObject;
 }

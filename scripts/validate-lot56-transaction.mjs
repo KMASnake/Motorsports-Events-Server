@@ -7,11 +7,13 @@ import { ProviderAcquisitionError } from '../apps/api/dist/providers/contracts.j
 const providerId='56c00000-0000-0000-0000-000000000001';
 const linkId='56c00000-0000-0000-0000-000000000002';
 const streamId='56c00000-0000-0000-0000-000000000003';
+const providerId2='56c00000-0000-0000-0000-000000000011';
+const linkId2='56c00000-0000-0000-0000-000000000012';
 const worker='lot56-c-worker';
 const scheduler=new PersistentSchedulerService();
 const service=new AcquisitionTransactionService(scheduler);
 const cursor=(page)=>({page,visited:page===1?[]:['page:1']});
-const item=(externalId,sourceData={},season=2026)=>({entityKind:'event',externalId,identityIsSynthetic:false,parentExternalId:null,season,sourceData});
+const item=(externalId,sourceData={},season=2026,extra={})=>({entityKind:'event',externalId,identityIsSynthetic:false,parentExternalId:null,parentEntityKind:null,season,sourceData,...extra});
 const result=(items,next=2,complete=false,itemAnomalies=[])=>({status:complete?'complete':'progress',items,itemAnomalies,nextCursor:cursor(next),requestCount:1,complete,completionReason:complete?(items.length?'end_of_collection':'explicit_empty_scope'):null});
 const adapter=(value)=>({fetchWorkUnit:async()=>{if(value instanceof Error)throw value;return value;}});
 const fetchInput={providerInstanceId:providerId,providerConfig:{},credentials:{},providerChampionshipId:linkId,championshipId:'f1',sourceConfig:{},phase:'current',season:2026,cursor:cursor(1),signal:new AbortController().signal};
@@ -31,15 +33,25 @@ try{
   await pool.query(`insert into provider_instances(id,adapter_key,name,enabled,state) values($1,'lot56-c-fixture','Lot 5.6-C fixture',true,'active')`,[providerId]);
   await pool.query(`insert into provider_championships(id,provider_instance_id,championship_id,external_championship_id,discovery_state,sync_state,is_primary) values($1,$2,'f1','fixture-f1','configured','active',true)`,[linkId,providerId]);
   await pool.query(`insert into sync_streams(id,provider_championship_id,phase,state,cursor_version,cursor) values($1,$2,'current','ready',1,$3::jsonb)`,[streamId,linkId,JSON.stringify(cursor(1))]);
+  await pool.query(`insert into provider_instances(id,adapter_key,name,enabled,state) values($1,'lot56-c-other','Other scope',true,'active')`,[providerId2]);
+  await pool.query(`insert into provider_championships(id,provider_instance_id,championship_id,external_championship_id,discovery_state,sync_state,is_primary) values($1,$2,'f1','other-f1','configured','inactive',false)`,[linkId2,providerId2]);
 
   await execute(result([item('historic', {name:'Historic GP',starts_at:'1950-05-13T11:00:00Z',ends_at:'1950-05-13T13:00:00Z'})]));
   assert.equal((await scalar('select cursor from sync_streams where id=$1',[streamId])).cursor.page,2);
   assert.equal(Number((await scalar('select count(*) count from provider_source_entities where provider_championship_id=$1',[linkId])).count),1);
   console.log('Unité valide, date pré-1970, commit et checkpoint : OK');
 
+  await execute(result([item('timestamp-start',{strTimestamp:'1969-07-20T20:17:00Z'})],21));
+  const timestampRow=await scalar("select provider_started_at,provider_ended_at from provider_source_entities where external_id='timestamp-start'");
+  assert.equal(new Date(timestampRow.provider_started_at).toISOString(),'1969-07-20T20:17:00.000Z');assert.equal(timestampRow.provider_ended_at,null);
+  await execute(result([item('explicit-end',{date:'1900-01-01T00:00:00Z',end_at:'1900-01-01T01:00:00Z'})],22));
+  const explicitEnd=await scalar("select provider_started_at,provider_ended_at from provider_source_entities where external_id='explicit-end'");
+  assert.equal(new Date(explicitEnd.provider_started_at).toISOString(),'1900-01-01T00:00:00.000Z');assert.equal(new Date(explicitEnd.provider_ended_at).toISOString(),'1900-01-01T01:00:00.000Z');
+  console.log('strTimestamp classé en début, fin explicite et dates historiques : OK');
+
   await execute(result([item('historic', {ends_at:'1950-05-13T13:00:00Z',starts_at:'1950-05-13T11:00:00Z',name:'Historic GP'})],3));
   assert.equal(Number((await scalar("select count(*) count from provider_source_entities where external_id='historic'")).count),1);
-  assert.equal(Number((await scalar('select count(*) count from provider_source_changes')).count),1);
+  assert.equal(Number((await scalar("select count(*) count from provider_source_changes where source_entity_id=(select id from provider_source_entities where external_id='historic')")).count),1);
   console.log('Replay idempotent sans doublon ni faux changement : OK');
 
   await execute(result([item('historic', {name:'Historic GP revised',starts_at:'1950-05-13T12:00:00Z'})],4));
@@ -62,6 +74,7 @@ try{
   await assert.rejects(()=>service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'crash-before-commit',lease:crashLease,adapter:adapter(result([item('crash-item',{name:'Crash'})],7)),fetchInput,beforeCommit:async()=>{throw new Error('simulated_crash');}}),/simulated_crash/);
   assert.equal(Number((await scalar("select count(*) count from provider_source_entities where external_id='crash-item'")).count),0);
   assert.deepEqual((await scalar('select cursor from sync_streams where id=$1',[streamId])).cursor,beforeFailure);
+  assert.equal((await scalar("select status,complete from provider_acquisition_traversals where safe_unit_key='crash-before-commit'")).status,'failed');
   console.log('Crash avant commit : checkpoint inchangé et aucune donnée partielle : OK');
 
   await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
@@ -72,25 +85,55 @@ try{
   const staleLease=await lease();await pool.query('update sync_streams set lease_generation=lease_generation+1 where id=$1',[streamId]);
   await assert.rejects(()=>service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'stale',lease:staleLease,adapter:adapter(result([item('stale-item')],8)),fetchInput}),/stale_worker/);
   assert.equal(Number((await scalar("select count(*) count from provider_source_entities where external_id='stale-item'")).count),0);
+  assert.equal((await scalar("select status from provider_acquisition_traversals where safe_unit_key='stale'")).status,'failed');
   console.log('Fencing stale refuse commit et checkpoint : OK');
 
   await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
   const lostLease=await lease();await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);
   await assert.rejects(()=>service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'lost',lease:lostLease,adapter:adapter(result([item('lost-item')],8)),fetchInput}),/stale_worker/);
+  assert.equal((await scalar("select status from provider_acquisition_traversals where safe_unit_key='lost'")).status,'failed');
   console.log('Lease perdue refuse commit : OK');
 
   await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
+  const orphanLease=await lease();
+  await pool.query(`insert into provider_acquisition_traversals(id,stream_id,run_id,work_class,season,safe_unit_key) values('56c00000-0000-0000-0000-000000000099',$1,$2,'current_future',2026,'orphaned-process')`,[streamId,orphanLease.runId]);
+  await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
+  assert.deepEqual(await scalar("select status,complete from provider_acquisition_traversals where safe_unit_key='orphaned-process'"),{status:'failed',complete:false});
+  console.log('Récupération lease : traversal orphelin clos sans complétude : OK');
+
   const cursorBeforeInvalid=(await scalar('select cursor from sync_streams where id=$1',[streamId])).cursor;
   const cursorLease=await lease();const cursorInvalid={...result([],1,false),status:'cursor_invalid',safeRestart:{scope:'season',season:2026}};
   const cursorOutcome=await service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'cursor-invalid',lease:cursorLease,adapter:adapter(cursorInvalid),fetchInput});
   assert.equal(cursorOutcome.checkpointAdvanced,false);assert.deepEqual((await scalar('select cursor from sync_streams where id=$1',[streamId])).cursor,cursorBeforeInvalid);
   console.log('Cursor invalid : checkpoint non avancé : OK');
 
-  await execute(result([item('partial-seen',{name:'Partial'})],9,false));
-  assert.equal(Number((await scalar("select count(*) count from provider_source_observations where observation_kind='not_observed' and traversal_id=(select id from provider_acquisition_traversals order by created_at desc limit 1)")).count),0);
-  await execute(result([],10,true));
-  assert(Number((await scalar("select count(*) count from provider_source_observations where observation_kind='not_observed' and traversal_id=(select id from provider_acquisition_traversals order by created_at desc limit 1)")).count)>0);
-  console.log('Traversal partiel sans absence, traversal complet avec non-observations : OK');
+  await execute(result(['A','B','C','D','OLD'].map(id=>item(`scope-${id}`)),9,true));
+  const page1=await execute(result(['A','B'].map(id=>item(`scope-${id}`)),10,false),{safeUnitKey:'two-pages'});
+  assert.equal((await scalar('select complete from provider_acquisition_traversals where id=$1',[page1.traversalId])).complete,false);
+  const page2=await execute(result(['C','D'].map(id=>item(`scope-${id}`)),11,true),{safeUnitKey:'two-pages',traversalId:page1.traversalId});
+  assert.equal(page2.traversalId,page1.traversalId);
+  const observations=(await pool.query(`select e.external_id,o.observation_kind from provider_source_observations o join provider_source_entities e on e.id=o.source_entity_id where o.traversal_id=$1 and e.external_id like 'scope-%' order by e.external_id`,[page1.traversalId])).rows;
+  assert.deepEqual(observations,[{external_id:'scope-A',observation_kind:'present'},{external_id:'scope-B',observation_kind:'present'},{external_id:'scope-C',observation_kind:'present'},{external_id:'scope-D',observation_kind:'present'},{external_id:'scope-OLD',observation_kind:'not_observed'}]);
+  assert.equal((await scalar('select complete,status from provider_acquisition_traversals where id=$1',[page1.traversalId])).status,'complete');
+  const failedPage1=await execute(result([item('scope-A')],12,false),{safeUnitKey:'two-pages-failure'});
+  await assert.rejects(()=>execute(new ProviderAcquisitionError('page_failed','Page 2 failed'),{safeUnitKey:'two-pages-failure',traversalId:failedPage1.traversalId}));
+  assert.equal(Number((await scalar("select count(*) count from provider_source_observations where traversal_id=$1 and observation_kind='not_observed'",[failedPage1.traversalId])).count),0);
+  assert.equal((await scalar('select status,complete from provider_acquisition_traversals where id=$1',[failedPage1.traversalId])).status,'failed');
+  console.log('Traversal multi-pages : présence cumulative, absence finale exacte et échec sans absence : OK');
+
+  const childFirst=await execute(result([item('child-late-parent',{},2026,{entityKind:'session',parentExternalId:'parent-late',parentEntityKind:'meeting'})],23));
+  assert.equal((await scalar("select parent_source_entity_id from provider_source_entities where external_id='child-late-parent'")).parent_source_entity_id,null);
+  await execute(result([item('parent-late',{},2026,{entityKind:'meeting'})],24));
+  assert((await scalar("select parent_source_entity_id from provider_source_entities where external_id='child-late-parent'")).parent_source_entity_id);
+  await execute(result([item('same-id',{},2026,{entityKind:'event'}),item('same-id',{},2026,{entityKind:'meeting'}),item('child-kind',{},2026,{entityKind:'session',parentExternalId:'same-id',parentEntityKind:'meeting'})],25));
+  assert.equal((await scalar(`select parent.entity_kind from provider_source_entities child join provider_source_entities parent on parent.id=child.parent_source_entity_id where child.external_id='child-kind'`)).entity_kind,'meeting');
+  await execute(result([item('parent-first',{},2026,{entityKind:'meeting'}),item('child-parent-first',{},2026,{entityKind:'session',parentExternalId:'parent-first',parentEntityKind:'meeting'})],26));
+  await execute(result([item('child-parent-first',{},2026,{entityKind:'session',parentExternalId:'parent-first',parentEntityKind:'meeting'})],27));
+  assert.equal(Number((await scalar("select count(*) count from provider_source_entities where external_id='child-parent-first'")).count),1);
+  await pool.query(`insert into provider_source_entities(id,provider_instance_id,provider_championship_id,entity_kind,external_id,season,source_data,source_hash,first_observed_at,last_observed_at,last_changed_at) values('56c00000-0000-0000-0000-000000000098',$1,$2,'meeting','foreign-parent',2026,'{}','foreign',now(),now(),now())`,[providerId2,linkId2]);
+  await execute(result([item('cross-scope-child',{},2026,{entityKind:'session',parentExternalId:'foreign-parent',parentEntityKind:'meeting'})],28));
+  assert.equal((await scalar("select parent_source_entity_id from provider_source_entities where external_id='cross-scope-child'")).parent_source_entity_id,null);
+  console.log('Références parent durables, typées, même périmètre et rejeu idempotent : OK');
 
   await pool.query(`insert into event_corrections(id,event_id,provider_key,field_name,provider_value,override_value,status,created_by) values('lot56-c-override','evt-002','fixture','name','"Provider"','"Local"','active','maintainer') on conflict(event_id,field_name) do update set override_value='"Local"',status='active'`);
   await pool.query("update events set provider_key='lot56-c-fixture',external_id='override-safe' where id='evt-002'");
@@ -113,6 +156,7 @@ try{
   await assert.rejects(()=>service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'db-error',lease:badLease,adapter:adapter(bad),fetchInput}));
   assert.equal(Number((await scalar("select count(*) count from provider_source_entities where external_id='db-error'")).count),0);
   assert.deepEqual((await scalar('select cursor from sync_streams where id=$1',[streamId])).cursor,checkpointBeforeDbError);
+  assert.equal((await scalar("select status from provider_acquisition_traversals where safe_unit_key='db-error'")).status,'failed');
   console.log('Erreur PostgreSQL : transaction annulée sans donnée partielle : OK');
   console.log('Tests PostgreSQL Lot 5.6-C : OK');
 } finally { await pool.end(); }
