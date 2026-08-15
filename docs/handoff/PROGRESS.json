@@ -4,9 +4,9 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-c-corrected-awaiting-maintainer-reaudit",
+    "status": "sub-lot-5.6-d-implemented-awaiting-maintainer-audit",
     "updated_at": "2026-08-15",
-    "implementation_percent": 59,
+    "implementation_percent": 66,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "merged_to_main": false,
@@ -18,10 +18,10 @@
     "sub_lot_5_4": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
     "sub_lot_5_5": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-14","authorized":true},
     "sub_lot_5_6": {
-      "implementation_percent": 33,
-      "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C"],
-      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B"],
-      "audit_status": "5.6-c-corrected-awaiting-maintainer-reaudit",
+      "implementation_percent": 44,
+      "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D"],
+      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C"],
+      "audit_status": "5.6-d-implemented-awaiting-maintainer-audit",
       "concept_validated": true,
       "ui_contract_validated": true,
       "acceptance_validated": true,
@@ -55,6 +55,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "STOP before Lot 5.6-D. Await maintainer re-audit of corrected Lot 5.6-C. Lot 5.7+ remain unauthorized."
+    "task": "STOP before Lot 5.6-E. Await maintainer audit of Lot 5.6-D. Lot 5.7+ remain unauthorized."
   }
 }

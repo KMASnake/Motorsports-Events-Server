@@ -1,6 +1,27 @@
 # État du projet
 
-## Lot 5.6-C — corrections d’audit en attente de ré-audit (15 août 2026)
+## Lot 5.6-D — candidat à l’audit mainteneur (15 août 2026)
+
+Le sous-lot 5.6-C est validé par le mainteneur. L’orchestrateur durable 5.6-D
+enchaîne `current_hot`, `current_future`, `recent_catchup`, `deep_history` et
+`finalization` sans contourner le scheduler 5.4, son fencing ni le quota gate
+5.5. Le current va jusqu’à épuisement futur du fournisseur ; J+30 reste une
+priorité hot, jamais une limite d’acquisition.
+
+La migration additive `0019_lot56_durable_orchestration` conserve l’étape
+current et les jalons durables d’historique/finalisation. Cinq saisons vides
+complètes consécutives terminent l’historique par défaut ; une réponse
+partielle, une erreur, un 429, un timeout ou un curseur invalide ne compte
+jamais. La réactivation relance immédiatement current sans reconstruire un
+historique déjà complet. Les fins théoriques suivent la hiérarchie fournisseur,
+dernière session, médiane comparable, règle adaptateur puis jour civil dans le
+fuseau fournisseur. Après le délai configurable, une anomalie persistante est
+créée sans forcer le statut métier.
+
+Preuve : `docs/handoff/LOT-5.6-D-VALIDATION.md`. STOP avant 5.6-E ; le Lot 5.6
+global reste non validé, non fusionnable, et les Lots 5.7+ restent interdits.
+
+## Lot 5.6-C — validé par le mainteneur (15 août 2026)
 
 Le sous-lot 5.6-B est validé par le mainteneur. Le moteur 5.6-C relie les
 fondations PostgreSQL 5.6-A aux adaptateurs 5.6-B via la transaction de commit
@@ -15,7 +36,7 @@ les traversals orphelins sont clos sans complétude ni checkpoint. Les dates
 La migration `0018` ajoute le fencing durable `run_id + lease_generation` : un
 worker stale ne peut plus fermer un traversal repris ni créer une anomalie
 tardive. La course PostgreSQL A/B correspondante est validée.
-STOP avant 5.6-D ; le Lot 5.6 global reste non validé et non fusionnable.
+Le ré-audit final mainteneur a validé ce sous-lot et autorisé uniquement 5.6-D.
 
 ## Lot 5.6-B — validé par le mainteneur (15 août 2026)
 

@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur Lot 5.6-C
+## Priorité courante — audit mainteneur Lot 5.6-D
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -16,10 +16,18 @@
 - [x] prouver rollback, crash/rejeu, anomalies, observations et overrides ;
 - [x] corriger traversal multi-pages, clôture des échecs, temporalité et parents durables ;
 - [x] fencer l’ownership des traversals et valider la course stale A / nouveau B ;
-- [ ] obtenir l’audit mainteneur explicite avant 5.6-D.
+- [x] obtenir l’audit mainteneur explicite avant 5.6-D ;
+- [x] orchestrer current hot/future jusqu’à épuisement fournisseur ;
+- [x] enchaîner bootstrap, recent catchup et historique profond durable ;
+- [x] terminer l’historique après cinq saisons vides complètes consécutives ;
+- [x] relancer current sans reconstruire un historique achevé ;
+- [x] estimer les fins avec provenance, fuseau fournisseur et dates pré-1970 ;
+- [x] créer l’anomalie de finalisation sans modifier le statut métier ;
+- [x] valider migration 0019, PostgreSQL, transaction/fencing et 200 tests API ;
+- [ ] obtenir l’audit mainteneur explicite avant 5.6-E.
 
-Point d'arrêt obligatoire : ne commencer ni l’orchestration durable 5.6-D,
-ni aucune fonctionnalité 5.7+ avant décision explicite du mainteneur.
+Point d'arrêt obligatoire : ne commencer ni le sous-lot 5.6-E, ni aucune
+fonctionnalité 5.7+ avant décision explicite du mainteneur.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 
