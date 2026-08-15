@@ -29,6 +29,15 @@ requête. La décision « saison vide » repose sur les compteurs cumulés du
 traversal complet. Enfin, finalization n’est sélectionné que lorsqu’une entité
 non terminée se trouve réellement dans sa fenêtre de grâce.
 
+Le second ré-audit formalise définitivement `current_global` comme unité
+fournisseur indivisible : la présence d’entités `current_hot` priorise ce stream
+parmi les unités déjà éligibles selon 5.4/5.5, sans créer de cadence ni de
+requête future parallèle. La migration `0021` renomme le work class durable et
+ajoute un curseur de finalization par saison. Une cible de décembre N reste donc
+traitée en janvier N+1 dans la saison N ; plusieurs saisons sont parcourues
+cycliquement et équitablement. La médiane utilise au maximum les cinq pairs
+comparables les plus récents.
+
 ## Lot 5.6-C — validé par le mainteneur (15 août 2026)
 
 Le sous-lot 5.6-B est validé par le mainteneur. Le moteur 5.6-C relie les

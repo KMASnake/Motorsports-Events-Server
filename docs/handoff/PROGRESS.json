@@ -21,7 +21,7 @@
       "implementation_percent": 44,
       "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D"],
       "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C"],
-      "audit_status": "5.6-d-corrected-awaiting-maintainer-reaudit",
+      "audit_status": "5.6-d-final-corrections-awaiting-maintainer-reaudit",
       "concept_validated": true,
       "ui_contract_validated": true,
       "acceptance_validated": true,

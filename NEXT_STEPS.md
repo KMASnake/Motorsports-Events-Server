@@ -29,6 +29,10 @@
 - [x] dériver saison et phase avant tout appel fournisseur/quota ;
 - [x] conditionner finalization à une cible réellement éligible ;
 - [x] valider la migration additive 0020 et toutes les suites 5.6-A/B/C/D ;
+- [x] formaliser `current_global` et sa priorité hot sans cadence fictive ;
+- [x] construire une file de finalization déterministe par saison N/N+1 ;
+- [x] limiter la médiane aux cinq pairs comparables les plus récents ;
+- [x] valider la migration additive 0021 et 201 tests API ;
 - [ ] obtenir l’audit mainteneur explicite avant 5.6-E.
 
 Point d'arrêt obligatoire : ne commencer ni le sous-lot 5.6-E, ni aucune

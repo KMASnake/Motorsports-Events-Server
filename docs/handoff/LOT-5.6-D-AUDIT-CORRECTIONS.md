@@ -29,3 +29,19 @@ Statut : **CORRIGÉ — RÉ-AUDIT REQUIS**
 - suites 5.6-A, 5.6-B, 5.6-C et 5.6-D vertes.
 
 STOP avant 5.6-E. Le Lot 5.6 global reste non validé et non fusionnable.
+
+## Corrections du ré-audit final
+
+- `current_global` remplace `current_hot` comme work class réellement exécuté.
+  Le scheduler donne priorité aux streams current ayant au moins une entité hot,
+  seulement après application de l’éligibilité, du quota et du backoff 5.5 ;
+- la migration `0021_lot56_current_global_finalization_queue` conserve ce nom
+  durable et le dernier millésime finalization exécuté ;
+- les cibles finalization sont groupées par saison. Au 5 janvier 2027, une cible
+  du 20 décembre 2026 produit une unité saison 2026, puis une cible 2027 produit
+  une unité distincte saison 2027 ;
+- en l’absence de cible, `current_global` est choisi sans appeler le fournisseur
+  au titre de finalization ;
+- les cinq observations comparables les plus récentes sont sélectionnées avant
+  la médiane, ce qui empêche un historique ancien abondant de dominer trois
+  événements récents cohérents.

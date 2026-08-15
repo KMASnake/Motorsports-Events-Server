@@ -49,6 +49,14 @@ n’est introduit.
 - finalization n’est choisie que pour une entité non terminée dont la fin
   théorique est passée mais reste dans la fenêtre de grâce. Une entité terminée
   ou déjà au-delà de la grâce ne provoque aucun rafraîchissement inutile.
+- `current_global` est aussi le nom durable du work class. La présence de hot
+  le priorise dans le scheduler parmi les unités rendues éligibles par 5.4/5.5 ;
+  sans hot, le stream reste maintenu par la fairness normale ;
+- les unités de finalization sont les plus petits scopes documentés, donc une
+  saison fournisseur. Le curseur durable `finalization_cursor_season` fait
+  alterner déterministement les saisons simultanément éligibles ;
+- les durées comparables sont triées par début décroissant et limitées aux cinq
+  pairs les plus récents avant calcul de la médiane.
 
 ## Matrice de preuves (30 scénarios)
 
@@ -87,11 +95,11 @@ n’est introduit.
 
 - `npm run typecheck --workspace @mse/api` : PASS ;
 - `npm run build --workspace @mse/api` : PASS ;
-- `npm test --workspace @mse/api` : **200/200 PASS** ;
+- `npm test --workspace @mse/api` : **201/201 PASS** ;
 - `./scripts/validate-repository.sh` : PASS (51 tests historiques, 18 ignorés
   faute de dépendances Python optionnelles) ;
 - `./scripts/test-lot56-orchestration.sh` : PASS, PostgreSQL réel jetable et
-  migrations `0019`/`0020` en up/down/up ;
+  migrations `0019`/`0020`/`0021` en up/down/up ;
 - `./scripts/test-lot56-acquisition.sh` : **72/72 PASS**, adaptateurs et sécurité
   5.6-B ;
 - `./scripts/test-lot56-transaction.sh` : PASS, transaction/fencing 5.6-C ;
