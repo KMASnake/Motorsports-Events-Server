@@ -8,7 +8,8 @@
 - [x] séparer anomalies élémentaires isolables et flux bloquants ;
 - [x] réutiliser exclusivement `providerHttp.ts` et le quota gate 5.5 ;
 - [x] valider API, sécurité, Docker et non-régression PostgreSQL 5.6-A ;
-- [ ] obtenir l'audit et l'autorisation explicite du mainteneur avant 5.6-C.
+- [x] corriger les constats WRC, pagination, TheSportsDB et cursor invalid ;
+- [ ] obtenir le ré-audit et l'autorisation explicite du mainteneur avant 5.6-C.
 
 Point d'arrêt obligatoire : ne commencer ni le moteur transactionnel 5.6-C,
 ni aucune fonctionnalité 5.7+ avant décision explicite du mainteneur.

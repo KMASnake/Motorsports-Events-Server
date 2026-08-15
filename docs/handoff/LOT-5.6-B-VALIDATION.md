@@ -1,7 +1,7 @@
 # Lot 5.6-B — Acquisition adaptateur sécurisée
 
 Date : 2026-08-15  
-Statut : **IMPLÉMENTÉ — EN ATTENTE D'AUDIT MAINTENEUR**
+Statut : **CORRIGÉ APRÈS AUDIT — EN ATTENTE DE RÉ-AUDIT MAINTENEUR**
 
 ## Périmètre livré
 
@@ -22,20 +22,37 @@ Statut : **IMPLÉMENTÉ — EN ATTENTE D'AUDIT MAINTENEUR**
 - délégation inchangée au quota gate 5.5 et absence de persistance/checkpoint,
   réservés à 5.6-C.
 
+## Corrections après audit
+
+- WRC reste dans `OcBlackTopAdapter` mais utilise la stratégie générique
+  `season-rallies-v1` et le modèle documenté
+  `/{series}/seasons/{year}` ; aucun test du nom WRC n’existe dans le moteur ;
+- une page vide ne prouve plus jamais seule la terminaison : priorité à
+  `has_next_page`, puis `next_page`, puis `total_pages`, avec arrêt bloquant
+  si ces preuves se contredisent ;
+- les HTTP 400, 404 et 410 génériques ne deviennent plus `cursor_invalid` ;
+  le restart saison exige une preuve d’invalidation fournisseur explicite ;
+- TheSportsDB v1 impose une clé dans le chemin et est donc incompatible avec
+  AC-5.6-161. L’adaptateur utilise l’API v2 documentée, `X-API-KEY`,
+  `/all/leagues` et `/schedule/league/{league}/{season}`. Les configurations
+  v1 historiques sont normalisées en mémoire vers v2 avant le transport.
+
 ## Sécurité HTTP
 
 Les deux adaptateurs utilisent exclusivement `fetchProviderJson` dans
 `providerHttp.ts`. Cette frontière conserve HTTPS obligatoire, allowlist exacte,
 refus des redirections, timeout de huit secondes, lecture streaming bornée à
 1 000 000 octets, compteur de requêtes et quota gate 5.5. Les erreurs
-normalisées n'incorporent ni réponse fournisseur ni credential.
+normalisées n'incorporent ni réponse fournisseur ni credential. La décision
+TheSportsDB est fondée sur la documentation officielle :
+<https://www.thesportsdb.com/docs_api_guide>.
 
 ## Preuves exécutées
 
 - typecheck API : PASS ;
 - build API : PASS ;
-- suite API complète : 175/175 PASS ;
-- suite ciblée acquisition/sécurité : 56/56 PASS ;
+- suite API complète : 190/190 PASS ;
+- suite ciblée acquisition/sécurité : 71/71 PASS ;
 - pagination OCBlackTop multi-pages et terminaison explicite : PASS ;
 - collection TheSportsDB vide explicitement complète : PASS ;
 - anomalie élément isolée sans perte des éléments valides : PASS ;
@@ -46,6 +63,12 @@ normalisées n'incorporent ni réponse fournisseur ni credential.
 - canari secret absent de l'erreur sérialisée : PASS ;
 - annulation scheduler propagée : PASS ;
 - dates source 1969, 1950 et 1900 : PASS.
+- WRC saisonnier via OCBlackTop sans adaptateur séparé : PASS ;
+- page vide avec `next_page` ou `has_next_page=true` : non terminale, PASS ;
+- métadonnées de pagination contradictoires : bloquées, PASS ;
+- HTTP 400/404/410 génériques : jamais `cursor_invalid`, PASS ;
+- TheSportsDB v2 : secret uniquement dans `X-API-KEY`, absent de l’URL, du
+  résultat sanitizé et de l’erreur sérialisée, PASS.
 
 ## Acceptance couverte à ce stade
 

@@ -1,5 +1,13 @@
 # Handbook Changelog
 
+## 1.33 — 2026-08-15
+
+- précise qu’une version d’API plaçant un secret dans l’URL est interdite ;
+- impose la version authentifiée par header lorsqu’elle existe ;
+- applique cette règle à TheSportsDB v2 avec `X-API-KEY`, sans exception à
+  AC-5.6-161 ;
+- maintient le Lot 5.6 non validé globalement et les Lots 5.7+ interdits.
+
 ## 1.32 — 2026-08-14
 
 - formalise l'autorisation mainteneur d'implémenter le Lot 5.6 — Acquisition fournisseur durable ;

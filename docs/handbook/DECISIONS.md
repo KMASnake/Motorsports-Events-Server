@@ -2,6 +2,18 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-15 — Application d’ADR-0016 aux versions d’API fournisseur
+
+- aucune compatibilité fournisseur ne justifie un secret dans une URL ;
+- lorsqu’un fournisseur propose une version authentifiée par header, cette
+  version est obligatoire même si une version historique gratuite utilise une
+  clé dans son chemin ;
+- l’adaptateur TheSportsDB utilise l’API v2 et `X-API-KEY` ; l’API v1
+  credentialisée est refusée pour les appels 5.6 ;
+- cette clarification ne crée aucune exception à AC-5.6-161.
+
+Voir `architecture/ADR-0016-HTTP-SECURITY-BOUNDARY.md`.
+
 ## 2026-08-14 — Autorisation d'implémentation du Lot 5.6
 
 - le Concept, le contrat UI et l'Acceptance consolidée du Lot 5.6 ont été audités contre 5.4, 5.5, la baseline sécurité et la frontière 5.7 ;
