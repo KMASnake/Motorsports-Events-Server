@@ -1,6 +1,7 @@
 import {
   ProviderAcquisitionError,
   type AcquiredProviderSourceItem,
+  type FetchWorkUnitResult,
   type JsonObject,
   type ProviderItemAnomaly,
   type ProviderSourceEntityKind
@@ -44,6 +45,100 @@ export function advancePageCursor(cursor: PageCursor, nextPage: number): PageCur
     throw new ProviderAcquisitionError('pagination_loop', 'Boucle de pagination fournisseur détectée.');
   }
   return { page: nextPage, visited: [...cursor.visited, current] };
+}
+
+type PageResolution =
+  | { readonly complete: true; readonly completionReason: 'end_of_collection' | 'explicit_empty_scope' }
+  | { readonly complete: false; readonly nextCursor: PageCursor };
+
+const optionalInteger = (value: unknown, label: string): number | null | undefined => {
+  if (value === null || value === undefined) return value;
+  if (!Number.isSafeInteger(value) || Number(value) < 1) {
+    throw new ProviderAcquisitionError('pagination_inconsistent', `${label} fournisseur invalide.`);
+  }
+  return Number(value);
+};
+
+/**
+ * Provider pagination evidence, strongest first: explicit has-next, explicit
+ * next page, then total page count. An empty item array is never evidence by
+ * itself. Contradictory metadata stops the stream instead of fabricating
+ * completeness.
+ */
+export function resolveProviderPage(payload: unknown, cursor: PageCursor, rowsLength: number): PageResolution {
+  const envelope = object(payload);
+  const raw = envelope.pagination ?? envelope.meta;
+  if (raw === undefined || raw === null) {
+    if (rowsLength === 0) {
+      throw new ProviderAcquisitionError('pagination_termination_unproven', 'Page vide sans preuve de terminaison.');
+    }
+    return { complete: false, nextCursor: advancePageCursor(cursor, cursor.page + 1) };
+  }
+  const metadata = object(raw);
+  const hasNextRaw = metadata.has_next_page ?? metadata.hasNextPage;
+  if (hasNextRaw !== undefined && typeof hasNextRaw !== 'boolean') {
+    throw new ProviderAcquisitionError('pagination_inconsistent', 'Indicateur has_next_page invalide.');
+  }
+  const hasNext = hasNextRaw as boolean | undefined;
+  const nextRaw = Object.hasOwn(metadata, 'next_page') ? metadata.next_page : metadata.nextPage;
+  const nextPage = optionalInteger(nextRaw, 'next_page');
+  const totalPageRaw = metadata.total_pages ?? metadata.totalPages;
+  const totalPages = optionalInteger(totalPageRaw, 'total_pages');
+
+  if (totalPages !== undefined && totalPages !== null && cursor.page > totalPages) {
+    throw new ProviderAcquisitionError('pagination_inconsistent', 'Page courante supérieure au total fournisseur.');
+  }
+  if (hasNext === true && nextPage === null) {
+    throw new ProviderAcquisitionError('pagination_inconsistent', 'Page suivante annoncée mais explicitement absente.');
+  }
+  if (hasNext === false && typeof nextPage === 'number') {
+    throw new ProviderAcquisitionError('pagination_inconsistent', 'Page suivante présente malgré une terminaison annoncée.');
+  }
+  if (totalPages && cursor.page === totalPages && (hasNext === true || typeof nextPage === 'number')) {
+    throw new ProviderAcquisitionError('pagination_inconsistent', 'Pagination annoncée au-delà de la dernière page.');
+  }
+  if (totalPages && cursor.page < totalPages && (hasNext === false || nextPage === null)) {
+    throw new ProviderAcquisitionError('pagination_inconsistent', 'Terminaison annoncée avant total_pages.');
+  }
+
+  if (hasNext === true || typeof nextPage === 'number') {
+    const candidate = typeof nextPage === 'number' ? nextPage : cursor.page + 1;
+    if (totalPages && candidate > totalPages) {
+      throw new ProviderAcquisitionError('pagination_inconsistent', 'Page suivante supérieure au total fournisseur.');
+    }
+    return { complete: false, nextCursor: advancePageCursor(cursor, candidate) };
+  }
+  if (hasNext === false || nextPage === null || (totalPages !== undefined && totalPages !== null && cursor.page === totalPages)) {
+    return { complete: true, completionReason: rowsLength === 0 && cursor.page === 1 ? 'explicit_empty_scope' : 'end_of_collection' };
+  }
+  if (totalPages && cursor.page < totalPages) {
+    return { complete: false, nextCursor: advancePageCursor(cursor, cursor.page + 1) };
+  }
+  if (rowsLength === 0) {
+    throw new ProviderAcquisitionError('pagination_termination_unproven', 'Page vide sans preuve de terminaison.');
+  }
+  return { complete: false, nextCursor: advancePageCursor(cursor, cursor.page + 1) };
+}
+
+export interface ProviderCursorInvalidationEvidence {
+  readonly kind: 'provider_cursor_rejected';
+  readonly providerCode: string;
+}
+
+export function seasonRestartAfterCursorInvalidation<Raw, Cursor extends JsonObject>(input: {
+  season: number;
+  initialCursor: Cursor;
+  evidence: ProviderCursorInvalidationEvidence;
+  requestCount: number;
+}): FetchWorkUnitResult<Raw, Cursor> {
+  if (!input.evidence.providerCode.trim()) {
+    throw new ProviderAcquisitionError('cursor_invalidation_unproven', 'Preuve fournisseur d’invalidation absente.');
+  }
+  return {
+    status: 'cursor_invalid', items: [], itemAnomalies: [], nextCursor: input.initialCursor,
+    requestCount: input.requestCount, complete: false, completionReason: null,
+    safeRestart: { scope: 'season', season: input.season }
+  };
 }
 
 export function providerRows(payload: unknown, keys: readonly string[]): readonly unknown[] {
