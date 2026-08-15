@@ -7,7 +7,7 @@ import type { Clock } from './schedulerService.js';
 import { PersistentSchedulerService, systemClock } from './schedulerService.js';
 import { sanitizeProviderSourceData } from './sourceStorage.js';
 
-type WorkClass='current_hot'|'finalization'|'recent_catchup'|'deep_history';
+type WorkClass='current_global'|'finalization'|'recent_catchup'|'deep_history';
 type Lease={streamId:string;runId:string;workerId:string;generation:number};
 type UnitContext={providerInstanceId:string;providerChampionshipId:string;season:number;workClass:WorkClass;safeUnitKey:string;lease:Lease};
 export type PersistedTraversalTotals={traversalId:string;receivedItems:number;validItems:number;complete:boolean};
@@ -73,10 +73,9 @@ export class AcquisitionTransactionService{
     await client.query(`update provider_source_entities child set parent_source_entity_id=parent.id from provider_source_entities parent where child.provider_championship_id=$1 and child.parent_external_id is not null and child.parent_entity_kind is not null and parent.provider_championship_id=child.provider_championship_id and parent.entity_kind=child.parent_entity_kind and parent.external_id=child.parent_external_id and child.parent_source_entity_id is distinct from parent.id`,[input.providerChampionshipId]);
     for(const anomaly of input.result.itemAnomalies)await this.upsertAnomaly(client,input.providerChampionshipId,anomaly,now);
     const complete=input.result.complete;
-    const totals=(await client.query(`update provider_acquisition_traversals set status=case when $2::boolean then 'complete' else 'running' end,complete=$2,received_items=received_items+$3,valid_items=valid_items+$4,anomaly_items=anomaly_items+$5,finished_at=case when $2 then $6::timestamptz else null end where id=$1 and run_id=$7 and lease_generation=$8 and complete=false returning received_items,valid_items`,[input.traversalId,complete,input.result.items.length+input.result.itemAnomalies.length,input.result.items.length,input.result.itemAnomalies.length,now,input.lease.runId,input.lease.generation])).rows[0];
+    const totals=(await client.query(`update provider_acquisition_traversals set status=case when $2::boolean and received_items+$3=0 then 'empty_confirmed' when $2::boolean then 'complete' else 'running' end,complete=$2,received_items=received_items+$3,valid_items=valid_items+$4,anomaly_items=anomaly_items+$5,finished_at=case when $2 then $6::timestamptz else null end where id=$1 and run_id=$7 and lease_generation=$8 and complete=false returning received_items,valid_items`,[input.traversalId,complete,input.result.items.length+input.result.itemAnomalies.length,input.result.items.length,input.result.itemAnomalies.length,now,input.lease.runId,input.lease.generation])).rows[0];
     if(!totals)throw new Error('Traversal déjà clos.');
     if(complete){
-      if(Number(totals.received_items)===0)await client.query(`update provider_acquisition_traversals set status='empty_confirmed' where id=$1 and run_id=$2 and lease_generation=$3`,[input.traversalId,input.lease.runId,input.lease.generation]);
       await client.query(`insert into provider_source_observations(traversal_id,source_entity_id,observation_kind,observed_at) select $1,entity.id,'not_observed',$4 from provider_source_entities entity where entity.provider_championship_id=$2 and entity.season=$3 and not exists(select 1 from provider_source_observations observed where observed.traversal_id=$1 and observed.source_entity_id=entity.id and observed.observation_kind='present') on conflict(traversal_id,source_entity_id) do nothing`,[input.traversalId,input.providerChampionshipId,input.season,now]);
     }
     await input.afterPersist?.(client,input.result,{traversalId:input.traversalId,receivedItems:Number(totals.received_items),validItems:Number(totals.valid_items),complete});
