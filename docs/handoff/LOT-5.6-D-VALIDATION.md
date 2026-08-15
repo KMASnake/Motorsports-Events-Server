@@ -1,7 +1,7 @@
 # Lot 5.6-D — Orchestration durable
 
 Date : 2026-08-15  
-Statut : **IMPLÉMENTÉ — AUDIT MAINTENEUR REQUIS**
+Statut : **CORRIGÉ — RÉ-AUDIT MAINTENEUR REQUIS**
 
 ## Périmètre livré
 
@@ -31,6 +31,24 @@ Le changement d’état d’orchestration est exécuté par le callback `afterPe
 dans la même transaction que les entités, observations, traversal, fencing et
 checkpoint 5.6-C. Aucun moteur HTTP, quota, scheduler ou normalisateur parallèle
 n’est introduit.
+
+## Corrections après audit
+
+- les providers ne documentant aucun scope temporel, l’approche B validée est
+  appliquée : un unique traversal `current_global` acquiert tout le futur, puis
+  la migration additive `0020_lot56_current_refresh_scope` persiste pour chaque
+  entité son périmètre `past`, `current_hot` ou `current_future` ; aucun second
+  appel identique n’est effectué sous un label future ;
+- `afterPersist` reçoit désormais les compteurs cumulés durables du traversal.
+  Une dernière page vide après 75 éléments ne peut donc plus déclarer la saison
+  vide ;
+- deep history impose `state.deep_history_season`, tandis que current,
+  finalization et recent catchup imposent l’année civile courante du fuseau
+  fournisseur. Toute contradiction est refusée avant traversal et appel au
+  quota gate ;
+- finalization n’est choisie que pour une entité non terminée dont la fin
+  théorique est passée mais reste dans la fenêtre de grâce. Une entité terminée
+  ou déjà au-delà de la grâce ne provoque aucun rafraîchissement inutile.
 
 ## Matrice de preuves (30 scénarios)
 
@@ -73,7 +91,9 @@ n’est introduit.
 - `./scripts/validate-repository.sh` : PASS (51 tests historiques, 18 ignorés
   faute de dépendances Python optionnelles) ;
 - `./scripts/test-lot56-orchestration.sh` : PASS, PostgreSQL réel jetable et
-  migration `0019` en up/down/up ;
+  migrations `0019`/`0020` en up/down/up ;
+- `./scripts/test-lot56-acquisition.sh` : **72/72 PASS**, adaptateurs et sécurité
+  5.6-B ;
 - `./scripts/test-lot56-transaction.sh` : PASS, transaction/fencing 5.6-C ;
 - `./scripts/test-lot56-foundations.sh` : PASS, fondations/sécurité 5.6-A.
 

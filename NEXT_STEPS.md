@@ -24,6 +24,11 @@
 - [x] estimer les fins avec provenance, fuseau fournisseur et dates pré-1970 ;
 - [x] créer l’anomalie de finalisation sans modifier le statut métier ;
 - [x] valider migration 0019, PostgreSQL, transaction/fencing et 200 tests API ;
+- [x] corriger les périmètres current réels sans parcours fournisseur dupliqué ;
+- [x] baser le vide historique sur les totaux cumulés du traversal ;
+- [x] dériver saison et phase avant tout appel fournisseur/quota ;
+- [x] conditionner finalization à une cible réellement éligible ;
+- [x] valider la migration additive 0020 et toutes les suites 5.6-A/B/C/D ;
 - [ ] obtenir l’audit mainteneur explicite avant 5.6-E.
 
 Point d'arrêt obligatoire : ne commencer ni le sous-lot 5.6-E, ni aucune

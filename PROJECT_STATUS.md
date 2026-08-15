@@ -1,6 +1,6 @@
 # État du projet
 
-## Lot 5.6-D — candidat à l’audit mainteneur (15 août 2026)
+## Lot 5.6-D — corrections d’audit en attente de ré-audit (15 août 2026)
 
 Le sous-lot 5.6-C est validé par le mainteneur. L’orchestrateur durable 5.6-D
 enchaîne `current_hot`, `current_future`, `recent_catchup`, `deep_history` et
@@ -20,6 +20,14 @@ créée sans forcer le statut métier.
 
 Preuve : `docs/handoff/LOT-5.6-D-VALIDATION.md`. STOP avant 5.6-E ; le Lot 5.6
 global reste non validé, non fusionnable, et les Lots 5.7+ restent interdits.
+
+Les corrections d’audit utilisent désormais un unique parcours current global,
+seule capacité documentée des fournisseurs, puis persistent le périmètre réel
+`past`, `current_hot` ou `current_future` de chaque entité via la migration
+`0020`. Le millésime et la phase sont dérivés de l’état durable avant toute
+requête. La décision « saison vide » repose sur les compteurs cumulés du
+traversal complet. Enfin, finalization n’est sélectionné que lorsqu’une entité
+non terminée se trouve réellement dans sa fenêtre de grâce.
 
 ## Lot 5.6-C — validé par le mainteneur (15 août 2026)
 
