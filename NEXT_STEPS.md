@@ -14,6 +14,7 @@
 - [x] implémenter la transaction d’unité, l’upsert et le journal source ;
 - [x] avancer le checkpoint uniquement dans le commit durable avec fencing ;
 - [x] prouver rollback, crash/rejeu, anomalies, observations et overrides ;
+- [x] corriger traversal multi-pages, clôture des échecs, temporalité et parents durables ;
 - [ ] obtenir l’audit mainteneur explicite avant 5.6-D.
 
 Point d'arrêt obligatoire : ne commencer ni l’orchestration durable 5.6-D,

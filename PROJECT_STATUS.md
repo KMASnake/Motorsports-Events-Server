@@ -1,15 +1,17 @@
 # État du projet
 
-## Lot 5.6-C — moteur transactionnel en attente d’audit (15 août 2026)
+## Lot 5.6-C — corrections d’audit en attente de ré-audit (15 août 2026)
 
 Le sous-lot 5.6-B est validé par le mainteneur. Le moteur 5.6-C relie les
 fondations PostgreSQL 5.6-A aux adaptateurs 5.6-B via la transaction de commit
 du scheduler 5.4. Entités, observations, anomalies, journal source et checkpoint
 sont cohérents avec le fencing et la lease au moment du commit.
 
-La recette PostgreSQL jetable couvre les 18 scénarios obligatoires : commit,
-rejeu, changement, anomalies, rollback, crash, fencing, lease, curseur,
-complétude, overrides concurrents, dates historiques, secrets et agrégation.
+La migration additive `0017` conserve les parents source tardifs et typés. Un
+traversal logique couvre désormais toutes ses pages, cumule les présences et
+ne déduit les absences qu’à terminaison certaine. Les échecs interceptables et
+les traversals orphelins sont clos sans complétude ni checkpoint. Les dates
+`strTimestamp` sont classées en début et les dates historiques restent valides.
 STOP avant 5.6-D ; le Lot 5.6 global reste non validé et non fusionnable.
 
 ## Lot 5.6-B — validé par le mainteneur (15 août 2026)
