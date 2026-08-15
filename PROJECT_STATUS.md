@@ -1,6 +1,18 @@
 # État du projet
 
-## Lot 5.6-B — candidat validable par le mainteneur (15 août 2026)
+## Lot 5.6-C — moteur transactionnel en attente d’audit (15 août 2026)
+
+Le sous-lot 5.6-B est validé par le mainteneur. Le moteur 5.6-C relie les
+fondations PostgreSQL 5.6-A aux adaptateurs 5.6-B via la transaction de commit
+du scheduler 5.4. Entités, observations, anomalies, journal source et checkpoint
+sont cohérents avec le fencing et la lease au moment du commit.
+
+La recette PostgreSQL jetable couvre les 18 scénarios obligatoires : commit,
+rejeu, changement, anomalies, rollback, crash, fencing, lease, curseur,
+complétude, overrides concurrents, dates historiques, secrets et agrégation.
+STOP avant 5.6-D ; le Lot 5.6 global reste non validé et non fusionnable.
+
+## Lot 5.6-B — validé par le mainteneur (15 août 2026)
 
 Le sous-lot 5.6-A est validé par le mainteneur. Les contrats d'acquisition,
 la pagination bornée, la complétude explicite, l'isolation des anomalies et la
@@ -16,7 +28,8 @@ Les corrections d’audit attribuent au WRC la stratégie saisonnière OCBlackTo
 refusent toute complétude issue d’une page vide contradictoire, réservent
 `cursor_invalid` aux preuves fournisseur explicites et conservent TheSportsDB
 v1 selon l’exception mainteneur ADR-0020. La stratégie v2 fantôme est refusée.
-Le sous-lot est candidat à la validation finale du mainteneur.
+Le sous-lot a reçu la validation finale du mainteneur et autorise uniquement
+le démarrage de 5.6-C.
 
 ## Lot 5.4 — candidat à l'audit mainteneur (12 août 2026)
 

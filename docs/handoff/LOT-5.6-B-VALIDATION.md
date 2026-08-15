@@ -1,7 +1,7 @@
 # Lot 5.6-B — Acquisition adaptateur sécurisée
 
 Date : 2026-08-15  
-Statut : **CANDIDAT VALIDABLE PAR LE MAINTENEUR**
+Statut : **VALIDÉ PAR LE MAINTENEUR**
 
 ## Périmètre livré
 
@@ -88,6 +88,5 @@ persistance des anomalies ne sont pas revendiqués ici : ils appartiennent à
 
 ## Gate
 
-STOP avant 5.6-C. Le Lot 5.6 global reste non validé, non clôturé et non
-fusionnable. `authorized_sub_lot` reste `5.6` et les Lots 5.7+ restent
-interdits.
+Validation mainteneur : PASS le 2026-08-15. Seul 5.6-C a été autorisé. Le Lot
+5.6 global reste non validé, non clôturé et non fusionnable.

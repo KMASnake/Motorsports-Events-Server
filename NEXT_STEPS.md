@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur Lot 5.6-B
+## Priorité courante — audit mainteneur Lot 5.6-C
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -10,9 +10,13 @@
 - [x] valider API, sécurité, Docker et non-régression PostgreSQL 5.6-A ;
 - [x] corriger les constats WRC, pagination, TheSportsDB et cursor invalid ;
 - [x] refuser explicitement la stratégie TheSportsDB v2 non implémentée ;
-- [ ] obtenir la validation finale explicite du mainteneur avant 5.6-C.
+- [x] obtenir la validation finale explicite du mainteneur de 5.6-B ;
+- [x] implémenter la transaction d’unité, l’upsert et le journal source ;
+- [x] avancer le checkpoint uniquement dans le commit durable avec fencing ;
+- [x] prouver rollback, crash/rejeu, anomalies, observations et overrides ;
+- [ ] obtenir l’audit mainteneur explicite avant 5.6-D.
 
-Point d'arrêt obligatoire : ne commencer ni le moteur transactionnel 5.6-C,
+Point d'arrêt obligatoire : ne commencer ni l’orchestration durable 5.6-D,
 ni aucune fonctionnalité 5.7+ avant décision explicite du mainteneur.
 
 ## Priorité courante — audit mainteneur Lot 5.4
