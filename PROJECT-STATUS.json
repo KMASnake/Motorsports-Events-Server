@@ -15,7 +15,7 @@
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
     "status": "sub-lot-5.6-c-corrected-awaiting-maintainer-reaudit",
-    "reason": "Lots 5.6-A and 5.6-B are maintainer-validated. The 5.6-C audit corrections cover logical multi-page traversals, failure/orphan closure, temporal classification and durable typed parent references through migration 0017. STOP before 5.6-D. Lot 5.7+ remain unauthorized."
+    "reason": "Lots 5.6-A and 5.6-B are maintainer-validated. The 5.6-C audit corrections cover logical multi-page traversals, failure/orphan closure, temporal classification, durable typed parent references and run plus lease-generation traversal fencing through migration 0018. STOP before 5.6-D. Lot 5.7+ remain unauthorized."
   },
   "working_lot": {
     "lot": "5",

@@ -12,6 +12,9 @@ traversal logique couvre désormais toutes ses pages, cumule les présences et
 ne déduit les absences qu’à terminaison certaine. Les échecs interceptables et
 les traversals orphelins sont clos sans complétude ni checkpoint. Les dates
 `strTimestamp` sont classées en début et les dates historiques restent valides.
+La migration `0018` ajoute le fencing durable `run_id + lease_generation` : un
+worker stale ne peut plus fermer un traversal repris ni créer une anomalie
+tardive. La course PostgreSQL A/B correspondante est validée.
 STOP avant 5.6-D ; le Lot 5.6 global reste non validé et non fusionnable.
 
 ## Lot 5.6-B — validé par le mainteneur (15 août 2026)

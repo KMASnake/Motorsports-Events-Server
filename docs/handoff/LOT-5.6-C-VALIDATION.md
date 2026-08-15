@@ -24,11 +24,18 @@ stale ou une lease perdue ne laisse ni entité partielle ni checkpoint avancé.
 Un `cursor_invalid` conserve le checkpoint et passe par le mécanisme d’échec
 transitoire 5.4.
 
-La récupération 5.4 clôt aussi comme `failed` les traversals `running` dont la
+La récupération 5.4 clôt aussi comme `partial` les traversals `running` dont la
 lease a expiré, sans créer de preuve de complétude. La migration additive
 `0017_lot56_durable_parent_reference` conserve la référence parent externe et
 son type jusqu’à ce que le parent exact soit observable dans le même périmètre.
 `strTimestamp` est exclusivement une date de début ; aucune fin n’est inventée.
+
+La migration additive `0018_lot56_traversal_fencing` persiste la génération de
+lease. Toute ouverture, reprise ou clôture hors commit exige désormais le
+couple courant `run_id + lease_generation`. Après récupération, un traversal
+orphelin devient `partial` et seul son nouveau propriétaire peut le reprendre ;
+un retour tardif de l’ancien worker est un no-op sur le traversal et ses
+anomalies.
 
 ## Overrides
 
@@ -46,6 +53,8 @@ Commande : `./scripts/test-lot56-transaction.sh`
 - clôture des échecs interceptables et récupération d’un traversal orphelin : PASS ;
 - parents tardifs, typés, cross-scope refusés et rejeu idempotent : PASS ;
 - `strTimestamp`, fin explicite et dates 1900/1950/1969 : PASS ;
+- course PostgreSQL A/B avec retour fournisseur tardif de A : PASS ;
+- migrations jusqu’à `0018` et non-régression fondations 5.6-A : PASS ;
 - typecheck API : PASS ;
 - build API : PASS ;
 - suite API complète : 191/191 PASS ;

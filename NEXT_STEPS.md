@@ -15,6 +15,7 @@
 - [x] avancer le checkpoint uniquement dans le commit durable avec fencing ;
 - [x] prouver rollback, crash/rejeu, anomalies, observations et overrides ;
 - [x] corriger traversal multi-pages, clôture des échecs, temporalité et parents durables ;
+- [x] fencer l’ownership des traversals et valider la course stale A / nouveau B ;
 - [ ] obtenir l’audit mainteneur explicite avant 5.6-D.
 
 Point d'arrêt obligatoire : ne commencer ni l’orchestration durable 5.6-D,
