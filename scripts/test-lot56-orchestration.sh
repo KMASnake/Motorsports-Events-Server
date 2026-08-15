@@ -11,6 +11,7 @@ cleanup
 echo 'Démarrage PostgreSQL jetable Lot 5.6-D...'
 docker compose up -d --wait postgres >/dev/null
 docker compose run --rm migrate >/dev/null
+docker compose run --rm migrate sh /migrations/migrate.sh down 0020_lot56_current_refresh_scope >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0019_lot56_durable_orchestration >/dev/null
 docker compose run --rm migrate >/dev/null
 docker run --rm --network "${PROJECT}_default" -e DATABASE_URL="$DATABASE_URL" -v "$PWD":/source:ro -w /tmp/project node:22-alpine sh -lc '

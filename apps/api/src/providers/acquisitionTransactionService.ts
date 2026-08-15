@@ -7,9 +7,10 @@ import type { Clock } from './schedulerService.js';
 import { PersistentSchedulerService, systemClock } from './schedulerService.js';
 import { sanitizeProviderSourceData } from './sourceStorage.js';
 
-type WorkClass='current_hot'|'current_future'|'finalization'|'recent_catchup'|'deep_history';
+type WorkClass='current_hot'|'finalization'|'recent_catchup'|'deep_history';
 type Lease={streamId:string;runId:string;workerId:string;generation:number};
 type UnitContext={providerInstanceId:string;providerChampionshipId:string;season:number;workClass:WorkClass;safeUnitKey:string;lease:Lease};
+export type PersistedTraversalTotals={traversalId:string;receivedItems:number;validItems:number;complete:boolean};
 
 const canonical=(value:unknown):unknown=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).sort(([left],[right])=>left.localeCompare(right)).map(([key,nested])=>[key,canonical(nested)])):value;
 const hash=(value:JsonObject)=>createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
@@ -28,7 +29,7 @@ export class AcquisitionTransactionService{
     fetchInput:FetchWorkUnitInput<P,S,C>;
     traversalId?:string;
     beforeCommit?:()=>Promise<void>;
-    afterPersist?:(client:PoolClient,result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>)=>Promise<void>;
+    afterPersist?:(client:PoolClient,result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>,totals:PersistedTraversalTotals)=>Promise<void>;
   }){
     const traversalId=input.traversalId??randomUUID();
     if(input.traversalId){
@@ -57,7 +58,7 @@ export class AcquisitionTransactionService{
     return {traversalId,result,checkpointAdvanced:true};
   }
 
-  private async persistUnit<C extends JsonObject>(client:PoolClient,input:UnitContext&{traversalId:string;result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>;afterPersist?:(client:PoolClient,result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>)=>Promise<void>}){
+  private async persistUnit<C extends JsonObject>(client:PoolClient,input:UnitContext&{traversalId:string;result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>;afterPersist?:(client:PoolClient,result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>,totals:PersistedTraversalTotals)=>Promise<void>}){
     const now=this.clock.now();
     for(const item of input.result.items){
       if(Boolean(item.parentExternalId)!==Boolean(item.parentEntityKind))throw new Error('Référence parent source incomplète.');
@@ -78,7 +79,7 @@ export class AcquisitionTransactionService{
       if(Number(totals.received_items)===0)await client.query(`update provider_acquisition_traversals set status='empty_confirmed' where id=$1 and run_id=$2 and lease_generation=$3`,[input.traversalId,input.lease.runId,input.lease.generation]);
       await client.query(`insert into provider_source_observations(traversal_id,source_entity_id,observation_kind,observed_at) select $1,entity.id,'not_observed',$4 from provider_source_entities entity where entity.provider_championship_id=$2 and entity.season=$3 and not exists(select 1 from provider_source_observations observed where observed.traversal_id=$1 and observed.source_entity_id=entity.id and observed.observation_kind='present') on conflict(traversal_id,source_entity_id) do nothing`,[input.traversalId,input.providerChampionshipId,input.season,now]);
     }
-    await input.afterPersist?.(client,input.result);
+    await input.afterPersist?.(client,input.result,{traversalId:input.traversalId,receivedItems:Number(totals.received_items),validItems:Number(totals.valid_items),complete});
   }
 
   private async upsertAnomaly(client:PoolClient,providerChampionshipId:string,anomaly:ProviderItemAnomaly,now:Date){
