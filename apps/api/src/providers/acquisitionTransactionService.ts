@@ -18,6 +18,7 @@ const temporal=(data:JsonObject)=>({
   started:date(data.starts_at??data.start_at??data.strTimestamp??data.dateEvent??data.date),
   ended:date(data.ends_at??data.end_at)
 });
+const staleWorker=()=>Object.assign(new Error('stale_worker'),{statusCode:409});
 
 export class AcquisitionTransactionService{
   constructor(readonly scheduler=new PersistentSchedulerService(),readonly clock:Clock=systemClock){}
@@ -30,14 +31,17 @@ export class AcquisitionTransactionService{
   }){
     const traversalId=input.traversalId??randomUUID();
     if(input.traversalId){
-      const resumed=(await pool.query(`update provider_acquisition_traversals set run_id=$2 where id=$1 and stream_id=$3 and work_class=$4 and season=$5 and safe_unit_key=$6 and status='running' and complete=false returning id`,[traversalId,input.lease.runId,input.lease.streamId,input.workClass,input.season,input.safeUnitKey])).rowCount;
-      if(!resumed)throw new Error('Traversal fournisseur absent, clos ou hors périmètre.');
-    }else await pool.query(`insert into provider_acquisition_traversals(id,stream_id,run_id,work_class,season,safe_unit_key) values($1,$2,$3,$4,$5,$6)`,[traversalId,input.lease.streamId,input.lease.runId,input.workClass,input.season,input.safeUnitKey]);
+      const resumed=(await pool.query(`update provider_acquisition_traversals traversal set run_id=$2,lease_generation=$7,status='running',finished_at=null from sync_streams stream,sync_runs run where traversal.id=$1 and traversal.stream_id=$3 and traversal.work_class=$4 and traversal.season=$5 and traversal.safe_unit_key=$6 and traversal.status in('running','partial') and traversal.complete=false and stream.id=traversal.stream_id and stream.lease_owner=$8 and stream.lease_generation=$7 and stream.lease_expires_at>$9 and run.id=$2 and run.stream_id=stream.id and run.worker_id=$8 and run.lease_generation=$7 and run.status='running' returning traversal.id`,[traversalId,input.lease.runId,input.lease.streamId,input.workClass,input.season,input.safeUnitKey,input.lease.generation,input.lease.workerId,this.clock.now()])).rowCount;
+      if(!resumed)throw staleWorker();
+    }else{
+      const created=(await pool.query(`insert into provider_acquisition_traversals(id,stream_id,run_id,lease_generation,work_class,season,safe_unit_key) select $1,stream.id,$2,$7,$4,$5,$6 from sync_streams stream join sync_runs run on run.id=$2 and run.stream_id=stream.id and run.worker_id=$8 and run.lease_generation=$7 and run.status='running' where stream.id=$3 and stream.lease_owner=$8 and stream.lease_generation=$7 and stream.lease_expires_at>$9 returning id`,[traversalId,input.lease.runId,input.lease.streamId,input.workClass,input.season,input.safeUnitKey,input.lease.generation,input.lease.workerId,this.clock.now()])).rowCount;
+      if(!created)throw staleWorker();
+    }
     let result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>;
     try{result=await input.adapter.fetchWorkUnit(input.fetchInput);}
-    catch(error){await this.recordBlockingFailure(traversalId,input.providerChampionshipId,error);await this.scheduler.fail({...input.lease,durable:true,code:error instanceof ProviderAcquisitionError?error.anomaly.code:'acquisition_failed'});throw error;}
+    catch(error){await this.recordBlockingFailure(traversalId,input.providerChampionshipId,error,input.lease);await this.scheduler.fail({...input.lease,durable:true,code:error instanceof ProviderAcquisitionError?error.anomaly.code:'acquisition_failed'});throw error;}
     if(result.status==='cursor_invalid'){
-      await pool.query(`update provider_acquisition_traversals set status='partial',received_items=$2,valid_items=$3,anomaly_items=$4,finished_at=$5 where id=$1`,[traversalId,result.items.length+result.itemAnomalies.length,result.items.length,result.itemAnomalies.length,this.clock.now()]);
+      await pool.query(`update provider_acquisition_traversals set status='partial',received_items=$2,valid_items=$3,anomaly_items=$4,finished_at=$5 where id=$1 and run_id=$6 and lease_generation=$7 and complete=false`,[traversalId,result.items.length+result.itemAnomalies.length,result.items.length,result.itemAnomalies.length,this.clock.now(),input.lease.runId,input.lease.generation]);
       await this.scheduler.fail({...input.lease,durable:false,code:'cursor_invalid'});
       return {traversalId,result,checkpointAdvanced:false};
     }
@@ -48,7 +52,7 @@ export class AcquisitionTransactionService{
         cursorAfter:result.nextCursor,
         apply:client=>this.persistUnit(client,{...input,traversalId,result})
       });
-    }catch(error){await this.closeTraversalFailure(traversalId);throw error;}
+    }catch(error){await this.closeTraversalFailure(traversalId,input.lease);throw error;}
     return {traversalId,result,checkpointAdvanced:true};
   }
 
@@ -67,10 +71,10 @@ export class AcquisitionTransactionService{
     await client.query(`update provider_source_entities child set parent_source_entity_id=parent.id from provider_source_entities parent where child.provider_championship_id=$1 and child.parent_external_id is not null and child.parent_entity_kind is not null and parent.provider_championship_id=child.provider_championship_id and parent.entity_kind=child.parent_entity_kind and parent.external_id=child.parent_external_id and child.parent_source_entity_id is distinct from parent.id`,[input.providerChampionshipId]);
     for(const anomaly of input.result.itemAnomalies)await this.upsertAnomaly(client,input.providerChampionshipId,anomaly,now);
     const complete=input.result.complete;
-    const totals=(await client.query(`update provider_acquisition_traversals set status=case when $2::boolean then 'complete' else 'running' end,complete=$2,received_items=received_items+$3,valid_items=valid_items+$4,anomaly_items=anomaly_items+$5,finished_at=case when $2 then $6::timestamptz else null end where id=$1 and complete=false returning received_items,valid_items`,[input.traversalId,complete,input.result.items.length+input.result.itemAnomalies.length,input.result.items.length,input.result.itemAnomalies.length,now])).rows[0];
+    const totals=(await client.query(`update provider_acquisition_traversals set status=case when $2::boolean then 'complete' else 'running' end,complete=$2,received_items=received_items+$3,valid_items=valid_items+$4,anomaly_items=anomaly_items+$5,finished_at=case when $2 then $6::timestamptz else null end where id=$1 and run_id=$7 and lease_generation=$8 and complete=false returning received_items,valid_items`,[input.traversalId,complete,input.result.items.length+input.result.itemAnomalies.length,input.result.items.length,input.result.itemAnomalies.length,now,input.lease.runId,input.lease.generation])).rows[0];
     if(!totals)throw new Error('Traversal déjà clos.');
     if(complete){
-      if(Number(totals.received_items)===0)await client.query(`update provider_acquisition_traversals set status='empty_confirmed' where id=$1`,[input.traversalId]);
+      if(Number(totals.received_items)===0)await client.query(`update provider_acquisition_traversals set status='empty_confirmed' where id=$1 and run_id=$2 and lease_generation=$3`,[input.traversalId,input.lease.runId,input.lease.generation]);
       await client.query(`insert into provider_source_observations(traversal_id,source_entity_id,observation_kind,observed_at) select $1,entity.id,'not_observed',$4 from provider_source_entities entity where entity.provider_championship_id=$2 and entity.season=$3 and not exists(select 1 from provider_source_observations observed where observed.traversal_id=$1 and observed.source_entity_id=entity.id and observed.observation_kind='present') on conflict(traversal_id,source_entity_id) do nothing`,[input.traversalId,input.providerChampionshipId,input.season,now]);
     }
   }
@@ -80,12 +84,12 @@ export class AcquisitionTransactionService{
     await client.query(`insert into provider_acquisition_anomalies(id,provider_championship_id,anomaly_key,anomaly_type,scope,details,first_seen_at,last_seen_at) values($1,$2,$3,$4,'entity',$5::jsonb,$6,$6) on conflict(provider_championship_id,anomaly_key) where state='active' do update set last_seen_at=excluded.last_seen_at,occurrence_count=provider_acquisition_anomalies.occurrence_count+1,details=excluded.details,updated_at=excluded.last_seen_at`,[randomUUID(),providerChampionshipId,key,anomaly.code,JSON.stringify({index:anomaly.index,external_id:anomaly.externalId,message:anomaly.message}),now]);
   }
 
-  private async recordBlockingFailure(traversalId:string,providerChampionshipId:string,error:unknown){
+  private async recordBlockingFailure(traversalId:string,providerChampionshipId:string,error:unknown,lease:Lease){
     const now=this.clock.now(),code=error instanceof ProviderAcquisitionError?error.anomaly.code:'acquisition_failed';
-    const client=await pool.connect();try{await client.query('begin');await client.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1`,[traversalId,now]);await client.query(`insert into provider_acquisition_anomalies(id,provider_championship_id,anomaly_key,anomaly_type,scope,details,first_seen_at,last_seen_at) values($1,$2,$3,$3,'stream','{}',$4,$4) on conflict(provider_championship_id,anomaly_key) where state='active' do update set last_seen_at=excluded.last_seen_at,occurrence_count=provider_acquisition_anomalies.occurrence_count+1,updated_at=excluded.last_seen_at`,[randomUUID(),providerChampionshipId,`stream:${code}`,now]);await client.query('commit');}catch(failure){await client.query('rollback');throw failure;}finally{client.release();}
+    const client=await pool.connect();try{await client.query('begin');const owned=await client.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false returning id`,[traversalId,now,lease.runId,lease.generation]);if(owned.rowCount)await client.query(`insert into provider_acquisition_anomalies(id,provider_championship_id,anomaly_key,anomaly_type,scope,details,first_seen_at,last_seen_at) values($1,$2,$3,$3,'stream','{}',$4,$4) on conflict(provider_championship_id,anomaly_key) where state='active' do update set last_seen_at=excluded.last_seen_at,occurrence_count=provider_acquisition_anomalies.occurrence_count+1,updated_at=excluded.last_seen_at`,[randomUUID(),providerChampionshipId,`stream:${code}`,now]);await client.query('commit');}catch(failure){await client.query('rollback');throw failure;}finally{client.release();}
   }
 
-  private async closeTraversalFailure(traversalId:string){
-    await pool.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and complete=false`,[traversalId,this.clock.now()]);
+  private async closeTraversalFailure(traversalId:string,lease:Lease){
+    await pool.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false`,[traversalId,this.clock.now(),lease.runId,lease.generation]);
   }
 }

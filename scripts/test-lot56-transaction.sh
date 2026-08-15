@@ -14,6 +14,7 @@ cleanup
 echo 'Démarrage PostgreSQL jetable Lot 5.6-C...'
 docker compose up -d --wait postgres >/dev/null
 docker compose run --rm migrate >/dev/null
+docker compose run --rm migrate sh /migrations/migrate.sh down 0018_lot56_traversal_fencing >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0017_lot56_durable_parent_reference >/dev/null
 docker compose run --rm migrate >/dev/null
 docker run --rm --network "${PROJECT}_default" \

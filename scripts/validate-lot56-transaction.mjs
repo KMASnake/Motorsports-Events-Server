@@ -85,21 +85,56 @@ try{
   const staleLease=await lease();await pool.query('update sync_streams set lease_generation=lease_generation+1 where id=$1',[streamId]);
   await assert.rejects(()=>service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'stale',lease:staleLease,adapter:adapter(result([item('stale-item')],8)),fetchInput}),/stale_worker/);
   assert.equal(Number((await scalar("select count(*) count from provider_source_entities where external_id='stale-item'")).count),0);
-  assert.equal((await scalar("select status from provider_acquisition_traversals where safe_unit_key='stale'")).status,'failed');
+  assert.equal(Number((await scalar("select count(*) count from provider_acquisition_traversals where safe_unit_key='stale'")).count),0);
   console.log('Fencing stale refuse commit et checkpoint : OK');
 
   await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
   const lostLease=await lease();await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);
   await assert.rejects(()=>service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'lost',lease:lostLease,adapter:adapter(result([item('lost-item')],8)),fetchInput}),/stale_worker/);
-  assert.equal((await scalar("select status from provider_acquisition_traversals where safe_unit_key='lost'")).status,'failed');
+  assert.equal(Number((await scalar("select count(*) count from provider_acquisition_traversals where safe_unit_key='lost'")).count),0);
   console.log('Lease perdue refuse commit : OK');
 
   await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
   const orphanLease=await lease();
-  await pool.query(`insert into provider_acquisition_traversals(id,stream_id,run_id,work_class,season,safe_unit_key) values('56c00000-0000-0000-0000-000000000099',$1,$2,'current_future',2026,'orphaned-process')`,[streamId,orphanLease.runId]);
+  await pool.query(`insert into provider_acquisition_traversals(id,stream_id,run_id,lease_generation,work_class,season,safe_unit_key) values('56c00000-0000-0000-0000-000000000099',$1,$2,$3,'current_future',2026,'orphaned-process')`,[streamId,orphanLease.runId,orphanLease.generation]);
   await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
-  assert.deepEqual(await scalar("select status,complete from provider_acquisition_traversals where safe_unit_key='orphaned-process'"),{status:'failed',complete:false});
+  assert.deepEqual(await scalar("select status,complete from provider_acquisition_traversals where safe_unit_key='orphaned-process'"),{status:'partial',complete:false});
   console.log('Récupération lease : traversal orphelin clos sans complétude : OK');
+
+  const raceLeaseA=await lease();let rejectA;
+  const delayedA=new Promise((_,reject)=>{rejectA=reject;});
+  const staleA=service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'race-a-b',lease:raceLeaseA,adapter:adapter(delayedA),fetchInput});
+  let raceTraversal;
+  for(let attempt=0;attempt<20&&!raceTraversal;attempt++){await new Promise(resolve=>setTimeout(resolve,25));raceTraversal=(await pool.query("select id from provider_acquisition_traversals where safe_unit_key='race-a-b'")).rows[0]?.id;}
+  assert(raceTraversal);
+  await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
+  const raceLeaseB=await lease();let releaseB;const holdB=new Promise(resolve=>{releaseB=resolve;});
+  const currentB=service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'race-a-b',traversalId:raceTraversal,lease:raceLeaseB,adapter:adapter(result([item('race-b')],30,true)),fetchInput,beforeCommit:()=>holdB});
+  for(let attempt=0;attempt<20;attempt++){const owner=await scalar('select run_id from provider_acquisition_traversals where id=$1',[raceTraversal]);if(owner.run_id===raceLeaseB.runId)break;await new Promise(resolve=>setTimeout(resolve,25));}
+  const staleAssertion=assert.rejects(()=>staleA,/stale_worker/);
+  rejectA(new ProviderAcquisitionError('late-a-failure','Late A provider failure'));
+  await staleAssertion;
+  const duringRace=await scalar('select run_id,lease_generation,status,complete from provider_acquisition_traversals where id=$1',[raceTraversal]);
+  assert.deepEqual(duringRace,{run_id:raceLeaseB.runId,lease_generation:String(raceLeaseB.generation),status:'running',complete:false});
+  assert.equal(Number((await scalar("select count(*) count from provider_acquisition_anomalies where anomaly_key='stream:late-a-failure'")).count),0);
+  releaseB();await currentB;
+  assert.deepEqual(await scalar('select run_id,lease_generation,status,complete from provider_acquisition_traversals where id=$1',[raceTraversal]),{run_id:raceLeaseB.runId,lease_generation:String(raceLeaseB.generation),status:'complete',complete:true});
+  assert.equal(Number((await scalar("select count(*) count from provider_source_observations where traversal_id=$1 and observation_kind='present'",[raceTraversal])).count),1);
+  const commitLeaseA=await lease();let resolveCommitA;
+  const delayedCommitA=new Promise(resolve=>{resolveCommitA=resolve;});
+  const staleCommitA=service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'race-commit-a-b',lease:commitLeaseA,adapter:adapter(delayedCommitA),fetchInput});
+  let commitTraversal;
+  for(let attempt=0;attempt<20&&!commitTraversal;attempt++){await new Promise(resolve=>setTimeout(resolve,25));commitTraversal=(await pool.query("select id from provider_acquisition_traversals where safe_unit_key='race-commit-a-b'")).rows[0]?.id;}
+  assert(commitTraversal);await pool.query("update sync_streams set lease_expires_at=now()-interval '1 second' where id=$1",[streamId]);await scheduler.recover();
+  const commitLeaseB=await lease();let releaseCommitB;const holdCommitB=new Promise(resolve=>{releaseCommitB=resolve;});
+  const commitB=service.executeUnit({providerInstanceId:providerId,providerChampionshipId:linkId,season:2026,workClass:'current_future',safeUnitKey:'race-commit-a-b',traversalId:commitTraversal,lease:commitLeaseB,adapter:adapter(result([item('race-commit-b')],31,true)),fetchInput,beforeCommit:()=>holdCommitB});
+  for(let attempt=0;attempt<20;attempt++){const owner=await scalar('select run_id from provider_acquisition_traversals where id=$1',[commitTraversal]);if(owner.run_id===commitLeaseB.runId)break;await new Promise(resolve=>setTimeout(resolve,25));}
+  const staleCommitAssertion=assert.rejects(()=>staleCommitA,/stale_worker/);resolveCommitA(result([item('race-commit-a')],31,true));await staleCommitAssertion;
+  assert.deepEqual(await scalar('select run_id,status,complete from provider_acquisition_traversals where id=$1',[commitTraversal]),{run_id:commitLeaseB.runId,status:'running',complete:false});
+  assert.equal(Number((await scalar("select count(*) count from provider_source_entities where external_id='race-commit-a'")).count),0);
+  releaseCommitB();await commitB;
+  assert.deepEqual(await scalar('select run_id,status,complete from provider_acquisition_traversals where id=$1',[commitTraversal]),{run_id:commitLeaseB.runId,status:'complete',complete:true});
+  console.log('Courses A/B : commit et erreur fournisseur stale sans mutation, B complète : OK');
 
   const cursorBeforeInvalid=(await scalar('select cursor from sync_streams where id=$1',[streamId])).cursor;
   const cursorLease=await lease();const cursorInvalid={...result([],1,false),status:'cursor_invalid',safeRestart:{scope:'season',season:2026}};

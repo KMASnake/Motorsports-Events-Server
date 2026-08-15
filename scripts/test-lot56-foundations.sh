@@ -74,12 +74,12 @@ insert into provider_source_entities(
    '2026-01-01T00:00:00Z',now(),now(),now());
 
 insert into provider_acquisition_traversals(
-  id,stream_id,work_class,safe_unit_key,status,complete,finished_at
+  id,stream_id,lease_generation,work_class,safe_unit_key,status,complete,finished_at
 ) values
   ('56000000-0000-0000-0000-000000000021','56000000-0000-0000-0000-000000000020',
-   'current_future','complete-page','complete',true,now()),
+   1,'current_future','complete-page','complete',true,now()),
   ('56000000-0000-0000-0000-000000000022','56000000-0000-0000-0000-000000000020',
-   'current_future','partial-page','partial',false,null);
+   1,'current_future','partial-page','partial',false,null);
 
 insert into provider_source_observations(traversal_id,source_entity_id,observation_kind,observed_at)
 values
@@ -247,6 +247,8 @@ echo 'Down destructif refusé par défaut : OK'
 
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 \
   -c 'truncate provider_acquisition_anomalies, provider_source_entities, provider_acquisition_traversals cascade;'
+docker compose run --rm migrate sh /migrations/migrate.sh down 0018_lot56_traversal_fencing >/dev/null
+docker compose run --rm migrate sh /migrations/migrate.sh down 0017_lot56_durable_parent_reference >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0016_lot56_durable_acquisition >/dev/null
 docker compose run --rm migrate >/dev/null
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 \
