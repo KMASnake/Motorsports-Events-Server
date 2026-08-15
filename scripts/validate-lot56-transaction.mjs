@@ -93,11 +93,13 @@ try{
   console.log('Traversal partiel sans absence, traversal complet avec non-observations : OK');
 
   await pool.query(`insert into event_corrections(id,event_id,provider_key,field_name,provider_value,override_value,status,created_by) values('lot56-c-override','evt-002','fixture','name','"Provider"','"Local"','active','maintainer') on conflict(event_id,field_name) do update set override_value='"Local"',status='active'`);
+  await pool.query("update events set provider_key='lot56-c-fixture',external_id='override-safe' where id='evt-002'");
   await Promise.all([
     execute(result([item('override-safe',{name:'Provider changed'})],11)),
     pool.query(`update event_corrections set override_value='"Local"'::jsonb,updated_at=now() where id='lot56-c-override'`)
   ]);
   assert.equal((await scalar("select override_value from event_corrections where id='lot56-c-override'")).override_value,'Local');
+  assert.equal((await scalar("select manual_override_active from provider_source_changes where source_entity_id=(select id from provider_source_entities where external_id='override-safe') order by id desc limit 1")).manual_override_active,true);
   console.log('Override actif préservé pendant mise à jour source : OK');
 
   const secret='LOT56_C_CANARY_SECRET';
