@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-f-implemented-awaiting-maintainer-audit",
+    "status": "sub-lot-5.6-f-maintainer-validated-5.6-g-implementation-authorized",
     "updated_at": "2026-08-21",
     "implementation_percent": 67,
     "architecture_percent": 100,
@@ -20,16 +20,18 @@
     "sub_lot_5_6": {
       "implementation_percent": 67,
       "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F"],
-      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E"],
-      "audit_status": "5.6-f-implemented-awaiting-maintainer-audit",
+      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F"],
+      "audit_status": "5.6-f-maintainer-audit-pass-and-validated",
       "sub_lot_5_6_d_maintainer_reaudit": "pass",
       "sub_lot_5_6_d_maintainer_validated": true,
       "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
       "sub_lot_5_6_e_maintainer_reaudit": "pass",
       "sub_lot_5_6_e_maintainer_validated": true,
       "sub_lot_5_6_e_maintainer_validation_date": "2026-08-21",
-      "sub_lot_5_6_f_maintainer_validated": false,
-      "authorized_technical_sub_lot": null,
+      "sub_lot_5_6_f_maintainer_audit": "pass",
+      "sub_lot_5_6_f_maintainer_validated": true,
+      "sub_lot_5_6_f_maintainer_validation_date": "2026-08-21",
+      "authorized_technical_sub_lot": "5.6-G",
       "concept_validated": true,
       "ui_contract_validated": true,
       "acceptance_validated": true,
@@ -63,6 +65,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Maintainer audits implemented Lot 5.6-F. STOP before Lot 5.6-G. Lot 5.7+ remain unauthorized."
+    "task": "Implement only Lot 5.6-G — API and ACP actions. Then STOP for maintainer audit before 5.6-H. Lot 5.7+ remain unauthorized."
   }
 }

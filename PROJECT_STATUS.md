@@ -1,6 +1,6 @@
 # État du projet
 
-## Lot 5.6-F — implémenté en attente d’audit mainteneur (21 août 2026)
+## Lot 5.6-F — validé par le mainteneur (21 août 2026)
 
 La migration additive 0023 sépare durablement les corrections et observations
 locales de la donnée source fournisseur. Provenance, valeur source initiale,
@@ -13,8 +13,11 @@ PostgreSQL réel, avec concurrence, rollback, stale worker, crash et reprise
 dans un second processus. Les 206 tests API et les recettes 5.4/5.5/5.6-C/D/E
 restent verts. Preuve : `docs/handoff/LOT-5.6-F-EVIDENCE.md`.
 
-5.6-F n’est pas validé par le mainteneur. 5.6-G n’est pas autorisé. Le Lot 5.6
-global reste non validé et non fusionnable, et les Lots 5.7+ restent interdits.
+L’audit mainteneur est PASS, sans constat ouvert, et 5.6-F est validé. Le
+prochain gate autorise uniquement l’implémentation de 5.6-G — API et actions
+ACP. Aucun code 5.6-G n’est commencé dans cette décision documentaire. Le Lot
+5.6 global reste non validé et non fusionnable, et les Lots 5.7+ restent
+interdits.
 
 ## Lot 5.6-E — validé par le mainteneur (21 août 2026)
 

@@ -6,7 +6,7 @@ Start SHA: `a26648924e8afd2f5b141a4179cf3bbe0a8cadb3`
 
 Implementation final SHA: `dc66103d95a3431441a30a4335a2309bcdd4f71c`
 
-Status: **IMPLEMENTED — MAINTAINER AUDIT REQUIRED**
+Status: **MAINTAINER AUDIT PASS — VALIDATED ON 2026-08-21**
 
 ## Mechanism
 
@@ -78,4 +78,4 @@ Totals: **26 PASS, 0 PARTIAL, 0 FAIL, 0 NOT TESTED**.
 
 The service is internal in 5.6-F; administrative HTTP actions belong to 5.6-G and are intentionally absent. The protected data model does not compute an effective business Event, merge providers, or introduce any 5.7 reconciliation. Operational rollback is intentionally blocked when protected data exists unless destructive intent is explicit.
 
-**Technical recommendation: PASS FOR MAINTAINER AUDIT.** This is not maintainer validation and does not authorize 5.6-G, 5.7+, or merge to `main`.
+**Technical recommendation: PASS FOR MAINTAINER AUDIT.** The maintainer subsequently audited this evidence PASS and validated 5.6-F on 2026-08-21. That decision opens only the 5.6-G implementation gate — API and ACP actions — and does not validate Lot 5.6 globally, authorize 5.7+, or authorize merge to `main`.
