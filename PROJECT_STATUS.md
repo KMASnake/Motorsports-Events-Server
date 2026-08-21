@@ -1,5 +1,25 @@
 # État du projet
 
+## Lot 5.6-E — implémenté en attente d’audit mainteneur (21 août 2026)
+
+La temporalité et la finalization sont désormais intégrées au commit durable
+d’acquisition. Le recalcul automatique ne vise que les entités touchées par le
+traversal, tout en utilisant les pairs comparables du même fournisseur,
+championnat et type. La hiérarchie conserve la priorité fournisseur, dernière
+session, médiane récente, règle adaptateur puis fin civile.
+
+La migration additive `0022_lot56_temporality_finalization` persiste la méthode,
+la provenance, l’échantillon ou la règle, la durée calculée et la version de
+logique. La grâce est un délai UTC exact, configurable à 30 jours par défaut.
+À l’échéance exacte, l’anomalie liée à l’entité est créée idempotemment sans
+forcer `completed`; `cancelled` est final et `postponed` recalcule le suivi à
+partir de la nouvelle planification.
+
+Preuve : `docs/handoff/LOT-5.6-E-VALIDATION.md`. Les recettes PostgreSQL 5.6-E,
+5.6-C, 5.6-D, 5.4 et 5.5 sont vertes, ainsi que 202 tests API. STOP avant
+5.6-F : 5.6-E n’est pas validé par le mainteneur, le Lot 5.6 global reste non
+validé et non fusionnable, et les Lots 5.7+ restent interdits.
+
 ## Lot 5.6-D — validé par le mainteneur (21 août 2026)
 
 Le sous-lot 5.6-C est validé par le mainteneur. L’orchestrateur durable 5.6-D

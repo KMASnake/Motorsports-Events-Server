@@ -90,6 +90,9 @@ try {
 
   const auditLinks = [active.link, inactive.link, paused.link];
   await pool.query("update provider_championships set sync_state='active' where id=any($1::uuid[])", [auditLinks]);
+  await pool.query(`insert into provider_acquisition_state(provider_championship_id,bootstrap_state,recent_catchup_state,deep_history_state,deep_history_season,current_cycle_started_at)
+    select id,'deep_history','complete','running',2026,$2 from provider_championships where id=any($1::uuid[])
+    on conflict(provider_championship_id) do update set bootstrap_state='deep_history',recent_catchup_state='complete',deep_history_state='running',deep_history_season=2026,updated_at=$2`, [auditLinks, now]);
   await pool.query("update championships set active=true where id=any($1::text[])", [championships]);
   await pool.query("update sync_streams set state='ready',lease_owner=null,lease_acquired_at=null,lease_expires_at=null,priority_boost_until=null where provider_championship_id=any($1::uuid[])", [auditLinks]);
   await pool.query("update provider_instances set discovery_lease_owner=null,discovery_lease_expires_at=null,state='active',last_discovery_at=null where id=any($1::uuid[])", [providers]);

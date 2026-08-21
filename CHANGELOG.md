@@ -1,5 +1,18 @@
 # Changelog
 
+## Lot 5.6-E — temporalité et finalization
+
+- intègre le recalcul des fins théoriques et l’évaluation de finalization dans
+  la transaction durable d’acquisition ;
+- persiste la méthode, la provenance, les échantillons/règles, la durée et la
+  version logique des estimations via la migration additive `0022` ;
+- applique une grâce UTC déterministe et crée l’anomalie liée à l’entité à
+  l’échéance exacte sans statut final artificiel ;
+- traite `cancelled` comme final et recalcule/résout le suivi `postponed` depuis
+  la nouvelle planification ;
+- ajoute les preuves unitaires et PostgreSQL de temporalité, idempotence,
+  reprise et non-régression 5.4/5.5/5.6.
+
 ## Lot 4.4 — Authentification administrateur validée
 
 - consigne la validation mainteneur sur Windows et VPS le 2026-08-12 ;
