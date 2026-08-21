@@ -1,5 +1,21 @@
 # État du projet
 
+## Lot 5.6-F — implémenté en attente d’audit mainteneur (21 août 2026)
+
+La migration additive 0023 sépare durablement les corrections et observations
+locales de la donnée source fournisseur. Provenance, valeur source initiale,
+raison, acteur, état, révision et timestamps sont bornés et traçables. Les
+écritures verrouillent la même entité source que l’acquisition : la source peut
+évoluer sans écraser les protections, et les absences restent non destructives.
+
+La matrice 5.6-F atteint 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED sur
+PostgreSQL réel, avec concurrence, rollback, stale worker, crash et reprise
+dans un second processus. Les 206 tests API et les recettes 5.4/5.5/5.6-C/D/E
+restent verts. Preuve : `docs/handoff/LOT-5.6-F-EVIDENCE.md`.
+
+5.6-F n’est pas validé par le mainteneur. 5.6-G n’est pas autorisé. Le Lot 5.6
+global reste non validé et non fusionnable, et les Lots 5.7+ restent interdits.
+
 ## Lot 5.6-E — validé par le mainteneur (21 août 2026)
 
 La temporalité et la finalization sont désormais intégrées au commit durable

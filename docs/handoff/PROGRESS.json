@@ -4,9 +4,9 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-e-maintainer-validated-5.6-f-implementation-authorized",
+    "status": "sub-lot-5.6-f-implemented-awaiting-maintainer-audit",
     "updated_at": "2026-08-21",
-    "implementation_percent": 66,
+    "implementation_percent": 67,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "merged_to_main": false,
@@ -18,17 +18,18 @@
     "sub_lot_5_4": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
     "sub_lot_5_5": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-14","authorized":true},
     "sub_lot_5_6": {
-      "implementation_percent": 56,
-      "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E"],
+      "implementation_percent": 67,
+      "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F"],
       "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E"],
-      "audit_status": "5.6-e-maintainer-reaudit-pass-and-validated",
+      "audit_status": "5.6-f-implemented-awaiting-maintainer-audit",
       "sub_lot_5_6_d_maintainer_reaudit": "pass",
       "sub_lot_5_6_d_maintainer_validated": true,
       "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
       "sub_lot_5_6_e_maintainer_reaudit": "pass",
       "sub_lot_5_6_e_maintainer_validated": true,
       "sub_lot_5_6_e_maintainer_validation_date": "2026-08-21",
-      "authorized_technical_sub_lot": "5.6-F",
+      "sub_lot_5_6_f_maintainer_validated": false,
+      "authorized_technical_sub_lot": null,
       "concept_validated": true,
       "ui_contract_validated": true,
       "acceptance_validated": true,
@@ -62,6 +63,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Implement only Lot 5.6-F — protection of corrections and observations — under the approved plan. STOP before 5.6-G. Lot 5.7+ remain unauthorized."
+    "task": "Maintainer audits implemented Lot 5.6-F. STOP before Lot 5.6-G. Lot 5.7+ remain unauthorized."
   }
 }

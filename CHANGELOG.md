@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 5.6-F — protection des corrections et observations
+
+- sépare les corrections et observations locales de la donnée source provider ;
+- conserve provenance, source initiale, raison, acteur, lifecycle et révision ;
+- sérialise acquisition et mutations locales par verrou de l’entité source ;
+- garantit replay et absences non destructifs, avec rollback peuplé protégé ;
+- ajoute la migration 0023 et une recette PostgreSQL à deux processus.
+
 ## Lot 5.6-E — temporalité et finalization
 
 - ferme les deux lacunes de preuve d’audit avec un scénario `completed` avant
