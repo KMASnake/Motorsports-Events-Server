@@ -19,7 +19,7 @@ test('ACP remains functional under the production Nginx CSP', async ({ page }) =
   for (const [path, heading] of [
     ['/', 'TABLEAU DE BORD'],
     ['/championships', 'CHAMPIONNATS'],
-    ['/synchronizations', 'SYNCHRONISATIONS']
+    ['/synchronizations', 'SYNCHRONISATION FOURNISSEUR']
   ] as const) {
     await page.goto(path);
     await expect(page.locator('.app-shell')).toBeVisible();
