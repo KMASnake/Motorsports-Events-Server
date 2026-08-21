@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-authorized-for-design-completion",
+    "status": "lot-5.7-p-technical-design-complete-awaiting-maintainer-audit",
     "updated_at": "2026-08-21",
     "implementation_percent": 100,
     "architecture_percent": 100,
@@ -58,8 +58,8 @@
       "authorized": true,
       "authorization_date": "2026-08-21",
       "implementation_started": false,
-      "design_status": "functional-design-complete-technical-sequencing-incomplete",
-      "authorized_gate": "design-completion",
+      "design_status": "technical-design-complete-awaiting-maintainer-audit",
+      "authorized_gate": null,
       "authorized_technical_sub_lot": null,
       "full_lot_5_7_authorized": false
     },
@@ -86,6 +86,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Complete only the authorized 5.7-P technical implementation plan and gate decomposition from the existing Production Preview Concept, Acceptance and audit corrections. STOP before implementation. Lot 5.7 full and Lot 5.8+ remain unauthorized; merge to main remains unauthorized."
+    "task": "Maintainer audits Lot 5.7-P technical design, acceptance and gate decomposition. STOP before implementation authorization. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge to main remains unauthorized."
   }
 }

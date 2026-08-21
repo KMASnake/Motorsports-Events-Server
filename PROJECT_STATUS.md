@@ -1,5 +1,16 @@
 # État du projet
 
+## Lot 5.7-P — conception technique prête pour audit mainteneur (21 août 2026)
+
+La conception technique, l’Acceptance PP-T01 à PP-T42 et la décomposition en
+six gates auditables sont terminées. Le cross-audit Concept ↔ Acceptance
+fonctionnelle PP-001 à PP-183 ↔ design ↔ Acceptance technique ↔ gates est PASS,
+sans constat bloquant.
+
+Le premier gate candidat est 5.7-P-A — fondations d’identité normalisée et de
+persistance. Il reste non autorisé. L’implémentation 5.7-P reste à 0 % et non
+commencée ; le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent interdits.
+
 ## Lot 5.7-P — autorisé pour complétion du design technique (21 août 2026)
 
 Le mainteneur autorise 5.7-P, tranche verticale de normalisation Production

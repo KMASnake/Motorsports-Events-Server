@@ -429,3 +429,12 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
   autorisé ;
 - le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
 - le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.
+## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
+
+- la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;
+- le design technique et l’Acceptance PP-T01 à PP-T42 sont complets ;
+- 5.7-P est décomposé en six gates ordonnés 5.7-P-A à 5.7-P-F ;
+- le cross-audit documentaire est PASS sans P1/P2/P3 bloquant ;
+- 5.7-P-A est le premier gate candidat mais reste non autorisé ;
+- l’implémentation reste à 0 % et non commencée ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.

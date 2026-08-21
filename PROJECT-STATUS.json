@@ -14,13 +14,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "lot-5.7-p-authorized-for-design-completion",
-    "reason": "Lot 5.7-P is authorized on 2026-08-21. Its functional Concept and Acceptance are complete, but no normative technical sub-lot structure or first implementation gate exists; only design completion is open. Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "status": "lot-5.7-p-technical-design-complete-awaiting-maintainer-audit",
+    "reason": "Lot 5.7-P technical design, PP-T Acceptance and six-gate decomposition are complete with cross-audit PASS. The first candidate 5.7-P-A remains unauthorized. Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-authorized-for-design-completion",
+    "status": "lot-5.7-p-technical-design-complete-awaiting-maintainer-audit",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -77,13 +77,17 @@
       "authorized": true,
       "authorization_date": "2026-08-21",
       "implementation_started": false,
-      "design_status": "functional-design-complete-technical-sequencing-incomplete",
-      "authorized_gate": "design-completion",
+      "design_status": "technical-design-complete-awaiting-maintainer-audit",
+      "authorized_gate": null,
       "authorized_technical_sub_lot": null,
       "full_lot_5_7_authorized": false,
       "concept": "docs/handoff/PRODUCTION-PREVIEW-CONCEPT.md",
       "acceptance": "docs/handoff/PRODUCTION-PREVIEW-ACCEPTANCE.md",
-      "audit_corrections": "docs/handoff/PRODUCTION-PREVIEW-AUDIT-CORRECTIONS.md"
+      "audit_corrections": "docs/handoff/PRODUCTION-PREVIEW-AUDIT-CORRECTIONS.md",
+      "technical_design": "docs/handoff/LOT-5.7-P-TECHNICAL-DESIGN.md",
+      "technical_acceptance": "docs/handoff/LOT-5.7-P-TECHNICAL-ACCEPTANCE.md",
+      "gates": "docs/handoff/LOT-5.7-P-GATES.md",
+      "design_cross_audit": "docs/handoff/LOT-5.7-P-DESIGN-CROSS-AUDIT.md"
     },
     "mandatory_constraints": [
       "Only Lot 5.7-P design completion is authorized; implementation is not started",
@@ -106,6 +110,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Complete only the authorized 5.7-P technical implementation plan and gate decomposition from the existing Production Preview Concept, Acceptance and audit corrections. STOP before implementation. Lot 5.7 full and Lot 5.8+ remain unauthorized; merge to main remains unauthorized."
+    "task": "Maintainer audits Lot 5.7-P technical design, acceptance and gate decomposition. STOP before implementation authorization. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge to main remains unauthorized."
   }
 }
