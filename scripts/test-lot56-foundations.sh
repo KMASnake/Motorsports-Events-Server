@@ -247,6 +247,7 @@ echo 'Down destructif refusé par défaut : OK'
 
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 \
   -c 'truncate provider_acquisition_anomalies, provider_source_entities, provider_acquisition_traversals cascade;'
+docker compose run --rm migrate sh /migrations/migrate.sh down 0024_lot57pa_normalized_persistence >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0023_lot56_source_protection >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0022_lot56_temporality_finalization >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0021_lot56_current_global_finalization_queue >/dev/null
@@ -266,14 +267,15 @@ docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_ST
       '0020_lot56_current_refresh_scope',
       '0021_lot56_current_global_finalization_queue',
       '0022_lot56_temporality_finalization',
-      '0023_lot56_source_protection'
-    )) <> 8 then raise exception 'Chaîne de migrations Lot 5.6 incomplète après réapplication'; end if;
+      '0023_lot56_source_protection',
+      '0024_lot57pa_normalized_persistence'
+    )) <> 9 then raise exception 'Chaîne de migrations 0016→0024 incomplète après réapplication'; end if;
     if to_regclass('public.provider_source_entities') is null
        or to_regclass('public.provider_source_corrections') is null
        or to_regclass('public.provider_source_local_observations') is null then
       raise exception 'Schéma Lot 5.6 incomplet après réapplication';
     end if;
-  end \$\$; select 'Cycle 0016→0023 up/down/up sur base jetable : OK';"
+  end \$\$; select 'Cycle 0016→0024 up/down/up sur base jetable : OK';"
 
 docker run --rm \
   -v "$PWD":/source:ro \
