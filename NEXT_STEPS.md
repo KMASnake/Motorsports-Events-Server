@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — implémentation autorisée du Lot 5.6-G
+## Priorité courante — implémentation autorisée du Lot 5.6-H
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -42,13 +42,18 @@
 - [x] implémenter uniquement 5.6-F — protection des corrections et
   observations — selon le plan approuvé.
 - [x] obtenir l’audit PASS et la validation mainteneur explicite de 5.6-F ;
-- [ ] implémenter uniquement 5.6-G — API et actions ACP — selon le plan
+- [x] implémenter uniquement 5.6-G — API et actions ACP — selon le plan
   approuvé.
+- [x] obtenir l’audit PASS et la validation mainteneur explicite de 5.6-G ;
+- [ ] implémenter uniquement 5.6-H — interface ACP — selon le contrat UI et
+  le plan approuvés.
 
-5.6-F est validé avec 26 PASS et 0 constat ouvert. Le gate d’implémentation
-5.6-G est ouvert, mais aucun code 5.6-G n’est commencé par cette décision
-documentaire. Point d'arrêt obligatoire après 5.6-G : ne commencer ni 5.6-H,
-ni aucune fonctionnalité 5.7+ sans nouvelle décision explicite du mainteneur.
+5.6-G est validé avec 26 PASS et un P3 non bloquant : les filtres invalides de
+la vue anomalies retournent `[]` plutôt qu’un HTTP 400. Le gate
+d’implémentation 5.6-H — interface ACP — est ouvert, mais aucun code 5.6-H
+n’est commencé par cette décision documentaire. Point d'arrêt obligatoire
+après 5.6-H : ne commencer ni 5.6-I, ni aucune fonctionnalité 5.7+ sans
+nouvelle décision explicite du mainteneur.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

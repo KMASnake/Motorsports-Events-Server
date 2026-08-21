@@ -6,7 +6,7 @@ Start SHA: `d219554ef8486e0283c0f6af30da552045a0128e`
 
 Implementation final SHA: `a3d02b2f97c333a5660a42792809f52313fa205e`
 
-Status: **IMPLEMENTED — AWAITING MAINTAINER AUDIT**
+Status: **MAINTAINER AUDIT PASS — VALIDATED ON 2026-08-21**
 
 ## Normative scope and implementation
 
@@ -29,7 +29,7 @@ All actions reuse administrator HMAC/session authorization. Actor identity comes
 - API/service: `acquisitionAdminService.ts`, `providerAcquisitionAdmin.ts`, `schedulerService.ts`, `acquisitionOrchestrator.ts`, `adminAudit.ts`, `server.ts`.
 - Tests: `providerAcquisitionAdminRoutes.test.ts`, extended real PostgreSQL validation in `validate-lot56-corrections-observations.mjs`.
 - Migration: none. Existing 0016 and 0023 durable structures are sufficient.
-- ACP components: none; 5.6-H remains unauthorized.
+- ACP components: none in 5.6-G; the 5.6-H interface gate was opened only by the subsequent maintainer validation recorded below.
 
 ## Acceptance matrix
 
@@ -64,6 +64,6 @@ Totals: **26 PASS, 0 PARTIAL, 0 FAIL, 0 NOT TESTED**.
 
 Administrative authorization, human-session CSRF protection and technical HMAC behavior are reused unchanged. Inputs are schema-validated; protection payloads retain the shared 65536-byte service bound. Responses contain no provider credentials or raw provider payload. The operational API caps anomaly results at 500 and source changes at 200.
 
-Residual risk: visual ACP rendering and interaction tests remain intentionally deferred to the separately governed 5.6-H interface gate. Lot 5.6 remains globally unvalidated. Lot 5.7+, Production Preview client surfaces and merge to `main` remain unauthorized.
+Residual risk: visual ACP rendering and interaction tests remain intentionally deferred to the separately governed 5.6-H interface gate. A non-blocking P3 audit observation notes that invalid filters on `GET /api/v1/admin/provider-acquisition/anomalies` currently return `[]` instead of an explicit HTTP 400; it does not reopen or block 5.6-G. Lot 5.6 remains globally unvalidated. Lot 5.7+, Production Preview client surfaces and merge to `main` remain unauthorized.
 
-**Technical recommendation: PASS FOR MAINTAINER AUDIT.**
+**Technical recommendation: PASS FOR MAINTAINER AUDIT.** The maintainer subsequently audited this evidence PASS and validated 5.6-G on 2026-08-21 with 26 PASS, 0 PARTIAL, 0 FAIL and 0 NOT TESTED. This decision opens only the 5.6-H implementation gate — interface ACP.

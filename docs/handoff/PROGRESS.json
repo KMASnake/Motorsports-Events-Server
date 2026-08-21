@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-g-implemented-awaiting-maintainer-audit",
+    "status": "sub-lot-5.6-g-maintainer-validated-5.6-h-implementation-authorized",
     "updated_at": "2026-08-21",
     "implementation_percent": 78,
     "architecture_percent": 100,
@@ -20,8 +20,8 @@
     "sub_lot_5_6": {
       "implementation_percent": 78,
       "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F", "5.6-G"],
-      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F"],
-      "audit_status": "5.6-g-implemented-awaiting-maintainer-audit",
+      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F", "5.6-G"],
+      "audit_status": "5.6-g-maintainer-audit-pass-and-validated",
       "sub_lot_5_6_d_maintainer_reaudit": "pass",
       "sub_lot_5_6_d_maintainer_validated": true,
       "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
@@ -31,8 +31,10 @@
       "sub_lot_5_6_f_maintainer_audit": "pass",
       "sub_lot_5_6_f_maintainer_validated": true,
       "sub_lot_5_6_f_maintainer_validation_date": "2026-08-21",
-      "sub_lot_5_6_g_maintainer_validated": false,
-      "authorized_technical_sub_lot": null,
+      "sub_lot_5_6_g_maintainer_audit": "pass",
+      "sub_lot_5_6_g_maintainer_validated": true,
+      "sub_lot_5_6_g_maintainer_validation_date": "2026-08-21",
+      "authorized_technical_sub_lot": "5.6-H",
       "concept_validated": true,
       "ui_contract_validated": true,
       "acceptance_validated": true,
@@ -65,7 +67,7 @@
     "lot_5_6_design": "cross-audit-passed-consolidated-and-authorized-2026-08-14"
   },
   "next_action": {
-    "owner": "Maintainer",
-    "task": "Maintainer audits implemented Lot 5.6-G. STOP before Lot 5.6-H. Lot 5.7+ remain unauthorized."
+    "owner": "Codex",
+    "task": "Implement only Lot 5.6-H — interface ACP. Then STOP for maintainer audit before Lot 5.6-I. Lot 5.7+ remain unauthorized."
   }
 }

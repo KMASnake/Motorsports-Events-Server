@@ -1,5 +1,21 @@
 # État du projet
 
+## Lot 5.6-G — validé par le mainteneur (21 août 2026)
+
+L’API interne expose les états d’acquisition, le diagnostic source, les
+anomalies, corrections et observations locales ainsi que les quatre actions
+ACP prévues. La matrice atteint 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+l’audit mainteneur est PASS et 5.6-G est validé.
+
+Un P3 non bloquant reste tracé : une query invalide sur
+`GET /api/v1/admin/provider-acquisition/anomalies` retourne actuellement `[]`
+au lieu d’un HTTP 400 explicite. Cette observation ne rouvre pas 5.6-G.
+
+Le prochain gate autorise uniquement 5.6-H — interface ACP — conformément au
+plan approuvé et au contrat UI. Aucun code 5.6-H n’est commencé par cette
+décision. Le Lot 5.6 global reste non validé et non fusionnable ; 5.7, 5.7-P
+et les lots suivants restent interdits.
+
 ## Lot 5.6-F — validé par le mainteneur (21 août 2026)
 
 La migration additive 0023 sépare durablement les corrections et observations
