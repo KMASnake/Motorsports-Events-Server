@@ -439,6 +439,20 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
 - l’autorisation technique de A est consommée et aucun gate B à F n’est
   autorisé ;
 - le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.
+
+## 2026-08-22 — Validation de 5.7-P-A et autorisation de 5.7-P-B
+
+- l’audit mainteneur de 5.7-P-A est PASS et A est validé mainteneur ;
+- PP-T01 à PP-T06 et la recette dédiée 18/18 sont PASS, sans P1, P2 ni P3
+  bloquant ;
+- seul 5.7-P-B — normalisation déterministe et mapping source — est autorisé et
+  reste non commencé ; son Acceptance est PP-T07 à PP-T16 avec les critères
+  fonctionnels pertinents PP-030 à PP-061 et PP-181 à PP-183 ;
+- B doit s’arrêter aux candidats normalisés persistés, sans publication ;
+- 5.7-P-C à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni 5.6 ni A.
+
 ## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
 
 - la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;
