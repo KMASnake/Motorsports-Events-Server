@@ -23,9 +23,12 @@ docker compose run --rm migrate psql -v ON_ERROR_STOP=1 -U mse -d motorsports_ev
 docker compose run --rm migrate >/dev/null
 docker run --rm --network "${PROJECT}_default" -e DATABASE_URL="$DATABASE_URL" \
   -v "$PWD":/source:ro -w /tmp/project node:22-alpine sh -lc '
+    set -eu
     cp -a /source/. .
     npm ci >/dev/null
     npm run build --workspace @mse/api >/dev/null
     node scripts/validate-lot56-temporality.mjs
+    node scripts/validate-lot56-finalization-restart.mjs phase-a
+    node scripts/validate-lot56-finalization-restart.mjs phase-b
   '
 echo 'Recette temporalité/finalization Lot 5.6-E : OK'

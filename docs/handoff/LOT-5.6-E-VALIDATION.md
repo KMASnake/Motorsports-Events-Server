@@ -1,7 +1,7 @@
 # Lot 5.6-E — Temporalité et finalization
 
 Date : 2026-08-21  
-Statut : **IMPLÉMENTÉ — AUDIT MAINTENEUR REQUIS**
+Statut : **CORRECTIONS DE PREUVE IMPLÉMENTÉES — RÉ-AUDIT MAINTENEUR REQUIS**
 
 ## Critères couverts
 
@@ -36,8 +36,11 @@ API ou stockage concurrent n’est ajouté.
 - test ciblé `acquisitionOrchestrator.test.ts` : 11/11 PASS ;
 - suite API : 202/202 PASS ;
 - `test-lot56-temporality.sh` : PASS sur PostgreSQL réel jetable, migration
-  0022 down/up, T+29/T+30, idempotence, résolution, cancelled, postponed,
-  trace et replay ;
+  0022 down/up, `completed` avant grâce sans anomalie à T+29, T+30 et après
+  T+30, idempotence, résolution, cancelled, postponed et trace ;
+- le même script lance deux processus Node successifs : le premier persiste le
+  curseur/traversal 2025 et quitte, le second recrée l’orchestrateur depuis
+  PostgreSQL, reprend 2026 et vérifie absence de perte et de doublon ;
 - `test-lot56-transaction.sh` : PASS ;
 - `test-lot56-orchestration.sh` : PASS ;
 - `test-lot54-scheduler.sh` : PASS, fairness/fencing et migrations ;
@@ -46,6 +49,7 @@ API ou stockage concurrent n’est ajouté.
 
 ## Frontière
 
-5.6-E est implémenté mais non validé par le mainteneur. 5.6-F n’est pas
+La matrice de preuve atteint 35 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED.
+5.6-E est corrigé mais non validé par le mainteneur. 5.6-F n’est pas
 autorisé. Le Lot 5.6 global reste non validé, `merge_authorized=false`, et les
 Lots 5.7/5.7-P et suivants restent non autorisés.

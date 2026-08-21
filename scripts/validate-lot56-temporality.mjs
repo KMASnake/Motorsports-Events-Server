@@ -6,7 +6,7 @@ import {DurableAcquisitionOrchestrator} from '../apps/api/dist/providers/acquisi
 const provider='56e00000-0000-0000-0000-000000000001';
 const link='56e00000-0000-0000-0000-000000000002';
 const stream='56e00000-0000-0000-0000-000000000003';
-let now=new Date('2026-08-21T12:00:00Z');
+let now=new Date('2026-08-20T12:00:00Z');
 const clock={now:()=>new Date(now)};
 const service=new DurableAcquisitionOrchestrator(clock);
 const gate={beforeRequest:async()=>({allowed:true}),afterResponse:async()=>{},afterError:async()=>{}};
@@ -24,11 +24,26 @@ try{
   await acquire([
     item('t30','scheduled','2026-07-22T10:00:00Z','2026-07-22T12:00:00Z'),
     item('t29','scheduled','2026-07-23T10:00:00Z','2026-07-23T12:00:00Z'),
+    item('completed-before-grace','completed','2026-07-22T10:00:00Z','2026-07-22T12:00:00Z'),
     item('cancelled','cancelled','2026-01-01T10:00:00Z','2026-01-01T12:00:00Z'),
     item('postponed','scheduled','2026-01-02T10:00:00Z','2026-01-02T12:00:00Z','isolated')
   ],'initial');
+  assert.equal((await anomaly('t30')).rowCount,0);
+  assert.equal((await anomaly('t29')).rowCount,0);
+  assert.equal((await anomaly('completed-before-grace')).rowCount,0);
+  now=new Date('2026-08-21T12:00:00Z');
+  await service.evaluateFinalization(link);
   assert.equal((await anomaly('t30')).rowCount,1);
   assert.equal((await anomaly('t29')).rowCount,0);
+  assert.equal((await anomaly('completed-before-grace')).rowCount,0);
+  now=new Date('2026-08-22T12:00:01Z');
+  await service.evaluateFinalization(link);
+  assert.equal((await anomaly('completed-before-grace')).rowCount,0);
+  const completedBeforeGrace=(await pool.query(`select source_data->>'status' status from provider_source_entities where external_id='completed-before-grace'`)).rows[0];
+  assert.equal(completedBeforeGrace.status,'completed');
+  const completedFinalizationCandidates=(await pool.query(`select count(*)::int count from provider_source_entities where external_id='completed-before-grace' and theoretical_end_at+interval '30 days'<=$1 and lower(coalesce(source_data->>'status','')) not in('completed','finished','final','cancelled','canceled')`,[now])).rows[0].count;
+  assert.equal(completedFinalizationCandidates,0);
+  now=new Date('2026-08-21T12:00:00Z');
   assert.equal((await anomaly('cancelled')).rowCount,0);
   assert.equal((await anomaly('postponed')).rowCount,1);
   const trace=(await pool.query(`select end_estimated,end_provenance,end_estimation_details from provider_source_entities where external_id='t30'`)).rows[0];
@@ -47,6 +62,6 @@ try{
   assert.equal(postponed.end_provenance,'civil_day_fallback');
   assert.equal(postponed.end_estimation_details.logic_version,'lot56-e-v1');
   assert.equal(await service.chooseWork(link,0,'current'),'finalization');
-  console.log('T+29/T+30, idempotence, completed, cancelled, postponed, trace et rejeu : OK');
+  console.log('T+29/T+30, completed avant grâce, idempotence, résolution, cancelled, postponed, trace et rejeu : OK');
   console.log('Aucune normalisation métier ni surface 5.7 : OK');
 }finally{await pool.end();}

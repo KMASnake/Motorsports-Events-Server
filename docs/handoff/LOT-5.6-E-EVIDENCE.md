@@ -14,7 +14,7 @@ This document records implementation evidence only. It does not validate Lot 5.6
 
 ## Governance state checked
 
-- Current state: `sub-lot-5.6-e-implemented-awaiting-maintainer-audit`.
+- Current state: `sub-lot-5.6-e-corrections-implemented-awaiting-maintainer-reaudit`.
 - Lot 5.6-E maintainer validation: `false`.
 - Authorized technical sub-lot: none; Lot 5.6-F is not started or authorized.
 - Lot 5.6 global maintainer validation: `false`.
@@ -92,7 +92,7 @@ Civil-day conversion uses explicit timezone-derived civil parts. Focused tests c
 | E19 | PASS | Adapter-duration rule fallback and trace coverage. |
 | E20 | PASS | Civil fallback and postponed replay are covered in PostgreSQL. |
 | E21 | PASS | Estimation provenance/details and logic version are persisted and asserted. |
-| E22 | PARTIAL | Final statuses are excluded and completion resolves an anomaly, but no dedicated fixture asserts `completed` specifically before J+30. |
+| E22 | PASS | A distinct real-PostgreSQL fixture remains `completed` and anomaly-free at T+29, T+30 and after T+30, without status mutation. |
 | E23 | PASS | Exact T+29 exclusion is asserted in PostgreSQL. |
 | E24 | PASS | Exact T+30 inclusion is asserted in PostgreSQL. |
 | E25 | PASS | `cancelled` exclusion is asserted in PostgreSQL. |
@@ -100,21 +100,21 @@ Civil-day conversion uses explicit timezone-derived civil parts. Focused tests c
 | E27 | PASS | Completion after anomaly resolves the active anomaly. |
 | E28 | PASS | Postponed date replay recomputes the theoretical end and resolves the obsolete anomaly. |
 | E29 | PASS | Durable finalization seasons/cursor are persisted by migration 0021 and exercised in PostgreSQL. |
-| E30 | PARTIAL | Durable replay in the same service process is covered; a fresh-process restart is not directly exercised by this recipe. |
+| E30 | PASS | Two sequential Node processes share only PostgreSQL: phase A persists cursor/traversal 2025 and exits; phase B creates a new orchestrator, resumes 2026, and proves cursor, traversal, entity and anomaly uniqueness. |
 | E31 | PASS | Finalization is integrated after persistence and exercised by orchestration PostgreSQL tests. |
 | E32 | PASS | Transaction/crash/replay regression suite passes against PostgreSQL. |
 | E33 | PASS | Scheduler fairness and stale-worker regressions pass. |
 | E34 | PASS | Active anomaly uniqueness and repeated evaluation idempotence are asserted. |
 | E35 | PASS | Git diff and test recipes show no implementation of Lot 5.7 functionality. |
 
-Totals: **33 PASS, 2 PARTIAL, 0 FAIL, 0 NOT TESTED**.
+Totals: **35 PASS, 0 PARTIAL, 0 FAIL, 0 NOT TESTED**.
 
 ## Executed validation
 
 | Command | Result |
 |---|---|
 | `npm test --workspace @mse/api -- acquisitionOrchestrator.test.ts` | PASS — 11 passed, 0 failed, 0 skipped. |
-| `./scripts/test-lot56-temporality.sh` | PASS — real PostgreSQL; migration up/down, T+29/T+30, idempotence, completed, cancelled, postponed, trace and replay. |
+| `./scripts/test-lot56-temporality.sh` | PASS — real PostgreSQL; migration up/down, `completed` before grace at T+29/T+30/after T+30, and two distinct Node processes proving durable restart, cursor/traversal continuity and uniqueness. |
 | `./scripts/test-lot56-transaction.sh` | PASS — real PostgreSQL; checkpoint, crash/replay, deduplication, stale/lost leases and concurrency races. |
 | `./scripts/test-lot56-orchestration.sh` | PASS — real PostgreSQL; current windows, priority/fairness, durable finalization traversal, hierarchy and pre-1970 regression. |
 | `./scripts/test-lot54-scheduler.sh` | PASS — real PostgreSQL plus 8 focused scheduler tests. |
@@ -122,7 +122,7 @@ Totals: **33 PASS, 2 PARTIAL, 0 FAIL, 0 NOT TESTED**.
 
 ## Risks and audit recommendation
 
-The two PARTIAL items are test-evidence gaps, not observed functional failures: there is no explicit pre-J+30 `completed` fixture, and the replay scenario does not launch a fresh service process. The durable schema, transaction/replay coverage and implementation support both behaviors, but they are deliberately not reported as fully demonstrated.
+The two former evidence gaps are now directly automated against disposable PostgreSQL. E22 uses a distinct immutable `completed` fixture across all grace boundaries. E30 executes phase A and phase B as separate Node processes, with no shared memory, and asserts the durable cursor, completed traversals, entity cardinality and idempotent anomalies after recovery.
 
 No Lot 5.7 functional leakage was found in the implementation diff. No functional code was changed while producing this evidence.
 

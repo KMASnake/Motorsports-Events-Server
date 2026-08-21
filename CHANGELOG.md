@@ -2,6 +2,8 @@
 
 ## Lot 5.6-E — temporalité et finalization
 
+- ferme les deux lacunes de preuve d’audit avec un scénario `completed` avant
+  J+30 et une reprise PostgreSQL entre deux processus Node réellement distincts ;
 - intègre le recalcul des fins théoriques et l’évaluation de finalization dans
   la transaction durable d’acquisition ;
 - persiste la méthode, la provenance, les échantillons/règles, la durée et la

@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur Lot 5.6-E
+## Priorité courante — ré-audit mainteneur Lot 5.6-E
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -36,11 +36,13 @@
 - [x] obtenir le ré-audit mainteneur PASS et la validation explicite de 5.6-D ;
 - [x] implémenter uniquement 5.6-E — temporalité et finalization — selon le
   Concept, l’Acceptance et le plan approuvés du Lot 5.6.
+- [x] prouver explicitement `completed` avant J+30 à T+29, T+30 et après T+30 ;
+- [x] prouver la reprise durable de finalization entre deux processus Node ;
 - [ ] obtenir l’audit et la validation mainteneur explicites avant 5.6-F.
 
-5.6-E est implémenté et attend l’audit mainteneur. Point d'arrêt obligatoire :
-ne commencer ni 5.6-F, ni aucune fonctionnalité 5.7+ avant une nouvelle
-décision explicite du mainteneur.
+5.6-E atteint 35 PASS et 0 PARTIAL et attend le ré-audit mainteneur. Point
+d'arrêt obligatoire : ne commencer ni 5.6-F, ni aucune fonctionnalité 5.7+
+avant une nouvelle décision explicite du mainteneur.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

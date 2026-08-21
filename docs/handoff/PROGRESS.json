@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-e-implemented-awaiting-maintainer-audit",
+    "status": "sub-lot-5.6-e-corrections-implemented-awaiting-maintainer-reaudit",
     "updated_at": "2026-08-21",
     "implementation_percent": 66,
     "architecture_percent": 100,
@@ -21,7 +21,7 @@
       "implementation_percent": 56,
       "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E"],
       "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D"],
-      "audit_status": "5.6-e-implemented-awaiting-maintainer-audit",
+      "audit_status": "5.6-e-corrections-implemented-awaiting-maintainer-reaudit",
       "sub_lot_5_6_d_maintainer_reaudit": "pass",
       "sub_lot_5_6_d_maintainer_validated": true,
       "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
@@ -60,6 +60,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Maintainer audits implemented Lot 5.6-E. STOP before Lot 5.6-F. Lot 5.7+ remain unauthorized."
+    "task": "Maintainer re-audits corrected Lot 5.6-E evidence (35 PASS, 0 PARTIAL). STOP before Lot 5.6-F. Lot 5.7+ remain unauthorized."
   }
 }
