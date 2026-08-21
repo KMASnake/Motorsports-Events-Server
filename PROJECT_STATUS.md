@@ -1,5 +1,19 @@
 # État du projet
 
+## Lot 5.6 — validé globalement par le mainteneur (21 août 2026)
+
+Le mainteneur valide globalement le Lot 5.6 après le PASS final de 5.6-I :
+26 PASS, aucun FAIL, aucun P1/P2 ouvert et aucun P3 bloquant. Les sous-lots
+5.6-A à 5.6-H sont validés mainteneur et le gate final 5.6-I est PASS. Le P3
+connu hérité de 5.6-G — query anomalies invalide retournant `[]` plutôt qu’un
+HTTP 400 — reste non bloquant et ne rouvre pas le lot.
+
+Le Lot 5.6 est donc complet à 100 %. Le prochain gate de la trajectoire
+Production Preview est identifié comme 5.7-P — tranche verticale de
+normalisation — mais il reste non autorisé jusqu’à une décision mainteneur
+distincte. La fusion dans `main`, 5.7, 5.7-P et les lots ultérieurs restent
+non autorisés.
+
 ## Lot 5.6-I — validation finale terminée, décision mainteneur attendue (21 août 2026)
 
 La recette complète du Lot 5.6-I est PASS. Elle couvre les sous-lots 5.6-A à

@@ -402,3 +402,15 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
 - 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
 - le prochain gate appartient au mainteneur : décider explicitement de la
   validation globale du Lot 5.6.
+## 2026-08-21 — Validation mainteneur globale du Lot 5.6
+
+- le mainteneur accepte le dossier final 5.6-I et ses 26/26 PASS ;
+- les sous-lots 5.6-A à 5.6-H sont validés et 5.6-I est un gate final PASS ;
+- P1 ouverts : 0 ; P2 ouverts : 0 ; P3 bloquants : 0 ;
+- le P3 hérité de 5.6-G sur la query anomalies invalide reste connu et non
+  bloquant ;
+- le Lot 5.6 est globalement validé le 2026-08-21 et complet à 100 % ;
+- le prochain gate identifié est 5.7-P — tranche verticale de normalisation
+  Production Preview — déjà conçu mais non autorisé ;
+- 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
+- la fusion dans `main` reste soumise à une décision séparée et non autorisée.

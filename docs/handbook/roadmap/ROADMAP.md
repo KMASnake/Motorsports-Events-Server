@@ -5,7 +5,7 @@
 - Lot 4.3 : validé utilisateur, fusionné dans `main` via PR #27 le 2026-08-11
 - Lot 4 : terminé fonctionnellement
 - Lot 4.4 : authentification de la console d'administration, validée utilisateur et fusionnée dans `main` via PR #28 le 2026-08-12
-- Lot 5 : Fournisseurs et moteur de synchronisation API — 5.1 à 5.5 validés par le mainteneur ; **5.6 autorisé en implémentation le 2026-08-14**
+- Lot 5 : Fournisseurs et moteur de synchronisation API — 5.1 à 5.6 validés par le mainteneur ; prochain gate 5.7-P identifié mais non autorisé
 
 ## Lot 4.4 — Authentification administration — TERMINÉ
 
@@ -15,7 +15,7 @@ Capacités validées : authentification administrateur, Argon2id, sessions serve
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
-Statut : `sub-lot-5.6-implementation-authorized`.
+Statut : `lot-5.6-maintainer-validated-awaiting-next-gate-decision`.
 
 La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Les documents dédiés des sous-lots priment lorsqu'ils amendent explicitement les formulations Phase 0.
 
@@ -27,7 +27,7 @@ La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-C
 - 5.4 — scheduler persistant, curseurs et leases : validé mainteneur ;
 - consolidation générale et sécurité pré-5.5 : validée mainteneur ;
 - 5.5 — quotas et cadence : validé mainteneur le 2026-08-14 ;
-- 5.6 — acquisition fournisseur durable : **Concept + UI + Acceptance + audit consolidés ; implémentation autorisée par le mainteneur le 2026-08-14** ;
+- 5.6 — acquisition fournisseur durable : **validé globalement par le mainteneur le 2026-08-21** ;
 - 5.7+ : non autorisés.
 
 ### Lot 5.4 — Scheduler, curseurs et leases
@@ -42,7 +42,7 @@ Documents normatifs : `docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md`, `docs/han
 
 Audit croisé et ré-audit final réussis sans constat P1/P2/P3 ouvert. La recette PostgreSQL dédiée compte 61 cas réussis. Les règles quota/cadence, réserve current, backoff, fencing et sécurité restent normatives pour 5.6.
 
-### Lot 5.6 — Acquisition fournisseur durable — AUTORISÉ EN IMPLÉMENTATION
+### Lot 5.6 — Acquisition fournisseur durable — VALIDÉ MAINTENEUR
 
 Documents normatifs :
 
@@ -52,12 +52,16 @@ Documents normatifs :
 - `docs/handoff/LOT-5.6-AUDIT-CORRECTIONS.md` ;
 - `docs/handoff/LOT-5.6-CONSOLIDATION.md`.
 
-Le mainteneur a explicitement validé la conception consolidée et **autorisé l'implémentation le 2026-08-14**. Cette autorisation ouvre uniquement le développement et les tests du Lot 5.6. Elle ne vaut pas validation finale, ne permet pas la fusion dans `main` et n'autorise aucun travail 5.7+.
+Après validation de la conception consolidée puis implémentation, le gate final
+5.6-I a obtenu 26/26 PASS. Le mainteneur a **globalement validé le Lot 5.6 le
+2026-08-21**. Cette validation ne permet pas la fusion dans `main` et
+n'autorise aucun travail 5.7+.
 
 Invariants majeurs : futur `current` jusqu'à épuisement fournisseur, fenêtre chaude J→J+30 par défaut, finalisation 30 jours, recent catchup, deep history jusqu'à épuisement avec 5 saisons vides consécutives par défaut, checkpoints transactionnels, pré-1970, source rejouable sans versions dupliquées, overrides protégés, absence non destructive, cadence déléguée à 5.4/5.5 et sécurité HTTP ADR-0016.
 
 ### Lots suivants
 
+- 5.7-P — tranche verticale de normalisation Production Preview : **prochain gate identifié, conçu, non autorisé** ;
 - 5.7 — normalisation, idempotence, mappings, corrections et présence fournisseur : **non autorisé** ;
 - 5.8 — runs/logs/alertes complets : non autorisé ;
 - 5.9 — interface Fournisseurs fidèle aux maquettes validées : non autorisé ;
@@ -85,4 +89,6 @@ Le contrat fonctionnel ACP 5.6 est validé en conception. La finition UI pixel-p
 
 ### Stop rule
 
-**Seul le Lot 5.6 est autorisé en implémentation.** Toute extension fonctionnelle vers 5.7 ou ultérieur doit s'arrêter et attendre un nouveau gate mainteneur explicite. L'implémentation 5.6 devra ensuite être testée, auditée et explicitement validée par le mainteneur avant toute clôture ou fusion.
+**Aucun nouveau lot n'est autorisé en implémentation.** Le prochain gate
+identifié, 5.7-P, doit attendre une autorisation mainteneur explicite. La
+validation du Lot 5.6 n’autorise pas sa fusion dans `main`.

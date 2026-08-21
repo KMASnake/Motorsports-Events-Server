@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — décision mainteneur finale du Lot 5.6
+## Priorité courante — décision d’autorisation du gate 5.7-P
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -51,14 +51,17 @@
   de 5.6-I.
 - [x] exécuter uniquement 5.6-I — recette complète, audit et passation — selon
   les preuves finales requises par l’Acceptance ;
-- [ ] soumettre le Lot 5.6 complet à la décision finale du mainteneur sans
+- [x] soumettre le Lot 5.6 complet à la décision finale du mainteneur sans
   ouvrir 5.7 ni autoriser une fusion dans `main`.
 
-5.6-I est terminé avec une recette complète PASS et sa preuve finale est
-consignée dans `docs/handoff/LOT-5.6-I-FINAL-VALIDATION.md`. Le prochain gate
-est exclusivement la décision explicite du mainteneur sur la validation globale
-du Lot 5.6. Aucune fusion et aucun travail 5.7, 5.7-P ou ultérieur ne sont
-autorisés.
+Le Lot 5.6 est validé globalement par le mainteneur le 2026-08-21. Le prochain
+gate identifié est 5.7-P — tranche verticale de normalisation Production
+Preview — dont la conception et l’Acceptance existent déjà. Il reste à obtenir
+une autorisation mainteneur explicite avant toute implémentation. Aucune fusion
+et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
+
+- [ ] décider explicitement d’autoriser ou non le gate 5.7-P ;
+- [ ] décider séparément d’autoriser ou non la fusion dans `main`.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 
