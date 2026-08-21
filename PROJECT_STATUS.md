@@ -1,5 +1,19 @@
 # État du projet
 
+## Lot 5.6-I — validation finale terminée, décision mainteneur attendue (21 août 2026)
+
+La recette complète du Lot 5.6-I est PASS. Elle couvre les sous-lots 5.6-A à
+5.6-H, les migrations 0016 à 0023 sur PostgreSQL réel avec rollback et
+réapplication, les suites API et Web, 17 scénarios Chromium sans skip, les
+régressions 5.4/5.5, la sécurité, la reprise inter-processus et le packaging
+2.7.0. La matrice finale et l’empreinte de release sont consignées dans
+`docs/handoff/LOT-5.6-I-FINAL-VALIDATION.md`.
+
+Le prochain gate est la décision explicite du mainteneur sur la validation
+globale du Lot 5.6. En attendant, `sub_lot_5_6.maintainer_validated` et
+`merge_authorized` restent à `false`; 5.7, 5.7-P et les lots suivants restent
+non autorisés. Aucun changement fonctionnel n’a été introduit par 5.6-I.
+
 ## Lot 5.6-H — validé par le mainteneur (21 août 2026)
 
 L’audit mainteneur de l’interface ACP est PASS : 26 PASS, 0 PARTIAL, 0 FAIL

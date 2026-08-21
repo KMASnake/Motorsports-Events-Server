@@ -390,3 +390,15 @@ Voir `architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.
   les changements d'heure civile.
 
 Voir `architecture/ADR-0007-CALENDAR.md`.
+## 2026-08-21 — Recette finale 5.6-I PASS et décision mainteneur attendue
+
+- la recette complète 5.6-I est PASS et clôt le dernier sous-lot technique du
+  plan approuvé, sans changement fonctionnel ;
+- les preuves PostgreSQL, API, Web, Chromium, sécurité, reprise, régressions
+  5.4/5.5 et release sont consignées dans
+  `docs/handoff/LOT-5.6-I-FINAL-VALIDATION.md` ;
+- cette clôture technique ne vaut pas validation globale du Lot 5.6 ;
+- `merge_authorized` reste faux et la fusion dans `main` reste interdite ;
+- 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
+- le prochain gate appartient au mainteneur : décider explicitement de la
+  validation globale du Lot 5.6.

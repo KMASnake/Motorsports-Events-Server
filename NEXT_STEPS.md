@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — gate final du Lot 5.6-I
+## Priorité courante — décision mainteneur finale du Lot 5.6
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -49,16 +49,16 @@
   le plan approuvés.
 - [x] auditer puis valider explicitement le Lot 5.6-H avant toute autorisation
   de 5.6-I.
-- [ ] exécuter uniquement 5.6-I — recette complète, audit et passation — selon
+- [x] exécuter uniquement 5.6-I — recette complète, audit et passation — selon
   les preuves finales requises par l’Acceptance ;
 - [ ] soumettre le Lot 5.6 complet à la décision finale du mainteneur sans
   ouvrir 5.7 ni autoriser une fusion dans `main`.
 
-5.6-H est validé par le mainteneur avec 26 PASS, 0 PARTIAL, 0 FAIL et
-0 NOT TESTED. Le gate 5.6-I est un gate de recette complète, audit et passation,
-pas un gate d’implémentation fonctionnelle. Point d’arrêt obligatoire après sa
-préparation : aucune validation globale 5.6, aucune fusion et aucun travail
-5.7+ sans nouvelle décision explicite du mainteneur.
+5.6-I est terminé avec une recette complète PASS et sa preuve finale est
+consignée dans `docs/handoff/LOT-5.6-I-FINAL-VALIDATION.md`. Le prochain gate
+est exclusivement la décision explicite du mainteneur sur la validation globale
+du Lot 5.6. Aucune fusion et aucun travail 5.7, 5.7-P ou ultérieur ne sont
+autorisés.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 
