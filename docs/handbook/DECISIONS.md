@@ -429,6 +429,16 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
   autorisé ;
 - le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
 - le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.
+
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-A
+
+- les fondations persistantes PP-T01 à PP-T06 sont implémentées et prouvées ;
+- 5.7-P-A est complet et attend l’audit mainteneur, sans être validé mainteneur ;
+- aucun moteur de normalisation, mapping, endpoint Preview, publication ou
+  contrôle client n’est ajouté ;
+- l’autorisation technique de A est consommée et aucun gate B à F n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.
 ## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
 
 - la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;

@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — implémentation bornée de 5.7-P-A
+## Priorité courante — audit mainteneur de 5.7-P-A
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -68,15 +68,17 @@ et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
 - [x] auditer puis valider explicitement le design, l’Acceptance technique et
   les six gates de 5.7-P ;
 - [x] autoriser séparément 5.7-P-A avant toute implémentation ;
-- [ ] implémenter uniquement 5.7-P-A — fondations d’identité normalisée et de
+- [x] implémenter uniquement 5.7-P-A — fondations d’identité normalisée et de
   persistance — puis STOP pour audit mainteneur ;
+- [ ] auditer 5.7-P-A sans commencer ni autoriser automatiquement 5.7-P-B ;
 - [ ] décider séparément d’autoriser ou non la fusion dans `main`.
 
-Le design 5.7-P est validé par le mainteneur. Seul 5.7-P-A est autorisé et reste
-non commencé. Son périmètre s’arrête aux migrations additives, contraintes et
-repositories des fondations persistantes avec PP-T01 à PP-T06 ; aucune donnée
-client ne doit être exposée. 5.7-P-B à F, le Lot 5.7 complet et 5.8+ restent
-non autorisés.
+Le design 5.7-P est validé par le mainteneur. 5.7-P-A est complet et attend son
+audit mainteneur ; son autorisation technique est consommée et aucun gate
+suivant n’est ouvert. Son périmètre s’arrête aux migrations additives,
+contraintes et repositories des fondations persistantes avec PP-T01 à PP-T06 ;
+aucune donnée client n’est exposée. 5.7-P-B à F, le Lot 5.7 complet et 5.8+
+restent non autorisés.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

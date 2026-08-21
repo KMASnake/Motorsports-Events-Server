@@ -1,16 +1,17 @@
 # État du projet
 
-## Lot 5.7-P-A — seul gate autorisé, non commencé (21 août 2026)
+## Lot 5.7-P-A — implémenté, en attente d’audit mainteneur (22 août 2026)
 
 Le mainteneur valide la conception fonctionnelle et technique 5.7-P,
 l’Acceptance PP-T01 à PP-T42, la décomposition A→F et le cross-audit PASS.
 L’audit mainteneur du design est PASS, sans P1, P2 ni P3 bloquant.
 
-Seul 5.7-P-A — fondations d’identité normalisée et de persistance — est
-autorisé pour implémentation. Il reste non commencé et doit s’arrêter après ses
-fondations persistantes et preuves PP-T01 à PP-T06. Il n’autorise aucune
-normalisation, publication, route client, authentification ou visibilité
-externe. 5.7-P-B à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent
+5.7-P-A — fondations d’identité normalisée et de persistance — est implémenté
+au commit `b458bb9c195bccd5c8d8a6106c18812747508a52`. Les migrations additives,
+repositories et preuves PP-T01 à PP-T06 sont terminés et attendent l’audit
+mainteneur. Aucun gate suivant n’est autorisé. Aucune normalisation,
+publication, route client, authentification ou visibilité externe n’a été
+ajoutée. 5.7-P-B à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent
 non autorisés.
 
 ## Lot 5.7-P — conception technique prête pour audit mainteneur (21 août 2026)
