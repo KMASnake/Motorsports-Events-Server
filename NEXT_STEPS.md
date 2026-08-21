@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — implémentation autorisée du Lot 5.6-H
+## Priorité courante — audit mainteneur du Lot 5.6-H
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -45,15 +45,15 @@
 - [x] implémenter uniquement 5.6-G — API et actions ACP — selon le plan
   approuvé.
 - [x] obtenir l’audit PASS et la validation mainteneur explicite de 5.6-G ;
-- [ ] implémenter uniquement 5.6-H — interface ACP — selon le contrat UI et
+- [x] implémenter uniquement 5.6-H — interface ACP — selon le contrat UI et
   le plan approuvés.
+- [ ] auditer puis valider explicitement le Lot 5.6-H avant toute autorisation
+  de 5.6-I.
 
-5.6-G est validé avec 26 PASS et un P3 non bloquant : les filtres invalides de
-la vue anomalies retournent `[]` plutôt qu’un HTTP 400. Le gate
-d’implémentation 5.6-H — interface ACP — est ouvert, mais aucun code 5.6-H
-n’est commencé par cette décision documentaire. Point d'arrêt obligatoire
-après 5.6-H : ne commencer ni 5.6-I, ni aucune fonctionnalité 5.7+ sans
-nouvelle décision explicite du mainteneur.
+5.6-H est implémenté et prêt pour audit mainteneur. Sa matrice atteint 26 PASS,
+0 PARTIAL, 0 FAIL et 0 NOT TESTED ; les tests frontend, Playwright, API et
+PostgreSQL sont verts. Point d’arrêt obligatoire : ne commencer ni 5.6-I, ni
+aucune fonctionnalité 5.7+ sans nouvelle décision explicite du mainteneur.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

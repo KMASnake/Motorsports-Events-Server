@@ -1,5 +1,21 @@
 # État du projet
 
+## Lot 5.6-H — implémenté, en attente d’audit mainteneur (21 août 2026)
+
+L’interface ACP de supervision de l’acquisition fournisseur consomme les API
+internes validées de 5.6-G. Elle couvre l’état current/finalization/history, les
+runs récents, anomalies et diagnostics source, les corrections et observations
+locales, ainsi que les quatre actions opérateur prévues avec confirmations et
+retours explicites.
+
+Les 42 tests frontend, 4 scénarios Playwright Chromium, 209 tests API et la
+recette PostgreSQL corrections/observations sont verts. Les preuves et captures
+sont consignées dans `docs/handoff/LOT-5.6-H-EVIDENCE.md`.
+
+5.6-H attend désormais l’audit mainteneur. 5.6-H n’est pas validé mainteneur,
+5.6-I n’est pas autorisé, le Lot 5.6 global reste non validé et non fusionnable,
+et 5.7, 5.7-P et les lots suivants restent interdits.
+
 ## Lot 5.6-G — validé par le mainteneur (21 août 2026)
 
 L’API interne expose les états d’acquisition, le diagnostic source, les

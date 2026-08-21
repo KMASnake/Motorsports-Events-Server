@@ -14,14 +14,14 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.6-g-maintainer-validated-5.6-h-implementation-authorized",
-    "reason": "Lots 5.6-A through 5.6-G are maintainer-validated. Lot 5.6-G audit is PASS with 26 PASS and one non-blocking P3 observation. The next approved gate authorizes only implementation of Lot 5.6-H — interface ACP. Lot 5.6 remains globally unvalidated and unmergeable; Lot 5.7+ remain unauthorized."
+    "status": "sub-lot-5.6-h-implemented-awaiting-maintainer-audit",
+    "reason": "Lots 5.6-A through 5.6-G are maintainer-validated. Lot 5.6-H — interface ACP — is implemented and awaiting maintainer audit; Lot 5.6-I is not authorized. Lot 5.6 remains globally unvalidated and unmergeable; Lot 5.7+ remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-g-maintainer-validated-5.6-h-implementation-authorized",
-    "implementation_percent": 78,
+    "status": "sub-lot-5.6-h-implemented-awaiting-maintainer-audit",
+    "implementation_percent": 89,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "merged_to_main": false,
@@ -33,10 +33,10 @@
     "sub_lot_5_4": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
     "sub_lot_5_5": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-14","authorized":true},
     "sub_lot_5_6": {
-      "implementation_percent": 78,
-      "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F", "5.6-G"],
+      "implementation_percent": 89,
+      "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F", "5.6-G", "5.6-H"],
       "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F", "5.6-G"],
-      "audit_status": "5.6-g-maintainer-audit-pass-and-validated",
+      "audit_status": "5.6-h-implemented-awaiting-maintainer-audit",
       "sub_lot_5_6_d_maintainer_reaudit": "pass",
       "sub_lot_5_6_d_maintainer_validated": true,
       "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
@@ -49,7 +49,8 @@
       "sub_lot_5_6_g_maintainer_audit": "pass",
       "sub_lot_5_6_g_maintainer_validated": true,
       "sub_lot_5_6_g_maintainer_validation_date": "2026-08-21",
-      "authorized_technical_sub_lot": "5.6-H",
+      "sub_lot_5_6_h_maintainer_validated": false,
+      "authorized_technical_sub_lot": null,
       "concept_validated": true,
       "concept_validation_date": "2026-08-14",
       "ui_contract_validated": true,
@@ -84,7 +85,7 @@
     "lot_5_6_design_gate": "passed-and-implementation-authorized-2026-08-14"
   },
   "next_action": {
-    "owner": "Codex",
-    "task": "Implement only Lot 5.6-H — interface ACP. Then STOP for maintainer audit before Lot 5.6-I. Lot 5.7+ remain unauthorized."
+    "owner": "Maintainer",
+    "task": "Maintainer audits implemented Lot 5.6-H. STOP before Lot 5.6-I. Lot 5.7+ remain unauthorized."
   }
 }
