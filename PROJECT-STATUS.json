@@ -14,13 +14,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "sub-lot-5.6-e-corrections-implemented-awaiting-maintainer-reaudit",
-    "reason": "Lots 5.6-A through 5.6-D are maintainer-validated. The two Lot 5.6-E evidence gaps are closed by explicit completed-before-J+30 and two-process PostgreSQL restart proofs (35 PASS, 0 PARTIAL), and await maintainer re-audit. Lot 5.6 remains globally unvalidated and unmergeable; Lot 5.7+ remain unauthorized."
+    "status": "sub-lot-5.6-e-maintainer-validated-5.6-f-implementation-authorized",
+    "reason": "Lots 5.6-A through 5.6-E are maintainer-validated. Lot 5.6-E re-audit is PASS with 35 PASS and 0 PARTIAL. The next approved gate authorizes only implementation of Lot 5.6-F — protection of corrections and observations. Lot 5.6 remains globally unvalidated and unmergeable; Lot 5.7+ remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-e-corrections-implemented-awaiting-maintainer-reaudit",
+    "status": "sub-lot-5.6-e-maintainer-validated-5.6-f-implementation-authorized",
     "implementation_percent": 66,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -35,13 +35,15 @@
     "sub_lot_5_6": {
       "implementation_percent": 56,
       "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E"],
-      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D"],
-      "audit_status": "5.6-e-corrections-implemented-awaiting-maintainer-reaudit",
+      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E"],
+      "audit_status": "5.6-e-maintainer-reaudit-pass-and-validated",
       "sub_lot_5_6_d_maintainer_reaudit": "pass",
       "sub_lot_5_6_d_maintainer_validated": true,
       "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
-      "sub_lot_5_6_e_maintainer_validated": false,
-      "authorized_technical_sub_lot": null,
+      "sub_lot_5_6_e_maintainer_reaudit": "pass",
+      "sub_lot_5_6_e_maintainer_validated": true,
+      "sub_lot_5_6_e_maintainer_validation_date": "2026-08-21",
+      "authorized_technical_sub_lot": "5.6-F",
       "concept_validated": true,
       "concept_validation_date": "2026-08-14",
       "ui_contract_validated": true,
@@ -77,6 +79,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "Maintainer re-audits corrected Lot 5.6-E evidence (35 PASS, 0 PARTIAL). STOP before Lot 5.6-F. Lot 5.7+ remain unauthorized."
+    "task": "Implement only Lot 5.6-F — protection of corrections and observations — under the approved plan. STOP before 5.6-G. Lot 5.7+ remain unauthorized."
   }
 }

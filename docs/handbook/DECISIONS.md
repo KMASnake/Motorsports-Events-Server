@@ -2,6 +2,17 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-21 — Validation mainteneur de 5.6-E et ouverture de 5.6-F
+
+- l’Acceptance finale de 5.6-E est 35 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- le ré-audit mainteneur de 5.6-E est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-F — protection des corrections
+  et observations — dont l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-G, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision n’implémente aucun code 5.6-F et ne modifie aucun invariant
+  fonctionnel validé de 5.6-E.
+
 ## 2026-08-21 — Validation mainteneur de 5.6-D et ouverture de 5.6-E
 
 - le ré-audit mainteneur de 5.6-D est PASS et le sous-lot est validé ;

@@ -10,13 +10,14 @@ Implementation final / audited SHA: `75b0fdf7d59d81c1e3e4f33d0391d525767629a8`
 
 Implementation commit: `75b0fdf7d59d81c1e3e4f33d0391d525767629a8 feat(providers): implement Lot 5.6-E temporality and finalization`
 
-This document records implementation evidence only. It does not validate Lot 5.6-E, authorize Lot 5.6-F, validate Lot 5.6 globally, authorize 5.7+, or authorize a merge to `main`.
+This document records implementation evidence. The maintainer subsequently re-audited it PASS and validated Lot 5.6-E on 2026-08-21. That decision opens only the Lot 5.6-F implementation gate; it does not validate Lot 5.6 globally, authorize 5.7+, or authorize a merge to `main`.
 
 ## Governance state checked
 
-- Current state: `sub-lot-5.6-e-corrections-implemented-awaiting-maintainer-reaudit`.
-- Lot 5.6-E maintainer validation: `false`.
-- Authorized technical sub-lot: none; Lot 5.6-F is not started or authorized.
+- Current state: `sub-lot-5.6-e-maintainer-validated-5.6-f-implementation-authorized`.
+- Lot 5.6-E maintainer re-audit: PASS; validation date: 2026-08-21.
+- Lot 5.6-E maintainer validation: `true`.
+- Authorized technical sub-lot: Lot 5.6-F — protection of corrections and observations; implementation not started by this governance update.
 - Lot 5.6 global maintainer validation: `false`.
 - Lot 5.7, 5.7-P and 5.8+: unauthorized.
 - Merge authorization: `false`.

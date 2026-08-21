@@ -1,7 +1,7 @@
 # Lot 5.6-E — Temporalité et finalization
 
 Date : 2026-08-21  
-Statut : **CORRECTIONS DE PREUVE IMPLÉMENTÉES — RÉ-AUDIT MAINTENEUR REQUIS**
+Statut : **RÉ-AUDIT MAINTENEUR PASS — VALIDÉ LE 2026-08-21**
 
 ## Critères couverts
 
@@ -49,7 +49,9 @@ API ou stockage concurrent n’est ajouté.
 
 ## Frontière
 
-La matrice de preuve atteint 35 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED.
-5.6-E est corrigé mais non validé par le mainteneur. 5.6-F n’est pas
-autorisé. Le Lot 5.6 global reste non validé, `merge_authorized=false`, et les
-Lots 5.7/5.7-P et suivants restent non autorisés.
+La matrice de preuve atteint 35 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED. Le
+ré-audit mainteneur est PASS et 5.6-E est validé le 2026-08-21. Le gate suivant
+autorise uniquement l’implémentation de 5.6-F — protection des corrections et
+observations — sans qu’elle soit commencée dans cette mission. Le Lot 5.6
+global reste non validé, `merge_authorized=false`, et les Lots 5.7/5.7-P et
+suivants restent non autorisés.

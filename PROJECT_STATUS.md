@@ -1,6 +1,6 @@
 # État du projet
 
-## Lot 5.6-E — preuves corrigées en attente de ré-audit mainteneur (21 août 2026)
+## Lot 5.6-E — validé par le mainteneur (21 août 2026)
 
 La temporalité et la finalization sont désormais intégrées au commit durable
 d’acquisition. Le recalcul automatique ne vise que les entités touchées par le
@@ -18,9 +18,11 @@ partir de la nouvelle planification.
 Preuve : `docs/handoff/LOT-5.6-E-VALIDATION.md`. La preuve PostgreSQL 5.6-E
 couvre désormais explicitement `completed` avant J+30 et la reprise durable
 entre deux processus Node sans état mémoire partagé : 35 PASS, 0 PARTIAL.
-Les recettes PostgreSQL 5.6-C, 5.6-D, 5.4 et 5.5 restent vertes. STOP avant
-5.6-F : 5.6-E n’est pas validé par le mainteneur, le Lot 5.6 global reste non
-validé et non fusionnable, et les Lots 5.7+ restent interdits.
+Les recettes PostgreSQL 5.6-C, 5.6-D, 5.4 et 5.5 restent vertes. Le ré-audit
+mainteneur est PASS et 5.6-E est validé. Le prochain gate autorise uniquement
+l’implémentation de 5.6-F — protection des corrections et observations. Aucun
+code 5.6-F n’est encore commencé. Le Lot 5.6 global reste non validé et non
+fusionnable, et les Lots 5.7+ restent interdits.
 
 ## Lot 5.6-D — validé par le mainteneur (21 août 2026)
 
