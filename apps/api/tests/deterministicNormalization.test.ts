@@ -1,0 +1,46 @@
+import {describe,expect,it} from 'vitest';
+import {EVENT_AUTO_MATCH_MARGIN,EVENT_AUTO_MATCH_SCORE,MAX_MATCH_CANDIDATES,canonicalJson,effectiveInput,mapSource,normalize,resolveIdentity,stableHash,stableUuid,type MappingConfig,type MatchCandidate,type SourceEnvelope} from '../src/normalization/deterministicNormalization.js';
+
+const mapping:MappingConfig={version:'f1-preview-v1',rulesVersion:'rules-v1',championshipIds:{f1:'f1'},circuitIds:{monza:'monza'},sessionTypes:{Race:'race',Sprint:'sprint',FP1:'practice',FP2:'practice'},statuses:{Scheduled:'scheduled',Cancelled:'cancelled',Postponed:'postponed',Finished:'completed'}};
+const source=(patch:Partial<SourceEnvelope>={}):SourceEnvelope=>({id:'57000000-0000-4000-8000-000000000001',kind:'event',sourceHash:'hash-1',providerKey:'fixture',championshipSourceId:'f1',season:1965,data:{name:'Italian Grand Prix',session_type:'Race',status:'Scheduled',championship_id:'f1',circuit_id:'monza',starts_at:'1965-09-12T14:00:00+01:00',timezone:'Europe/Rome',round:'8'},corrections:[],lastChangedAt:'1965-09-01T00:00:00Z',lastObservedAt:'1965-09-01T00:00:00Z',observation:'present',traversalComplete:true,providerStartedAt:null,providerEndedAt:null,theoreticalEndAt:'1965-09-12T16:00:00Z',endEstimated:true,endProvenance:'adapter_rule',now:'1965-09-02T00:00:00Z',...patch});
+const candidate=(patch:Partial<MatchCandidate>={}):MatchCandidate=>({id:'event-1',championshipId:'f1',season:1965,meetingId:'57000000-0000-4000-8000-000000000010',sessionType:'race',startsAt:'1965-09-12T13:00:00Z',circuitId:'monza',name:'Italian Grand Prix',round:'8',...patch});
+
+describe('Lot 5.7-P-B deterministic normalization',()=>{
+  it('B01 deterministic replay',()=>expect(normalize(source(),mapping,[candidate()],null)).toEqual(normalize(source(),mapping,[candidate()],null)));
+  it('B02 provider update keeps proposed UUID',()=>expect(normalize(source(),mapping,[],null).proposedUuid).toBe(normalize(source({sourceHash:'hash-2',data:{...source().data,name:'Updated'}}),mapping,[],null).proposedUuid));
+  it('B03 durable source link wins',()=>expect(normalize(source(),mapping,[candidate({id:'other'})],'event-linked').resolution).toMatchObject({decision:'linked',targetId:'event-linked',reason:'existing_link'}));
+  it('B04 hard incompatibility prevents auto-link',()=>expect(resolveIdentity(mapSource(source(),mapping),[candidate({championshipId:'wec'})],null).decision).toBe('create'));
+  it('B05 deterministic candidate selection',()=>expect(resolveIdentity(mapSource(source(),mapping),[candidate({id:'z'}),candidate({id:'a',startsAt:'1965-09-12T18:00:00Z'})],null).targetId).toBe('z'));
+  it('B06 equal candidates become review',()=>expect(resolveIdentity(mapSource(source(),mapping),[candidate({id:'a'}),candidate({id:'b'})],null)).toMatchObject({decision:'review',reason:'ambiguous_margin'}));
+  it('B07 mapping version changes candidate identity explicitly',()=>expect(normalize(source(),mapping,[],null).candidateId).not.toBe(normalize(source(),{...mapping,version:'v2'},[],null).candidateId));
+  it('B08 provenance contains source and rule versions',()=>expect(mapSource(source(),mapping).provenance).toMatchObject({sourceEntityId:source().id,sourceHash:'hash-1',mappingVersion:'f1-preview-v1',rulesVersion:'rules-v1'}));
+  it('B09 unknown session maps to other and retains label',()=>expect(mapSource(source({data:{...source().data,session_type:'Warmup'}}),mapping)).toMatchObject({sessionType:'other',sessionLabel:'Warmup'}));
+  it('B10 unknown required identity becomes review',()=>expect(normalize(source({data:{...source().data,circuit_id:'unknown'}}),mapping,[],null).resolution).toMatchObject({decision:'review',reason:'required_identity_unknown'}));
+  it('B11 active correction changes effective candidate',()=>expect(mapSource(source({corrections:[{id:'c1',fieldPath:'status',value:'Cancelled',active:true}]}),mapping).status).toBe('cancelled'));
+  it('B12 disabled correction is ignored',()=>expect(mapSource(source({corrections:[{id:'c1',fieldPath:'status',value:'Cancelled',active:false}]}),mapping).status).toBe('scheduled'));
+  it('B13 complete traversal accepts non-observation',()=>expect(mapSource(source({observation:'not_observed',traversalComplete:true}),mapping).presence).toBe('not_observed'));
+  it('B14 incomplete traversal does not imply absence',()=>expect(mapSource(source({observation:'not_observed',traversalComplete:false}),mapping).presence).toBe('unknown'));
+  it('B15 cancelled is explicit',()=>expect(mapSource(source({data:{...source().data,status:'Cancelled'}}),mapping).status).toBe('cancelled'));
+  it('B16 postponed is explicit and not completed',()=>expect(mapSource(source({data:{...source().data,status:'Postponed'}}),mapping)).toMatchObject({status:'postponed',finalization:'estimated_internal'}));
+  it('B17 timestamps normalize to UTC',()=>expect(mapSource(source(),mapping).startsAt).toBe('1965-09-12T13:00:00.000Z'));
+  it('B18 DST spring offsets are explicit',()=>expect(mapSource(source({data:{...source().data,starts_at:'2026-03-29T03:30:00+02:00'}}),mapping).startsAt).toBe('2026-03-29T01:30:00.000Z'));
+  it('B19 DST autumn offsets are explicit',()=>expect(mapSource(source({data:{...source().data,starts_at:'2026-10-25T02:30:00+01:00'}}),mapping).startsAt).toBe('2026-10-25T01:30:00.000Z'));
+  it('B20 pre-1970 remains valid',()=>expect(new Date(mapSource(source(),mapping).startsAt!).getUTCFullYear()).toBe(1965));
+  it('B21 reliable source end beats estimation',()=>expect(mapSource(source({providerEndedAt:'1965-09-12T16:00:00Z',endEstimated:false,endProvenance:'provider'}),mapping)).toMatchObject({endsAt:'1965-09-12T16:00:00.000Z',finalization:'trustworthy_source_end'}));
+  it('B22 overdue unresolved finalization raises internal anomaly without completed',()=>expect(mapSource(source({now:'1965-10-12T16:00:00Z'}),mapping)).toMatchObject({status:'scheduled',finalizationAnomaly:true}));
+  it('B23 canonical JSON ignores property insertion order',()=>expect(canonicalJson({b:1,a:2})).toBe(canonicalJson({a:2,b:1})));
+  it('B24 stable UUID is deterministic and valid',()=>expect(stableUuid('n',{a:1})).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/));
+  it('B25 source hash changes normalized checksum',()=>expect(normalize(source(),mapping,[],null).checksum).not.toBe(normalize(source({sourceHash:'new'}),mapping,[],null).checksum));
+  it('B26 deterministic tie ordering is stable',()=>expect(resolveIdentity(mapSource(source(),mapping),[candidate({id:'b'}),candidate({id:'a'})],null).score).toBe(100));
+  it('B27 unsafe correction paths are rejected',()=>expect(()=>effectiveInput({},[{id:'c',fieldPath:'__proto__.polluted',value:true,active:true}])).toThrow('normalization_correction_path_invalid'));
+  it('B28 restart has no process-local influence',()=>expect(stableHash(normalize(source(),mapping,[],null))).toBe(stableHash(normalize(structuredClone(source()),structuredClone(mapping),[],null))));
+  it('B29 candidate data contains no raw source payload',()=>expect(normalize(source({data:{...source().data,secret:'private'}}),mapping,[],null).state).not.toHaveProperty('secret'));
+  it('B30 timezone-less timestamp is rejected safely',()=>expect(()=>mapSource(source({data:{...source().data,starts_at:'2026-01-01T10:00:00'}}),mapping)).toThrow('normalization_timestamp_requires_offset'));
+  it('B31 candidate search is bounded',()=>expect(()=>resolveIdentity(mapSource(source(),mapping),Array.from({length:MAX_MATCH_CANDIDATES+1},(_,id)=>candidate({id:String(id)})),null)).toThrow('normalization_candidate_search_unbounded'));
+  it('B32 no publication/client concepts are emitted',()=>expect(Object.keys(normalize(source(),mapping,[],null))).not.toEqual(expect.arrayContaining(['publication','publicState','changeLog','client'])));
+  it('matches one Meeting by championship season and reliable round',()=>expect(normalize(source({kind:'meeting',data:{...source().data,session_type:null,round:'8'}}),mapping,[candidate({id:'meeting-8',meetingId:null,sessionType:'other',round:'8'})],null).resolution).toMatchObject({decision:'linked',targetId:'meeting-8',reason:'deterministic_meeting_identity'}));
+  it('routes ambiguous Meetings to review',()=>expect(normalize(source({kind:'meeting',data:{...source().data,session_type:null,round:'8'}}),mapping,[candidate({id:'meeting-a',meetingId:null,sessionType:'other',round:'8'}),candidate({id:'meeting-b',meetingId:null,sessionType:'other',round:'8'})],null).resolution).toMatchObject({decision:'review',reason:'ambiguous_meeting'}));
+  it('does not repropose a durably rejected target',()=>expect(normalize(source(),mapping,[candidate()],null,['event-1']).resolution).toMatchObject({decision:'create',targetId:null}));
+  it('resolves a finalization anomaly on later reliable completed evidence',()=>expect(mapSource(source({now:'1965-10-20T00:00:00Z',data:{...source().data,status:'Finished'}}),mapping)).toMatchObject({status:'completed',finalization:'provider_explicit',finalizationAnomaly:false}));
+  it('uses normative initial thresholds',()=>expect([EVENT_AUTO_MATCH_SCORE,EVENT_AUTO_MATCH_MARGIN]).toEqual([90,15]));
+});
