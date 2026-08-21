@@ -453,6 +453,19 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
   autorisés ;
 - le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni 5.6 ni A.
 
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-B
+
+- la normalisation déterministe et le mapping source PP-T07 à PP-T16 sont
+  implémentés et prouvés ;
+- B s’arrête aux candidats, décisions, liens et checkpoints persistés ; aucune
+  publication, API Preview ou surface client n’est ajoutée ;
+- 5.7-P-B est complet et attend l’audit mainteneur, sans être validé
+  mainteneur ;
+- l’autorisation technique de B est consommée et aucun gate C à F n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et inchangé.
+
 ## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
 
 - la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;

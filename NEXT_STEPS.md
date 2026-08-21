@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — implémentation bornée de 5.7-P-B
+## Priorité courante — audit mainteneur de 5.7-P-B
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -71,14 +71,15 @@ et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
 - [x] implémenter uniquement 5.7-P-A — fondations d’identité normalisée et de
   persistance — puis STOP pour audit mainteneur ;
 - [x] auditer et valider 5.7-P-A ;
-- [ ] implémenter uniquement 5.7-P-B — normalisation déterministe et mapping
+- [x] implémenter uniquement 5.7-P-B — normalisation déterministe et mapping
   source — puis STOP pour audit mainteneur ;
+- [ ] auditer 5.7-P-B sans commencer ni autoriser automatiquement 5.7-P-C ;
 - [ ] décider séparément d’autoriser ou non la fusion dans `main`.
 
-5.7-P-A est validé mainteneur le 2026-08-22. Seul 5.7-P-B est autorisé et reste
-non commencé. Son futur périmètre PP-T07 à PP-T16 produit des candidats
-normalisés déterministes depuis la source 5.6 et s’arrête avant toute
-publication. 5.7-P-C à F, le Lot 5.7 complet et 5.8+ restent non autorisés.
+5.7-P-A est validé mainteneur. 5.7-P-B est complet et attend l’audit
+mainteneur. PP-T07 à PP-T16 produisent des candidats normalisés déterministes
+depuis la source 5.6 et s’arrêtent avant toute publication. Aucun gate suivant
+n’est ouvert. 5.7-P-C à F, le Lot 5.7 complet et 5.8+ restent non autorisés.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

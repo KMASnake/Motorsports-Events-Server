@@ -14,13 +14,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "lot-5.7-p-b-authorized-awaiting-implementation",
-    "reason": "Lot 5.7-P-A passed maintainer audit and is maintainer-validated. Only 5.7-P-B deterministic normalization and source mapping is authorized and not started. Gates C through F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "status": "lot-5.7-p-b-complete-awaiting-maintainer-audit",
+    "reason": "Lot 5.7-P-B deterministic normalization and source mapping is complete and awaits maintainer audit. No next gate is authorized. Gates C through F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-b-authorized-awaiting-implementation",
+    "status": "lot-5.7-p-b-complete-awaiting-maintainer-audit",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -78,17 +78,17 @@
       "authorization_date": "2026-08-21",
       "implementation_started": true,
       "implementation_percent_method": "completed-gate-count; no weighted percentage is defined for gates A-F, so no arbitrary percentage is assigned",
-      "completed_technical_gates": ["5.7-P-A"],
+      "completed_technical_gates": ["5.7-P-A", "5.7-P-B"],
       "maintainer_validated_technical_gates": ["5.7-P-A"],
       "design_status": "maintainer-validated",
       "design_maintainer_audit": "pass",
       "design_maintainer_validated": true,
       "design_maintainer_validation_date": "2026-08-21",
-      "authorized_gate": "5.7-P-B",
-      "authorized_technical_sub_lot": "5.7-P-B",
+      "authorized_gate": null,
+      "authorized_technical_sub_lot": null,
       "technical_gates": {
         "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
-        "5.7-P-B": {"status":"authorized","implementation_started":false},
+        "5.7-P-B": {"status":"completed-awaiting-maintainer-audit","implementation_started":true,"implementation_complete":true,"maintainer_validated":false},
         "5.7-P-C": {"status":"unauthorized"},
         "5.7-P-D": {"status":"unauthorized"},
         "5.7-P-E": {"status":"unauthorized"},
@@ -104,7 +104,7 @@
       "design_cross_audit": "docs/handoff/LOT-5.7-P-DESIGN-CROSS-AUDIT.md"
     },
     "mandatory_constraints": [
-      "Lot 5.7-P-A is maintainer-validated and only 5.7-P-B is authorized but not started",
+      "Lot 5.7-P-A is maintainer-validated; 5.7-P-B is complete and awaits maintainer audit; no next gate is authorized",
       "Lot 5.7 full and Lot 5.8+ remain unauthorized",
       "Lot 5.6 validation and Lot 5.7-P authorization do not constitute merge authorization",
       "Lot 5.6 must preserve all Lot 5.4 scheduler/lease/fencing invariants",
@@ -115,7 +115,7 @@
       "Pre-1970 dates must be supported without positive-Unix-timestamp assumptions",
       "No Lot 5.7 business reconciliation or final normalization may be implemented"
     ],
-    "validation_rule": "Lot 5.6 and technical gate 5.7-P-A are maintainer-validated. Only 5.7-P-B is authorized and not started. Gates C-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Lot 5.6 and technical gate 5.7-P-A are maintainer-validated. Gate 5.7-P-B is complete and awaits maintainer audit; no next gate is authorized. Gates C-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "technical_baseline": {
     "pre_5_5_security_baseline": "maintainer-validated-2026-08-14",
@@ -124,6 +124,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Implement only Lot 5.7-P-B — Deterministic normalization and source mapping. Then STOP for maintainer audit. Do not start 5.7-P-C. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge main remains unauthorized."
+    "task": "Maintainer audits completed Lot 5.7-P-B. Do not start 5.7-P-C. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge main remains unauthorized."
   }
 }
