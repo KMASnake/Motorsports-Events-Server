@@ -29,6 +29,9 @@ import { DiscoverySchedulerRuntime } from './providers/discoverySchedulerRuntime
 import { registerSecurityHeaders, secureFastifyOptions } from './lib/httpSecurity.js';
 import { registerUuidParamValidation } from './lib/routeParams.js';
 import { QuotaCadenceService } from './providers/quotaCadenceService.js';
+import { AcquisitionAdminService } from './providers/acquisitionAdminService.js';
+import { SourceProtectionService } from './providers/sourceProtectionService.js';
+import { providerAcquisitionAdminRoutes } from './routes/providerAcquisitionAdmin.js';
 
 const app = Fastify(secureFastifyOptions());
 registerSecurityHeaders(app);
@@ -76,6 +79,7 @@ await app.register(providerDiscoveryRoutes,{service:discoveryService});
 await app.register(providerManualSourceRoutes,{service:new ManualChampionshipSourceService(providerService)});
 const schedulerService=new PersistentSchedulerService();
 await app.register(providerSchedulerRoutes,{service:schedulerService});
+await app.register(providerAcquisitionAdminRoutes,{admin:new AcquisitionAdminService(),protection:new SourceProtectionService(),scheduler:schedulerService});
 const pollSeconds=Math.min(30,Math.max(10,Number(process.env.SCHEDULER_POLL_SECONDS)||15));
 const discoveryRuntime=new DiscoverySchedulerRuntime(schedulerService,discoveryService,app.log,pollSeconds*1000);
 app.addHook('onClose',async()=>discoveryRuntime.stop());

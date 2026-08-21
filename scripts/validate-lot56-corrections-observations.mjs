@@ -4,9 +4,13 @@ import {pool} from '../apps/api/dist/lib/db.js';
 import {AcquisitionTransactionService} from '../apps/api/dist/providers/acquisitionTransactionService.js';
 import {SourceProtectionService} from '../apps/api/dist/providers/sourceProtectionService.js';
 import {PersistentSchedulerService} from '../apps/api/dist/providers/schedulerService.js';
+import Fastify from 'fastify';
+import {AcquisitionAdminService} from '../apps/api/dist/providers/acquisitionAdminService.js';
+import {providerAcquisitionAdminRoutes} from '../apps/api/dist/routes/providerAcquisitionAdmin.js';
+import {registerAdminAuth,signAdminToken} from '../apps/api/dist/lib/adminAuth.js';
 
 const phase=process.argv[2];assert.ok(phase==='phase-a'||phase==='phase-b');
-const provider='56f00000-0000-0000-0000-000000000001',link='56f00000-0000-0000-0000-000000000002',stream='56f00000-0000-0000-0000-000000000003';
+const provider='56f00000-0000-4000-8000-000000000001',link='56f00000-0000-4000-8000-000000000002',stream='56f00000-0000-4000-8000-000000000003';
 const clock={now:()=>new Date('2026-08-21T12:00:00Z')},scheduler=new PersistentSchedulerService(clock),acquisition=new AcquisitionTransactionService(scheduler,clock),protection=new SourceProtectionService();
 const gate={beforeRequest:async()=>({allowed:true}),afterResponse:async()=>{},afterError:async()=>{}};
 const fetchInput={providerInstanceId:provider,providerConfig:{},credentials:{},requestGate:gate,providerChampionshipId:link,championshipId:'lot56-f',sourceConfig:{},phase:'current',season:1969,cursor:{},signal:new AbortController().signal};
@@ -52,6 +56,14 @@ try{
     await execute(result([item('Provider D')],7),'restart-d');await execute(result([item('Provider D')],7),'restart-d-retry');
     assert.equal((await scalar('select source_data from provider_source_entities where id=$1',[entity.id])).source_data.name,'Provider D');assert.equal(Number((await scalar('select count(*)::int count from provider_source_entities where id=$1',[entity.id])).count),1);assert.equal(Number((await scalar(`select count(*)::int count from provider_source_corrections where source_entity_id=$1 and status='active'`,[entity.id])).count),1);assert.equal(Number((await scalar('select count(*)::int count from provider_source_local_observations where source_entity_id=$1',[entity.id])).count),1);
     assert.equal((await scalar('select cursor from sync_streams where id=$1',[stream])).cursor.page,7);
+    const historical='56f00000-0000-4000-8000-000000000004';await pool.query(`insert into sync_streams(id,provider_championship_id,phase,state,cursor_version,cursor,historical_state) values($1,$2,'historical','ready',1,'{}','{"recent_catchup_queue":[],"deep_history_cursor":{}}') on conflict(provider_championship_id,phase) do nothing`,[historical,link]);await pool.query(`insert into provider_acquisition_state(provider_championship_id,bootstrap_state,recent_catchup_state,deep_history_state,deep_history_season) values($1,'complete','complete','complete',1968) on conflict(provider_championship_id) do nothing`,[link]);
+    const app=Fastify(),secret='lot-5-6-g-real-postgres-secret-at-least-32-chars';registerAdminAuth(app,secret);await app.register(providerAcquisitionAdminRoutes,{admin:new AcquisitionAdminService(),protection,scheduler});const headers={authorization:`Bearer ${signAdminToken({sub:'api-maintainer',role:'admin',exp:Math.floor(Date.now()/1000)+60},secret)}`};
+    const detail=await app.inject({url:`/api/v1/admin/provider-source-entities/${entity.id}`,headers});assert.equal(detail.statusCode,200);assert.equal(Object.hasOwn(detail.json().entity,'source_data'),false);assert.equal(detail.json().manual_correction_active,true);
+    const correctionResponse=await app.inject({method:'PUT',url:`/api/v1/admin/provider-source-entities/${entity.id}/corrections/status`,headers,payload:{override_value:'verified',reason:'API verification'}});assert.equal(correctionResponse.statusCode,200);assert.equal(correctionResponse.json().actor_id,'api-maintainer');assert.equal((await scalar('select source_data from provider_source_entities where id=$1',[entity.id])).source_data.status,'scheduled');
+    const observationResponse=await app.inject({method:'PUT',url:`/api/v1/admin/provider-source-entities/${entity.id}/observations/api:review`,headers,payload:{kind:'review_note',details:{verified:true},reason:'API verification'}});assert.equal(observationResponse.statusCode,200);assert.equal(observationResponse.json().actor_id,'api-maintainer');
+    assert.equal((await app.inject({method:'POST',url:`/api/v1/admin/provider-source-entities/${entity.id}/resync`,headers})).statusCode,202);assert.equal((await scalar("select historical_state->'recent_catchup_queue'->0->>'year' season from sync_streams where id=$1",[historical])).season,'1969');
+    assert.equal((await app.inject({method:'POST',url:`/api/v1/admin/provider-championships/${link}/acquisition/rebuild-history`,headers,payload:{from_season:1965,confirmed:true}})).statusCode,202);assert.equal(Number((await scalar('select deep_history_season from provider_acquisition_state where provider_championship_id=$1',[link])).deep_history_season),1965);
+    assert.equal((await app.inject({method:'POST',url:`/api/v1/admin/provider-championships/${link}/acquisition/resume-history`,headers})).statusCode,202);await app.close();
     console.log('Phase B : nouveau processus, reprise, provenance, cardinalités et retry idempotent : OK');
   }
 }finally{await pool.end();}
