@@ -14,19 +14,19 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "lot-5.6-maintainer-validated-awaiting-next-gate-decision",
-    "reason": "Lot 5.6-I final validation is PASS and global Lot 5.6 is maintainer-validated on 2026-08-21. The next roadmap gate is identified as 5.7-P but remains unauthorized. Merge to main and all Lot 5.7+ work remain unauthorized."
+    "status": "lot-5.7-p-authorized-for-design-completion",
+    "reason": "Lot 5.7-P is authorized on 2026-08-21. Its functional Concept and Acceptance are complete, but no normative technical sub-lot structure or first implementation gate exists; only design completion is open. Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.6-maintainer-validated-awaiting-next-gate-decision",
+    "status": "lot-5.7-p-authorized-for-design-completion",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "merged_to_main": false,
     "merge_authorized": false,
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.7-P",
     "sub_lot_5_1": {"implementation_percent":100,"maintainer_validated":true},
     "sub_lot_5_2": {"implementation_percent":100,"maintainer_validated":true},
     "sub_lot_5_3": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
@@ -72,10 +72,23 @@
       "ui_contract": "docs/handoff/LOT-5.6-UI-CONTRACT.md",
       "acceptance": "docs/handoff/LOT-5.6-ACCEPTANCE.md"
     },
+    "sub_lot_5_7_p": {
+      "implementation_percent": 0,
+      "authorized": true,
+      "authorization_date": "2026-08-21",
+      "implementation_started": false,
+      "design_status": "functional-design-complete-technical-sequencing-incomplete",
+      "authorized_gate": "design-completion",
+      "authorized_technical_sub_lot": null,
+      "full_lot_5_7_authorized": false,
+      "concept": "docs/handoff/PRODUCTION-PREVIEW-CONCEPT.md",
+      "acceptance": "docs/handoff/PRODUCTION-PREVIEW-ACCEPTANCE.md",
+      "audit_corrections": "docs/handoff/PRODUCTION-PREVIEW-AUDIT-CORRECTIONS.md"
+    },
     "mandatory_constraints": [
-      "Lot 5.6 only is authorized for implementation",
-      "Lot 5.7 and later remain unauthorized",
-      "Lot 5.6 authorization does not constitute implementation validation or merge authorization",
+      "Only Lot 5.7-P design completion is authorized; implementation is not started",
+      "Lot 5.7 full and Lot 5.8+ remain unauthorized",
+      "Lot 5.6 validation and Lot 5.7-P authorization do not constitute merge authorization",
       "Lot 5.6 must preserve all Lot 5.4 scheduler/lease/fencing invariants",
       "Lot 5.6 must preserve all Lot 5.5 quota/cadence/reserve/backoff invariants",
       "Current acquisition extends to provider future exhaustion; J+30 is only the default hot window",
@@ -84,7 +97,7 @@
       "Pre-1970 dates must be supported without positive-Unix-timestamp assumptions",
       "No Lot 5.7 business reconciliation or final normalization may be implemented"
     ],
-    "validation_rule": "Lot 5.6 is maintainer-validated on 2026-08-21 after the 5.6-I final validation PASS. This validation does not authorize merge to main or any Lot 5.7+ work."
+    "validation_rule": "Lot 5.6 is maintainer-validated. Lot 5.7-P is authorized only for technical design completion until a named implementation gate is separately approved. Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "technical_baseline": {
     "pre_5_5_security_baseline": "maintainer-validated-2026-08-14",
@@ -93,6 +106,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Review the identified next roadmap gate, 5.7-P — Production Preview normalization vertical slice, and decide whether to authorize it. Lot 5.7, 5.7-P and later remain unauthorized; merge to main remains unauthorized."
+    "task": "Complete only the authorized 5.7-P technical implementation plan and gate decomposition from the existing Production Preview Concept, Acceptance and audit corrections. STOP before implementation. Lot 5.7 full and Lot 5.8+ remain unauthorized; merge to main remains unauthorized."
   }
 }

@@ -110,7 +110,7 @@ Le Concept et l'Acceptance du Lot **5.5 — Quotas et cadence** ont été audit�
 
 Le Concept, le contrat UI et l'Acceptance du **Lot 5.6 — Acquisition fournisseur durable** ont été formalisés, audités contre 5.4/5.5, la baseline sécurité et la frontière 5.7, puis consolidés après fermeture des constats. Après le PASS final de 5.6-I, le mainteneur a **globalement validé le Lot 5.6 le 2026-08-21**.
 
-`authorized_sub_lot = null` signifie qu’aucun nouveau lot n’est actuellement autorisé à entrer en implémentation. Le prochain gate identifié est 5.7-P — tranche verticale de normalisation Production Preview — déjà conçu mais non autorisé. La validation 5.6 ne vaut pas autorisation de fusion dans `main`. Les **Lots 5.7 et suivants restent non autorisés** avant un nouveau gate explicite.
+`authorized_sub_lot = 5.7-P` autorise la tranche verticale de normalisation Production Preview depuis le 2026-08-21. Comme les normes existantes ne nomment aucun sous-lot technique ni premier gate implémentable, seule la complétion du plan technique est ouverte ; l’implémentation reste non commencée. La validation 5.6 et l’autorisation 5.7-P ne valent pas autorisation de fusion dans `main`. Le **Lot 5.7 complet et les Lots 5.8+ restent non autorisés**.
 
 Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves VPS isolées des migrations, API, corrections et contrôles visuels avec la recette Windows complète réussie le 2026-08-11 (qualité, données synthétiques et 11 scénarios Chromium). Il attend sa fusion contrôlée dans `main` ; cette fusion ne constitue pas elle-même la validation, déjà acquise explicitement.
 

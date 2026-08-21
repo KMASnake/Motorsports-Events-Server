@@ -4,14 +4,14 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.6-maintainer-validated-awaiting-next-gate-decision",
+    "status": "lot-5.7-p-authorized-for-design-completion",
     "updated_at": "2026-08-21",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
     "merged_to_main": false,
     "merge_authorized": false,
-    "authorized_sub_lot": null,
+    "authorized_sub_lot": "5.7-P",
     "sub_lot_5_1": {"implementation_percent":100,"maintainer_validated":true},
     "sub_lot_5_2": {"implementation_percent":100,"maintainer_validated":true},
     "sub_lot_5_3": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
@@ -53,7 +53,17 @@
       "authorization_date": "2026-08-14",
       "maintainer_validated": true
     },
-    "validation_rule": "Lot 5.6 is maintainer-validated after the 5.6-I final validation PASS. This does not authorize merge to main or any Lot 5.7+ work."
+    "sub_lot_5_7_p": {
+      "implementation_percent": 0,
+      "authorized": true,
+      "authorization_date": "2026-08-21",
+      "implementation_started": false,
+      "design_status": "functional-design-complete-technical-sequencing-incomplete",
+      "authorized_gate": "design-completion",
+      "authorized_technical_sub_lot": null,
+      "full_lot_5_7_authorized": false
+    },
+    "validation_rule": "Lot 5.6 is maintainer-validated. Lot 5.7-P is authorized only for technical design completion until a named implementation gate is separately approved. Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -76,6 +86,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Review the identified next roadmap gate, 5.7-P — Production Preview normalization vertical slice, and decide whether to authorize it. Lot 5.7, 5.7-P and later remain unauthorized; merge to main remains unauthorized."
+    "task": "Complete only the authorized 5.7-P technical implementation plan and gate decomposition from the existing Production Preview Concept, Acceptance and audit corrections. STOP before implementation. Lot 5.7 full and Lot 5.8+ remain unauthorized; merge to main remains unauthorized."
   }
 }

@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — décision d’autorisation du gate 5.7-P
+## Priorité courante — complétion du design technique 5.7-P
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -60,8 +60,16 @@ Preview — dont la conception et l’Acceptance existent déjà. Il reste à ob
 une autorisation mainteneur explicite avant toute implémentation. Aucune fusion
 et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
 
-- [ ] décider explicitement d’autoriser ou non le gate 5.7-P ;
+- [x] décider explicitement d’autoriser ou non le gate 5.7-P ;
+- [ ] produire uniquement le plan technique et la décomposition ordonnée en
+  gates de 5.7-P depuis le Concept, l’Acceptance PP-001 à PP-183 et les
+  corrections d’audit ;
+- [ ] soumettre ce plan à une décision mainteneur avant toute implémentation ;
 - [ ] décider séparément d’autoriser ou non la fusion dans `main`.
+
+5.7-P est autorisé mais aucune implémentation n’est ouverte : les normes ne
+nomment actuellement ni sous-lots techniques ni premier gate implémentable. Le
+Lot 5.7 complet et 5.8+ restent non autorisés.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

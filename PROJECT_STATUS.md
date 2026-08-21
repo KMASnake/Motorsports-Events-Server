@@ -1,5 +1,18 @@
 # État du projet
 
+## Lot 5.7-P — autorisé pour complétion du design technique (21 août 2026)
+
+Le mainteneur autorise 5.7-P, tranche verticale de normalisation Production
+Preview. Le Concept, l’Acceptance PP-001 à PP-183 et les corrections d’audit
+définissent le périmètre fonctionnel, les invariants et les preuves finales.
+Ils ne définissent toutefois aucun sous-lot technique ni premier gate
+d’implémentation nommé.
+
+Le seul gate ouvert est donc documentaire : produire le plan technique et la
+décomposition ordonnée de 5.7-P à partir des normes existantes. L’implémentation
+reste à 0 % et n’est pas commencée. Le Lot 5.7 complet, 5.8, 5.9, 5.10 et les
+lots suivants restent non autorisés ; la fusion dans `main` reste interdite.
+
 ## Lot 5.6 — validé globalement par le mainteneur (21 août 2026)
 
 Le mainteneur valide globalement le Lot 5.6 après le PASS final de 5.6-I :

@@ -5,7 +5,7 @@
 - Lot 4.3 : validé utilisateur, fusionné dans `main` via PR #27 le 2026-08-11
 - Lot 4 : terminé fonctionnellement
 - Lot 4.4 : authentification de la console d'administration, validée utilisateur et fusionnée dans `main` via PR #28 le 2026-08-12
-- Lot 5 : Fournisseurs et moteur de synchronisation API — 5.1 à 5.6 validés par le mainteneur ; prochain gate 5.7-P identifié mais non autorisé
+- Lot 5 : Fournisseurs et moteur de synchronisation API — 5.1 à 5.6 validés par le mainteneur ; 5.7-P autorisé pour complétion du design technique
 
 ## Lot 4.4 — Authentification administration — TERMINÉ
 
@@ -15,7 +15,7 @@ Capacités validées : authentification administrateur, Argon2id, sessions serve
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
-Statut : `lot-5.6-maintainer-validated-awaiting-next-gate-decision`.
+Statut : `lot-5.7-p-authorized-for-design-completion`.
 
 La conception générale reste définie par `docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md`, la SPEC et l'errata. Les documents dédiés des sous-lots priment lorsqu'ils amendent explicitement les formulations Phase 0.
 
@@ -61,7 +61,7 @@ Invariants majeurs : futur `current` jusqu'à épuisement fournisseur, fenêtre 
 
 ### Lots suivants
 
-- 5.7-P — tranche verticale de normalisation Production Preview : **prochain gate identifié, conçu, non autorisé** ;
+- 5.7-P — tranche verticale de normalisation Production Preview : **autorisée le 2026-08-21 pour complétion du design technique ; implémentation non commencée** ;
 - 5.7 — normalisation, idempotence, mappings, corrections et présence fournisseur : **non autorisé** ;
 - 5.8 — runs/logs/alertes complets : non autorisé ;
 - 5.9 — interface Fournisseurs fidèle aux maquettes validées : non autorisé ;
@@ -89,6 +89,7 @@ Le contrat fonctionnel ACP 5.6 est validé en conception. La finition UI pixel-p
 
 ### Stop rule
 
-**Aucun nouveau lot n'est autorisé en implémentation.** Le prochain gate
-identifié, 5.7-P, doit attendre une autorisation mainteneur explicite. La
+**Seule la complétion du design technique de 5.7-P est ouverte.** Aucun gate
+d’implémentation n’est nommé ni autorisé avant production et validation de sa
+décomposition technique. Le Lot 5.7 complet et 5.8+ restent non autorisés. La
 validation du Lot 5.6 n’autorise pas sa fusion dans `main`.

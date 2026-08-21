@@ -402,6 +402,7 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
 - 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
 - le prochain gate appartient au mainteneur : décider explicitement de la
   validation globale du Lot 5.6.
+
 ## 2026-08-21 — Validation mainteneur globale du Lot 5.6
 
 - le mainteneur accepte le dossier final 5.6-I et ses 26/26 PASS ;
@@ -414,3 +415,17 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
   Production Preview — déjà conçu mais non autorisé ;
 - 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
 - la fusion dans `main` reste soumise à une décision séparée et non autorisée.
+
+## 2026-08-21 — Autorisation mainteneur de 5.7-P
+
+- le mainteneur autorise 5.7-P, tranche verticale de normalisation Production
+  Preview ;
+- le Concept, l’Acceptance effective PP-001 à PP-183 et les corrections
+  d’audit constituent les normes existantes ;
+- ces normes ne définissent aucun sous-lot technique ni premier gate
+  d’implémentation nommé : seule leur traduction en plan technique ordonné est
+  autorisée dans le premier gate ;
+- l’implémentation 5.7-P reste non commencée et aucun sous-lot technique n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
+- le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.
