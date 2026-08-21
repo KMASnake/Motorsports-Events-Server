@@ -2,6 +2,15 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-21 — Validation mainteneur de 5.6-D et ouverture de 5.6-E
+
+- le ré-audit mainteneur de 5.6-D est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-E — temporalité et
+  finalization — dont l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-F, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision ne modifie aucun invariant fonctionnel validé de 5.6-D.
+
 ## 2026-08-15 — Exception mainteneur TheSportsDB v1
 
 - le mainteneur impose le maintien de TheSportsDB v1 et accepte explicitement

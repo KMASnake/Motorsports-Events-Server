@@ -4,8 +4,8 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "sub-lot-5.6-d-corrected-awaiting-maintainer-reaudit",
-    "updated_at": "2026-08-15",
+    "status": "sub-lot-5.6-e-authorized-not-started",
+    "updated_at": "2026-08-21",
     "implementation_percent": 66,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -20,8 +20,12 @@
     "sub_lot_5_6": {
       "implementation_percent": 44,
       "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D"],
-      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C"],
-      "audit_status": "5.6-d-final-corrections-awaiting-maintainer-reaudit",
+      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D"],
+      "audit_status": "5.6-d-maintainer-validated",
+      "sub_lot_5_6_d_maintainer_reaudit": "pass",
+      "sub_lot_5_6_d_maintainer_validated": true,
+      "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
+      "authorized_technical_sub_lot": "5.6-E",
       "concept_validated": true,
       "ui_contract_validated": true,
       "acceptance_validated": true,
@@ -55,6 +59,6 @@
   },
   "next_action": {
     "owner": "Codex",
-    "task": "STOP before Lot 5.6-E. Await maintainer re-audit of corrected Lot 5.6-D. Lot 5.7+ remain unauthorized."
+    "task": "Implement only Lot 5.6-E (temporality and finalization) under the approved Lot 5.6 gate, then STOP for maintainer audit before 5.6-F. Lot 5.7+ remain unauthorized."
   }
 }

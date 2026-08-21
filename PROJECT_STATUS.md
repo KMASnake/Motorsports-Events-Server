@@ -1,6 +1,6 @@
 # État du projet
 
-## Lot 5.6-D — corrections d’audit en attente de ré-audit (15 août 2026)
+## Lot 5.6-D — validé par le mainteneur (21 août 2026)
 
 Le sous-lot 5.6-C est validé par le mainteneur. L’orchestrateur durable 5.6-D
 enchaîne `current_hot`, `current_future`, `recent_catchup`, `deep_history` et
@@ -18,7 +18,8 @@ dernière session, médiane comparable, règle adaptateur puis jour civil dans l
 fuseau fournisseur. Après le délai configurable, une anomalie persistante est
 créée sans forcer le statut métier.
 
-Preuve : `docs/handoff/LOT-5.6-D-VALIDATION.md`. STOP avant 5.6-E ; le Lot 5.6
+Preuve : `docs/handoff/LOT-5.6-D-VALIDATION.md`. Le ré-audit mainteneur est
+PASS et 5.6-D est validé. Cette décision ouvre uniquement 5.6-E ; le Lot 5.6
 global reste non validé, non fusionnable, et les Lots 5.7+ restent interdits.
 
 Les corrections d’audit utilisent désormais un unique parcours current global,
@@ -37,6 +38,10 @@ ajoute un curseur de finalization par saison. Une cible de décembre N reste don
 traitée en janvier N+1 dans la saison N ; plusieurs saisons sont parcourues
 cycliquement et équitablement. La médiane utilise au maximum les cinq pairs
 comparables les plus récents.
+
+Le gate mainteneur du 21 août 2026 autorise le démarrage de 5.6-E —
+temporalité et finalization — conformément au plan d’implémentation approuvé.
+Il n’autorise ni 5.6-F, ni 5.7/5.7-P, ni une fusion dans `main`.
 
 ## Lot 5.6-C — validé par le mainteneur (15 août 2026)
 

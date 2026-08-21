@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur Lot 5.6-D
+## Priorité courante — Lot 5.6-E autorisé
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -33,10 +33,13 @@
 - [x] construire une file de finalization déterministe par saison N/N+1 ;
 - [x] limiter la médiane aux cinq pairs comparables les plus récents ;
 - [x] valider la migration additive 0021 et 201 tests API ;
-- [ ] obtenir l’audit mainteneur explicite avant 5.6-E.
+- [x] obtenir le ré-audit mainteneur PASS et la validation explicite de 5.6-D ;
+- [ ] implémenter uniquement 5.6-E — temporalité et finalization — selon le
+  Concept, l’Acceptance et le plan approuvés du Lot 5.6.
 
-Point d'arrêt obligatoire : ne commencer ni le sous-lot 5.6-E, ni aucune
-fonctionnalité 5.7+ avant décision explicite du mainteneur.
+Le mainteneur a autorisé uniquement 5.6-E le 21 août 2026. Point d'arrêt
+obligatoire après son implémentation : ne commencer ni 5.6-F, ni aucune
+fonctionnalité 5.7+ avant une nouvelle décision explicite du mainteneur.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 
