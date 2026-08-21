@@ -1,5 +1,18 @@
 # État du projet
 
+## Lot 5.6-H — validé par le mainteneur (21 août 2026)
+
+L’audit mainteneur de l’interface ACP est PASS : 26 PASS, 0 PARTIAL, 0 FAIL
+et 0 NOT TESTED. Le sous-lot 5.6-H est explicitement validé. Le P3 hérité de
+5.6-G — une query anomalies invalide retourne `[]` au lieu d’un HTTP 400 —
+reste une amélioration non bloquante et ne rouvre ni 5.6-G ni 5.6-H.
+
+Le plan approuvé identifie 5.6-I — « recette complète, audit et passation » —
+comme dernier sous-lot technique. Seul ce gate de recette et validation finale
+est ouvert ; aucune implémentation fonctionnelle 5.6-I n’est autorisée. Le Lot
+5.6 global reste non validé et non fusionnable ; 5.7, 5.7-P et les lots
+suivants restent interdits.
+
 ## Lot 5.6-H — implémenté, en attente d’audit mainteneur (21 août 2026)
 
 L’interface ACP de supervision de l’acquisition fournisseur consomme les API

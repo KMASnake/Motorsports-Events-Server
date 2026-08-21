@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur du Lot 5.6-H
+## Priorité courante — gate final du Lot 5.6-I
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -47,13 +47,18 @@
 - [x] obtenir l’audit PASS et la validation mainteneur explicite de 5.6-G ;
 - [x] implémenter uniquement 5.6-H — interface ACP — selon le contrat UI et
   le plan approuvés.
-- [ ] auditer puis valider explicitement le Lot 5.6-H avant toute autorisation
+- [x] auditer puis valider explicitement le Lot 5.6-H avant toute autorisation
   de 5.6-I.
+- [ ] exécuter uniquement 5.6-I — recette complète, audit et passation — selon
+  les preuves finales requises par l’Acceptance ;
+- [ ] soumettre le Lot 5.6 complet à la décision finale du mainteneur sans
+  ouvrir 5.7 ni autoriser une fusion dans `main`.
 
-5.6-H est implémenté et prêt pour audit mainteneur. Sa matrice atteint 26 PASS,
-0 PARTIAL, 0 FAIL et 0 NOT TESTED ; les tests frontend, Playwright, API et
-PostgreSQL sont verts. Point d’arrêt obligatoire : ne commencer ni 5.6-I, ni
-aucune fonctionnalité 5.7+ sans nouvelle décision explicite du mainteneur.
+5.6-H est validé par le mainteneur avec 26 PASS, 0 PARTIAL, 0 FAIL et
+0 NOT TESTED. Le gate 5.6-I est un gate de recette complète, audit et passation,
+pas un gate d’implémentation fonctionnelle. Point d’arrêt obligatoire après sa
+préparation : aucune validation globale 5.6, aucune fusion et aucun travail
+5.7+ sans nouvelle décision explicite du mainteneur.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 
