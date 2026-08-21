@@ -14,13 +14,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "lot-5.7-p-technical-design-complete-awaiting-maintainer-audit",
-    "reason": "Lot 5.7-P technical design, PP-T Acceptance and six-gate decomposition are complete with cross-audit PASS. The first candidate 5.7-P-A remains unauthorized. Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "status": "lot-5.7-p-a-authorized-awaiting-implementation",
+    "reason": "Lot 5.7-P technical design, PP-T Acceptance and six-gate decomposition are maintainer-validated with cross-audit PASS. Only 5.7-P-A is authorized and not started. Gates B through F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-technical-design-complete-awaiting-maintainer-audit",
+    "status": "lot-5.7-p-a-authorized-awaiting-implementation",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -77,9 +77,20 @@
       "authorized": true,
       "authorization_date": "2026-08-21",
       "implementation_started": false,
-      "design_status": "technical-design-complete-awaiting-maintainer-audit",
-      "authorized_gate": null,
-      "authorized_technical_sub_lot": null,
+      "design_status": "maintainer-validated",
+      "design_maintainer_audit": "pass",
+      "design_maintainer_validated": true,
+      "design_maintainer_validation_date": "2026-08-21",
+      "authorized_gate": "5.7-P-A",
+      "authorized_technical_sub_lot": "5.7-P-A",
+      "technical_gates": {
+        "5.7-P-A": {"status":"authorized","implementation_started":false},
+        "5.7-P-B": {"status":"unauthorized"},
+        "5.7-P-C": {"status":"unauthorized"},
+        "5.7-P-D": {"status":"unauthorized"},
+        "5.7-P-E": {"status":"unauthorized"},
+        "5.7-P-F": {"status":"unauthorized"}
+      },
       "full_lot_5_7_authorized": false,
       "concept": "docs/handoff/PRODUCTION-PREVIEW-CONCEPT.md",
       "acceptance": "docs/handoff/PRODUCTION-PREVIEW-ACCEPTANCE.md",
@@ -90,7 +101,7 @@
       "design_cross_audit": "docs/handoff/LOT-5.7-P-DESIGN-CROSS-AUDIT.md"
     },
     "mandatory_constraints": [
-      "Only Lot 5.7-P design completion is authorized; implementation is not started",
+      "Only Lot 5.7-P-A persistence foundations are authorized for implementation and remain not started",
       "Lot 5.7 full and Lot 5.8+ remain unauthorized",
       "Lot 5.6 validation and Lot 5.7-P authorization do not constitute merge authorization",
       "Lot 5.6 must preserve all Lot 5.4 scheduler/lease/fencing invariants",
@@ -101,7 +112,7 @@
       "Pre-1970 dates must be supported without positive-Unix-timestamp assumptions",
       "No Lot 5.7 business reconciliation or final normalization may be implemented"
     ],
-    "validation_rule": "Lot 5.6 is maintainer-validated. Lot 5.7-P is authorized only for technical design completion until a named implementation gate is separately approved. Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Lot 5.6 is maintainer-validated. Lot 5.7-P design is maintainer-validated and only technical gate 5.7-P-A is authorized for implementation. Gates B-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "technical_baseline": {
     "pre_5_5_security_baseline": "maintainer-validated-2026-08-14",
@@ -110,6 +121,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Maintainer audits Lot 5.7-P technical design, acceptance and gate decomposition. STOP before implementation authorization. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge to main remains unauthorized."
+    "task": "Implement only Lot 5.7-P-A — Normalized identity and persistence foundations. Then STOP for maintainer audit. Do not start 5.7-P-B. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge to main remains unauthorized."
   }
 }

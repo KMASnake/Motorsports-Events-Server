@@ -438,3 +438,15 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
 - 5.7-P-A est le premier gate candidat mais reste non autorisé ;
 - l’implémentation reste à 0 % et non commencée ;
 - le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.
+## 2026-08-21 — Validation du design 5.7-P et autorisation de 5.7-P-A
+
+- l’audit mainteneur du design technique, de l’Acceptance PP-T01 à PP-T42 et
+  de la décomposition A→F est PASS ;
+- le design 5.7-P est validé par le mainteneur le 2026-08-21 ;
+- seul 5.7-P-A — fondations d’identité normalisée et de persistance — est
+  autorisé pour implémentation et reste non commencé ;
+- A couvre PP-T01 à PP-T06 et les critères fonctionnels pertinents PP-001 à
+  PP-009 et PP-024 à PP-036, sans normalisation ni exposition client ;
+- 5.7-P-B à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.

@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur du design technique 5.7-P
+## Priorité courante — implémentation bornée de 5.7-P-A
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -65,15 +65,18 @@ et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
   gates de 5.7-P depuis le Concept, l’Acceptance PP-001 à PP-183 et les
   corrections d’audit ;
 - [x] réaliser le cross-audit documentaire sans fuite vers 5.7 complet ou 5.8+ ;
-- [ ] auditer puis valider explicitement le design, l’Acceptance technique et
+- [x] auditer puis valider explicitement le design, l’Acceptance technique et
   les six gates de 5.7-P ;
-- [ ] autoriser séparément 5.7-P-A avant toute implémentation ;
+- [x] autoriser séparément 5.7-P-A avant toute implémentation ;
+- [ ] implémenter uniquement 5.7-P-A — fondations d’identité normalisée et de
+  persistance — puis STOP pour audit mainteneur ;
 - [ ] décider séparément d’autoriser ou non la fusion dans `main`.
 
-5.7-P dispose désormais d’un design technique complet et de six gates A→F. Le
-premier gate candidat 5.7-P-A reste non autorisé jusqu’à une décision mainteneur
-explicite. L’implémentation reste non commencée ; le Lot 5.7 complet et 5.8+
-restent non autorisés.
+Le design 5.7-P est validé par le mainteneur. Seul 5.7-P-A est autorisé et reste
+non commencé. Son périmètre s’arrête aux migrations additives, contraintes et
+repositories des fondations persistantes avec PP-T01 à PP-T06 ; aucune donnée
+client ne doit être exposée. 5.7-P-B à F, le Lot 5.7 complet et 5.8+ restent
+non autorisés.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 
