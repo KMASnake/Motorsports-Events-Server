@@ -38,5 +38,5 @@ export async function previewReadRoutes(app:FastifyInstance,options:PreviewReadO
     const rows=await repository.changes(cursor.sequence,parsed.data.limit,parsed.data.include==='data'),hasMore=rows.length>parsed.data.limit,visible=rows.slice(0,parsed.data.limit),sequence=visible.at(-1)?.sequence??cursor.sequence;
     return {data:visible.map(change=>({sequence:change.sequence,resource_type:change.resourceType,resource_id:change.resourceId,revision:change.revision,operation:change.operation,changed_fields:change.changedFields,occurred_at:change.occurredAt,...(parsed.data.include==='data'?{current:change.current?publicState(change.current):null}:{})})),pagination:{next_cursor:encodeCursor({kind:'sync',sequence,issuedAt:Math.floor(now().valueOf()/1000)},options.cursorSecret),has_more:hasMore}};
   });
-  app.setErrorHandler((failure,request,reply)=>{request.log.error({err:failure,requestId:request.id},'Preview read request failed');return error(reply,request,500,'internal_error','The service could not complete the request.');});
+  app.setErrorHandler((_failure,request,reply)=>{request.log.error({code:'preview_read_failed',requestId:request.id},'Preview read request failed');return error(reply,request,500,'internal_error','The service could not complete the request.');});
 }
