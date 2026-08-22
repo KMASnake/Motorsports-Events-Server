@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "vps-preproduction-ready-awaiting-deployment",
+    "status": "lot-5.7-p-d-authorized-after-vps-validation",
     "updated_at": "2026-08-22",
     "implementation_percent": 100,
     "architecture_percent": 100,
@@ -65,19 +65,23 @@
       "design_maintainer_audit": "pass",
       "design_maintainer_validated": true,
       "design_maintainer_validation_date": "2026-08-21",
-      "authorized_gate": null,
-      "authorized_technical_sub_lot": null,
+      "vps_preproduction_validation": "pass",
+      "vps_preproduction_validated": true,
+      "vps_preproduction_validation_date": "2026-08-22",
+      "vps_preproduction_validated_sha": "cb7d04795b156dc23af6c57efe2bce788569e3da",
+      "authorized_gate": "5.7-P-D",
+      "authorized_technical_sub_lot": "5.7-P-D",
       "technical_gates": {
         "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-B": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-C": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
-        "5.7-P-D": {"status":"unauthorized"},
+        "5.7-P-D": {"status":"authorized","implementation_started":false},
         "5.7-P-E": {"status":"unauthorized"},
         "5.7-P-F": {"status":"unauthorized"}
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Lot 5.6 and technical gates 5.7-P-A/B/C are maintainer-validated. VPS preproduction is locally ready awaiting deployment. Gates D-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Lot 5.6 and technical gates 5.7-P-A/B/C are maintainer-validated. VPS preproduction A/B/C is validated at cb7d04795b156dc23af6c57efe2bce788569e3da. Only 5.7-P-D is authorized and not started. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -100,6 +104,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Maintainer deploys validated A/B/C stack to the VPS preproduction environment and executes the VPS validation checklist. Do not start 5.7-P-D. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge main remains unauthorized."
+    "task": "Implement only Lot 5.7-P-D — Read-only V1 Preview API and incremental sync. Use the validated VPS A/B/C environment as the deployment target for later D validation. Then STOP for maintainer audit. Do not start 5.7-P-E. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge main remains unauthorized."
   }
 }

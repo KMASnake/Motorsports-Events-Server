@@ -1,7 +1,12 @@
 # VPS preproduction readiness — A/B/C internal stack
 
 Date: 2026-08-22  
-Status: **LOCAL READINESS PASS — READY TO TEST ON VPS**
+Status: **REAL VPS VALIDATION PASS — VALIDATED 2026-08-22**
+
+The maintainer completed the real VPS checklist on Debian 13.6 at deployed SHA
+`cb7d04795b156dc23af6c57efe2bce788569e3da`. The permanent preproduction stack,
+full reboot, persistence, isolation, backup and canonical C01–C35 recipe passed.
+See `VPS-PREPRODUCTION-VALIDATION.md` for the immutable evidence record.
 
 This is an internal preproduction environment, not Production Preview and not
 a client-ready deployment. It exposes no new route or client control.
