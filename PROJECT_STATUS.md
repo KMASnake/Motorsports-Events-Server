@@ -1,19 +1,18 @@
 # État du projet
 
-## Lot 5.7-P-B — implémenté, en attente d’audit mainteneur (22 août 2026)
+## Lot 5.7-P-B validé ; seul 5.7-P-C autorisé (22 août 2026)
 
 Le mainteneur valide la conception fonctionnelle et technique 5.7-P,
 l’Acceptance PP-T01 à PP-T42, la décomposition A→F et le cross-audit PASS.
 L’audit mainteneur du design est PASS, sans P1, P2 ni P3 bloquant.
 
-5.7-P-A reste validé mainteneur. 5.7-P-B — normalisation déterministe et
-mapping source — est complet au commit
-`a77db5c4d0b1ffcde349fdbce196d51193cf0160` et attend l’audit mainteneur.
-PP-T07 à PP-T16, les critères fonctionnels B et la recette PostgreSQL sont
-PASS. Le chemin s’arrête aux candidats/décisions/checkpoints persistés : aucune
-publication ou exposition client n’est ajoutée. Aucun gate suivant n’est
-autorisé. 5.7-P-C à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main`
-restent non autorisés.
+5.7-P-A reste validé mainteneur. L’audit de 5.7-P-B est PASS avec 45 critères
+PASS, aucun PARTIAL/FAIL/NOT TESTED ; B est validé mainteneur le 2026-08-22.
+Seul 5.7-P-C — état de publication, last-known-good et journal de changements —
+est autorisé et reste non commencé. Son futur périmètre couvre PP-T17 à PP-T22
+et les critères pertinents PP-062 à PP-073 / PP-086 à PP-104, uniquement en
+persistance interne sans route client. 5.7-P-D à F, le Lot 5.7 complet, 5.8+
+et la fusion dans `main` restent non autorisés.
 
 ## Lot 5.7-P — conception technique prête pour audit mainteneur (21 août 2026)
 

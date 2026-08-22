@@ -466,6 +466,19 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
 - le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
 - le P3 hérité de 5.6-G reste non bloquant et inchangé.
 
+## 2026-08-22 — Validation de 5.7-P-B et autorisation de 5.7-P-C
+
+- l’audit mainteneur de 5.7-P-B est PASS et B est validé mainteneur ;
+- 45 critères applicables sont PASS, sans PARTIAL, FAIL ni NOT TESTED ;
+- seul 5.7-P-C — état de publication, last-known-good et journal de
+  changements — est autorisé et reste non commencé ;
+- C couvre PP-T17 à PP-T22 et les critères fonctionnels pertinents PP-062 à
+  PP-073 / PP-086 à PP-104, avec persistance interne atomique mais sans route
+  client ;
+- 5.7-P-D à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni A ni B.
+
 ## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
 
 - la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;
