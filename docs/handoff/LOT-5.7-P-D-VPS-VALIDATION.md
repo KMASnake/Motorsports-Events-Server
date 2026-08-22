@@ -54,7 +54,7 @@ gunzip -c "$BACKUP" | docker exec -i mse-preprod-postgres-1 \
   psql -v ON_ERROR_STOP=1 -U mse -d '<EMPTY_PREPROD_RESTORE_DATABASE>'
 ```
 
-## 3. Fast-forward update and targeted rebuild
+## 3. Fast-forward update and migration
 
 ```sh
 git checkout codex/lot-5-providers-sync
@@ -63,6 +63,7 @@ test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
 test -z "$(git status --porcelain)"
 COMPOSE='docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml'
 $COMPOSE build api
+$COMPOSE run --rm migrate
 $COMPOSE up -d --no-deps api
 ```
 
@@ -80,8 +81,10 @@ curl -fsS http://127.0.0.1:3101/health
 test "$(docker inspect --format '{{.State.Health.Status}}' motorsports-events-api)" = healthy
 ```
 
-Expected migration head remains `0025_lot57pc_publication_state`; D adds no
-migration.
+Expected migration head is `0027_lot57pc_public_resource_history`. Record the
+baseline from `public_history_controls`, counts from `public_resource_versions`
+and `public_change_log`, and verify that no snapshot before the baseline is
+claimed as reconstructible.
 
 ## 5. Isolated real PostgreSQL D recipe
 
@@ -100,7 +103,7 @@ Expected output:
 
 ```text
 Lot 5.7-P-D PostgreSQL Preview API: PASS
-D01-D14 read/filter/snapshot/cursor/change/security boundary: PASS
+D01-D20 historical snapshot/update/tombstone/retention/security boundary: PASS
 ```
 
 ## 6. Permanent preproduction HTTP audit
@@ -128,11 +131,11 @@ Record C state, restart only preproduction, and compare it afterward:
 
 ```sh
 $COMPOSE exec -T postgres psql -U mse -d motorsports_events -Atc \
-  "select count(*) from public_resource_states; select count(*) from public_change_log;"
+  "select count(*) from public_resource_states; select count(*) from public_resource_versions; select count(*) from public_change_log; select oldest_snapshot_sequence from public_history_controls;"
 $COMPOSE restart postgres api web
 $COMPOSE ps
 $COMPOSE exec -T postgres psql -U mse -d motorsports_events -Atc \
-  "select count(*) from public_resource_states; select count(*) from public_change_log;"
+  "select count(*) from public_resource_states; select count(*) from public_resource_versions; select count(*) from public_change_log; select oldest_snapshot_sequence from public_history_controls;"
 docker volume inspect mse_preprod_postgres_data >/dev/null
 docker inspect --format '{{.State.Health.Status}}' motorsports-events-api
 ```
@@ -172,9 +175,11 @@ curl -fsS http://127.0.0.1:3101/health
 docker inspect --format '{{.State.Health.Status}}' motorsports-events-api
 ```
 
-D has no migration, so normal application rollback does not restore the
-database. Use the verified backup only if an independently demonstrated data
-incident requires it. Never use `down --volumes`.
+Application rollback leaves the forward-compatible 0027 schema in place.
+Database rollback, if separately approved, must stop only preproduction API,
+run the tested 0027 DOWN, verify current state/change counts and retain the
+backup. Use the verified backup only for a demonstrated incident. Never use
+`down --volumes`.
 
 Passing this protocol does not authorize E, client exposure, full Lot 5.7,
 Lot 5.8+ or merge main. The maintainer must record a separate audit decision.

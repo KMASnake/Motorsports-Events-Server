@@ -1,7 +1,7 @@
 # Lot 5.7-P-C — implementation evidence
 
 Date: 2026-08-22  
-Status: **PASS — MAINTAINER VALIDATED 2026-08-22**
+Status: **ADDITIVE CORRECTION COMPLETE — AWAITING MAINTAINER REVALIDATION**
 
 START_SHA: `6da9049e9dd6efe680d107e87d8e659290a4c6ef`  
 FINAL_SHA: `2ef24abc2c35feafd5b687b988604fe8b92066f9` (immutable implementation/test commit)
@@ -135,3 +135,15 @@ FINAL_RECOMMENDATION: **PASS FOR MAINTAINER AUDIT**
 - MAINTAINER_VALIDATED: **TRUE**
 - MAINTAINER_VALIDATION_DATE: **2026-08-22**
 ACCEPTANCE: **25 PASS / 0 PARTIAL / 0 FAIL / 0 NOT TESTED**
+
+## Additive C/D correction — 2026-08-22
+
+The original current-state-only model could not reconstruct a page snapshot
+after a concurrent mutation. Migration 0027 adds immutable
+`public_resource_versions`; every new publication and tombstone now writes its
+canonical public version atomically with current state, change log and receipt.
+The migration baselines current state and records the earliest guaranteed
+snapshot sequence without claiming recovery of older overwritten revisions.
+No automatic purge is introduced. C01–C35, immutability, no-leak, transaction
+rollback and idempotent rebuild proofs pass. This additive correction requires
+maintainer revalidation; the earlier validation is not extended automatically.

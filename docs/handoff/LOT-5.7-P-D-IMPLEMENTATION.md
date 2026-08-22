@@ -12,8 +12,11 @@ Status: **IMPLEMENTATION COMPLETE — AWAITING MAINTAINER AUDIT**
 - signed opaque HMAC page and sync cursors, type separation and 2 KiB bound;
 - a snapshot change-sequence boundary with concurrent updates replayed through
   `/changes`;
+- historical snapshot reconstruction from immutable public versions, including
+  concurrent updates and tombstones;
 - monotone incremental replay, tombstones and optional `include=data`;
-- configurable 90-day sync cursor expiry with HTTP 410/full-resync signal;
+- sync cursor expiry derived from the oldest retained journal sequence, with
+  HTTP 410/full-resync signal;
 - safe structured errors containing `code`, `message` and `request_id`;
 - OpenAPI 3.1 contract in `docs/api-v1-preview.openapi.json`.
 
@@ -27,11 +30,16 @@ and client controls. No E capability is implemented.
 - API unit suite: 267/267 PASS;
 - targeted public/security suite: 30/30 PASS;
 - ESLint API source/tests: PASS;
-- `scripts/test-lot57pd-preview-api.sh`: PostgreSQL D01-D14 PASS;
+- `scripts/test-lot57pd-preview-api.sh`: PostgreSQL D01-D20 PASS;
 - `scripts/test-lot57pc-publication.sh`: C01-C35 PASS;
-- migrations: NONE;
+- migration 0027 fresh/upgrade/DOWN/UP: PASS;
 - provider calls: 0;
 - provider credits: 0.
 
 Maintainer validation is not claimed. 5.7-P-E/F, full Lot 5.7, Lot 5.8+ and
 merge main remain unauthorized.
+
+The oldest guaranteed snapshot is stored separately from the oldest retained
+change. Pre-0027 snapshots expire at the migration baseline; change cursors
+expire only when their sequence precedes the actual retained journal boundary.
+`issuedAt` remains signed cursor metadata but no longer decides retention.

@@ -60,7 +60,7 @@
       "implementation_started": true,
       "implementation_percent_method": "completed-gate-count; no weighted percentage is defined for gates A-F, so no arbitrary percentage is assigned",
       "completed_technical_gates": ["5.7-P-A", "5.7-P-B", "5.7-P-C", "5.7-P-D"],
-      "maintainer_validated_technical_gates": ["5.7-P-A", "5.7-P-B", "5.7-P-C"],
+      "maintainer_validated_technical_gates": ["5.7-P-A", "5.7-P-B"],
       "design_status": "maintainer-validated",
       "design_maintainer_audit": "pass",
       "design_maintainer_validated": true,
@@ -74,14 +74,14 @@
       "technical_gates": {
         "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-B": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
-        "5.7-P-C": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
+        "5.7-P-C": {"status":"awaiting-maintainer-revalidation","implementation_started":true,"implementation_complete":true,"additive_correction_complete":true,"maintainer_revalidation_required":true,"maintainer_validated":false,"prior_maintainer_validation_date":"2026-08-22"},
         "5.7-P-D": {"status":"awaiting-maintainer-audit","implementation_started":true,"implementation_complete":true,"maintainer_validated":false},
         "5.7-P-E": {"status":"unauthorized"},
         "5.7-P-F": {"status":"unauthorized"}
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Lot 5.6 and technical gates 5.7-P-A/B/C are maintainer-validated. VPS preproduction A/B/C is validated at cb7d04795b156dc23af6c57efe2bce788569e3da. 5.7-P-D is implemented and awaits maintainer audit; maintainer validation is not claimed. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Lot 5.6 and technical gates 5.7-P-A/B are maintainer-validated. The additive C history correction is complete and awaits maintainer revalidation. 5.7-P-D is implemented and awaits maintainer audit; validation is not claimed. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -104,6 +104,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Maintainer audits Lot 5.7-P-D and executes docs/handoff/LOT-5.7-P-D-VPS-VALIDATION.md on the validated A/B/C preproduction environment. Do not start 5.7-P-E. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge main remains unauthorized."
+    "task": "Maintainer revalidates the additive Lot 5.7-P-C history correction, audits Lot 5.7-P-D, and executes docs/handoff/LOT-5.7-P-D-VPS-VALIDATION.md. Do not start 5.7-P-E. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge main remains unauthorized."
   }
 }
