@@ -35,6 +35,7 @@ node scripts/validate-lot57pc-publication.mjs
 if docker compose run --rm migrate sh /migrations/migrate.sh down 0025_lot57pc_publication_state >/dev/null 2>&1; then
   echo 'destructive migration rollback unexpectedly succeeded' >&2; exit 1
 fi
+docker compose run --rm migrate sh /migrations/migrate.sh down 0027_lot57pc_public_resource_history >/dev/null
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 <<'SQL' >/dev/null
 truncate publication_rebuild_checkpoints,publication_receipts,public_change_log,public_resource_states;
 alter database motorsports_events set mse.allow_destructive_lot57pc_down='on';

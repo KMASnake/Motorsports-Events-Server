@@ -247,6 +247,7 @@ echo 'Down destructif refusé par défaut : OK'
 
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 \
   -c 'truncate provider_acquisition_anomalies, provider_source_entities, provider_acquisition_traversals cascade;'
+docker compose run --rm migrate sh /migrations/migrate.sh down 0027_lot57pc_public_resource_history >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0025_lot57pc_publication_state >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0024_lot57pa_normalized_persistence >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0023_lot56_source_protection >/dev/null

@@ -27,8 +27,12 @@ try{
   const tombstone=(await pool.query('select lifecycle,canonical_state from public_resource_states where resource_id=$1',['57000000-0000-4000-8000-000000000210'])).rows[0];
   assert.equal(tombstone.lifecycle,'removed');assert.equal(tombstone.canonical_state,null);
   const sequences=(await pool.query('select sequence from public_change_log order by sequence')).rows.map(row=>Number(row.sequence));assert.deepEqual(sequences,[...sequences].sort((a,b)=>a-b));assert.equal(new Set(sequences).size,sequences.length);
+  const versionsBeforeRebuild=Number((await pool.query('select count(*) from public_resource_versions')).rows[0].count);assert.equal(versionsBeforeRebuild,sequences.length);
+  assert.equal(Number((await pool.query(`select count(*) from public_resource_versions where canonical_state::text ~* 'provider|credential|provenance|lease|fencing|stack|secret'`)).rows[0].count),0);
+  await assert.rejects(pool.query(`update public_resource_versions set state_checksum=repeat('f',64) where publication_sequence=$1`,[sequences[0]]),/immutable/);
   const before=JSON.stringify((await pool.query('select resource_type,resource_id,revision,lifecycle,canonical_state from public_resource_states order by 1,2')).rows);
   await service.rebuildFromScratch('proof-from-scratch',at);await service.rebuildIncremental('proof-from-scratch',at);
   const after=JSON.stringify((await pool.query('select resource_type,resource_id,revision,lifecycle,canonical_state from public_resource_states order by 1,2')).rows);assert.equal(after,before);
+  assert.equal(Number((await pool.query('select count(*) from public_resource_versions')).rows[0].count),versionsBeforeRebuild);
   console.log('Lot 5.7-P-C PostgreSQL publication: PASS');
 }finally{await pool.end();}

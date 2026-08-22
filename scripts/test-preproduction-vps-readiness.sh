@@ -59,6 +59,7 @@ compose exec -T postgres psql -U mse -d motorsports_events -Atc "select count(*)
 
 # Current DB 0024 -> 0025, with legacy data retained.
 compose exec -T postgres psql -U mse -d motorsports_events -c "update events set description='preprod-preserved' where id='evt-001'" >/dev/null
+compose run --rm migrate sh /migrations/migrate.sh down 0027_lot57pc_public_resource_history >/dev/null
 compose run --rm migrate sh /migrations/migrate.sh down 0025_lot57pc_publication_state >/dev/null
 compose run --rm migrate >/dev/null
 compose exec -T postgres psql -U mse -d motorsports_events -Atc "select (description='preprod-preserved')::int from events where id='evt-001'" | grep -qx 1
