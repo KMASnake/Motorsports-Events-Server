@@ -14,13 +14,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "lot-5.7-p-d-implemented-awaiting-maintainer-audit",
-    "reason": "The additive 5.7-P-C public history correction is complete and awaits maintainer revalidation. 5.7-P-D is implemented and awaits maintainer audit; validation is not claimed. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "status": "lot-5.7-p-c-d-maintainer-validated-awaiting-explicit-e-authorization",
+    "reason": "The additive 5.7-P-C public-history correction is maintainer-revalidated and 5.7-P-D is maintainer-validated with VPS evidence at 90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96. Gate E is not authorized. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-d-implemented-awaiting-maintainer-audit",
+    "status": "lot-5.7-p-c-d-maintainer-validated-awaiting-explicit-e-authorization",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -79,7 +79,7 @@
       "implementation_started": true,
       "implementation_percent_method": "completed-gate-count; no weighted percentage is defined for gates A-F, so no arbitrary percentage is assigned",
       "completed_technical_gates": ["5.7-P-A", "5.7-P-B", "5.7-P-C", "5.7-P-D"],
-      "maintainer_validated_technical_gates": ["5.7-P-A", "5.7-P-B"],
+      "maintainer_validated_technical_gates": ["5.7-P-A", "5.7-P-B", "5.7-P-C", "5.7-P-D"],
       "design_status": "maintainer-validated",
       "design_maintainer_audit": "pass",
       "design_maintainer_validated": true,
@@ -88,13 +88,13 @@
       "vps_preproduction_validated": true,
       "vps_preproduction_validation_date": "2026-08-22",
       "vps_preproduction_validated_sha": "cb7d04795b156dc23af6c57efe2bce788569e3da",
-      "authorized_gate": "5.7-P-D",
-      "authorized_technical_sub_lot": "5.7-P-D",
+      "authorized_gate": null,
+      "authorized_technical_sub_lot": null,
       "technical_gates": {
         "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-B": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
-        "5.7-P-C": {"status":"awaiting-maintainer-revalidation","implementation_started":true,"implementation_complete":true,"additive_correction_complete":true,"maintainer_revalidation_required":true,"maintainer_validated":false,"prior_maintainer_validation_date":"2026-08-22"},
-        "5.7-P-D": {"status":"awaiting-maintainer-audit","implementation_started":true,"implementation_complete":true,"maintainer_validated":false},
+        "5.7-P-C": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"additive_correction_complete":true,"additive_correction_vps_validated":true,"additive_correction_vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-22","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
+        "5.7-P-D": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"vps_validated":true,"vps_validation_date":"2026-08-22","vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-E": {"status":"unauthorized"},
         "5.7-P-F": {"status":"unauthorized"}
       },
@@ -108,7 +108,7 @@
       "design_cross_audit": "docs/handoff/LOT-5.7-P-DESIGN-CROSS-AUDIT.md"
     },
     "mandatory_constraints": [
-      "Lot 5.7-P-A and 5.7-P-B are maintainer-validated; the additive 5.7-P-C correction awaits maintainer revalidation; 5.7-P-D awaits maintainer audit",
+      "Lot 5.7-P-A/B/C/D are maintainer-validated, including the additive C public-history correction and the D VPS validation",
       "Lot 5.7 full and Lot 5.8+ remain unauthorized",
       "Lot 5.6 validation and Lot 5.7-P authorization do not constitute merge authorization",
       "Lot 5.6 must preserve all Lot 5.4 scheduler/lease/fencing invariants",
@@ -119,7 +119,7 @@
       "Pre-1970 dates must be supported without positive-Unix-timestamp assumptions",
       "Lot 5.6 acquisition must not perform Lot 5.7 business reconciliation or final normalization"
     ],
-    "validation_rule": "Lot 5.6 and technical gates 5.7-P-A/B are maintainer-validated. The additive C history correction is complete and awaits maintainer revalidation. 5.7-P-D is implemented and awaits maintainer audit; validation is not claimed. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D are maintainer-validated, including the additive C public-history correction and VPS validation at 90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96. Gate E is not authorized. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "technical_baseline": {
     "pre_5_5_security_baseline": "maintainer-validated-2026-08-14",
@@ -128,6 +128,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Maintainer revalidates the additive Lot 5.7-P-C history correction, audits Lot 5.7-P-D, and executes docs/handoff/LOT-5.7-P-D-VPS-VALIDATION.md. Do not start 5.7-P-E. Lot 5.7 full and Lot 5.8+ remain unauthorized. Merge main remains unauthorized."
+    "task": "Wait for explicit maintainer authorization before opening Lot 5.7-P-E. Do not start E or F. Lot 5.7 full, Lot 5.8+ and merge main remain unauthorized."
   }
 }

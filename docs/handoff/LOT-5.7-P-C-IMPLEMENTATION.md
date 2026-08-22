@@ -1,7 +1,7 @@
 # Lot 5.7-P-C — implementation evidence
 
 Date: 2026-08-22  
-Status: **ADDITIVE CORRECTION COMPLETE — AWAITING MAINTAINER REVALIDATION**
+Status: **PASS — ADDITIVE CORRECTION MAINTAINER REVALIDATED 2026-08-22**
 
 START_SHA: `6da9049e9dd6efe680d107e87d8e659290a4c6ef`  
 FINAL_SHA: `2ef24abc2c35feafd5b687b988604fe8b92066f9` (immutable implementation/test commit)
@@ -145,5 +145,17 @@ canonical public version atomically with current state, change log and receipt.
 The migration baselines current state and records the earliest guaranteed
 snapshot sequence without claiming recovery of older overwritten revisions.
 No automatic purge is introduced. C01–C35, immutability, no-leak, transaction
-rollback and idempotent rebuild proofs pass. This additive correction requires
-maintainer revalidation; the earlier validation is not extended automatically.
+rollback and idempotent rebuild proofs pass. This additive correction required
+separate maintainer revalidation, recorded below.
+
+## Additive correction maintainer revalidation
+
+- VPS validated SHA: `90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96`;
+- migration head: `0027_lot57pc_public_resource_history`;
+- migration fresh/upgrade/DOWN/UP: PASS;
+- C01–C35 publication/transaction/rebuild: PASS;
+- immutable public history, snapshot baseline and cleanup: PASS;
+- MAINTAINER REVALIDATED: **TRUE — 2026-08-22**.
+
+This revalidation does not authorize 5.7-P-E/F, full Lot 5.7, Lot 5.8+ or
+merge main.

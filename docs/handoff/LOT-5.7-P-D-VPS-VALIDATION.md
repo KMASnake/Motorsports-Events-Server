@@ -1,6 +1,24 @@
 # Lot 5.7-P-D — VPS preproduction validation protocol
 
-Status: **READY FOR MAINTAINER EXECUTION — NOT YET VALIDATED**
+Status: **PASS — MAINTAINER VALIDATED 2026-08-22**
+
+## Recorded execution evidence
+
+- audited SHA: `90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96`;
+- verified backup: `/home/debian/backups/mse-preprod/pre-0026-0027-20260822T192259Z.sql.gz` (`BACKUP_GZIP=PASS`, `BACKUP_0025=PASS`);
+- migrations 0026 and 0027 applied; schema head 0027;
+- legacy UUID repaired, with zero unvalidated foreign keys;
+- empty pre-migration publication state baselined at snapshot/change sequence 0;
+- 0027 fresh/upgrade/DOWN/UP: PASS;
+- C01–C35: PASS; D01–D20: PASS;
+- historical snapshot, concurrent update, tombstone, `/changes`, retained cursor and snapshot index: PASS;
+- Production API/database/Grafana: healthy;
+- preproduction API/database/Web: healthy and bound only to `127.0.0.1` on 3100/3101/5433;
+- persistent volume `mse_preprod_postgres_data` preserved;
+- isolated recipes left no container, network or volume residue.
+
+This evidence validates C/D only. It does not authorize E/F, full Lot 5.7,
+Lot 5.8+ or merge main.
 
 This protocol targets only `/home/debian/motorsports-events-server-preprod` and
 Compose project `mse-preprod`. It must not mutate or restart Production. Set

@@ -1,7 +1,7 @@
 # Lot 5.7-P-D — implementation evidence
 
 Date: 2026-08-22
-Status: **IMPLEMENTATION COMPLETE — AWAITING MAINTAINER AUDIT**
+Status: **PASS — MAINTAINER VALIDATED 2026-08-22**
 
 ## Delivered boundary
 
@@ -36,10 +36,18 @@ and client controls. No E capability is implemented.
 - provider calls: 0;
 - provider credits: 0.
 
-Maintainer validation is not claimed. 5.7-P-E/F, full Lot 5.7, Lot 5.8+ and
-merge main remain unauthorized.
+Maintainer validation is recorded after successful VPS execution at
+`90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96`. Migration 0027, historical
+multi-page snapshots, concurrent update, tombstone behavior, `/changes`, real
+retention boundaries and cleanup all passed. Production remained healthy and
+preproduction remained private on loopback.
 
 The oldest guaranteed snapshot is stored separately from the oldest retained
 change. Pre-0027 snapshots expire at the migration baseline; change cursors
 expire only when their sequence precedes the actual retained journal boundary.
 `issuedAt` remains signed cursor metadata but no longer decides retention.
+
+MAINTAINER AUDIT: **PASS**
+MAINTAINER VALIDATED: **TRUE — 2026-08-22**
+
+5.7-P-E/F, full Lot 5.7, Lot 5.8+ and merge main remain unauthorized.
