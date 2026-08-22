@@ -117,7 +117,7 @@
       "Provider absence is non-destructive in Lot 5.6",
       "Manual overrides are never destroyed by provider acquisition",
       "Pre-1970 dates must be supported without positive-Unix-timestamp assumptions",
-      "No Lot 5.7 business reconciliation or final normalization may be implemented"
+      "Lot 5.6 acquisition must not perform Lot 5.7 business reconciliation or final normalization"
     ],
     "validation_rule": "Lot 5.6 and technical gates 5.7-P-A/B/C are maintainer-validated. VPS preproduction A/B/C is validated at cb7d04795b156dc23af6c57efe2bce788569e3da. Only 5.7-P-D is authorized and not started. Gates E-F, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },

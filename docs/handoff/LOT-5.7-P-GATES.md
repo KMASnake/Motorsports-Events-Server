@@ -129,9 +129,19 @@ explicit maintainer validation before the next gate may be opened.
   onboard a client, merge main or open full 5.7.
 - Maintainer audit required: YES.
 
-## First gate candidate
+## Current authorized gate
 
-`5.7-P-A — Normalized identity and persistence foundations` is the first
-potentially implementable gate. Its prerequisites exist, it has concrete
-PostgreSQL evidence, and it creates no public/API surface. It remains **NOT
-AUTHORIZED** until a separate maintainer decision.
+`5.7-P-D — Read-only V1 Preview API and incremental sync` is the only currently
+authorized technical gate.
+
+Prerequisites:
+
+- 5.7-P-A maintainer validated;
+- 5.7-P-B maintainer validated;
+- 5.7-P-C maintainer validated;
+- VPS A/B/C validated at
+  `cb7d04795b156dc23af6c57efe2bce788569e3da`.
+
+Status: **AUTHORIZED — NOT STARTED**.
+
+5.7-P-E/F, full Lot 5.7, Lot 5.8+ and merge main remain unauthorized.
