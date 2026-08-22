@@ -25,6 +25,7 @@ end $$;
 SQL
 
 echo 'A02 — current pre-A database upgrade preserves legacy data'
+docker compose run --rm migrate sh /migrations/migrate.sh down 0025_lot57pc_publication_state >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0024_lot57pa_normalized_persistence >/dev/null
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 \
   -c "update events set description='lot57pa-preserved' where id='evt-001';"
@@ -136,6 +137,7 @@ docker compose exec -T postgres pg_isready -U mse -d motorsports_events >/dev/nu
 docker compose exec -T postgres psql -U mse -d motorsports_events -Atc "select count(*) from event_source_links" | grep -qx 2
 
 echo 'A03 — destructive down refusal, cleanup, rollback and reapply'
+docker compose run --rm migrate sh /migrations/migrate.sh down 0025_lot57pc_publication_state >/dev/null
 if docker compose run --rm migrate sh /migrations/migrate.sh down 0024_lot57pa_normalized_persistence >/dev/null 2>&1; then
   echo 'Populated destructive rollback should have been refused' >&2
   exit 1
