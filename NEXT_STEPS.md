@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — audit mainteneur de 5.7-P-C
+## Priorité courante — déploiement VPS préproduction interne A/B/C
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -76,11 +76,15 @@ et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
 - [x] auditer et valider 5.7-P-B ;
 - [x] implémenter uniquement 5.7-P-C — état de publication, last-known-good et
   journal de changements — puis STOP pour audit mainteneur ;
+- [x] enregistrer l’audit PASS et la validation mainteneur de 5.7-P-C ;
+- [x] préparer et valider localement la stack VPS préproduction interne ;
+- [ ] installer les secrets et paramètres réels hors Git sur le VPS ;
+- [ ] déployer A/B/C et exécuter la checklist VPS sans démarrer 5.7-P-D ;
 - [ ] décider séparément d’autoriser ou non la fusion dans `main`.
 
-5.7-P-A et B sont validés mainteneur. 5.7-P-C est complet et attend l’audit
-mainteneur. Ne pas commencer 5.7-P-D. 5.7-P-D à F, le Lot 5.7 complet, 5.8+
-et la fusion dans `main` restent non autorisés.
+5.7-P-A, B et C sont validés mainteneur. La readiness locale de préproduction
+VPS est PASS et attend les paramètres/déploiement réels. Ne pas commencer
+5.7-P-D. D à F, le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

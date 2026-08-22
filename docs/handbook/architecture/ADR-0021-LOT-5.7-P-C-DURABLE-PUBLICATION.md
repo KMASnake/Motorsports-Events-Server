@@ -1,7 +1,7 @@
 # ADR-0021 — État de publication durable interne 5.7-P-C
 
 Date : 2026-08-22  
-Statut : accepté pour implémentation, audit mainteneur C requis
+Statut : accepté, implémentation validée par le mainteneur le 2026-08-22
 
 ## Décision
 

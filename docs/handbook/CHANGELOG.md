@@ -184,6 +184,12 @@
 - ajoute la recette isolée de 43 cas et son plan de rollback ;
 - maintient le Lot 5.5 en attente de validation mainteneur et interdit le démarrage du Lot 5.6 à cet état historique.
 
+## 1.36 — 2026-08-22
+
+- enregistre la validation mainteneur de C ;
+- formalise la préproduction interne A/B/C sans ouverture de D ;
+- impose loopback PostgreSQL, backup avant migration et secrets hors Git.
+
 ## 1.35 — 2026-08-22
 
 - formalise l’état public durable interne du gate 5.7-P-C ;

@@ -491,6 +491,15 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
 
 Voir `architecture/ADR-0021-LOT-5.7-P-C-DURABLE-PUBLICATION.md`.
 
+## 2026-08-22 — Validation mainteneur de C et readiness préproduction interne
+
+- l’audit mainteneur de 5.7-P-C est PASS et C est validé mainteneur ;
+- PP-T17 à PP-T22 et 25 critères applicables sont PASS sans constat bloquant ;
+- la stack A/B/C est prête localement pour une préproduction VPS interne avec
+  PostgreSQL persistant, migration 0025, restart, healthchecks et backup/restore ;
+- aucun déploiement/reboot VPS réel n’est encore déclaré ;
+- 5.7-P-D à F, le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
 ## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
 
 - la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;

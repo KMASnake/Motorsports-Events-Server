@@ -1,5 +1,16 @@
 # État du projet
 
+## 5.7-P-C validé ; préproduction VPS prête localement (22 août 2026)
+
+Le mainteneur valide 5.7-P-C : PP-T17 à PP-T22 et les 25 critères C
+applicables sont PASS. A, B et C sont maintenant validés mainteneur.
+
+La stack existante est préparée par override Compose minimal pour une première
+préproduction interne : ports loopback, volume PostgreSQL durable, migration
+0025, restart policies, healthchecks, backup/restore et recette backend C. La
+readiness locale est PASS ; aucun déploiement ni reboot VPS réel n’est déclaré.
+5.7-P-D à F, le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
 ## Lot 5.7-P-C implémenté ; audit mainteneur requis (22 août 2026)
 
 Le gate C persiste l’état public interne, le last-known-good, les révisions par

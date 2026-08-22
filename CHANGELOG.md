@@ -1,5 +1,12 @@
 # Changelog
 
+## Préproduction VPS interne A/B/C
+
+- enregistre la validation mainteneur de 5.7-P-C ;
+- ajoute un override Compose loopback/persistant sans dupliquer la stack ;
+- ajoute la recette fresh/current/restart/health/backup/restore et le runbook VPS ;
+- n’ajoute aucune route Preview ni sécurité client.
+
 ## Lot 5.7-P-C — publication durable interne
 
 - ajoute la migration 0025 pour état public, révisions, journal, reçus et kill switch ;
