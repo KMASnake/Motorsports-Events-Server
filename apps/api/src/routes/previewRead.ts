@@ -16,13 +16,14 @@ function publicState(row:ResourceRow){const state=row.state??{};const common={id
 export interface PreviewReadOptions{repository?:PreviewRepository;cursorSecret:string;retentionDays?:number;now?:()=>Date}
 export async function previewReadRoutes(app:FastifyInstance,options:PreviewReadOptions){
   if(options.cursorSecret.length<32)throw new Error('PREVIEW_CURSOR_SECRET must contain at least 32 characters');
-  const repository=options.repository??new PostgresPreviewRepository(),now=options.now??(()=>new Date()),retentionDays=options.retentionDays??90;
+  const repository=options.repository??new PostgresPreviewRepository(),now=options.now??(()=>new Date());
   const list=async(type:ResourceType,request:FastifyRequest,reply:FastifyReply)=>{
     const schema=type==='event'?resourceQuery:basicQuery,parsed=schema.safeParse(request.query);if(!parsed.success)return error(reply,request,400,'invalid_request','Invalid or unsupported query parameters.');
     const query=parsed.data as z.infer<typeof resourceQuery>;let cursor:PageCursor|undefined;
     try{if(query.cursor)cursor=decodeCursor(query.cursor,'page',options.cursorSecret) as PageCursor;}catch{return error(reply,request,400,'invalid_request','Invalid page cursor.');}
     if(cursor&&cursor.resourceType!==type)return error(reply,request,400,'invalid_request','Cursor does not match this resource.');
     const snapshotSequence=cursor?.snapshotSequence??await repository.snapshotBoundary();
+    if(cursor&&snapshotSequence<await repository.oldestSnapshotSequence())return error(reply,request,410,'snapshot_cursor_expired','Snapshot cursor expired; restart pagination.');
     const from=type==='event'?(query.from??cursor?.effectiveFrom??now().toISOString()):undefined;
     const fingerprint=filterHash({type,championship:query.championship??null,championshipId:query.championship_id??null,from:from??null,to:query.to??null,status:query.status??null,sessionType:query.session_type??null});
     if(cursor&&cursor.filterHash!==fingerprint)return error(reply,request,400,'invalid_request','Cursor does not match these filters.');
@@ -34,7 +35,9 @@ export async function previewReadRoutes(app:FastifyInstance,options:PreviewReadO
   };
   for(const type of ['championship','event','meeting'] as const){const plural=`${type}s`;app.get(`/api/v1/${plural}`,async(request,reply)=>list(type,request,reply));app.get(`/api/v1/${plural}/:id`,async(request,reply)=>{const parsed=uuid.safeParse((request.params as {id?:unknown}).id);if(!parsed.success)return error(reply,request,400,'invalid_request','Invalid resource identifier.');const found=await repository.detail(type,parsed.data);if(!found)return error(reply,request,404,'not_found','Resource not found.');return publicState(found);});}
   app.get('/api/v1/changes',async(request,reply)=>{const parsed=changesQuery.safeParse(request.query);if(!parsed.success)return error(reply,request,400,'invalid_request','Invalid or unsupported query parameters.');let cursor:SyncCursor={kind:'sync',sequence:0,issuedAt:Math.floor(now().valueOf()/1000)};try{if(parsed.data.cursor)cursor=decodeCursor(parsed.data.cursor,'sync',options.cursorSecret) as SyncCursor;}catch{return error(reply,request,400,'invalid_sync_cursor','Invalid sync cursor.');}
-    const cutoff=now().valueOf()-retentionDays*86400000;if(parsed.data.cursor&&cursor.issuedAt*1000<cutoff)return error(reply,request,410,'sync_cursor_expired','Sync cursor expired; perform a full resync.');
+    const [oldestSequence,latestSequence]=await Promise.all([repository.oldestChangeSequence(),repository.snapshotBoundary()]);
+    if(cursor.sequence>latestSequence)return error(reply,request,400,'invalid_sync_cursor','Invalid sync cursor.');
+    if(parsed.data.cursor&&oldestSequence!==null&&cursor.sequence<oldestSequence)return error(reply,request,410,'sync_cursor_expired','Sync cursor expired; perform a full resync.');
     const rows=await repository.changes(cursor.sequence,parsed.data.limit,parsed.data.include==='data'),hasMore=rows.length>parsed.data.limit,visible=rows.slice(0,parsed.data.limit),sequence=visible.at(-1)?.sequence??cursor.sequence;
     return {data:visible.map(change=>({sequence:change.sequence,resource_type:change.resourceType,resource_id:change.resourceId,revision:change.revision,operation:change.operation,changed_fields:change.changedFields,occurred_at:change.occurredAt,...(parsed.data.include==='data'?{current:change.current?publicState(change.current):null}:{})})),pagination:{next_cursor:encodeCursor({kind:'sync',sequence,issuedAt:Math.floor(now().valueOf()/1000)},options.cursorSecret),has_more:hasMore}};
   });
