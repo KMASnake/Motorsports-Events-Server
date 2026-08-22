@@ -53,6 +53,8 @@ export class PostgresPublicationService{
       on conflict(resource_type,resource_id) do update set championship_id=excluded.championship_id,revision=excluded.revision,canonical_state=excluded.canonical_state,state_checksum=excluded.state_checksum,promoted_candidate_id=excluded.promoted_candidate_id,promoted_at=excluded.promoted_at`,[resourceType,resourceId,state.championshipId??null,revision,JSON.stringify(state),checksum,input.candidateId,input.occurredAt]);
     const change=(await client.query(`insert into public_change_log(resource_type,resource_id,resource_revision,operation,changed_fields,state_checksum,occurred_at)
       values($1,$2,$3,$4,$5,$6,$7) returning sequence`,[resourceType,resourceId,revision,operation,changed,checksum,input.occurredAt])).rows[0];
+    await client.query(`insert into public_resource_versions(resource_type,resource_id,revision,publication_sequence,operation,championship_id,lifecycle,canonical_state,state_checksum,published_at)
+      values($1,$2,$3,$4,$5,$6,'active',$7::jsonb,$8,$9)`,[resourceType,resourceId,revision,change.sequence,operation,state.championshipId??null,JSON.stringify(state),checksum,input.occurredAt]);
     await client.query(`insert into publication_receipts(candidate_id,resource_type,resource_id,effective_checksum,resource_revision,change_sequence,outcome,committed_at)
       values($1,$2,$3,$4,$5,$6,$7,$8)`,[input.candidateId,resourceType,resourceId,checksum,revision,change.sequence,operation,input.occurredAt]);
     await client.query("update normalized_candidates set state='promoted',updated_at=$2 where id=$1",[input.candidateId,input.occurredAt]);
@@ -68,6 +70,8 @@ export class PostgresPublicationService{
     const revision=Number(current.revision)+1,checksum=publicStateChecksum({removed:true});
     await client.query(`update public_resource_states set revision=$3,lifecycle='removed',canonical_state=null,state_checksum=$4,removed_at=$5,promoted_at=$5 where resource_type=$1 and resource_id=$2`,[input.resourceType,input.resourceId,revision,checksum,input.occurredAt]);
     const change=(await client.query(`insert into public_change_log(resource_type,resource_id,resource_revision,operation,changed_fields,state_checksum,occurred_at) values($1,$2,$3,'removed','{}',$4,$5) returning sequence`,[input.resourceType,input.resourceId,revision,checksum,input.occurredAt])).rows[0];
+    await client.query(`insert into public_resource_versions(resource_type,resource_id,revision,publication_sequence,operation,championship_id,lifecycle,canonical_state,state_checksum,published_at)
+      values($1,$2,$3,$4,'removed',$5,'removed',null,$6,$7)`,[input.resourceType,input.resourceId,revision,change.sequence,current.championship_id,checksum,input.occurredAt]);
     return {outcome:'removed',revision,sequence:Number(change.sequence)};
   });}
 
