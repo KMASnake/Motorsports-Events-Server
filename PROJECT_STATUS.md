@@ -1,5 +1,18 @@
 # État du projet
 
+## Lot 5.7-P-D implémenté ; audit mainteneur requis (22 août 2026)
+
+Le plugin API Preview V1 read-only consomme exclusivement l’état durable C et
+implémente championships, events, meetings et `/changes`, avec projections
+explicites, requêtes paramétrées bornées, snapshot, curseurs HMAC distincts,
+rétention et erreurs sûres. Il n’est pas enregistré dans le serveur de
+production avant le gate E.
+
+Le build, 267 tests API, le lint, 30 tests sécurité ciblés, la recette
+PostgreSQL D01-D14 et la non-régression C01-C35 sont PASS. Aucune migration ni
+appel provider n’a eu lieu. D attend l’audit mainteneur et n’est pas déclaré
+validé. E/F, le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
 ## 5.7-P-C validé ; préproduction VPS prête localement (22 août 2026)
 
 Le mainteneur valide 5.7-P-C : PP-T17 à PP-T22 et les 25 critères C

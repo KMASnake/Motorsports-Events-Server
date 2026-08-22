@@ -1,5 +1,14 @@
 # Changelog
 
+## Lot 5.7-P-D — API Preview V1 read-only
+
+- ajoute les contrats définitifs read-only championships, events, meetings et
+  `/changes` dans un plugin non activé avant le gate E ;
+- ajoute projections explicites, requêtes PostgreSQL bornées, pagination de
+  snapshot et curseurs page/sync opaques signés ;
+- ajoute OpenAPI, erreurs sûres, rétention configurable et preuves unitaires
+  et PostgreSQL sans migration ni appel provider.
+
 ## Préproduction VPS interne A/B/C
 
 - enregistre la validation mainteneur de 5.7-P-C ;

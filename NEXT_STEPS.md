@@ -1,6 +1,18 @@
 # Prochaines étapes
 
-## Priorité courante — déploiement VPS préproduction interne A/B/C
+## Priorité courante — audit mainteneur et validation VPS de 5.7-P-D
+
+- [x] conserver 5.7-P-A/B/C maintainer-validated et enregistrer le PASS VPS A/B/C ;
+- [x] implémenter uniquement 5.7-P-D sans activer les routes avant E ;
+- [x] prouver build, OpenAPI, sécurité, PostgreSQL D01-D14 et non-régression C01-C35 ;
+- [x] documenter le protocole VPS D avec backup, isolation, persistance et rollback ;
+- [ ] exécuter `docs/handoff/LOT-5.7-P-D-VPS-VALIDATION.md` sur le SHA final ;
+- [ ] auditer puis valider explicitement 5.7-P-D avant toute autorisation de E.
+
+5.7-P-D est implémenté et attend l’audit mainteneur. 5.7-P-E/F, le Lot 5.7
+complet, 5.8+ et merge `main` restent non autorisés.
+
+## Historique — déploiement VPS préproduction interne A/B/C
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -78,13 +90,13 @@ et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
   journal de changements — puis STOP pour audit mainteneur ;
 - [x] enregistrer l’audit PASS et la validation mainteneur de 5.7-P-C ;
 - [x] préparer et valider localement la stack VPS préproduction interne ;
-- [ ] installer les secrets et paramètres réels hors Git sur le VPS ;
-- [ ] déployer A/B/C et exécuter la checklist VPS sans démarrer 5.7-P-D ;
+- [x] installer les secrets et paramètres réels hors Git sur le VPS ;
+- [x] déployer A/B/C et exécuter la checklist VPS sans démarrer 5.7-P-D ;
 - [ ] décider séparément d’autoriser ou non la fusion dans `main`.
 
-5.7-P-A, B et C sont validés mainteneur. La readiness locale de préproduction
-VPS est PASS et attend les paramètres/déploiement réels. Ne pas commencer
-5.7-P-D. D à F, le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+5.7-P-A, B et C sont validés mainteneur. La préproduction A/B/C réelle est
+validée sur `cb7d04795b156dc23af6c57efe2bce788569e3da`. Cet état est désormais
+historique ; le gate courant est l’audit mainteneur de D.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

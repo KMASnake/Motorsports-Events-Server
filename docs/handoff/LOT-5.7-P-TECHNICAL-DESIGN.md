@@ -1,7 +1,7 @@
 # Lot 5.7-P — Technical design
 
 Date : 2026-08-21  
-Status : **COMPLETE — AWAITING MAINTAINER AUDIT — IMPLEMENTATION NOT AUTHORIZED**
+Status : **DESIGN VALIDATED — GATE D IMPLEMENTED AWAITING MAINTAINER AUDIT**
 
 ## 1. Context and objective
 
@@ -261,7 +261,8 @@ scope creep into full 5.7/5.8. Stop rules and PP-T criteria isolate each risk.
 
 ## 18. Boundary and governance
 
-No gate is authorized by this design. Gate A is the first candidate for a
-separate maintainer decision. Full 5.7, 5.8+, merge to `main`, general
+Gate D has been separately authorized and implemented without activating its
+routes in the production server. It now awaits maintainer audit. Gate E remains
+unauthorized. Full 5.7, 5.8+, merge to `main`, general
 cross-provider reconciliation, advanced mapping UX and commercial platform
 remain unauthorized.

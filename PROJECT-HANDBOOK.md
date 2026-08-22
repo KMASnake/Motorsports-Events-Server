@@ -1,5 +1,5 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.36
+## Version 1.37
 
 Ce document est la source de vérité permanente du projet.
 
@@ -110,7 +110,7 @@ Le Concept et l'Acceptance du Lot **5.5 — Quotas et cadence** ont été audit�
 
 Le Concept, le contrat UI et l'Acceptance du **Lot 5.6 — Acquisition fournisseur durable** ont été formalisés, audités contre 5.4/5.5, la baseline sécurité et la frontière 5.7, puis consolidés après fermeture des constats. Après le PASS final de 5.6-I, le mainteneur a **globalement validé le Lot 5.6 le 2026-08-21**.
 
-`authorized_sub_lot = 5.7-P` autorise la tranche verticale de normalisation Production Preview depuis le 2026-08-21. Sa conception technique, son Acceptance PP-T01 à PP-T42 et ses six gates A→F sont validés par le mainteneur. 5.7-P-A, 5.7-P-B et 5.7-P-C sont validés mainteneur depuis le 2026-08-22. Aucun gate suivant n’est autorisé. L’état public C est une projection durable interne : promotion, révision et journal sont atomiques, le last-known-good n’est pas remplacé par un candidat non fiable, les tombstones sont permanents et aucune route client n’est exposée. La préproduction VPS A/B/C reste interne, lie PostgreSQL/API/Web à loopback et exige backup avant migration, secrets hors Git et validation réelle avant toute déclaration VPS PASS. Voir ADR-0021. Le **Lot 5.7 complet et les Lots 5.8+ restent non autorisés**.
+`authorized_sub_lot = 5.7-P` autorise la tranche verticale de normalisation Production Preview depuis le 2026-08-21. Sa conception technique, son Acceptance PP-T01 à PP-T42 et ses six gates A→F sont validés par le mainteneur. 5.7-P-A, 5.7-P-B et 5.7-P-C sont validés mainteneur depuis le 2026-08-22. 5.7-P-D est implémenté et attend l’audit mainteneur ; sa validation n’est pas revendiquée et 5.7-P-E reste non autorisé. L’état public C est une projection durable interne : promotion, révision et journal sont atomiques, le last-known-good n’est pas remplacé par un candidat non fiable et les tombstones sont permanents. Les routes D définitives restent désenregistrées du serveur de production avant E. La préproduction VPS A/B/C reste interne, lie PostgreSQL/API/Web à loopback et exige backup, secrets hors Git et validation réelle. Voir ADR-0021. Le **Lot 5.7 complet et les Lots 5.8+ restent non autorisés**.
 
 Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves VPS isolées des migrations, API, corrections et contrôles visuels avec la recette Windows complète réussie le 2026-08-11 (qualité, données synthétiques et 11 scénarios Chromium). Il attend sa fusion contrôlée dans `main` ; cette fusion ne constitue pas elle-même la validation, déjà acquise explicitement.
 

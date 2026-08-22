@@ -1,7 +1,7 @@
 # Lot 5.7-P — Technical gates
 
 Date : 2026-08-22
-Status : **5.7-P-D AUTHORIZED — NOT STARTED**
+Status : **5.7-P-D IMPLEMENTED — AWAITING MAINTAINER AUDIT**
 
 Each gate requires explicit maintainer authorization before implementation and
 explicit maintainer validation before the next gate may be opened.
@@ -13,7 +13,7 @@ explicit maintainer validation before the next gate may be opened.
 | 1 | 5.7-P-A | Normalized identity and persistence foundations | CANDIDATE — NOT AUTHORIZED | validated 5.6 |
 | 2 | 5.7-P-B | Deterministic normalization and source mapping | NOT AUTHORIZED | validated A |
 | 3 | 5.7-P-C | Publication state, last-known-good and change log | NOT AUTHORIZED | validated B |
-| 4 | 5.7-P-D | Read-only V1 Preview API and incremental sync | AUTHORIZED — NOT STARTED | validated C and VPS A/B/C |
+| 4 | 5.7-P-D | Read-only V1 Preview API and incremental sync | IMPLEMENTED — AWAITING MAINTAINER AUDIT | validated C and VPS A/B/C |
 | 5 | 5.7-P-E | Client security, entitlements, limits and minimal ACP | NOT AUTHORIZED | validated D |
 | 6 | 5.7-P-F | F1 vertical certification and operational readiness | NOT AUTHORIZED | validated E |
 
@@ -129,10 +129,10 @@ explicit maintainer validation before the next gate may be opened.
   onboard a client, merge main or open full 5.7.
 - Maintainer audit required: YES.
 
-## Current authorized gate
+## Current audit gate
 
-`5.7-P-D — Read-only V1 Preview API and incremental sync` is the only currently
-authorized technical gate.
+`5.7-P-D — Read-only V1 Preview API and incremental sync` is implemented and is
+the only current technical audit gate.
 
 Prerequisites:
 
@@ -142,6 +142,6 @@ Prerequisites:
 - VPS A/B/C validated at
   `cb7d04795b156dc23af6c57efe2bce788569e3da`.
 
-Status: **AUTHORIZED — NOT STARTED**.
+Status: **AWAITING MAINTAINER AUDIT — NOT MAINTAINER VALIDATED**.
 
 5.7-P-E/F, full Lot 5.7, Lot 5.8+ and merge main remain unauthorized.

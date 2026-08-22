@@ -10,7 +10,7 @@ C: **MAINTAINER VALIDATED**
 VPS A/B/C: **VALIDATED** at
 `cb7d04795b156dc23af6c57efe2bce788569e3da`
 
-D: **AUTHORIZED FOR IMPLEMENTATION — NOT STARTED**
+D: **IMPLEMENTED — AWAITING MAINTAINER AUDIT**
 
 E: **UNAUTHORIZED**
 F: **UNAUTHORIZED**
@@ -40,5 +40,5 @@ client quotas/rate limiting, client ACP, onboarding, launch/certification F,
 billing, full 5.7 generalization, 5.8+, or merge main. Those remain outside D
 and must not be anticipated.
 
-This document authorizes implementation only. No D code or test is created by
-this governance decision. D must stop for maintainer audit before E.
+The authorized implementation is now complete. This transition does not claim
+maintainer validation. D must stop for maintainer audit before E.
