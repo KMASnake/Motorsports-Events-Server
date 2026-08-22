@@ -1,0 +1,33 @@
+services:
+  postgres:
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+      POSTGRES_INITDB_ARGS: --encoding=UTF8
+    ports: !override
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    restart: unless-stopped
+
+  api:
+    environment:
+      NODE_ENV: production
+      TZ: UTC
+    ports: !override
+      - "127.0.0.1:${API_HOST_PORT:-3001}:3001"
+    restart: unless-stopped
+
+  web:
+    environment:
+      TZ: UTC
+    ports: !override
+      - "127.0.0.1:${WEB_HOST_PORT:-3000}:3000"
+    restart: unless-stopped
+
+  migrate:
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+
+volumes:
+  postgres_data:
+    name: ${PREPROD_POSTGRES_VOLUME:-mse_preprod_postgres_data}
