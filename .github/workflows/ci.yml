@@ -53,6 +53,16 @@ jobs:
           API_URL: http://127.0.0.1:3001
           WEB_URL: http://127.0.0.1:3000
         run: npx playwright test
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-diagnostics
+          path: |
+            test-results/playwright/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Show Docker diagnostics
         if: failure()
         run: docker compose ps --all && docker compose logs --no-color

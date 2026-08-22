@@ -3,9 +3,17 @@ import { expect, test } from '@playwright/test';
 test('ACP remains functional under the production Nginx CSP', async ({ page }) => {
   const browserErrors: string[] = [];
   page.on('console', (message) => {
-    if (message.type() === 'error') browserErrors.push(message.text());
+    if (message.type() === 'error') {
+      const location = message.location();
+      browserErrors.push(`${message.text()}${location.url ? ` (${location.url}:${location.lineNumber ?? 0})` : ''}`);
+    }
   });
   page.on('pageerror', (error) => browserErrors.push(error.message));
+  page.on('response', (response) => {
+    if (response.status() >= 400) {
+      browserErrors.push(`HTTP ${response.status()} ${response.request().method()} ${response.url()}`);
+    }
+  });
 
   await page.goto('/login');
   await expect(page.getByRole('heading', { name: 'Connexion' })).toBeVisible();
@@ -26,6 +34,8 @@ test('ACP remains functional under the production Nginx CSP', async ({ page }) =
     await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
   }
 
-  expect(browserErrors.filter((message) => /content security policy|refused to/i.test(message))).toEqual([]);
-  expect(browserErrors).toEqual([]);
+  const cspErrors = browserErrors.filter((message) => /content security policy|refused to/i.test(message));
+  const otherBrowserErrors = browserErrors.filter((message) => !cspErrors.includes(message));
+  expect(cspErrors, `Unexpected CSP browser errors:\n${cspErrors.join('\n') || '(none)'}`).toEqual([]);
+  expect(otherBrowserErrors, `Unexpected non-CSP browser errors:\n${otherBrowserErrors.join('\n') || '(none)'}`).toEqual([]);
 });
