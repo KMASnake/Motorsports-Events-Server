@@ -479,6 +479,18 @@ Voir `architecture/ADR-0007-CALENDAR.md`.
   autorisés ;
 - le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni A ni B.
 
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-C
+
+- PP-T17 à PP-T22 sont implémentés et prouvés sur PostgreSQL réel ;
+- état public interne, last-known-good, révisions, journal monotone, kill switch
+  et tombstones sont durables et transactionnels ;
+- 5.7-P-C est complet et attend l’audit mainteneur sans être validé ;
+- aucun gate suivant n’est autorisé et 5.7-P-D ne doit pas commencer ;
+- aucune route Preview ni sécurité client n’est ajoutée ;
+- le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0021-LOT-5.7-P-C-DURABLE-PUBLICATION.md`.
+
 ## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
 
 - la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;

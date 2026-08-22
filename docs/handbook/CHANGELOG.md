@@ -184,6 +184,12 @@
 - ajoute la recette isolée de 43 cas et son plan de rollback ;
 - maintient le Lot 5.5 en attente de validation mainteneur et interdit le démarrage du Lot 5.6 à cet état historique.
 
+## 1.35 — 2026-08-22
+
+- formalise l’état public durable interne du gate 5.7-P-C ;
+- impose atomicité état/révision/journal, last-known-good et tombstones ;
+- conserve toute exposition HTTP et sécurité client dans les gates suivants.
+
 ## 1.15 — 2026-08-10
 
 - définit le modèle relationnel et temporel des Sessions ;

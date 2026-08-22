@@ -1,6 +1,6 @@
 # Prochaines étapes
 
-## Priorité courante — implémentation bornée de 5.7-P-C
+## Priorité courante — audit mainteneur de 5.7-P-C
 
 - [x] obtenir la validation mainteneur définitive du sous-lot 5.6-A ;
 - [x] définir les contrats d'acquisition sans normalisation métier 5.7 ;
@@ -74,14 +74,13 @@ et aucun travail 5.7, 5.7-P ou ultérieur ne sont autorisés.
 - [x] implémenter uniquement 5.7-P-B — normalisation déterministe et mapping
   source — puis STOP pour audit mainteneur ;
 - [x] auditer et valider 5.7-P-B ;
-- [ ] implémenter uniquement 5.7-P-C — état de publication, last-known-good et
+- [x] implémenter uniquement 5.7-P-C — état de publication, last-known-good et
   journal de changements — puis STOP pour audit mainteneur ;
 - [ ] décider séparément d’autoriser ou non la fusion dans `main`.
 
-5.7-P-A et B sont validés mainteneur. Seul 5.7-P-C est autorisé et reste non
-commencé. Son futur périmètre construit l’état publiable durable interne, le
-last-known-good, les révisions et le journal monotone sans aucune route client.
-5.7-P-D à F, le Lot 5.7 complet et 5.8+ restent non autorisés.
+5.7-P-A et B sont validés mainteneur. 5.7-P-C est complet et attend l’audit
+mainteneur. Ne pas commencer 5.7-P-D. 5.7-P-D à F, le Lot 5.7 complet, 5.8+
+et la fusion dans `main` restent non autorisés.
 
 ## Priorité courante — audit mainteneur Lot 5.4
 

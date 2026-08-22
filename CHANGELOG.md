@@ -1,5 +1,11 @@
 # Changelog
 
+## Lot 5.7-P-C — publication durable interne
+
+- ajoute la migration 0025 pour état public, révisions, journal, reçus et kill switch ;
+- conserve le last-known-good et distingue annulation de tombstone permanent ;
+- prouve atomicité, retry, concurrence, rebuild et pré-1970 sans route Preview.
+
 ## Lot 5.6-F — protection des corrections et observations
 
 - sépare les corrections et observations locales de la donnée source provider ;

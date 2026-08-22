@@ -1,5 +1,16 @@
 # État du projet
 
+## Lot 5.7-P-C implémenté ; audit mainteneur requis (22 août 2026)
+
+Le gate C persiste l’état public interne, le last-known-good, les révisions par
+ressource et le journal monotone dans une transaction unique. La migration
+additive 0025 protège les tombstones, le rollback peuplé et la séquence durable.
+
+PP-T17 à PP-T22 sont PASS. La suite API compte 259/259 tests et les recettes
+PostgreSQL C, A, B, 5.6-A→F, 5.4 et 5.5 sont vertes sans appel fournisseur.
+Aucune route Preview ni sécurité client n’a été ajoutée. C attend l’audit
+mainteneur ; D à F, le Lot 5.7 complet, 5.8+ et merge `main` restent interdits.
+
 ## Lot 5.7-P-B validé ; seul 5.7-P-C autorisé (22 août 2026)
 
 Le mainteneur valide la conception fonctionnelle et technique 5.7-P,
