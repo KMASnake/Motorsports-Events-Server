@@ -1,7 +1,7 @@
 # Lot 5.7-P — Technical gates
 
-Date : 2026-08-22
-Status : **5.7-P-C REVALIDATED / 5.7-P-D MAINTAINER VALIDATED — E UNAUTHORIZED**
+Date : 2026-08-23
+Status : **5.7-P-E AUTHORIZED FOR IMPLEMENTATION — NOT YET VALIDATED**
 
 Each gate requires explicit maintainer authorization before implementation and
 explicit maintainer validation before the next gate may be opened.
@@ -14,7 +14,7 @@ explicit maintainer validation before the next gate may be opened.
 | 2 | 5.7-P-B | Deterministic normalization and source mapping | NOT AUTHORIZED | validated A |
 | 3 | 5.7-P-C | Publication state, last-known-good and change log | NOT AUTHORIZED | validated B |
 | 4 | 5.7-P-D | Read-only V1 Preview API and incremental sync | MAINTAINER VALIDATED | validated C and VPS A/B/C |
-| 5 | 5.7-P-E | Client security, entitlements, limits and minimal ACP | NOT AUTHORIZED | validated D |
+| 5 | 5.7-P-E | Client security, entitlements, limits and minimal ACP | AUTHORIZED FOR IMPLEMENTATION | validated D |
 | 6 | 5.7-P-F | F1 vertical certification and operational readiness | NOT AUTHORIZED | validated E |
 
 ## 5.7-P-A — Normalized identity and persistence foundations
@@ -129,19 +129,25 @@ explicit maintainer validation before the next gate may be opened.
   onboard a client, merge main or open full 5.7.
 - Maintainer audit required: YES.
 
-## Current audit gate
+## Current implementation gate
 
-`5.7-P-D — Read-only V1 Preview API and incremental sync` is maintainer
-validated. There is no current implementation gate because E is unauthorized.
+`5.7-P-E — Client security, entitlements, limits and minimal ACP` is explicitly
+authorized for implementation by the maintainer on **2026-08-23**.
 
-Prerequisites:
+Authorization record:
+`docs/handoff/LOT-5.7-P-E-AUTHORIZATION.md`.
+
+Prerequisites satisfied:
 
 - 5.7-P-A maintainer validated;
 - 5.7-P-B maintainer validated;
 - 5.7-P-C additive public-history correction maintainer revalidated;
-- VPS A/B/C validated at
-  `90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96` for the C/D correction.
+- 5.7-P-D maintainer validated;
+- VPS C/D validation PASS at
+  `90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96`.
 
-Status: **MAINTAINER VALIDATED — 2026-08-22**.
+Status: **AUTHORIZED FOR IMPLEMENTATION — NOT YET MAINTAINER VALIDATED**.
 
-5.7-P-E/F, full Lot 5.7, Lot 5.8+ and merge main remain unauthorized.
+Implementation must stop for maintainer audit after PP-T29–PP-T35 evidence is
+complete. 5.7-P-F, full Lot 5.7, Lot 5.8+, Production launch/external client
+onboarding and merge main remain unauthorized.
