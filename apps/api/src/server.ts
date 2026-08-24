@@ -3,8 +3,6 @@ import cors from '@fastify/cors';
 import { healthRoutes } from './routes/health.js';
 import { dashboardRoutes } from './routes/dashboard.js';
 import { catalogRoutes } from './routes/catalog.js';
-import { championshipRoutes } from './routes/championships.js';
-import { eventRoutes } from './routes/events.js';
 import { correctionRoutes } from './routes/corrections.js';
 import { verifyApplicationSchema } from './lib/db.js';
 import { registerAdminAuth } from './lib/adminAuth.js';
@@ -33,7 +31,7 @@ import { AcquisitionAdminService } from './providers/acquisitionAdminService.js'
 import { SourceProtectionService } from './providers/sourceProtectionService.js';
 import { providerAcquisitionAdminRoutes } from './routes/providerAcquisitionAdmin.js';
 import { PreviewClientSecurityService } from './preview/clientSecurity.js';
-import { previewClientAdminRoutes, previewSecurityRoutes } from './routes/previewSecurity.js';
+import { previewAwareResourceRoutes } from './routes/previewAwareResources.js';
 
 const app = Fastify(secureFastifyOptions());
 registerSecurityHeaders(app);
@@ -66,8 +64,15 @@ await app.register(healthRoutes);
 await app.register(authRoutes, { cookie, sessionSecret, webOrigin });
 await app.register(dashboardRoutes);
 await app.register(catalogRoutes);
-await app.register(championshipRoutes);
-await app.register(eventRoutes);
+const previewEnabled = process.env.PREVIEW_API_ENABLED === 'true';
+const previewSecurity = previewEnabled
+  ? new PreviewClientSecurityService(process.env.PREVIEW_API_KEY_PEPPER ?? '')
+  : undefined;
+await app.register(previewAwareResourceRoutes, {
+  previewEnabled,
+  security: previewSecurity,
+  cursorSecret: process.env.PREVIEW_CURSOR_SECRET
+});
 await app.register(correctionRoutes);
 await app.register(auditRoutes);
 await app.register(sessionRoutes);
@@ -82,12 +87,6 @@ await app.register(providerManualSourceRoutes,{service:new ManualChampionshipSou
 const schedulerService=new PersistentSchedulerService();
 await app.register(providerSchedulerRoutes,{service:schedulerService});
 await app.register(providerAcquisitionAdminRoutes,{admin:new AcquisitionAdminService(),protection:new SourceProtectionService(),scheduler:schedulerService});
-if (process.env.PREVIEW_API_ENABLED === 'true') {
-  const previewSecurity = new PreviewClientSecurityService(process.env.PREVIEW_API_KEY_PEPPER ?? '');
-  const cursorSecret = process.env.PREVIEW_CURSOR_SECRET ?? '';
-  await app.register(previewClientAdminRoutes, { security: previewSecurity });
-  await app.register(previewSecurityRoutes, { security: previewSecurity, cursorSecret });
-}
 const pollSeconds=Math.min(30,Math.max(10,Number(process.env.SCHEDULER_POLL_SECONDS)||15));
 const discoveryRuntime=new DiscoverySchedulerRuntime(schedulerService,discoveryService,app.log,pollSeconds*1000);
 app.addHook('onClose',async()=>discoveryRuntime.stop());

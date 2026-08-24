@@ -95,26 +95,30 @@ function technicalFieldsIn(body: unknown): string[] {
   return technicalAdminFields.filter((field) => field in body);
 }
 
-export async function eventRoutes(app: FastifyInstance): Promise<void> {
-  app.get('/api/v1/events', async (request, reply) => {
-    const parsedQuery = publicEventQuery.safeParse(request.query);
-    if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
-    const query = parsedQuery.data;
-    const where = ['e.published=true', 'c.active=true', `e.status <> 'draft'`];
-    const params: unknown[] = [];
-    if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
-    if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
-    if (query.from) { params.push(query.from); where.push(`e.starts_at >= $${params.length}::timestamptz`); }
-    if (query.to) { params.push(query.to); where.push(`e.starts_at <= $${params.length}::timestamptz`); }
-    return (await pool.query(`${publicSelect} where ${where.join(' and ')} order by e.starts_at,e.name`, params)).rows;
-  });
+export interface EventRouteOptions { includePublic?: boolean }
 
-  app.get('/api/v1/events/:id', async (request, reply) => {
-    const { id } = request.params as { id: string };
-    const result = await pool.query(`${publicSelect} where e.id=$1 and e.published=true and c.active=true and e.status <> 'draft'`, [id]);
-    if (!result.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
-    return result.rows[0];
-  });
+export async function eventRoutes(app: FastifyInstance, options: EventRouteOptions = {}): Promise<void> {
+  if (options.includePublic !== false) {
+    app.get('/api/v1/events', async (request, reply) => {
+      const parsedQuery = publicEventQuery.safeParse(request.query);
+      if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
+      const query = parsedQuery.data;
+      const where = ['e.published=true', 'c.active=true', `e.status <> 'draft'`];
+      const params: unknown[] = [];
+      if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
+      if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
+      if (query.from) { params.push(query.from); where.push(`e.starts_at >= $${params.length}::timestamptz`); }
+      if (query.to) { params.push(query.to); where.push(`e.starts_at <= $${params.length}::timestamptz`); }
+      return (await pool.query(`${publicSelect} where ${where.join(' and ')} order by e.starts_at,e.name`, params)).rows;
+    });
+
+    app.get('/api/v1/events/:id', async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const result = await pool.query(`${publicSelect} where e.id=$1 and e.published=true and c.active=true and e.status <> 'draft'`, [id]);
+      if (!result.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
+      return result.rows[0];
+    });
+  }
 
   app.get('/api/v1/admin/events', async (request, reply) => {
     const parsedQuery = adminEventQuery.safeParse(request.query);

@@ -1,7 +1,7 @@
 # Lot 5.7-P-E — implementation evidence
 
 Date: 2026-08-24
-Status: **PASS — MAINTAINER VALIDATED 2026-08-24**
+Status: **INTEGRATION CORRECTION COMPLETE — MAINTAINER/VPS REVALIDATION REQUIRED**
 
 ## Delivered boundary
 
@@ -51,10 +51,35 @@ On an isolated preproduction checkout of the audited SHA:
 This protocol performs no provider request, no Production visibility switch
 and no external client onboarding.
 
-## Maintainer validation
+## Reopened validation and integration correction
 
-The maintainer audit passed at
-`bfe6d4818b105a08417e6c524084cae0a176690d`:
+The local audit initially passed at
+`bfe6d4818b105a08417e6c524084cae0a176690d`, but the real VPS validation
+reopened E after the complete server exposed duplicate Fastify registrations
+for the definitive Event and Championship GET routes.
+
+The correction introduces one Preview-aware resource assembly used by the real
+`server.ts`. Preview OFF registers the historical public Event/Championship
+reads. Preview ON omits only those four colliding GET handlers, preserves all
+historical admin/write handlers, and registers the seven definitive protected
+Preview reads. A full assembly regression proves both modes and would fail with
+`FST_ERR_DUPLICATED_ROUTE` before the correction.
+
+Local correction evidence:
+
+- full typecheck, lint, 42 Web tests, 277 API tests and builds: PASS;
+- real route assembly Preview OFF/ON, seven definitive routes and admin/write
+  preservation: PASS;
+- PP-T23 through PP-T28 PostgreSQL D01-D20 recipe: PASS;
+- PP-T29 through PP-T35 PostgreSQL E01-E18 recipe: PASS;
+- migration 0028 fresh/down/up and populated rollback protection: PASS;
+- repository validation, release build, extracted validation and tests: PASS;
+- real provider calls and provider credits: 0.
+
+These are local correction results only. They do not constitute maintainer or
+VPS revalidation.
+
+Evidence retained from the VPS run:
 
 - GitHub CI and security/code review: PASS;
 - PP-T29 through PP-T35: PASS;
@@ -64,9 +89,9 @@ The maintainer audit passed at
 - real provider calls: 0;
 - provider credits consumed: 0.
 
-MAINTAINER AUDIT: **PASS**
-MAINTAINER VALIDATED: **TRUE — 2026-08-24**
-VALIDATED SHA: **bfe6d4818b105a08417e6c524084cae0a176690d**
+PRIOR AUDITED SHA: **bfe6d4818b105a08417e6c524084cae0a176690d**
+MAINTAINER REVALIDATED: **NO**
+VPS REVALIDATED: **NO**
 
 5.7-P-F, Production Preview activation, external client onboarding, full Lot
 5.7, Lot 5.8+ and merge main remain unauthorized.

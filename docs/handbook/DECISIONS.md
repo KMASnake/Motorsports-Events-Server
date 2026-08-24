@@ -2,6 +2,21 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-24 — Réouverture et correction d’intégration de 5.7-P-E
+
+- la validation VPS a révélé une collision Fastify entre quatre lectures
+  historiques et leurs routes Preview définitives ;
+- la validation mainteneur E est rouverte malgré le PASS confirmé de la
+  migration 0028 et de la recette E01-E18 ;
+- l’assemblage partagé par `server.ts` conserve les lectures historiques avec
+  Preview OFF et installe les lectures Preview sécurisées sans collision avec
+  Preview ON, sans retirer les routes admin/write ;
+- la correction est complète mais exige une revalidation mainteneur et VPS ;
+- 5.7-P-F, la visibilité Production, l’onboarding externe, le Lot 5.7 complet,
+  5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
 ## 2026-08-24 — Validation mainteneur de 5.7-P-E
 
 - l’audit mainteneur de 5.7-P-E est PASS au SHA

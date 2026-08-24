@@ -1,7 +1,7 @@
 # ADR-0022 — Sécurité client de la Preview 5.7-P-E
 
 Date : 2026-08-24
-Statut : accepté et validé par le mainteneur
+Statut : correction d’intégration terminée, revalidation mainteneur/VPS requise
 
 ## Décision
 
@@ -29,14 +29,22 @@ plugin D n’est enregistré derrière E que si `PREVIEW_API_ENABLED=true`; la
 valeur par défaut reste `false`. Cette décision n’active donc pas la visibilité
 Production, n’onboarde aucun client externe et n’autorise pas 5.7-P-F.
 
-## Validation mainteneur
+## Réouverture VPS et correction d’intégration
 
-Le mainteneur valide explicitement 5.7-P-E le 2026-08-24 au SHA
-`bfe6d4818b105a08417e6c524084cae0a176690d`. La CI GitHub, la revue
-sécurité/code, PP-T29 à PP-T35, les critères fonctionnels E applicables PP-105
-à PP-135 et PP-180, E01-E18 et la migration 0028 fresh/down/up avec protection
-du rollback peuplé sont PASS. Aucun appel fournisseur réel et aucun crédit
-fournisseur n’ont été consommés.
+La validation VPS réelle du 2026-08-24 a confirmé la migration 0028, E01-E18 et
+le fonctionnement Preview OFF, mais a rouvert la validation E : l’assemblage
+complet enregistrait deux fois les lectures Event et Championship lorsque
+Preview était activée.
+
+La correction conserve un seul namespace `/api/v1`. Preview OFF enregistre les
+lectures historiques. Preview ON remplace uniquement les quatre GET en collision
+par les lectures Preview sécurisées, conserve les routes admin/write et ajoute
+les lectures Meeting et Changes sans collision. L’assemblage partagé avec
+`server.ts` est couvert dans les deux modes.
+
+La correction est terminée, mais E n’est pas revalidé mainteneur et le VPS
+n’est pas revalidé. La migration 0028 reste inchangée. Aucun appel fournisseur
+réel et aucun crédit fournisseur n’ont été consommés.
 
 Cette validation n’autorise ni 5.7-P-F, ni l’activation Preview en Production,
 ni l’onboarding d’un client externe, ni le Lot 5.7 complet, ni 5.8+, ni le

@@ -63,36 +63,40 @@ function dbValues(body: z.infer<typeof championshipBody>) {
   ];
 }
 
-export async function championshipRoutes(app: FastifyInstance): Promise<void> {
-  app.get('/api/v1/championships', async (request, reply) => {
-    const parsed = z.object({ search: z.string().trim().max(160).optional(), season: z.coerce.number().int().min(1950).max(2200).optional() }).strict().safeParse(request.query);
-    if (!parsed.success) return reply.code(400).send({ message: 'Filtres invalides.' });
-    const query = parsed.data;
-    const where: string[] = ['c.active=true'];
-    const values: unknown[] = [];
+export interface ChampionshipRouteOptions { includePublic?: boolean }
 
-    if (query.search?.trim()) {
-      values.push(`%${query.search.trim()}%`);
-      where.push(`(c.name ilike $${values.length} or c.slug ilike $${values.length} or coalesce(c.official_name,'') ilike $${values.length})`);
-    }
-    if (query.season) {
-      values.push(query.season);
-      where.push(`c.season = $${values.length}`);
-    }
+export async function championshipRoutes(app: FastifyInstance, options: ChampionshipRouteOptions = {}): Promise<void> {
+  if (options.includePublic !== false) {
+    app.get('/api/v1/championships', async (request, reply) => {
+      const parsed = z.object({ search: z.string().trim().max(160).optional(), season: z.coerce.number().int().min(1950).max(2200).optional() }).strict().safeParse(request.query);
+      if (!parsed.success) return reply.code(400).send({ message: 'Filtres invalides.' });
+      const query = parsed.data;
+      const where: string[] = ['c.active=true'];
+      const values: unknown[] = [];
 
-    const result = await pool.query(
-      `${publicSelectSql} where ${where.join(' and ')} group by c.id order by c.name`,
-      values
-    );
-    return result.rows;
-  });
+      if (query.search?.trim()) {
+        values.push(`%${query.search.trim()}%`);
+        where.push(`(c.name ilike $${values.length} or c.slug ilike $${values.length} or coalesce(c.official_name,'') ilike $${values.length})`);
+      }
+      if (query.season) {
+        values.push(query.season);
+        where.push(`c.season = $${values.length}`);
+      }
 
-  app.get('/api/v1/championships/:id', async (request, reply) => {
-    const parsed = uuidParam('id', request.params); if (!parsed) return reply.code(400).send({ message: 'Identifiant invalide.' });
-    const result = await pool.query(`${publicSelectSql} where c.id=$1 and c.active=true group by c.id`, [parsed.id]);
-    if (!result.rowCount) return reply.code(404).send({ message: 'Championnat introuvable.' });
-    return result.rows[0];
-  });
+      const result = await pool.query(
+        `${publicSelectSql} where ${where.join(' and ')} group by c.id order by c.name`,
+        values
+      );
+      return result.rows;
+    });
+
+    app.get('/api/v1/championships/:id', async (request, reply) => {
+      const parsed = uuidParam('id', request.params); if (!parsed) return reply.code(400).send({ message: 'Identifiant invalide.' });
+      const result = await pool.query(`${publicSelectSql} where c.id=$1 and c.active=true group by c.id`, [parsed.id]);
+      if (!result.rowCount) return reply.code(404).send({ message: 'Championnat introuvable.' });
+      return result.rows[0];
+    });
+  }
 
   app.get('/api/v1/admin/championships', async () => (
     await pool.query(`${adminSelectSql} group by c.id order by c.name`)

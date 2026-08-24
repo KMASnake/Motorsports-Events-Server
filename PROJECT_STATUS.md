@@ -1,18 +1,22 @@
 # État du projet
 
-## Lot 5.7-P-E validé par le mainteneur (24 août 2026)
+## Lot 5.7-P-E corrigé ; revalidation mainteneur et VPS requise (24 août 2026)
 
 La sécurité client Preview PP-T29 à PP-T35 est implémentée avec migration 0028,
 clés HMAC affichées une fois, droits F1/scopes séparés, limites PostgreSQL
 atomiques et ACP minimal. Le plugin D reste désactivé par défaut et ne peut être
 enregistré que derrière ces contrôles.
 
-L’audit mainteneur est PASS et 5.7-P-E est validé au SHA
-`bfe6d4818b105a08417e6c524084cae0a176690d`. PP-T29 à PP-T35, les critères
-fonctionnels E applicables PP-105 à PP-135 et PP-180, E01-E18 et la migration
-0028 fresh/down/up avec protection du rollback peuplé sont PASS, sans appel ni
-crédit provider. 5.7-P-F, la visibilité Production, l’onboarding externe, le
-Lot 5.7 complet, 5.8+ et merge `main` restent interdits.
+La recette VPS au SHA `bfe6d4818b105a08417e6c524084cae0a176690d` a confirmé
+la migration 0028 et E01-E18, mais a révélé une collision Fastify entre les
+lectures historiques et Preview de `/events` et `/championships`. La validation
+E est donc rouverte. L’assemblage serveur enregistre désormais les lectures
+historiques uniquement avec Preview OFF et les sept lectures définitives
+sécurisées avec Preview ON, tout en conservant les routes admin/write.
+
+La correction est complète localement mais n’est ni revalidée mainteneur ni
+revalidée VPS. 5.7-P-F, la visibilité Production, l’onboarding externe, le Lot
+5.7 complet, 5.8+ et merge `main` restent interdits.
 
 ## Lot 5.7-P-D implémenté ; audit mainteneur requis (22 août 2026)
 

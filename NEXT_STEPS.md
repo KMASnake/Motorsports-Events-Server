@@ -1,13 +1,14 @@
 # Prochaines étapes
 
-## Gate courant — aucun gate d’implémentation autorisé après 5.7-P-E
+## Priorité courante — revalidation mainteneur et VPS de 5.7-P-E
 
 - [x] implémenter exclusivement PP-T29 à PP-T35 ;
 - [x] prouver le lifecycle clé, droits, limites atomiques et redaction ;
 - [x] conserver l’activation Preview Production désactivée par défaut ;
-- [x] auditer PP-T29 à PP-T35, PP-105 à PP-135 et PP-180 ;
-- [x] valider explicitement 5.7-P-E au SHA
-  `bfe6d4818b105a08417e6c524084cae0a176690d` le 2026-08-24.
+- [x] corriger la collision Fastify du vrai assemblage serveur Preview ON ;
+- [x] ajouter la non-régression d’intégration Preview OFF/ON ;
+- [ ] auditer la correction avec PP-T23 à PP-T35 impactés ;
+- [ ] revalider 5.7-P-E sur VPS avec Preview ON.
 
 5.7-P-F n’est pas autorisé et ne doit pas commencer. La visibilité Production,
 l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge `main` restent interdits.

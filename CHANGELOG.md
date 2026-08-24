@@ -1,5 +1,15 @@
 # Changelog
 
+## Lot 5.7-P-E — correction d’intégration des routes Preview
+
+- évite les collisions Fastify entre les lectures historiques et les routes
+  Preview définitives lorsque `PREVIEW_API_ENABLED=true` ;
+- conserve les lectures historiques avec Preview OFF et les routes admin/write
+  dans les deux modes ;
+- ajoute une recette d’assemblage serveur Preview OFF/ON couvrant les sept
+  routes V1 définitives et leur protection ;
+- ne modifie aucune migration et maintient 5.7-P-F non autorisé.
+
 ## Lot 5.7-P-E — sécurité client Preview
 
 - ajoute la migration additive 0028, les clés HMAC affichées une fois, scopes,
