@@ -1,6 +1,6 @@
 # ADR-0022 — Sécurité client de la Preview 5.7-P-E
 
-Date : 2026-08-24  
+Date : 2026-08-24
 Statut : implémenté, en attente de validation mainteneur
 
 ## Décision
