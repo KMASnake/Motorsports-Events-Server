@@ -6,7 +6,7 @@ import type { AdminPrincipal } from './adminAuth.js';
 type AuditContext = { actor: string; action: string; resourceType: string; resourceId: string | null; oldValue: unknown };
 const contexts = new WeakMap<FastifyRequest, AuditContext>();
 const atomicallyAudited = new WeakSet<FastifyRequest>();
-const sensitive = /authorization|token|secret|password|cookie|api[_-]?key|master[_-]?key/i;
+const sensitive = /authorization|token|secret|password|cookie|api[_-]?key|master[_-]?key|key[_-]?digest|pepper/i;
 
 function sanitize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sanitize);
@@ -41,6 +41,8 @@ function target(request: FastifyRequest): { type: string; id: string | null; tab
   if (path.startsWith('/api/v1/admin/provider-source-corrections')) return { type: 'provider-source-correction', id: params.id ?? null, table: 'provider_source_corrections' };
   if (path.startsWith('/api/v1/admin/provider-source-entities')) return { type: 'provider-source-entity', id: params.id ?? null, table: 'provider_source_entities' };
   if (path.startsWith('/api/v1/admin/provider-championships')) return { type: 'provider-championship', id: params.id ?? null, table: 'provider_championships' };
+  if (path.startsWith('/api/v1/admin/api-clients')) return { type: 'api-client', id: params.id ?? null, table: 'api_clients' };
+  if (path.startsWith('/api/v1/admin/api-keys')) return { type: 'api-key', id: params.id ?? null, table: 'api_keys' };
   if (path.startsWith('/api/v1/admin/provider-sessions')) return { type: 'session-correction-sync', id: params.id ?? null, table: null };
   if (path.startsWith('/api/v1/admin/sessions')) return { type: 'session', id: params.id ?? null, table: 'sessions' };
   if (/^\/api\/v1\/admin\/events\/[^/]+\/sessions$/.test(path)) return { type: 'session', id: null, table: null };

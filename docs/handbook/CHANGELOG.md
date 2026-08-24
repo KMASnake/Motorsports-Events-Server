@@ -1,5 +1,12 @@
 # Handbook Changelog
 
+## 1.38 — 2026-08-24
+
+- formalise la frontière de sécurité client 5.7-P-E dans ADR-0022 ;
+- conserve l’activation Preview opt-in et interdit tout secret client en base,
+  logs ou audit ;
+- maintient 5.7-P-F, la visibilité Production et merge `main` non autorisés.
+
 ## 1.34 — 2026-08-15
 
 - consigne l’autorisation explicite du mainteneur de conserver TheSportsDB v1 ;

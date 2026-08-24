@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 5.7-P-E — sécurité client Preview
+
+- ajoute la migration additive 0028, les clés HMAC affichées une fois, scopes,
+  entitlement F1 et compteurs atomiques par client ;
+- protège le plugin D avec droits relus par requête, cursors liés au client,
+  limites, erreurs anti-énumération et observabilité sans secret ;
+- ajoute l’ACP minimal et les preuves PP-T29 à PP-T35 sans activer Production.
+
 ## Lot 5.7-P-D — API Preview V1 read-only
 
 - ajoute les contrats définitifs read-only championships, events, meetings et

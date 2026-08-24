@@ -2,6 +2,19 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-24 — Achèvement de l’implémentation 5.7-P-E
+
+- PP-T29 à PP-T35 sont implémentés et disposent de preuves ciblées et
+  PostgreSQL reproductibles ;
+- l’activation Preview reste désactivée par défaut et aucun client externe
+  n’est onboardé ;
+- 5.7-P-E attend l’audit mainteneur et n’est pas déclaré validé ;
+- `authorized_gate` reste `5.7-P-E` et n’ouvre pas automatiquement F ;
+- 5.7-P-F, la visibilité Production, le Lot 5.7 complet, 5.8+ et merge `main`
+  restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
 ## 2026-08-21 — Validation mainteneur de 5.6-H et ouverture du gate 5.6-I
 
 - l’Acceptance finale de 5.6-H est 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;

@@ -1,5 +1,16 @@
 # Prochaines étapes
 
+## Priorité courante — audit mainteneur de 5.7-P-E
+
+- [x] implémenter exclusivement PP-T29 à PP-T35 ;
+- [x] prouver le lifecycle clé, droits, limites atomiques et redaction ;
+- [x] conserver l’activation Preview Production désactivée par défaut ;
+- [ ] exécuter le protocole VPS E sur le SHA audité ;
+- [ ] obtenir la validation mainteneur explicite de E.
+
+5.7-P-F n’est pas autorisé. La visibilité Production, l’onboarding externe,
+le Lot 5.7 complet, 5.8+ et merge `main` restent interdits.
+
 ## Priorité courante — audit mainteneur et validation VPS de 5.7-P-D
 
 - [x] conserver 5.7-P-A/B/C maintainer-validated et enregistrer le PASS VPS A/B/C ;

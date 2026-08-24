@@ -1,7 +1,7 @@
 import {createHmac,timingSafeEqual} from 'node:crypto';
 
-export type PageCursor={kind:'page';resourceType:'championship'|'event'|'meeting';snapshotSequence:number;sortKey:string;resourceId:string;filterHash:string;effectiveFrom?:string;issuedAt:number};
-export type SyncCursor={kind:'sync';sequence:number;issuedAt:number};
+export type PageCursor={kind:'page';resourceType:'championship'|'event'|'meeting';snapshotSequence:number;sortKey:string;resourceId:string;filterHash:string;effectiveFrom?:string;clientId?:string;issuedAt:number};
+export type SyncCursor={kind:'sync';sequence:number;clientId?:string;issuedAt:number};
 export type PreviewCursor=PageCursor|SyncCursor;
 
 const MAX_CURSOR_LENGTH=2048;
@@ -25,6 +25,7 @@ export function decodeCursor(value:string,kind:PreviewCursor['kind'],secret:stri
   if(!parsed||typeof parsed!=='object'||(parsed as {kind?:unknown}).kind!==kind)throw new Error('cursor_invalid');
   const cursor=parsed as Record<string,unknown>;
   if(!Number.isSafeInteger(cursor.issuedAt)||Number(cursor.issuedAt)<0)throw new Error('cursor_invalid');
+  if(cursor.clientId!==undefined&&!/^[0-9a-f-]{36}$/i.test(String(cursor.clientId)))throw new Error('cursor_invalid');
   if(kind==='sync'){
     if(!Number.isSafeInteger(cursor.sequence)||Number(cursor.sequence)<0)throw new Error('cursor_invalid');
   }else if(!['event','meeting','championship'].includes(String(cursor.resourceType))||!Number.isSafeInteger(cursor.snapshotSequence)||Number(cursor.snapshotSequence)<0||typeof cursor.sortKey!=='string'||cursor.sortKey.length>256||!/^[-_A-Za-z0-9]{43}$/.test(String(cursor.filterHash))||!/^[0-9a-f-]{36}$/i.test(String(cursor.resourceId))||(cursor.effectiveFrom!==undefined&&(typeof cursor.effectiveFrom!=='string'||cursor.effectiveFrom.length>64))){
