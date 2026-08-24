@@ -1,5 +1,13 @@
 # Changelog
 
+## Lot 5.7-P-E — revalidation mainteneur/VPS finale
+
+- enregistre le PASS final au SHA
+  `74f45b7d341ca214d4569b5d9917a46bb1d38254` avec migration head 0029 ;
+- confirme Preview remise OFF, services healthy, client synthétique suspendu
+  et clés synthétiques révoquées ;
+- maintient 5.7-P-F, l’activation Production et merge `main` non autorisés.
+
 ## Lot 5.7-P-E — correction d’intégration des routes Preview
 
 - évite les collisions Fastify entre les lectures historiques et les routes

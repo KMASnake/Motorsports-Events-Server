@@ -1,5 +1,11 @@
 # Handbook Changelog
 
+## 1.39 — 2026-08-25
+
+- enregistre la revalidation mainteneur/VPS finale de 5.7-P-E au SHA
+  `74f45b7d341ca214d4569b5d9917a46bb1d38254`, migration head 0029 et Preview
+  remise OFF ;
+
 ## 1.38 — 2026-08-24
 
 - rouvre la validation E après la collision de routes révélée sur VPS et

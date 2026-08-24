@@ -2,6 +2,21 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-25 — Revalidation mainteneur et VPS finale de 5.7-P-E
+
+- 5.7-P-E est implémenté et revalidé mainteneur/VPS au SHA
+  `74f45b7d341ca214d4569b5d9917a46bb1d38254` ;
+- E01-E18 et 0028/0029 fresh/upgrade/down/up avec protection du rollback peuplé
+  sont PASS, avec migration head 0029 en préproduction ;
+- Preview OFF/ON, les sept routes protégées, l’entitlement `f1`, les scopes,
+  `/changes`, le lifecycle client/clé et les limites atomiques sont PASS ;
+- l’état final conserve Preview OFF, les services healthy, le client
+  synthétique suspendu et toutes ses clés révoquées ;
+- 5.7-P-F, l’activation Preview Production, l’onboarding externe, le Lot 5.7
+  complet, 5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
 ## 2026-08-24 — Réouverture et correction d’intégration de 5.7-P-E
 
 - la validation VPS a révélé une collision Fastify entre quatre lectures

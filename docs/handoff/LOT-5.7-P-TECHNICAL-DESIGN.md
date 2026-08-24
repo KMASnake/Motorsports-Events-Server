@@ -1,7 +1,7 @@
 # Lot 5.7-P — Technical design
 
 Date : 2026-08-21  
-Status : **DESIGN VALIDATED — GATE E CORRECTED AWAITING REVALIDATION; F UNAUTHORIZED**
+Status : **DESIGN VALIDATED — GATE E MAINTAINER/VPS REVALIDATED; F UNAUTHORIZED**
 
 ## 1. Context and objective
 
@@ -261,9 +261,9 @@ scope creep into full 5.7/5.8. Stop rules and PP-T criteria isolate each risk.
 
 ## 18. Boundary and governance
 
-Gate D remains maintainer-validated. Gate E has a complete integration
-correction after VPS discovery of duplicate definitive V1 route registration;
-maintainer and VPS revalidation are required. Preview activation in Production
-and external client onboarding remain unauthorized. Gate F, full 5.7, 5.8+,
+Gates D and E remain maintainer-validated. Gate E is VPS revalidated at
+`74f45b7d341ca214d4569b5d9917a46bb1d38254` with migration head 0029 and
+Preview returned OFF. Preview activation in Production and external client
+onboarding remain unauthorized. Gate F, full 5.7, 5.8+,
 merge to `main`, general cross-provider reconciliation, advanced mapping UX and
 the commercial platform remain unauthorized.

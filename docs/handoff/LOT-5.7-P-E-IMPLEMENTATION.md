@@ -1,7 +1,7 @@
 # Lot 5.7-P-E — implementation evidence
 
-Date: 2026-08-24
-Status: **INTEGRATION CORRECTION COMPLETE — MAINTAINER/VPS REVALIDATION REQUIRED**
+Date: 2026-08-25
+Status: **PASS — IMPLEMENTATION COMPLETE AND MAINTAINER/VPS REVALIDATED**
 
 ## Delivered boundary
 
@@ -76,8 +76,8 @@ Local correction evidence:
 - repository validation, release build, extracted validation and tests: PASS;
 - real provider calls and provider credits: 0.
 
-These are local correction results only. They do not constitute maintainer or
-VPS revalidation.
+These local correction results were subsequently confirmed by maintainer audit
+and real VPS revalidation.
 
 Evidence retained from the VPS run:
 
@@ -89,9 +89,30 @@ Evidence retained from the VPS run:
 - real provider calls: 0;
 - provider credits consumed: 0.
 
-PRIOR AUDITED SHA: **bfe6d4818b105a08417e6c524084cae0a176690d**
-MAINTAINER REVALIDATED: **NO**
-VPS REVALIDATED: **NO**
+## Final maintainer and VPS revalidation
+
+The corrected implementation was deployed and revalidated at
+`74f45b7d341ca214d4569b5d9917a46bb1d38254` on 2026-08-25:
+
+- migration head `0029_lot57pe_canonical_championship_entitlements`;
+- E01-E18 and 0028/0029 fresh/upgrade/down/up with populated rollback
+  protection: PASS;
+- Preview OFF legacy behavior: PASS;
+- Preview ON API healthy, no duplicated route, seven of seven unauthenticated
+  Preview routes returning `401 invalid_api_key`;
+- synthetic client creation with `championship_ids=["f1"]`, persistent scopes
+  and entitlement: PASS;
+- F1 allowed with HTTP 200; MotoGP outside entitlement rejected with HTTP 403;
+- authenticated `/changes`, suspend/reactivate, revoke and rotate: PASS;
+- minute limit 10/10 accepted then HTTP 429, database counter 10; daily quota
+  and headers: PASS;
+- final synthetic client suspended, all synthetic keys revoked, Preview OFF,
+  API/Web/PostgreSQL healthy and no final critical API message.
+
+IMPLEMENTATION COMPLETE: **YES**
+MAINTAINER REVALIDATED: **YES — 2026-08-25**
+VPS REVALIDATED: **YES — 2026-08-25**
+VALIDATED SHA: **74f45b7d341ca214d4569b5d9917a46bb1d38254**
 
 5.7-P-F, Production Preview activation, external client onboarding, full Lot
 5.7, Lot 5.8+ and merge main remain unauthorized.

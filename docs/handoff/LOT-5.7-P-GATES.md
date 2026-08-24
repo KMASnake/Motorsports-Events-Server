@@ -1,7 +1,7 @@
 # Lot 5.7-P — Technical gates
 
-Date : 2026-08-24
-Status : **5.7-P-E CORRECTED — MAINTAINER/VPS REVALIDATION REQUIRED; F UNAUTHORIZED**
+Date : 2026-08-25
+Status : **5.7-P-E MAINTAINER/VPS REVALIDATED — 5.7-P-F UNAUTHORIZED**
 
 Each gate requires explicit maintainer authorization before implementation and
 explicit maintainer validation before the next gate may be opened.
@@ -14,7 +14,7 @@ explicit maintainer validation before the next gate may be opened.
 | 2 | 5.7-P-B | Deterministic normalization and source mapping | NOT AUTHORIZED | validated A |
 | 3 | 5.7-P-C | Publication state, last-known-good and change log | NOT AUTHORIZED | validated B |
 | 4 | 5.7-P-D | Read-only V1 Preview API and incremental sync | MAINTAINER VALIDATED | validated C and VPS A/B/C |
-| 5 | 5.7-P-E | Client security, entitlements, limits and minimal ACP | CORRECTED — REVALIDATION REQUIRED | validated D |
+| 5 | 5.7-P-E | Client security, entitlements, limits and minimal ACP | MAINTAINER/VPS REVALIDATED | validated D |
 | 6 | 5.7-P-F | F1 vertical certification and operational readiness | NOT AUTHORIZED | validated E |
 
 ## 5.7-P-A — Normalized identity and persistence foundations
@@ -131,8 +131,9 @@ explicit maintainer validation before the next gate may be opened.
 
 ## Current gate state
 
-`5.7-P-E — Client security, entitlements, limits and minimal ACP` has a complete
-integration correction after its VPS validation was reopened on **2026-08-24**.
+`5.7-P-E — Client security, entitlements, limits and minimal ACP` is revalidated
+by the maintainer and on VPS on **2026-08-25** at
+`74f45b7d341ca214d4569b5d9917a46bb1d38254`.
 
 Authorization record:
 `docs/handoff/LOT-5.7-P-E-AUTHORIZATION.md`.
@@ -146,7 +147,7 @@ Prerequisites satisfied:
 - VPS C/D validation PASS at
   `90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96`.
 
-Status: **CORRECTION COMPLETE — MAINTAINER AND VPS REVALIDATION REQUIRED**.
+Status: **IMPLEMENTATION COMPLETE — MAINTAINER/VPS REVALIDATED**.
 
 No implementation gate is currently authorized. 5.7-P-F, full Lot 5.7, Lot
 5.8+, Production launch/external client onboarding and merge main remain

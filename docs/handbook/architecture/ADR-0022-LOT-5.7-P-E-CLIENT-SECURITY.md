@@ -1,7 +1,7 @@
 # ADR-0022 — Sécurité client de la Preview 5.7-P-E
 
 Date : 2026-08-24
-Statut : correction d’intégration terminée, revalidation mainteneur/VPS requise
+Statut : accepté, revalidé mainteneur et VPS
 
 ## Décision
 
@@ -42,9 +42,13 @@ par les lectures Preview sécurisées, conserve les routes admin/write et ajoute
 les lectures Meeting et Changes sans collision. L’assemblage partagé avec
 `server.ts` est couvert dans les deux modes.
 
-La correction est terminée, mais E n’est pas revalidé mainteneur et le VPS
-n’est pas revalidé. La migration 0028 reste inchangée. Aucun appel fournisseur
-réel et aucun crédit fournisseur n’ont été consommés.
+La correction est revalidée mainteneur et VPS le 2026-08-25 au SHA
+`74f45b7d341ca214d4569b5d9917a46bb1d38254`. E01-E18, le cycle correctif
+0028/0029, Preview OFF/ON, les sept routes protégées, l’entitlement texte `f1`,
+les scopes, `/changes`, le lifecycle client/clé et les quotas atomiques sont
+PASS. La migration head est 0029 et l’état final conserve Preview OFF, les
+services healthy, le client synthétique suspendu et ses clés révoquées. Aucun
+appel fournisseur réel et aucun crédit fournisseur n’ont été consommés.
 
 Cette validation n’autorise ni 5.7-P-F, ni l’activation Preview en Production,
 ni l’onboarding d’un client externe, ni le Lot 5.7 complet, ni 5.8+, ni le
