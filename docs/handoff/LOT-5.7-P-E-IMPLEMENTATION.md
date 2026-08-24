@@ -1,7 +1,7 @@
 # Lot 5.7-P-E — implementation evidence
 
 Date: 2026-08-24
-Status: **IMPLEMENTATION COMPLETE — MAINTAINER AUDIT REQUIRED**
+Status: **PASS — MAINTAINER VALIDATED 2026-08-24**
 
 ## Delivered boundary
 
@@ -50,3 +50,23 @@ On an isolated preproduction checkout of the audited SHA:
 
 This protocol performs no provider request, no Production visibility switch
 and no external client onboarding.
+
+## Maintainer validation
+
+The maintainer audit passed at
+`bfe6d4818b105a08417e6c524084cae0a176690d`:
+
+- GitHub CI and security/code review: PASS;
+- PP-T29 through PP-T35: PASS;
+- applicable PP-105 through PP-135 and PP-180: PASS;
+- E01-E18 key lifecycle, rights, suspension and atomic limits: PASS;
+- migration 0028 fresh/down/up and populated rollback protection: PASS;
+- real provider calls: 0;
+- provider credits consumed: 0.
+
+MAINTAINER AUDIT: **PASS**
+MAINTAINER VALIDATED: **TRUE — 2026-08-24**
+VALIDATED SHA: **bfe6d4818b105a08417e6c524084cae0a176690d**
+
+5.7-P-F, Production Preview activation, external client onboarding, full Lot
+5.7, Lot 5.8+ and merge main remain unauthorized.

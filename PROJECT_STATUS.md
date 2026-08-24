@@ -1,15 +1,18 @@
 # État du projet
 
-## Lot 5.7-P-E implémenté ; audit mainteneur requis (24 août 2026)
+## Lot 5.7-P-E validé par le mainteneur (24 août 2026)
 
 La sécurité client Preview PP-T29 à PP-T35 est implémentée avec migration 0028,
 clés HMAC affichées une fois, droits F1/scopes séparés, limites PostgreSQL
 atomiques et ACP minimal. Le plugin D reste désactivé par défaut et ne peut être
 enregistré que derrière ces contrôles.
 
-Les preuves ciblées TypeScript et PostgreSQL sont PASS sans appel provider.
-5.7-P-E n’est pas validé mainteneur. 5.7-P-F, la visibilité Production,
-l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge `main` restent interdits.
+L’audit mainteneur est PASS et 5.7-P-E est validé au SHA
+`bfe6d4818b105a08417e6c524084cae0a176690d`. PP-T29 à PP-T35, les critères
+fonctionnels E applicables PP-105 à PP-135 et PP-180, E01-E18 et la migration
+0028 fresh/down/up avec protection du rollback peuplé sont PASS, sans appel ni
+crédit provider. 5.7-P-F, la visibilité Production, l’onboarding externe, le
+Lot 5.7 complet, 5.8+ et merge `main` restent interdits.
 
 ## Lot 5.7-P-D implémenté ; audit mainteneur requis (22 août 2026)
 

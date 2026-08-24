@@ -2,6 +2,20 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-08-24 — Validation mainteneur de 5.7-P-E
+
+- l’audit mainteneur de 5.7-P-E est PASS au SHA
+  `bfe6d4818b105a08417e6c524084cae0a176690d` ;
+- PP-T29 à PP-T35, les critères fonctionnels E applicables PP-105 à PP-135 et
+  PP-180, E01-E18 et la migration 0028 fresh/down/up avec protection du
+  rollback peuplé sont PASS ;
+- aucun appel fournisseur réel et aucun crédit fournisseur n’ont été consommés ;
+- aucun gate d’implémentation suivant n’est autorisé ; 5.7-P-F, la visibilité
+  Production, l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge `main`
+  restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
 ## 2026-08-24 — Achèvement de l’implémentation 5.7-P-E
 
 - PP-T29 à PP-T35 sont implémentés et disposent de preuves ciblées et

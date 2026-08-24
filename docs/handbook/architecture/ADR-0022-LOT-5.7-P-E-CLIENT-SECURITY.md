@@ -1,7 +1,7 @@
 # ADR-0022 — Sécurité client de la Preview 5.7-P-E
 
 Date : 2026-08-24
-Statut : implémenté, en attente de validation mainteneur
+Statut : accepté et validé par le mainteneur
 
 ## Décision
 
@@ -28,3 +28,16 @@ La migration 0028 est additive et son DOWN refuse toute donnée client. Le
 plugin D n’est enregistré derrière E que si `PREVIEW_API_ENABLED=true`; la
 valeur par défaut reste `false`. Cette décision n’active donc pas la visibilité
 Production, n’onboarde aucun client externe et n’autorise pas 5.7-P-F.
+
+## Validation mainteneur
+
+Le mainteneur valide explicitement 5.7-P-E le 2026-08-24 au SHA
+`bfe6d4818b105a08417e6c524084cae0a176690d`. La CI GitHub, la revue
+sécurité/code, PP-T29 à PP-T35, les critères fonctionnels E applicables PP-105
+à PP-135 et PP-180, E01-E18 et la migration 0028 fresh/down/up avec protection
+du rollback peuplé sont PASS. Aucun appel fournisseur réel et aucun crédit
+fournisseur n’ont été consommés.
+
+Cette validation n’autorise ni 5.7-P-F, ni l’activation Preview en Production,
+ni l’onboarding d’un client externe, ni le Lot 5.7 complet, ni 5.8+, ni le
+merge vers `main`.

@@ -2,6 +2,8 @@
 
 ## 1.38 — 2026-08-24
 
+- enregistre la validation mainteneur de 5.7-P-E au SHA
+  `bfe6d4818b105a08417e6c524084cae0a176690d` ;
 - formalise la frontière de sécurité client 5.7-P-E dans ADR-0022 ;
 - conserve l’activation Preview opt-in et interdit tout secret client en base,
   logs ou audit ;
