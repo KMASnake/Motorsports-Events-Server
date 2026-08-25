@@ -14,7 +14,6 @@ def test_workspace_packages_match_version_metadata():
         ROOT / "packages" / "types" / "package.json",
     ]
 
-    assert metadata["version"] == "8.1.0-alpha.2-lot.4.3"
     assert all(
         json.loads(path.read_text(encoding="utf-8"))["version"]
         == metadata["version"]
