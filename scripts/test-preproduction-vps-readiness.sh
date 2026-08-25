@@ -71,8 +71,10 @@ compose run --rm migrate >/dev/null
 compose exec -T postgres psql -U mse -d motorsports_events -Atc "select (description='preprod-preserved')::int from events where id='evt-001'" | grep -qx 1
 
 compose up -d --wait api web
-curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health/live" | grep -q '"git_sha":"'"$(git rev-parse HEAD)"'"'
-curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health/ready" | grep -q '"status":"ok"'
+EXPECTED_METADATA='"version":"'"$(tr -d '\r\n' < VERSION)"'","git_sha":"'"$(git rev-parse HEAD)"'","build_time":"'
+curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health" | grep -q "${EXPECTED_METADATA}"
+curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health/live" | grep -q "${EXPECTED_METADATA}"
+curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health/ready" | grep -q "${EXPECTED_METADATA}"
 curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/metrics" | grep -q '^motorsports_postgres_ready 1$'
 curl -fsS "http://127.0.0.1:$((PORT_BASE+2))/" >/dev/null
 
