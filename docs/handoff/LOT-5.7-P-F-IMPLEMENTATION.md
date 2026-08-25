@@ -28,6 +28,10 @@ and lease reuse, atomic traversal/mapping binding, partial-state protection and
 canonical handoff only after persisted completeness. Its contract and future
 non-executable VPS protocol are recorded in
 `LOT-5.7-P-F-BOUNDED-PROVIDER-RUNNER.md`. Real execution remains unauthorized.
+The follow-up resume audit is corrected: an incomplete traversal keeps its
+immutable bound mapping across active-mapping changes, while only future
+traversals use the newly active mapping. Missing historical bindings fail
+closed before provider HTTP.
 
 ## Local evidence
 

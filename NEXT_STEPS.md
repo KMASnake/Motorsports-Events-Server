@@ -19,6 +19,9 @@
   traversal partiel ;
 - [x] exécuter sa recette PostgreSQL/Docker isolée avec transport fournisseur
   injecté/mocké, quota PostgreSQL réel et réseau externe explicitement bloqué ;
+- [x] préserver le mapping immuable d’une traversal partielle lors de la reprise,
+  même après changement du mapping actif, et refuser une reprise non liée avant
+  toute requête HTTP ;
 - [ ] auditer la proposition bornée d’appel OCBlackTop F1 et l’autoriser ou la
   refuser séparément ;
 - [ ] exécuter sur VPS les preuves TLS, rollback release `N → N+1 → N` et smoke

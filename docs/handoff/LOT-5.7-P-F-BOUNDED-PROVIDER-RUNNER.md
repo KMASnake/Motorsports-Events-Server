@@ -23,6 +23,14 @@ transaction before the first request. A partial or budget-stopped traversal
 cannot enter the canonical handoff. A complete persisted traversal is handed
 to `CanonicalAcquisitionPublicationService`; no caller mapping is accepted.
 
+For a new traversal, the mapping currently active for the provider
+championship is required and bound before HTTP. For a resumed incomplete
+traversal, its immutable historical binding is authoritative even if the
+active mapping was changed or removed afterward. An unbound resumable
+traversal fails closed before HTTP. Preflight reports
+`resumable_traversal_id`, `effective_mapping_uuid` and `mapping_source`
+without exposing credentials.
+
 ## Safe preflight
 
 Build the API first, then run only this read-only command with non-secret UUIDs:

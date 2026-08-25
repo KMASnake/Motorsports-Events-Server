@@ -22,6 +22,12 @@ HTTP injecté. Le réseau fournisseur est bloqué dans la recette et aucun appel
 ou crédit réel n’a été consommé. Cette preuve locale ne vaut ni validation VPS
 finale ni autorisation d’exécution fournisseur.
 
+Le constat d’audit sur la reprise après changement de mapping actif est
+corrigé : une traversal partielle reprend exclusivement son binding immuable,
+même si le mapping actif a changé ou a été retiré. Une traversal future utilise
+le nouveau mapping actif. Une reprise historique sans binding échoue avant tout
+HTTP et le garde-fou de rebind conflictuel reste inchangé.
+
 PP-T39 et les régressions 5.4–5.6 sont PASS sans appel/crédit provider. F ne
 peut toutefois pas être déclaré complet : PP-T36 exige encore une acquisition
 F1 réelle, et les preuves VPS/TLS, rollback release réel et smoke Production
