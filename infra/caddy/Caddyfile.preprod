@@ -9,19 +9,16 @@ preprod.motorsports-events.fr {
         -Server
     }
 
-    @blocked path /metrics /.env /.git/* /server-status /actuator/* /wp-admin*
-    respond @blocked 404
+    route {
+        @metrics path /metrics
+        respond @metrics 404
 
-    handle /health {
-        reverse_proxy mse-preprod-api:3001
-    }
-    handle /health/* {
-        reverse_proxy mse-preprod-api:3001
-    }
-    handle /api/* {
-        reverse_proxy mse-preprod-api:3001
-    }
-    handle {
+        @sensitive path /.env /.env.* /.git/* /.svn/* /.hg/* /.DS_Store /.vscode/* /.idea/* /server-status /actuator/* /trace.axd /info.php /phpinfo.php /telescope/* /v2/_catalog /wp-admin* /wp-login.php /xmlrpc.php
+        respond @sensitive 404
+
+        @api path /health /health/* /api/*
+        reverse_proxy @api mse-preprod-api:3001
+
         reverse_proxy mse-preprod-web:3000
     }
 

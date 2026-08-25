@@ -48,9 +48,40 @@ def test_caddy_preprod_connectivity_and_hardening_are_declarative():
     assert "import /etc/caddy/Caddyfile.production" in integration
     assert "import /etc/caddy/Caddyfile.preprod" in integration
     assert "preprod.motorsports-events.fr" in caddy
-    assert "reverse_proxy mse-preprod-api:3001" in caddy
+    assert "    route {" in caddy
+    assert "@api path /health /health/* /api/*" in caddy
+    assert "reverse_proxy @api mse-preprod-api:3001" in caddy
     assert "reverse_proxy mse-preprod-web:3000" in caddy
-    for path in ("/metrics", "/.env", "/.git/*", "/server-status", "/actuator/*", "/wp-admin*"):
+    assert caddy.index("@metrics path /metrics") < caddy.index("@sensitive path")
+    assert caddy.index("respond @metrics 404") < caddy.index(
+        "reverse_proxy mse-preprod-web:3000"
+    )
+    assert caddy.index("respond @sensitive 404") < caddy.index(
+        "reverse_proxy @api mse-preprod-api:3001"
+    )
+    assert caddy.index("reverse_proxy @api mse-preprod-api:3001") < caddy.index(
+        "reverse_proxy mse-preprod-web:3000"
+    )
+    for path in (
+        "/.env",
+        "/.env.*",
+        "/.git/*",
+        "/.svn/*",
+        "/.hg/*",
+        "/.DS_Store",
+        "/.vscode/*",
+        "/.idea/*",
+        "/server-status",
+        "/actuator/*",
+        "/trace.axd",
+        "/info.php",
+        "/phpinfo.php",
+        "/telescope/*",
+        "/v2/_catalog",
+        "/wp-admin*",
+        "/wp-login.php",
+        "/xmlrpc.php",
+    ):
         assert path in caddy
 
 
