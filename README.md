@@ -1,55 +1,32 @@
-# Motorsports Events Server — GitHub Handover
-
-Ce dépôt constitue le package de passation complet destiné à GitHub et Codex.
+# Motorsports Events Server
 
 > **Source de vérité permanente :** consultez le
 > [Project Handbook](PROJECT-HANDBOOK.md) avant toute modification du dépôt.
-> Les documents de `docs/handoff/` complètent le Handbook uniquement pour le
-> périmètre et l'état d'un lot donné.
+> L’état courant d’un lot est suivi dans `docs/handoff/PROGRESS.json` et les
+> documents de `docs/handoff/` apportent les preuves de validation associées.
 
-## État du dépôt
+## Architecture actuelle
 
-La racine contient le **lot 4 rev.1**, qui réunit le CRUD des événements, les
-API publique/administration et la vue calendrier restaurée. Ce candidat a été
-validé par l'utilisateur le 1er août 2026 sur un environnement VPS isolé.
+Le dépôt contient temporairement deux générations du serveur :
 
-Le dernier jalon entièrement validé est :
+- **cible active** : Node.js / TypeScript / PostgreSQL sous `apps/api`, `apps/web` et `infra/postgres` ;
+- **production historique** : backend Python sous `server/`, conservé en mode **LEGACY / FROZEN** jusqu’au cutover Production Node.
 
-```text
-v8.1.0-alpha.2-lot.4-rev.1
-```
-
-Le rapport de validation et la passation sont conservés dans :
+L’architecture cible et le modèle d’états provider sont documentés dans :
 
 ```text
-docs/handover/LOT-4-REV-1-VPS-VALIDATION.md
-docs/handover/LOT-4-REV-1-HANDOFF.md
+docs/architecture.md
+docs/provider-state-model.md
 ```
 
-## Prochaine action
-
-Relire puis fusionner la PR #24 dans `main`, vérifier la CI après fusion et
-choisir explicitement le prochain lot. Ne pas installer cette architecture 8.1
-sur la production historique 2.7.0 avec l'ancien script de mise à niveau.
-
-## Maquettes officielles
+Les règles applicables au backend historique sont documentées dans :
 
 ```text
-docs/ui-reference/validated-mockups/
+server/LEGACY.md
+docs/cleanup/CLEANUP-06-LEGACY-OPERATIONS-AUDIT.md
 ```
 
-Les maquettes sont un contrat visuel. Elles ne sont pas de simples exemples.
-
-## Documentation historique
-
-```text
-docs/reference/documentation-v7.0.0/
-```
-
-Elle contient les spécifications UI et d'architecture produites avant le
-développement du socle exécutable.
-
-## Démarrage local
+## Développement local Node
 
 Sous Windows :
 
@@ -57,25 +34,60 @@ Sous Windows :
 scripts\reset-dev.cmd
 ```
 
-Validation du dernier lot :
+Validation générique :
 
-```cmd
-scripts\test-lot4.cmd
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
 ```
 
-Le lot ne doit être déclaré validé qu'après :
+Les validations historiques encore maintenues restent accessibles via les commandes `npm run ...` déclarées dans `package.json`, par exemple :
 
-- build TypeScript web ;
-- build API ;
-- trois conteneurs healthy ;
-- validation API ;
-- test visuel ;
-- comparaison à la maquette ;
-- mise à jour de `PROJECT-STATUS.json` et des documents de passation.
+```bash
+npm run validate:lot4
+npm run test:lot44:final
+npm run test:lot55
+```
+
+Ne pas utiliser d’ancien wrapper `.cmd` supprimé comme source canonique : `package.json` et les scripts shell/Node qu’il référence constituent les points d’entrée maintenus.
+
+## Exploitation historique
+
+Les scripts racine `start.sh`, `stop.sh`, `restart.sh`, `backup.sh`, `restore.sh`, `upgrade.sh`, `show-keys.sh` ainsi que `install.sh` appartiennent encore à la chaîne d’exploitation/rollback historique.
+
+Ils sont **gelés** :
+
+- ne pas les étendre pour l’architecture Node ;
+- ne pas les utiliser pour piloter la préproduction Node ;
+- les conserver uniquement jusqu’au cutover Production Node et à la fin de la capacité de rollback Python.
+
+La préproduction Node utilise sa configuration Compose et son infrastructure déclarative dédiées.
+
+## Maquettes officielles
+
+```text
+docs/ui-reference/validated-mockups/
+```
+
+Les maquettes restent le contrat visuel de référence.
+
+## Documentation historique
+
+Les anciens handovers, décisions et références restent conservés sous :
+
+```text
+docs/handover/
+docs/decisions/
+docs/reference/
+```
+
+Ils servent d’historique et ne doivent pas être confondus avec les sources de vérité actives.
 
 ## Plateforme cible
 
-Console d'administration desktop :
+Console d’administration desktop :
 
 - résolution de référence : 1440 × 900 ;
 - minimum supporté : 1280 × 720 ;
