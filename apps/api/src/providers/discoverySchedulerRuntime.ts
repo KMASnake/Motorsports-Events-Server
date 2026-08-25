@@ -24,9 +24,10 @@ export class DiscoverySchedulerRuntime {
     this.schedule(0);
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
     this.stopped = true;
     if (this.pollTimer) clearTimeout(this.pollTimer);
+    await this.current;
   }
 
   private schedule(delay: number): void {

@@ -54,6 +54,24 @@ services:
       retries: 10
     logging: *default-logging
 
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["node", "apps/api/dist/worker.js"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://mse:change-me@postgres:5432/motorsports_events}
+      NODE_ENV: development
+      PROVIDER_MASTER_KEYS: ${PROVIDER_MASTER_KEYS:-}
+      PROVIDER_ACTIVE_KEY_VERSION: ${PROVIDER_ACTIVE_KEY_VERSION:-}
+      SCHEDULER_POLL_SECONDS: ${SCHEDULER_POLL_SECONDS:-15}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging: *default-logging
+
   migrate:
     image: postgres:17-alpine
     environment:

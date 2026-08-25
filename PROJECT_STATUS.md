@@ -1,5 +1,21 @@
 # État du projet
 
+## Correction d’isolation API/worker terminée ; audit mainteneur requis (25 août 2026)
+
+La correction préalable explicitement autorisée retire
+`DiscoverySchedulerRuntime` du processus HTTP et fournit un entrypoint/service
+Compose worker dédié. L’API démarre et reste healthy sans worker ; le worker
+partage uniquement PostgreSQL et les secrets fournisseur nécessaires, sans port
+HTTP ni secrets Preview/admin. SIGTERM draine le travail en cours, ferme le pool
+et termine proprement.
+
+Les tests ciblés, typecheck, lint, Compose config et la preuve Docker réelle
+API-seule → worker séparé → arrêt en une seconde → API toujours healthy sont
+PASS. Aucun provider réel n’a été configuré ou appelé et aucune migration n’a
+été ajoutée. L’implémentation générale de 5.7-P-F reste non autorisée, comme
+Production Preview, l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge
+`main`.
+
 ## Lot 5.7-P-E revalidé mainteneur et VPS (25 août 2026)
 
 La sécurité client Preview PP-T29 à PP-T35 est implémentée avec migration 0028,

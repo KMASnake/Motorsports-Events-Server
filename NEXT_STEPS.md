@@ -1,6 +1,17 @@
 # Prochaines étapes
 
-## Gate courant — aucun gate d’implémentation autorisé après 5.7-P-E
+## Priorité courante — audit de la correction d’isolation API/worker
+
+- [x] retirer le runtime fournisseur du processus HTTP API ;
+- [x] créer l’entrypoint et le service Compose worker dédiés ;
+- [x] prouver API autonome, worker indépendant et arrêt SIGTERM propre ;
+- [ ] obtenir l’audit mainteneur de cette correction préalable.
+
+L’implémentation générale de 5.7-P-F reste non autorisée. Les appels provider
+réels, Preview Production, l’onboarding externe, le Lot 5.7 complet, 5.8+ et
+merge `main` restent interdits.
+
+## Gate précédent — 5.7-P-E clôturé
 
 - [x] implémenter exclusivement PP-T29 à PP-T35 ;
 - [x] prouver le lifecycle clé, droits, limites atomiques et redaction ;
@@ -12,8 +23,7 @@
   `74f45b7d341ca214d4569b5d9917a46bb1d38254` avec migration head 0029 ;
 - [x] remettre Preview OFF et confirmer API/Web/PostgreSQL healthy.
 
-5.7-P-F n’est pas autorisé et ne doit pas commencer. La visibilité Production,
-l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge `main` restent interdits.
+5.7-P-E reste revalidé mainteneur/VPS.
 
 ## Priorité courante — audit mainteneur et validation VPS de 5.7-P-D
 

@@ -15,13 +15,13 @@
   },
   "repository_state": {
     "branch": "codex/lot-5-providers-sync",
-    "status": "lot-5.7-p-e-maintainer-vps-revalidated-no-next-gate-authorized",
-    "reason": "5.7-P-E is implementation-complete and maintainer/VPS revalidated at 74f45b7d341ca214d4569b5d9917a46bb1d38254 on 2026-08-25. Gate F, Production Preview activation, external client onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "status": "lot-5.7-p-f-worker-isolation-correction-complete-awaiting-maintainer-audit",
+    "reason": "The separately authorized API/worker isolation correction is complete and awaits maintainer audit. The HTTP API no longer starts DiscoverySchedulerRuntime; a dedicated Compose worker preserves the PostgreSQL lease/fencing boundary and drains on shutdown. Gate F full implementation, real provider calls, Production Preview activation, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "working_lot": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-e-maintainer-vps-revalidated-no-next-gate-authorized",
+    "status": "lot-5.7-p-f-worker-isolation-correction-complete-awaiting-maintainer-audit",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -97,7 +97,7 @@
         "5.7-P-C": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"additive_correction_complete":true,"additive_correction_vps_validated":true,"additive_correction_vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-22","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-D": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"vps_validated":true,"vps_validation_date":"2026-08-22","vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-E": {"status":"maintainer-vps-revalidated","authorization_date":"2026-08-23","implementation_started":true,"implementation_complete":true,"integration_correction_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-25","maintainer_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","vps_revalidated":true,"vps_revalidation_date":"2026-08-25","vps_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","migration_head":"0029_lot57pe_canonical_championship_entitlements","authorization":"docs/handoff/LOT-5.7-P-E-AUTHORIZATION.md","implementation":"docs/handoff/LOT-5.7-P-E-IMPLEMENTATION.md"},
-        "5.7-P-F": {"status":"unauthorized"}
+        "5.7-P-F": {"status":"unauthorized","worker_isolation_correction_authorized":true,"worker_isolation_correction_complete":true,"worker_isolation_correction_maintainer_audit":"required","implementation_started":false,"implementation_authorized":false,"evidence":"docs/handoff/LOT-5.7-P-F-WORKER-ISOLATION-CORRECTION.md"}
       },
       "full_lot_5_7_authorized": false,
       "concept": "docs/handoff/PRODUCTION-PREVIEW-CONCEPT.md",
@@ -111,7 +111,8 @@
     },
     "mandatory_constraints": [
       "Lot 5.7-P-E is implementation-complete and maintainer/VPS revalidated at 74f45b7d341ca214d4569b5d9917a46bb1d38254",
-      "Lot 5.7-P-F, Lot 5.7 full and Lot 5.8+ remain unauthorized",
+      "The separately authorized 5.7-P-F worker isolation correction is complete and awaits maintainer audit; full gate F implementation remains unauthorized",
+      "Real provider calls, Production Preview activation, external onboarding, Lot 5.7 full and Lot 5.8+ remain unauthorized",
       "Lot 5.6 validation and Lot 5.7-P authorization do not constitute merge authorization",
       "Lot 5.6 must preserve all Lot 5.4 scheduler/lease/fencing invariants",
       "Lot 5.6 must preserve all Lot 5.5 quota/cadence/reserve/backoff invariants",
@@ -121,7 +122,7 @@
       "Pre-1970 dates must be supported without positive-Unix-timestamp assumptions",
       "Lot 5.6 acquisition must not perform Lot 5.7 business reconciliation or final normalization"
     ],
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E are maintainer-validated. Gate E is maintainer/VPS revalidated at 74f45b7d341ca214d4569b5d9917a46bb1d38254 with migration head 0029 on 2026-08-25. Gate F, Production Preview activation, external client onboarding, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E are maintainer-validated. The separately authorized API/worker isolation correction prerequisite to F is complete and awaits audit. Full gate F implementation, real provider calls, Production Preview activation, external client onboarding, Lot 5.7 full, Lot 5.8+ and merge to main remain unauthorized."
   },
   "technical_baseline": {
     "pre_5_5_security_baseline": "maintainer-validated-2026-08-14",
@@ -130,6 +131,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "No implementation gate is authorized. Do not start 5.7-P-F, activate Preview in Production, onboard an external client, authorize full Lot 5.7 or Lot 5.8+, or merge main."
+    "task": "Audit the completed API/worker isolation correction. Full 5.7-P-F implementation remains unauthorized; do not call a real provider, activate Preview in Production, onboard an external client, authorize full Lot 5.7 or Lot 5.8+, or merge main."
   }
 }

@@ -1,7 +1,7 @@
 # Lot 5.7-P — Technical gates
 
 Date : 2026-08-25
-Status : **5.7-P-E MAINTAINER/VPS REVALIDATED — 5.7-P-F UNAUTHORIZED**
+Status : **F WORKER-ISOLATION CORRECTION COMPLETE — FULL 5.7-P-F UNAUTHORIZED**
 
 Each gate requires explicit maintainer authorization before implementation and
 explicit maintainer validation before the next gate may be opened.
@@ -131,6 +131,12 @@ explicit maintainer validation before the next gate may be opened.
 
 ## Current gate state
 
+The maintainer separately authorized the API/worker isolation correction that
+precedes F. It is complete and awaits audit: the HTTP API no longer starts the
+provider discovery runtime, while a dedicated Compose worker retains the
+PostgreSQL lease/fencing/quota boundary and drains in-flight work on shutdown.
+See `LOT-5.7-P-F-WORKER-ISOLATION-CORRECTION.md`.
+
 `5.7-P-E — Client security, entitlements, limits and minimal ACP` is revalidated
 by the maintainer and on VPS on **2026-08-25** at
 `74f45b7d341ca214d4569b5d9917a46bb1d38254`.
@@ -149,6 +155,6 @@ Prerequisites satisfied:
 
 Status: **IMPLEMENTATION COMPLETE — MAINTAINER/VPS REVALIDATED**.
 
-No implementation gate is currently authorized. 5.7-P-F, full Lot 5.7, Lot
-5.8+, Production launch/external client onboarding and merge main remain
-unauthorized.
+Full 5.7-P-F implementation is not authorized. Real provider calls, full Lot
+5.7, Lot 5.8+, Production launch/external client onboarding and merge main
+remain unauthorized.

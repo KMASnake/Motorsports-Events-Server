@@ -23,7 +23,6 @@ import { ManualChampionshipSourceService } from './providers/manualSourceService
 import { providerManualSourceRoutes } from './routes/providerManualSources.js';
 import { PersistentSchedulerService } from './providers/schedulerService.js';
 import { providerSchedulerRoutes } from './routes/providerScheduler.js';
-import { DiscoverySchedulerRuntime } from './providers/discoverySchedulerRuntime.js';
 import { registerSecurityHeaders, secureFastifyOptions } from './lib/httpSecurity.js';
 import { registerUuidParamValidation } from './lib/routeParams.js';
 import { QuotaCadenceService } from './providers/quotaCadenceService.js';
@@ -87,11 +86,6 @@ await app.register(providerManualSourceRoutes,{service:new ManualChampionshipSou
 const schedulerService=new PersistentSchedulerService();
 await app.register(providerSchedulerRoutes,{service:schedulerService});
 await app.register(providerAcquisitionAdminRoutes,{admin:new AcquisitionAdminService(),protection:new SourceProtectionService(),scheduler:schedulerService});
-const pollSeconds=Math.min(30,Math.max(10,Number(process.env.SCHEDULER_POLL_SECONDS)||15));
-const discoveryRuntime=new DiscoverySchedulerRuntime(schedulerService,discoveryService,app.log,pollSeconds*1000);
-app.addHook('onClose',async()=>discoveryRuntime.stop());
-discoveryRuntime.start();
-
 const port = Number(process.env.API_PORT ?? 3001);
 const host = '0.0.0.0';
 

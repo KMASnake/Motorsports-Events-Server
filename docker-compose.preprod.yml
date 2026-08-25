@@ -16,6 +16,12 @@ services:
       - "127.0.0.1:${API_HOST_PORT:-3001}:3001"
     restart: unless-stopped
 
+  worker:
+    environment:
+      NODE_ENV: production
+      TZ: UTC
+    restart: unless-stopped
+
   web:
     environment:
       TZ: UTC

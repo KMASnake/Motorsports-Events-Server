@@ -25,4 +25,34 @@ describe('periodic discovery runtime', () => {
     await runtime.runOnce();
     expect(discovery.discover).not.toHaveBeenCalled();
   });
+
+  it('waits for in-flight work during graceful shutdown', async () => {
+    vi.useFakeTimers();
+    let finishDiscovery!: () => void;
+    const discoveryPending = new Promise<void>((resolve) => { finishDiscovery = resolve; });
+    const scheduler = {
+      acquireDueDiscovery: vi.fn().mockResolvedValue({ id: 'provider-a', discovery_lease_generation: 3 }),
+      config: vi.fn().mockResolvedValue({ heartbeat_seconds: 30 }),
+      heartbeatDiscovery: vi.fn(),
+      releaseDiscovery: vi.fn().mockResolvedValue({ id: 'provider-a' })
+    };
+    const discovery = { discover: vi.fn().mockReturnValue(discoveryPending) };
+    const runtime = new DiscoverySchedulerRuntime(
+      scheduler as never,
+      discovery as never,
+      { error: vi.fn() } as never
+    );
+
+    runtime.start();
+    await vi.advanceTimersByTimeAsync(0);
+    let stopped = false;
+    const shutdown = runtime.stop().then(() => { stopped = true; });
+    await Promise.resolve();
+    expect(stopped).toBe(false);
+
+    finishDiscovery();
+    await shutdown;
+    expect(scheduler.releaseDiscovery).toHaveBeenCalledOnce();
+    vi.useRealTimers();
+  });
 });

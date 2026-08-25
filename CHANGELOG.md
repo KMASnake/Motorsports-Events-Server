@@ -1,5 +1,14 @@
 # Changelog
 
+## Pré-5.7-P-F — isolation du worker fournisseur
+
+- retire le runtime de découverte fournisseur du processus HTTP API ;
+- ajoute un entrypoint et un service Compose worker dédiés sans port HTTP ni
+  secrets Preview/admin ;
+- draine le travail en cours et ferme PostgreSQL lors de SIGTERM/SIGINT ;
+- maintient l’implémentation générale de F et tout appel provider réel non
+  autorisés.
+
 ## Lot 5.7-P-E — revalidation mainteneur/VPS finale
 
 - enregistre le PASS final au SHA
