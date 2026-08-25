@@ -27,3 +27,14 @@ def test_release_checksum_uses_a_portable_filename():
 
     assert 'cd "${DIST}"' in builder
     assert 'sha256sum "$(basename "${ARCHIVE}")"' in builder
+
+
+def test_release_builder_embeds_identifiable_metadata():
+    builder = (ROOT / "scripts" / "build-release.sh").read_text(encoding="utf-8")
+
+    assert 'GIT_SHA="$(git rev-parse HEAD)"' in builder
+    assert 'BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"' in builder
+    assert 'release-metadata.json' in builder
+    assert '"version": version' in builder
+    assert '"git_sha": git_sha' in builder
+    assert '"build_time": build_time' in builder

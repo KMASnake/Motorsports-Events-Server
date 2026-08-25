@@ -13,7 +13,7 @@ groups:
       - alert: MotorsportsApiHigh5xxRate
         expr: |
           (
-            sum(rate(motorsports_http_requests_total{status=~"5.."}[5m]))
+            sum(rate(motorsports_http_server_errors_total[5m]))
             /
             clamp_min(sum(rate(motorsports_http_requests_total[5m])), 0.001)
           ) > 0.05

@@ -1,6 +1,22 @@
 # État du projet
 
-## Exit loop worker corrigée ; revalidation VPS requise (25 août 2026)
+## 5.7-P-F implémenté localement ; preuves externes requises (25 août 2026)
+
+Le prérequis d’isolation API/worker est validé mainteneur/VPS et le mainteneur
+a autorisé la reprise de F. La certification contrôlée F1 traverse les données
+source durables 5.6, la normalisation, la publication, l’API et `/changes` avec
+UUID stable, révisions/séquences monotones, override, annulation, kill switch et
+last-known-good. Les routes live/ready, les métriques minimales, les métadonnées
+de release et la recette Docker/PostgreSQL backup/restore sont PASS localement.
+
+PP-T39 et les régressions 5.4–5.6 sont PASS sans appel/crédit provider. F ne
+peut toutefois pas être déclaré complet : PP-T36 exige encore une acquisition
+F1 réelle, et les preuves VPS/TLS, rollback release réel et smoke Production
+restent soumises à autorisation/environnement distincts. Aucun appel réel n’a
+été effectué, Preview Production reste OFF, aucun client externe n’est onboardé
+et merge `main` reste interdit. Voir `docs/handoff/LOT-5.7-P-F-IMPLEMENTATION.md`.
+
+## Exit loop worker corrigée et revalidée VPS (25 août 2026)
 
 La correction préalable explicitement autorisée retire
 `DiscoverySchedulerRuntime` du processus HTTP et fournit un entrypoint/service
@@ -16,11 +32,9 @@ les usages historiques conservent leurs timers non référencés. Les timers pol
 et heartbeat du worker sont référencés, tandis que `stop()` annule le poll et
 attend toujours le travail courant.
 
-Les tests ciblés runtime/isolation/scheduler, typecheck, lint et diff check sont
-PASS. La correction attend une revalidation VPS. Aucun provider réel n’a été
-appelé et aucune migration n’a été ajoutée. L’implémentation générale de
-5.7-P-F reste non autorisée, comme Production Preview, l’onboarding externe, le
-Lot 5.7 complet, 5.8+ et merge `main`.
+Les tests ciblés et la revalidation VPS sont PASS : worker stable sur plusieurs
+polls, `RestartCount=0`, SIGTERM propre et API autonome. Aucun provider réel
+n’a été appelé et aucune migration n’a été ajoutée.
 
 ## Lot 5.7-P-E revalidé mainteneur et VPS (25 août 2026)
 

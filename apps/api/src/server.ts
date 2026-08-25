@@ -31,10 +31,12 @@ import { SourceProtectionService } from './providers/sourceProtectionService.js'
 import { providerAcquisitionAdminRoutes } from './routes/providerAcquisitionAdmin.js';
 import { PreviewClientSecurityService } from './preview/clientSecurity.js';
 import { previewAwareResourceRoutes } from './routes/previewAwareResources.js';
+import { registerRuntimeMetrics } from './lib/runtimeMetrics.js';
 
 const app = Fastify(secureFastifyOptions());
 registerSecurityHeaders(app);
 registerUuidParamValidation(app);
+await registerRuntimeMetrics(app);
 await verifyApplicationSchema();
 const webOrigin = process.env.ADMIN_WEB_ORIGIN ?? 'http://localhost:3000';
 const sessionSecret = process.env.ADMIN_SESSION_SECRET;

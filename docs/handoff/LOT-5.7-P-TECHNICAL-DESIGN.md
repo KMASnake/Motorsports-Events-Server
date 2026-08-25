@@ -264,6 +264,7 @@ scope creep into full 5.7/5.8. Stop rules and PP-T criteria isolate each risk.
 Gates D and E remain maintainer-validated. Gate E is VPS revalidated at
 `74f45b7d341ca214d4569b5d9917a46bb1d38254` with migration head 0029 and
 Preview returned OFF. Preview activation in Production and external client
-onboarding remain unauthorized. Gate F, full 5.7, 5.8+,
+onboarding remain unauthorized. Gate F implementation is authorized and locally
+implemented pending external evidence and maintainer audit. Full 5.7, 5.8+,
 merge to `main`, general cross-provider reconciliation, advanced mapping UX and
 the commercial platform remain unauthorized.

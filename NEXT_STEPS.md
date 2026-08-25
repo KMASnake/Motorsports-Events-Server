@@ -1,18 +1,27 @@
 # Prochaines étapes
 
-## Priorité courante — revalidation VPS de l’exit loop worker
+## Priorité courante — audit des preuves externes 5.7-P-F
 
 - [x] retirer le runtime fournisseur du processus HTTP API ;
 - [x] créer l’entrypoint et le service Compose worker dédiés ;
 - [x] prouver API autonome, worker indépendant et arrêt SIGTERM propre ;
 - [x] corriger le timer standalone avec `keepProcessAlive` sans changer le
   comportement historique par défaut ;
-- [ ] revalider sur VPS un `RestartCount` stable entre plusieurs polls et
+- [x] revalider sur VPS un `RestartCount` stable entre plusieurs polls et
   l’arrêt SIGTERM propre.
+- [x] certifier le replay F1 contrôlé 5.6 → normalisation → publication → API →
+  `/changes` sans appel fournisseur ;
+- [x] valider live/ready, métriques, build identifiable, staging isolé et
+  backup/restore PostgreSQL ;
+- [x] rejouer les recettes 5.4, 5.5 et 5.6 sans crédit provider ;
+- [ ] auditer la proposition bornée d’appel OCBlackTop F1 et l’autoriser ou la
+  refuser séparément ;
+- [ ] exécuter sur VPS les preuves TLS, rollback release `N → N+1 → N` et smoke
+  uniquement après leurs autorisations respectives ;
+- [ ] obtenir la validation mainteneur finale de F.
 
-L’implémentation générale de 5.7-P-F reste non autorisée. Les appels provider
-réels, Preview Production, l’onboarding externe, le Lot 5.7 complet, 5.8+ et
-merge `main` restent interdits.
+Les appels provider réels, Preview Production, l’onboarding externe, le Lot
+5.7 complet, 5.8+ et merge `main` restent interdits.
 
 ## Gate précédent — 5.7-P-E clôturé
 

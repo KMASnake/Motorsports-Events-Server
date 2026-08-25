@@ -41,6 +41,12 @@ ADMIN_SESSION_SECRET=portable-test-session-secret-at-least-32-characters
 ADMIN_WEB_ORIGIN=http://127.0.0.1:$((PORT_BASE+2))
 ADMIN_COOKIE_SECURE=true
 TRUST_PROXY_CIDRS=127.0.0.1
+PREVIEW_API_ENABLED=false
+PREVIEW_CURSOR_SECRET=portable-cursor-secret-at-least-32-characters
+PREVIEW_API_KEY_PEPPER=portable-key-pepper-at-least-32-characters
+APP_VERSION=$(tr -d '\r\n' < VERSION)
+GIT_SHA=$(git rev-parse HEAD)
+BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
 
 compose(){ docker compose --env-file "${ENV_FILE}" -f docker-compose.yml -f docker-compose.preprod.yml "$@"; }
@@ -55,7 +61,7 @@ grep -q 'host_ip: 127.0.0.1' <<<"${CONFIG}"
 compose build api web >/dev/null
 compose up -d --wait postgres
 compose run --rm migrate >/dev/null
-compose exec -T postgres psql -U mse -d motorsports_events -Atc "select count(*) from schema_migrations where version='0025_lot57pc_publication_state'" | grep -qx 1
+compose exec -T postgres psql -U mse -d motorsports_events -Atc "select count(*) from schema_migrations where version in('0028_lot57pe_client_security','0029_lot57pe_canonical_championship_entitlements')" | grep -qx 2
 
 # Current DB 0024 -> 0025, with legacy data retained.
 compose exec -T postgres psql -U mse -d motorsports_events -c "update events set description='preprod-preserved' where id='evt-001'" >/dev/null
@@ -65,7 +71,9 @@ compose run --rm migrate >/dev/null
 compose exec -T postgres psql -U mse -d motorsports_events -Atc "select (description='preprod-preserved')::int from events where id='evt-001'" | grep -qx 1
 
 compose up -d --wait api web
-curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health" | grep -q '"status":"ok"'
+curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health/live" | grep -q '"git_sha":"'"$(git rev-parse HEAD)"'"'
+curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/health/ready" | grep -q '"status":"ok"'
+curl -fsS "http://127.0.0.1:$((PORT_BASE+1))/metrics" | grep -q '^motorsports_postgres_ready 1$'
 curl -fsS "http://127.0.0.1:$((PORT_BASE+2))/" >/dev/null
 
 # Portable durable-state sentinel: state, revision, change, tombstone and rebuild checkpoint.
@@ -91,9 +99,10 @@ gzip -t "${BACKUP_FILE}"; test -s "${BACKUP_FILE}"
 compose exec -T postgres dropdb -U mse --if-exists motorsports_events_restore
 compose exec -T postgres createdb -U mse motorsports_events_restore
 gzip -dc "${BACKUP_FILE}" | compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events_restore >/dev/null
-compose exec -T postgres psql -U mse -d motorsports_events_restore -Atc "select count(*) from schema_migrations where version='0025_lot57pc_publication_state'" | grep -qx 1
+compose exec -T postgres psql -U mse -d motorsports_events_restore -Atc "select count(*) from schema_migrations where version in('0028_lot57pe_client_security','0029_lot57pe_canonical_championship_entitlements')" | grep -qx 2
 compose exec -T postgres psql -U mse -d motorsports_events_restore -Atc "select count(*) from public_resource_states where resource_id='57000000-0000-4000-8000-000000000901' and revision=3" | grep -qx 1
 compose exec -T postgres psql -U mse -d motorsports_events_restore -Atc "select count(*) from public_change_log where sequence=9001" | grep -qx 1
+compose exec -T postgres psql -U mse -d motorsports_events_restore -Atc "select count(*) from provider_source_entities" | grep -Eq '^[0-9]+$'
 
 echo 'VPS preproduction portable readiness: PASS'
 echo 'PROVIDER_CALLS=0'

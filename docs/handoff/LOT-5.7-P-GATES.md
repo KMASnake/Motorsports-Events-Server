@@ -15,7 +15,7 @@ explicit maintainer validation before the next gate may be opened.
 | 3 | 5.7-P-C | Publication state, last-known-good and change log | NOT AUTHORIZED | validated B |
 | 4 | 5.7-P-D | Read-only V1 Preview API and incremental sync | MAINTAINER VALIDATED | validated C and VPS A/B/C |
 | 5 | 5.7-P-E | Client security, entitlements, limits and minimal ACP | MAINTAINER/VPS REVALIDATED | validated D |
-| 6 | 5.7-P-F | F1 vertical certification and operational readiness | NOT AUTHORIZED | validated E |
+| 6 | 5.7-P-F | F1 vertical certification and operational readiness | IMPLEMENTED LOCALLY — EXTERNAL EVIDENCE REQUIRED | validated E and worker isolation |
 
 ## 5.7-P-A — Normalized identity and persistence foundations
 
@@ -156,6 +156,9 @@ Prerequisites satisfied:
 
 Status: **IMPLEMENTATION COMPLETE — MAINTAINER/VPS REVALIDATED**.
 
-Full 5.7-P-F implementation is not authorized. Real provider calls, full Lot
-5.7, Lot 5.8+, Production launch/external client onboarding and merge main
-remain unauthorized.
+The worker isolation prerequisite is maintainer/VPS validated and F
+implementation is authorized. Controlled local implementation evidence is
+recorded in `LOT-5.7-P-F-IMPLEMENTATION.md`; real provider, VPS/TLS, genuine
+release rollback and Production smoke evidence remain separately gated. Real
+provider calls, full Lot 5.7, Lot 5.8+, Production launch/external client
+onboarding and merge main remain unauthorized.
