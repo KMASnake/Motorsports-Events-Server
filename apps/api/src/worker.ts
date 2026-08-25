@@ -25,7 +25,8 @@ const runtime = new DiscoverySchedulerRuntime(
   schedulerService,
   discoveryService,
   loggerHost.log,
-  pollSeconds * 1000
+  pollSeconds * 1000,
+  { keepProcessAlive: true }
 );
 
 let stopping = false;

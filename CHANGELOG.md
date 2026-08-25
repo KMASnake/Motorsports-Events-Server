@@ -2,6 +2,8 @@
 
 ## Pré-5.7-P-F — isolation du worker fournisseur
 
+- maintient explicitement le processus worker vivant entre deux polls tout en
+  conservant les timers historiques non référencés par défaut ;
 - retire le runtime de découverte fournisseur du processus HTTP API ;
 - ajoute un entrypoint et un service Compose worker dédiés sans port HTTP ni
   secrets Preview/admin ;

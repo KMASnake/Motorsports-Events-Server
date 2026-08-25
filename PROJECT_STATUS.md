@@ -1,6 +1,6 @@
 # État du projet
 
-## Correction d’isolation API/worker terminée ; audit mainteneur requis (25 août 2026)
+## Exit loop worker corrigée ; revalidation VPS requise (25 août 2026)
 
 La correction préalable explicitement autorisée retire
 `DiscoverySchedulerRuntime` du processus HTTP et fournit un entrypoint/service
@@ -9,12 +9,18 @@ partage uniquement PostgreSQL et les secrets fournisseur nécessaires, sans port
 HTTP ni secrets Preview/admin. SIGTERM draine le travail en cours, ferme le pool
 et termine proprement.
 
-Les tests ciblés, typecheck, lint, Compose config et la preuve Docker réelle
-API-seule → worker séparé → arrêt en une seconde → API toujours healthy sont
-PASS. Aucun provider réel n’a été configuré ou appelé et aucune migration n’a
-été ajoutée. L’implémentation générale de 5.7-P-F reste non autorisée, comme
-Production Preview, l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge
-`main`.
+Le premier audit VPS a révélé une sortie naturelle toutes les onze secondes :
+le timer de poll `unref()` ne gardait pas le processus standalone vivant. Le
+runtime accepte désormais `keepProcessAlive`, activé uniquement par le worker ;
+les usages historiques conservent leurs timers non référencés. Les timers poll
+et heartbeat du worker sont référencés, tandis que `stop()` annule le poll et
+attend toujours le travail courant.
+
+Les tests ciblés runtime/isolation/scheduler, typecheck, lint et diff check sont
+PASS. La correction attend une revalidation VPS. Aucun provider réel n’a été
+appelé et aucune migration n’a été ajoutée. L’implémentation générale de
+5.7-P-F reste non autorisée, comme Production Preview, l’onboarding externe, le
+Lot 5.7 complet, 5.8+ et merge `main`.
 
 ## Lot 5.7-P-E revalidé mainteneur et VPS (25 août 2026)
 

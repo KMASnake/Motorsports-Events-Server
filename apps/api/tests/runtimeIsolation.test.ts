@@ -16,6 +16,7 @@ describe('provider runtime isolation', () => {
   it('starts and gracefully stops the runtime from the dedicated worker entrypoint', () => {
     const worker = source('apps/api/src/worker.ts');
     expect(worker).toContain('new DiscoverySchedulerRuntime');
+    expect(worker).toContain('{ keepProcessAlive: true }');
     expect(worker).toContain('runtime.start()');
     expect(worker).toContain('await runtime.stop()');
     expect(worker).toContain("process.once('SIGTERM'");

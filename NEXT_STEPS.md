@@ -1,11 +1,14 @@
 # Prochaines étapes
 
-## Priorité courante — audit de la correction d’isolation API/worker
+## Priorité courante — revalidation VPS de l’exit loop worker
 
 - [x] retirer le runtime fournisseur du processus HTTP API ;
 - [x] créer l’entrypoint et le service Compose worker dédiés ;
 - [x] prouver API autonome, worker indépendant et arrêt SIGTERM propre ;
-- [ ] obtenir l’audit mainteneur de cette correction préalable.
+- [x] corriger le timer standalone avec `keepProcessAlive` sans changer le
+  comportement historique par défaut ;
+- [ ] revalider sur VPS un `RestartCount` stable entre plusieurs polls et
+  l’arrêt SIGTERM propre.
 
 L’implémentation générale de 5.7-P-F reste non autorisée. Les appels provider
 réels, Preview Production, l’onboarding externe, le Lot 5.7 complet, 5.8+ et

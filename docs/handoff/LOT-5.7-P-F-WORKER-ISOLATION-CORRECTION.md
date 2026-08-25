@@ -1,7 +1,7 @@
 # 5.7-P-F prerequisite — API/worker isolation correction
 
 Date: 2026-08-25
-Status: **CORRECTION COMPLETE — MAINTAINER AUDIT REQUIRED**
+Status: **EXIT LOOP CORRECTED LOCALLY — VPS REVALIDATION REQUIRED**
 
 ## Authorization boundary
 
@@ -51,7 +51,20 @@ changed.
 
 ## Audit state
 
+The first real VPS audit found the worker restarted approximately every eleven
+seconds with exit code 0. The poll timer was deliberately unreferenced for the
+historical embedded runtime; once isolated from the HTTP server, no referenced
+resource kept the standalone Node process alive.
+
+The runtime now accepts an explicit `keepProcessAlive` option. It remains false
+by default and is enabled only by `worker.ts`, keeping poll and heartbeat timers
+referenced. Targeted tests prove the worker timer remains referenced between
+polls, `stop()` cancels it, graceful shutdown still awaits current work, lease
+release remains intact and the API still contains no runtime instance.
+
 WORKER ISOLATION CORRECTION: **COMPLETE**
+WORKER EXIT LOOP CORRECTION: **COMPLETE LOCALLY**
+VPS REVALIDATION: **REQUIRED**
 MAINTAINER AUDIT: **REQUIRED**
 FULL 5.7-P-F IMPLEMENTATION AUTHORIZED: **NO**
 REAL PROVIDER CALL AUTHORIZED: **NO**

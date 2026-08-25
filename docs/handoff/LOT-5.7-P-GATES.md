@@ -1,7 +1,7 @@
 # Lot 5.7-P — Technical gates
 
 Date : 2026-08-25
-Status : **F WORKER-ISOLATION CORRECTION COMPLETE — FULL 5.7-P-F UNAUTHORIZED**
+Status : **F WORKER EXIT LOOP CORRECTED — VPS REVALIDATION REQUIRED; FULL F UNAUTHORIZED**
 
 Each gate requires explicit maintainer authorization before implementation and
 explicit maintainer validation before the next gate may be opened.
@@ -132,8 +132,9 @@ explicit maintainer validation before the next gate may be opened.
 ## Current gate state
 
 The maintainer separately authorized the API/worker isolation correction that
-precedes F. It is complete and awaits audit: the HTTP API no longer starts the
-provider discovery runtime, while a dedicated Compose worker retains the
+precedes F. The VPS exit loop caused by an unreferenced standalone poll timer is
+corrected locally and awaits VPS revalidation. The HTTP API no longer starts
+the provider discovery runtime, while a dedicated Compose worker retains the
 PostgreSQL lease/fencing/quota boundary and drains in-flight work on shutdown.
 See `LOT-5.7-P-F-WORKER-ISOLATION-CORRECTION.md`.
 

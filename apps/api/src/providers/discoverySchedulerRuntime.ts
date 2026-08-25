@@ -4,6 +4,7 @@ import type { ProviderDiscoveryService } from './discoveryService.js';
 import type { PersistentSchedulerService } from './schedulerService.js';
 
 type Timer = ReturnType<typeof setTimeout>;
+type RuntimeOptions = { keepProcessAlive?: boolean };
 
 export class DiscoverySchedulerRuntime {
   readonly workerId = `discovery:${process.pid}:${randomUUID()}`;
@@ -15,7 +16,8 @@ export class DiscoverySchedulerRuntime {
     private readonly scheduler: PersistentSchedulerService,
     private readonly discovery: ProviderDiscoveryService,
     private readonly logger: FastifyBaseLogger,
-    private readonly pollMilliseconds = 15_000
+    private readonly pollMilliseconds = 15_000,
+    private readonly options: RuntimeOptions = {}
   ) {}
 
   start(): void {
@@ -38,7 +40,7 @@ export class DiscoverySchedulerRuntime {
         this.schedule(this.pollMilliseconds);
       });
     }, delay);
-    this.pollTimer.unref();
+    if (!this.options.keepProcessAlive) this.pollTimer.unref();
   }
 
   async runOnce(): Promise<void> {
@@ -59,13 +61,13 @@ export class DiscoverySchedulerRuntime {
       try {
         await this.scheduler.heartbeatDiscovery(lease.id, this.workerId, generation);
         heartbeat = setTimeout(renew, config.heartbeat_seconds * 1000);
-        heartbeat.unref();
+        if (!this.options.keepProcessAlive) heartbeat.unref();
       } catch {
         leaseLost = true;
       }
     };
     heartbeat = setTimeout(renew, config.heartbeat_seconds * 1000);
-    heartbeat.unref();
+    if (!this.options.keepProcessAlive) heartbeat.unref();
 
     try {
       await this.discovery.discover(lease.id, 'periodic', {

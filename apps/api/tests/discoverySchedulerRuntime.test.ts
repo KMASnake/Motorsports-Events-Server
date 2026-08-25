@@ -26,6 +26,43 @@ describe('periodic discovery runtime', () => {
     expect(discovery.discover).not.toHaveBeenCalled();
   });
 
+  it('keeps the standalone worker alive between polls and cancels that timer on stop', async () => {
+    vi.useFakeTimers();
+    const scheduler = { acquireDueDiscovery: vi.fn().mockResolvedValue(null) };
+    const runtime = new DiscoverySchedulerRuntime(
+      scheduler as never,
+      { discover: vi.fn() } as never,
+      { error: vi.fn() } as never,
+      15_000,
+      { keepProcessAlive: true }
+    );
+
+    runtime.start();
+    await vi.advanceTimersByTimeAsync(0);
+    const scheduled = (runtime as unknown as { pollTimer?: NodeJS.Timeout }).pollTimer;
+    expect(scheduled?.hasRef()).toBe(true);
+    expect(scheduler.acquireDueDiscovery).toHaveBeenCalledOnce();
+
+    await runtime.stop();
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(scheduler.acquireDueDiscovery).toHaveBeenCalledOnce();
+    vi.useRealTimers();
+  });
+
+  it('keeps historical embedded-runtime timers unreferenced by default', () => {
+    vi.useFakeTimers();
+    const runtime = new DiscoverySchedulerRuntime(
+      { acquireDueDiscovery: vi.fn() } as never,
+      { discover: vi.fn() } as never,
+      { error: vi.fn() } as never
+    );
+    runtime.start();
+    const scheduled = (runtime as unknown as { pollTimer?: NodeJS.Timeout }).pollTimer;
+    expect(scheduled?.hasRef()).toBe(false);
+    void runtime.stop();
+    vi.useRealTimers();
+  });
+
   it('waits for in-flight work during graceful shutdown', async () => {
     vi.useFakeTimers();
     let finishDiscovery!: () => void;
