@@ -1,4 +1,4 @@
-name: Validate server
+name: Validate legacy Python server
 
 on:
   workflow_dispatch:
