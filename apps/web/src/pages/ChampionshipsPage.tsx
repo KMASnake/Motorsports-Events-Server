@@ -4,7 +4,7 @@ import { PageHeader, Panel, StatusChip as Pill } from '../design-system';
 import { assetRegistry } from '../assets/assetRegistry';
 import { adminAuthorization, notifyAuthenticationRequired } from '../lib/adminAuth';
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 
 type Championship = {
   id: string;

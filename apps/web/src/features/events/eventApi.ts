@@ -1,7 +1,7 @@
 import type { Championship, Circuit, EventFormState, EventRow, SessionTitleSuggestion } from './eventTypes';
 import { adminAuthorization, notifyAuthenticationRequired } from '../../lib/adminAuth';
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);

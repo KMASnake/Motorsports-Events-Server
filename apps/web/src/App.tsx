@@ -10,7 +10,7 @@ import { AuthProvider, useAdminAuth } from './lib/adminAuth';
 import { AuthenticationLoading, LoginPage } from './pages/LoginPage';
 import { ProviderAcquisitionPage } from './features/provider-acquisition/ProviderAcquisitionPage';
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 type Row = Record<string, any>;
 async function get(path:string){const r=await fetch(API+path);if(!r.ok)throw new Error(await r.text());return r.json()}
 const fmt=(v:string)=>v?new Intl.DateTimeFormat('fr-FR',{dateStyle:'short',timeStyle:'short'}).format(new Date(v)):'—';

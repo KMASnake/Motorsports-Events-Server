@@ -7,7 +7,7 @@ import type { Championship, Circuit } from '../features/events/eventTypes';
 import { availableProviderOptions, providerLabel, providerSource } from '../features/events/providerDisplay';
 import { adminAuthorization, notifyAuthenticationRequired } from '../lib/adminAuth';
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 type References = { championships: Map<string, string>; circuits: Map<string, string> };
 
 async function call<T>(path:string,init?:RequestInit):Promise<T>{

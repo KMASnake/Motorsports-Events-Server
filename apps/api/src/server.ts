@@ -32,6 +32,7 @@ import { providerAcquisitionAdminRoutes } from './routes/providerAcquisitionAdmi
 import { PreviewClientSecurityService } from './preview/clientSecurity.js';
 import { previewAwareResourceRoutes } from './routes/previewAwareResources.js';
 import { registerRuntimeMetrics } from './lib/runtimeMetrics.js';
+import { corsAllowedOrigins } from './lib/corsOrigins.js';
 
 const app = Fastify(secureFastifyOptions());
 registerSecurityHeaders(app);
@@ -42,7 +43,7 @@ const webOrigin = process.env.ADMIN_WEB_ORIGIN ?? 'http://localhost:3000';
 const sessionSecret = process.env.ADMIN_SESSION_SECRET;
 if (!sessionSecret || sessionSecret.length < 32) throw new Error('ADMIN_SESSION_SECRET doit contenir au moins 32 caractères.');
 const cookie = adminCookieConfig();
-await app.register(cors, { origin: webOrigin, credentials: true });
+await app.register(cors, { origin: corsAllowedOrigins(), credentials: true });
 registerAdminAuth(app, process.env.ADMIN_AUTH_SECRET, { cookie, sessionSecret, webOrigin });
 registerAdminAudit(app);
 

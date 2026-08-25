@@ -1,6 +1,6 @@
 import { adminAuthorization, notifyAuthenticationRequired } from '../../lib/adminAuth';
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 export type Provider={id:string;name:string;adapter_key:string;state:string;enabled:boolean};
 export type Discovery={id:string;name:string;provider_championship_id:string|null;state:string};
 export type AcquisitionOverview={provider_championship:Record<string,any>;current:Record<string,any>;finalization:Record<string,any>;history:Record<string,any>;recent_runs:Record<string,any>[];allowed_actions:string[]};
