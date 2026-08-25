@@ -33,4 +33,11 @@ describe('provider runtime isolation', () => {
     expect(worker).not.toContain('ADMIN_SESSION_SECRET');
     expect(worker).not.toContain('ports:');
   });
+
+  it('never starts the bounded maintenance runner from API, worker or Compose', () => {
+    expect(source('apps/api/src/server.ts')).not.toContain('providerAcquireOnce');
+    expect(source('apps/api/src/worker.ts')).not.toContain('providerAcquireOnce');
+    expect(source('docker-compose.yml')).not.toContain('provider:acquire-once');
+    expect(source('docker-compose.preprod.yml')).not.toContain('provider:acquire-once');
+  });
 });

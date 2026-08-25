@@ -14,6 +14,11 @@
 - [x] valider live/ready, métriques, build identifiable, staging isolé et
   backup/restore PostgreSQL ;
 - [x] rejouer les recettes 5.4, 5.5 et 5.6 sans crédit provider ;
+- [x] implémenter le runner one-shot exact avec budget pré-émission obligatoire,
+  mapping actif lié avant requête, lease/fencing durable et handoff interdit sur
+  traversal partiel ;
+- [x] exécuter sa recette PostgreSQL/Docker isolée avec transport fournisseur
+  injecté/mocké, quota PostgreSQL réel et réseau externe explicitement bloqué ;
 - [ ] auditer la proposition bornée d’appel OCBlackTop F1 et l’autoriser ou la
   refuser séparément ;
 - [ ] exécuter sur VPS les preuves TLS, rollback release `N → N+1 → N` et smoke

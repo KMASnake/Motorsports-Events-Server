@@ -35,6 +35,7 @@ export interface ProviderRequestGate {
   beforeRequest(): Promise<{ allowed: boolean; chargeId?: string; nextEligibleAt?: string | null; reason?: string | null }>;
   afterResponse(chargeId: string, response: ProviderResponseMetadata): Promise<void>;
   afterError(chargeId: string, error: { code: string; statusCode?: number }): Promise<void>;
+  cancelAuthorization?(chargeId: string): Promise<void>;
 }
 
 export interface ProviderStreamContext<

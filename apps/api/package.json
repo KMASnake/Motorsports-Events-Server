@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "start:worker": "node dist/worker.js",
     "admin": "tsx src/cli/admin.ts",
+    "provider:acquire-once": "node dist/cli/providerAcquireOnce.js",
     "test": "vitest run",
     "lint": "eslint src tests",
     "typecheck": "tsc -p tsconfig.json --noEmit"

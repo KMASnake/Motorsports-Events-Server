@@ -67,7 +67,7 @@ export async function fetchProviderJson(input: {
   }
   const authorization=await input.gate?.beforeRequest();
   if(authorization&&!authorization.allowed)throw new ProviderHttpError(
-    'quota_deferred',
+    authorization.reason==='request_budget_exhausted'?'request_budget_exhausted':authorization.reason==='request_cancelled'?'aborted':'quota_deferred',
     authorization.reason??'Appel fournisseur différé.',
     undefined,
     authorization.reason??null,

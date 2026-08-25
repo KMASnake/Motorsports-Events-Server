@@ -9,6 +9,19 @@ UUID stable, révisions/séquences monotones, override, annulation, kill switch 
 last-known-good. Les routes live/ready, les métriques minimales, les métadonnées
 de release et la recette Docker/PostgreSQL backup/restore sont PASS localement.
 
+Le runner de maintenance one-shot explicitement autorisé est désormais borné
+avant émission HTTP, ciblé par UUID sur un seul stream `current`, lié au mapping
+actif dans la transaction de création du traversal et fermé aux acquisitions
+partielles. Il ne démarre avec aucun service. Son exécution fournisseur réelle
+reste interdite ; voir
+`docs/handoff/LOT-5.7-P-F-BOUNDED-PROVIDER-RUNNER.md`.
+
+Sa certification PostgreSQL/Docker A–H est PASS avec quota et charges durables,
+pagination deux pages, concurrence, secret synthétique chiffré et transport
+HTTP injecté. Le réseau fournisseur est bloqué dans la recette et aucun appel
+ou crédit réel n’a été consommé. Cette preuve locale ne vaut ni validation VPS
+finale ni autorisation d’exécution fournisseur.
+
 PP-T39 et les régressions 5.4–5.6 sont PASS sans appel/crédit provider. F ne
 peut toutefois pas être déclaré complet : PP-T36 exige encore une acquisition
 F1 réelle, et les preuves VPS/TLS, rollback release réel et smoke Production

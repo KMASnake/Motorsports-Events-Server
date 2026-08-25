@@ -22,6 +22,13 @@ Status: **IMPLEMENTED LOCALLY — MAINTAINER/VPS/PROVIDER EVIDENCE REQUIRED**
 No migration was added. Preview remains false by default. No real client was
 onboarded and no real provider was called.
 
+The separately authorized bounded one-shot acquisition runner is implemented
+with exact UUID targeting, mandatory pre-emission request budget, durable quota
+and lease reuse, atomic traversal/mapping binding, partial-state protection and
+canonical handoff only after persisted completeness. Its contract and future
+non-executable VPS protocol are recorded in
+`LOT-5.7-P-F-BOUNDED-PROVIDER-RUNNER.md`. Real execution remains unauthorized.
+
 ## Local evidence
 
 - `scripts/test-lot57pf-certification.sh`: PASS, controlled F1 fixture/replay,
@@ -32,6 +39,9 @@ onboarded and no real provider was called.
   credits 0;
 - targeted health/metrics tests, API typecheck and lint: PASS;
 - OpenAPI JSON, Compose config, shell syntax and `git diff --check`: PASS.
+- bounded runner PostgreSQL/Docker A–H and Lot 5.5 quota regression (64 cases):
+  PASS with injected HTTP transport, external network blocked, provider
+  calls/credits 0.
 
 The previously validated E security evidence remains authoritative and was not
 needlessly rerun. The validated API/worker isolation prerequisite also remains
