@@ -1,73 +1,38 @@
 # Instructions communes aux assistants
 
-Ce dépôt est la mémoire officielle du projet. Une conversation ChatGPT ou
-Codex ne remplace jamais le code, les tests et les documents versionnés.
+Ce dépôt est la mémoire officielle du projet. Une conversation ChatGPT ou Codex ne remplace jamais le code, les tests et les documents versionnés.
+
+## Sources de vérité
+
+Deux niveaux seulement sont actifs :
+
+1. `PROJECT-HANDBOOK.md` — règles permanentes, invariants et architecture normative ;
+2. `docs/handoff/PROGRESS.json` — état courant, autorisations, prochaine action et validation du lot en cours.
+
+`docs/handbook/DECISIONS.md` et les ADR de `docs/handbook/architecture/` expliquent et historisent les décisions permanentes. `docs/handoff/` contient les contrats et preuves du lot courant. `docs/handover/` et `docs/decisions/` sont historiques et ne doivent jamais être interprétés comme l'état courant.
+
+Les fichiers racine `PROJECT-STATUS.json`, `PROJECT_STATUS.md`, `NEXT_STEPS.md` et `DECISIONS.md` sont uniquement des points de compatibilité/documentation ; ils ne constituent plus des sources de vérité.
 
 ## Démarrage d'une session
 
 Avant toute modification :
 
-1. lire `PROJECT-HANDBOOK.md`, source de vérité permanente officielle ;
-2. lire `AGENTS.md`, `CODEX-HANDBOOK.md`, `PROJECT-STATUS.json`,
-   `docs/handoff/PROGRESS.json`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
-3. lire `docs/handbook/DECISIONS.md`, tous les ADR permanents et les ADR
-   historiques concernés ;
-4. lire les spécifications du lot dans `docs/handoff/` ;
-5. vérifier l'état Git et les changements non commités ;
-6. exécuter `./scripts/validate-repository.sh` ;
-7. reprendre la première tâche non terminée sans élargir son périmètre.
+1. lire `PROJECT-HANDBOOK.md` ;
+2. lire `docs/handoff/PROGRESS.json` ;
+3. lire les ADR permanents et la documentation du lot concerné ;
+4. vérifier l'état Git et les changements non commités ;
+5. exécuter `./scripts/validate-repository.sh` lorsqu'il est applicable ;
+6. reprendre uniquement la prochaine action autorisée par `PROGRESS.json`.
 
-## Architecture obligatoire
+## Principes permanents
 
-- `domain/` contient les règles métier pures et ne dépend pas de FastAPI,
-  SQLAlchemy ou des providers ;
-- `application/` orchestre les cas d'usage ;
-- `infrastructure/` contient la persistance et les adaptateurs techniques ;
-- `api/` contient le contrat HTTP et ses représentations ;
-- les façades historiques restent compatibles jusqu'à une décision explicite.
-
-## Compatibilité
-
-- ne retirer, renommer ou changer le type d'aucun champ de `/api/v1` ;
-- ne renommer aucune route de `/api/v1` ;
-- un changement incompatible nécessite `/api/v2` ;
-- conserver les interfaces providers `fetch(season)` ;
-- conserver la classification des courses, sprints et qualifications ;
-- ne pas introduire de changement fonctionnel pendant une refactorisation sans
-  demande explicite.
-
-## Sécurité et données
-
+- ne pas introduire de changement fonctionnel pendant une refactorisation sans demande explicite ;
 - ne jamais commiter `.env`, clé API, mot de passe, sauvegarde ou donnée VPS ;
-- ne jamais afficher une clé dans un journal, un test ou une documentation ;
-- utiliser `.env.example` uniquement avec des valeurs factices ;
-- conserver les sauvegardes et le rollback lors d'une mise à niveau.
+- ne jamais afficher un secret dans un journal, un test ou une documentation ;
+- préserver les contrats publics versionnés et les migrations historiques ;
+- conserver les mécanismes de sauvegarde, rollback, audit et contrôle d'accès ;
+- une CI verte, un build réussi, un déploiement ou un merge ne remplacent jamais une validation explicite du mainteneur.
 
-## Validation et livraison
+## Documentation
 
-Avant toute livraison :
-
-1. exécuter `./scripts/validate-repository.sh` ;
-2. vérifier la syntaxe Python et shell ;
-3. construire avec `./scripts/build-release.sh` ;
-4. réextraire l'archive et relancer les tests depuis son contenu ;
-5. vérifier le ZIP et son SHA-256 ;
-6. fournir le jeu de données reproductible utile à la recette, sa commande
-   d'injection, les résultats attendus et sa commande de nettoyage ;
-7. mettre à jour `CHANGELOG.md`, `PROJECT_STATUS.md` et `NEXT_STEPS.md` ;
-8. créer un commit explicite et publier par pull request ;
-9. après validation VPS, enregistrer les résultats et créer le tag de version.
-
-## Passation
-
-L'assistant sortant met à jour au minimum :
-
-- `PROJECT_STATUS.md` avec les versions, validations et problèmes connus ;
-- `NEXT_STEPS.md` avec des tâches ordonnées et leurs critères d'acceptation.
-
-L'assistant entrant ne doit pas supposer qu'une étape décrite uniquement dans
-une conversation a été réalisée.
-
-Les règles permanentes appartiennent au Handbook. Les documents de
-`docs/handoff/` restent spécifiques aux lots et ne peuvent pas remplacer ou
-contredire `PROJECT-HANDBOOK.md`.
+Toute règle durable doit être portée par le Handbook et, lorsqu'elle représente une décision d'architecture, par l'ADR correspondant. L'état courant ne doit être écrit qu'une fois dans `docs/handoff/PROGRESS.json`.
