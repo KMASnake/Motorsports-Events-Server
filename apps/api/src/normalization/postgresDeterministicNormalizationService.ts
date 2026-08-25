@@ -2,7 +2,7 @@ import type {PoolClient} from 'pg';
 import {withTransaction} from '../lib/db.js';
 import {normalize,stableUuid,type Correction,type MappingConfig,type MatchCandidate,type SourceEnvelope} from './deterministicNormalization.js';
 
-interface NormalizeUnitInput {sourceEntityId:string;scopeKey:string;expectedFenceGeneration:number;normalizationNow:Date;mapping:MappingConfig}
+interface NormalizeUnitInput {sourceEntityId:string;scopeKey:string;expectedFenceGeneration:number;normalizationNow:Date;mapping:MappingConfig;traversalId?:string}
 
 export class PostgresDeterministicNormalizationService{
   normalizeUnit(input:NormalizeUnitInput){return withTransaction(client=>this.normalizeUnitInTransaction(client,input));}
@@ -14,9 +14,9 @@ export class PostgresDeterministicNormalizationService{
       from provider_source_entities entity
       join provider_instances provider on provider.id=entity.provider_instance_id
       join provider_championships championship on championship.id=entity.provider_championship_id
-      left join provider_acquisition_traversals last_traversal on last_traversal.id=entity.last_traversal_id
-      left join provider_source_observations observation on observation.traversal_id=entity.last_traversal_id and observation.source_entity_id=entity.id
-      where entity.id=$1 for update of entity`,[input.sourceEntityId])).rows[0];
+      left join provider_acquisition_traversals last_traversal on last_traversal.id=coalesce($2::uuid,entity.last_traversal_id)
+      left join provider_source_observations observation on observation.traversal_id=coalesce($2::uuid,entity.last_traversal_id) and observation.source_entity_id=entity.id
+      where entity.id=$1 for update of entity`,[input.sourceEntityId,input.traversalId??null])).rows[0];
     if(!source)throw new Error('normalization_source_not_found');
     const correctionRows=(await client.query(`select id,field_path,override_value,status from provider_source_corrections
       where source_entity_id=$1 order by field_path,id`,[input.sourceEntityId])).rows;
