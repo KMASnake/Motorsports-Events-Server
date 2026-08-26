@@ -23,6 +23,7 @@ change pas cet état.
 Poursuivre le lot 4.2 selon ses spécifications, vérifier les builds et Docker,
 puis demander une validation utilisateur explicite avant de modifier son état.
 
-Les fichiers `LOT-1-*`, `LOT-2-*` et `LOT-3-*` conservés dans ce dossier sont
-des spécifications de lots antérieurs et ne remplacent ni le Handbook ni le
-suivi canonique courant.
+Les fichiers historiques `LOT-1-*`, `LOT-2-*` et `LOT-3-*` ont été déplacés
+vers `docs/archive/handoff-history/handoff/`. Ils restent disponibles comme
+preuves des lots antérieurs et ne remplacent ni le Handbook ni le suivi
+canonique courant.
