@@ -22,7 +22,8 @@ export function providerSource(origin: EventOrigin | undefined, providerKey: str
   const normalized = normalizedKey(providerKey);
   if (normalized === 'ocblacktop') return 'ocblacktop';
   if (normalized === 'thesportsdb') return 'thesportsdb';
-  if (origin === 'manual' || !normalized) return 'motorsports-events';
+  if (origin === 'manual') return 'motorsports-events';
+  if (!normalized) return 'provider-identity-missing';
   return `provider:${providerKey!.trim().toLowerCase()}`;
 }
 
@@ -35,6 +36,7 @@ function readableProviderKey(providerKey: string) {
 }
 
 export function providerLabel(origin: EventOrigin | undefined, providerKey: string | null | undefined) {
+  if (origin !== undefined && origin !== 'manual' && !normalizedKey(providerKey)) return 'Identité fournisseur manquante';
   const source = providerSource(origin, providerKey);
   const known = providerOptions.find((option) => option.value === source);
   return known?.label ?? readableProviderKey(providerKey?.trim() || 'Motorsports Events');

@@ -12,6 +12,7 @@ import {
 } from '../lib/eventCorrections.js';
 import { adminEventQuery, paginated, publicEventQuery } from '../lib/adminQuery.js';
 import { markAtomicallyAudited, writeAdminAudit } from '../lib/adminAudit.js';
+import { assertCorrectionSafeEvent, IncompleteProviderIdentityError } from '../lib/correctionPolicy.js';
 
 const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional();
 const nullableSessionTitle = z.union([z.string().trim().min(1).max(160), z.null()]).optional();
@@ -199,6 +200,7 @@ export async function eventRoutes(app: FastifyInstance, options: EventRouteOptio
       const updated = await withTransaction(async (client) => {
         const current = await lockEvent(client, id);
         if (!current) return null;
+        assertCorrectionSafeEvent(current);
         const merged = eventBody.parse({ ...current, ...patch,
           timezone: EVENT_STORAGE_TIMEZONE,
           starts_at: new Date((patch.starts_at as string | undefined) ?? current.starts_at as string | Date).toISOString(),
@@ -217,6 +219,7 @@ export async function eventRoutes(app: FastifyInstance, options: EventRouteOptio
       markAtomicallyAudited(request);
       return updated;
     } catch (error: unknown) {
+      if (error instanceof IncompleteProviderIdentityError) return reply.code(409).send({ message: error.message, code: 'provider_identity_incomplete' });
       if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
       const code=(error as {code?:string}).code;
       if (code==='23505') return reply.code(409).send({ message: 'Ce slug existe déjà.' });

@@ -3,6 +3,7 @@ import { StatusChip as Pill } from '../../design-system';
 import { eventColor } from './eventColors';
 import { eventPage, eventPresentationStatus, fullDate, sortEventList, type EventListSortDirection, type EventListSortKey } from './eventUtils';
 import type { Championship, EventRow } from './eventTypes';
+import { providerLabel } from './providerDisplay';
 
 const statusMeta = {
   draft: { text: 'BROUILLON', tone: 'muted' }, scheduled: { text: 'À VENIR', tone: 'blue' },
@@ -55,7 +56,7 @@ export function EventListView({ events, championships, selectedId, onSelect, onE
       {visible.map((event) => {const visualStatus=eventPresentationStatus(event);return <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
         <time><strong>{fullDate(event.starts_at)}</strong><small>{event.timezone}</small></time>
         <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.name}</strong><small>{event.session_title || event.category || event.slug}</small></span></div>
-        <div><strong>{event.championship_name}</strong><small>{event.origin === 'manual' ? 'Gestion manuelle' : event.origin === 'mixed' ? 'Gestion hybride' : 'Synchronisé'}</small></div>
+        <div><strong>{event.championship_name}</strong><small>{providerLabel(event.origin,event.provider_key)}</small></div>
         <div><strong>{event.circuit_name || 'Circuit non défini'}</strong><small>{[event.circuit_city, event.country_code].filter(Boolean).join(' · ') || event.timezone}</small></div>
         <Pill text={statusMeta[visualStatus].text} tone={statusMeta[visualStatus].tone} />
         <button className={`events-publish ${event.published ? 'on' : ''}`} onClick={(click) => { click.stopPropagation(); onTogglePublication(event); }}>{event.published ? 'PUBLIÉ' : 'PRIVÉ'}</button>
