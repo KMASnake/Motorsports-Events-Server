@@ -106,7 +106,7 @@ Fusionner une branche dans `main` ne constitue jamais, à lui seul, une validati
 ## État
 Le Lot 5.4 et son scheduler persistant décrit par l'ADR-0015 sont validés par le mainteneur. La consolidation sécurité pré‑5.5 décrite par l'ADR-0016 a été auditée, corrigée et **validée explicitement par le mainteneur le 2026-08-14**.
 
-Le Concept et l'Acceptance du Lot **5.5 — Quotas et cadence** ont été audités contre les invariants 5.4 et la baseline sécurité, corrigés puis validés par le mainteneur. Son implémentation a ensuite été auditée, les constats P1/P2/P3 ont été clos et le ré-audit final a réussi. Le **Lot 5.5 est validé par le mainteneur depuis le 2026-08-14**. Les preuves sont consignées dans `docs/handoff/LOT-5.5-MAINTAINER-VALIDATION.md` et la décision permanente dans `docs/handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
+Le Concept et l'Acceptance du Lot **5.5 — Quotas et cadence** ont été audités contre les invariants 5.4 et la baseline sécurité, corrigés puis validés par le mainteneur. Son implémentation a ensuite été auditée, les constats P1/P2/P3 ont été clos et le ré-audit final a réussi. Le **Lot 5.5 est validé par le mainteneur depuis le 2026-08-14**. Les preuves historiques sont conservées dans `docs/archive/handoff-history/handoff/LOT-5.5-MAINTAINER-VALIDATION.md` et la décision permanente dans `docs/handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
 
 Le Concept, le contrat UI et l'Acceptance du **Lot 5.6 — Acquisition fournisseur durable** ont été formalisés, audités contre 5.4/5.5, la baseline sécurité et la frontière 5.7, puis consolidés après fermeture des constats. Après le PASS final de 5.6-I, le mainteneur a **globalement validé le Lot 5.6 le 2026-08-21**.
 
