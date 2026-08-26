@@ -5,10 +5,9 @@ import json
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def test_workspace_packages_match_version_metadata():
-    metadata = json.loads((ROOT / "VERSION.json").read_text(encoding="utf-8"))
+def test_workspace_packages_match_root_package_version():
+    root_package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
     package_files = [
-        ROOT / "package.json",
         ROOT / "apps" / "api" / "package.json",
         ROOT / "apps" / "web" / "package.json",
         ROOT / "packages" / "types" / "package.json",
@@ -16,7 +15,7 @@ def test_workspace_packages_match_version_metadata():
 
     assert all(
         json.loads(path.read_text(encoding="utf-8"))["version"]
-        == metadata["version"]
+        == root_package["version"]
         for path in package_files
     )
 
