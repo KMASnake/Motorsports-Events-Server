@@ -38,7 +38,7 @@ Invariants conservés : streams current/historical, fenêtre current glissante 7
 
 ### Lot 5.5 — Quotas et cadence — VALIDÉ MAINTENEUR
 
-Documents normatifs : `docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md`, `docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md`, `docs/handoff/LOT-5.5-VALIDATION.md`, `docs/handoff/LOT-5.5-MAINTAINER-VALIDATION.md` et `docs/handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
+Documents normatifs : `docs/handoff/LOT-5.5-QUOTA-CADENCE-CONCEPT.md`, `docs/handoff/LOT-5.5-QUOTA-CADENCE-ACCEPTANCE.md` et `docs/handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`. Les preuves de validation sont archivées dans `docs/archive/handoff-history/handoff/LOT-5.5-VALIDATION.md` et `docs/archive/handoff-history/handoff/LOT-5.5-MAINTAINER-VALIDATION.md`.
 
 Audit croisé et ré-audit final réussis sans constat P1/P2/P3 ouvert. La recette PostgreSQL dédiée compte 61 cas réussis. Les règles quota/cadence, réserve current, backoff, fencing et sécurité restent normatives pour 5.6.
 
@@ -49,8 +49,9 @@ Documents normatifs :
 - `docs/handoff/LOT-5.6-ACQUISITION-CONCEPT.md` ;
 - `docs/handoff/LOT-5.6-UI-CONTRACT.md` ;
 - `docs/handoff/LOT-5.6-ACCEPTANCE.md` ;
-- `docs/handoff/LOT-5.6-AUDIT-CORRECTIONS.md` ;
 - `docs/handoff/LOT-5.6-CONSOLIDATION.md`.
+
+Les audits, validations, preuves d'exécution, l'ancien plan d'implémentation et les autorisations terminées de 5.6 sont conservés sous `docs/archive/handoff-history/handoff/`.
 
 Après validation de la conception consolidée puis implémentation, le gate final
 5.6-I a obtenu 26/26 PASS. Le mainteneur a **globalement validé le Lot 5.6 le
