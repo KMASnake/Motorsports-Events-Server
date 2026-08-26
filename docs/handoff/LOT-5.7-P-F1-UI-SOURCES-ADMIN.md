@@ -18,6 +18,13 @@ Les mappings restent immuables : toute édition crée puis active une nouvelle v
 
 L’action « Vérifier la configuration » appelle exclusivement `BoundedProviderOneShotRunner.preflight()`. Elle ne lance ni acquisition, ni discovery, ni publication, ne crée aucune traversal et n’avance aucun cursor. Son contrat expose `PROVIDER_CALLS=0`.
 
+Le preflight canonique distingue désormais deux dimensions :
+
+- `configuration_ready` valide adapter, configuration provider/source, credential présent, stream current, mapping effectif et quota/cadence sans exiger une activation opérationnelle ;
+- `execution_ready` ajoute les exigences strictes `provider.enabled`, état provider actif, association active et stream exécutable.
+
+Une source volontairement désactivée ou en pause peut donc être techniquement prête tout en exposant des `execution_blockers`. `BoundedProviderOneShotRunner.run()` exige toujours `execution_ready=true` et refuse sinon avec `execution_not_authorized`, avant lecture du secret, autorisation quota, lease, traversal ou requête fournisseur.
+
 ## Frontière d’activation
 
 `CONFIGURED != EXECUTION_AUTHORIZED`. Sources crée les nouveaux providers avec `enabled=false` et `discovery_enabled=false`, n’expose aucune mutation de ces champs et ne propose aucune transition `sync_state`. Les états opérationnels existants sont informatifs seulement. Leur changement reste hors de ce sous-lot.

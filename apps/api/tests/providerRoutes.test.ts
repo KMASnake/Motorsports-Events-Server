@@ -25,7 +25,7 @@ describe('Provider administration routes', () => {
       quotaPolicy: async () => null,
       setQuotaPolicy: async () => ({ provider_instance_id: providerId, monthly_limit: 1000 })
     } as unknown as ProviderConfigurationService;
-    const sources={championships:async()=>[{id:providerId,championship_id:'f1',source_config:{strategy:'series-events-v1'}}],updateChampionship:async()=>({id:providerId}),updateSourceConfig:async(_id:string,value:unknown)=>({config:value}),mappingState:async()=>({active:null,versions:[]}),createMapping:async()=>({id:providerId}),preflight:async()=>({status:'preflight_ok',PROVIDER_CALLS:0,provider_requests_emitted:0})} as unknown as ProviderSourcesAdminService;
+    const sources={championships:async()=>[{id:providerId,championship_id:'f1',source_config:{strategy:'series-events-v1'}}],updateChampionship:async()=>({id:providerId}),updateSourceConfig:async(_id:string,value:unknown)=>({config:value}),mappingState:async()=>({active:null,versions:[]}),createMapping:async()=>({id:providerId}),preflight:async()=>({status:'preflight_ok',configuration_ready:true,execution_ready:false,execution_blockers:['provider_disabled'],PROVIDER_CALLS:0,provider_requests_emitted:0})} as unknown as ProviderSourcesAdminService;
     await app.register(providerRoutes, { service, sources });
   });
   afterEach(async () => app.close());
@@ -62,7 +62,7 @@ describe('Provider administration routes', () => {
     const headers={authorization:`Bearer ${token('admin')}`};
     expect((await app.inject({method:'GET',url:`/api/v1/admin/providers/${providerId}/championships`,headers})).json()[0].championship_id).toBe('f1');
     const response=await app.inject({method:'POST',url:`/api/v1/admin/provider-championships/${providerId}/preflight`,headers,payload:{max_provider_requests:1}});
-    expect(response.json()).toMatchObject({status:'preflight_ok',PROVIDER_CALLS:0,provider_requests_emitted:0});
+    expect(response.json()).toMatchObject({status:'preflight_ok',configuration_ready:true,execution_ready:false,PROVIDER_CALLS:0,provider_requests_emitted:0});
   });
 
   it('strictly rejects malformed source and mapping payloads',async()=>{

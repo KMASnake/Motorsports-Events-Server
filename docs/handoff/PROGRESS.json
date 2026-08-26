@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-f1-ui-implemented-after-audit-corrections-awaiting-maintainer-reaudit",
+    "status": "lot-5.7-p-f1-ui-implemented-after-readiness-correction-awaiting-maintainer-reaudit",
     "updated_at": "2026-08-26",
     "implementation_percent": 100,
     "architecture_percent": 100,
@@ -98,6 +98,7 @@
           "sources_admin_mvp_implementation_complete":true,
           "sources_admin_mvp_maintainer_validated":false,
           "sources_admin_mvp_audit_corrections_complete":true,
+          "sources_admin_configuration_execution_readiness_separated":true,
           "sources_admin_mvp_reaudit_required":true,
           "sources_admin_mvp_evidence":"docs/handoff/LOT-5.7-P-F1-UI-SOURCES-ADMIN.md",
           "sources_admin_mvp_scope":"Implement the existing Providers > Sources administration UI by reusing the existing provider backend, credentials encryption, championships, source configuration, quota/cadence, immutable normalization mappings and bounded-runner preflight. Preserve the validated Sources / Synchronisations / Taches planifiees separation and existing UI contract.",
@@ -132,6 +133,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Reaudit the corrected 5.7-P-F1-UI Sources administration MVP: explicit multi-championship selection, non-operational configuration boundary, atomic mapping activation/audit, safe JSON handling and expanded local/PostgreSQL zero-credit evidence. No real provider execution, Production Preview activation, external onboarding, VPS deployment, full Lot 5.7 authorization, Lot 5.8+ authorization or merge to main is authorized."
+    "task": "Reaudit the corrected 5.7-P-F1-UI Sources administration MVP, including the canonical bounded-runner distinction between configuration readiness and execution readiness. A technically complete paused/inactive source may pass zero-credit configuration preflight, while run remains blocked before secret read, quota, lease, traversal or provider request unless execution_ready=true. No real provider execution, Production Preview activation, external onboarding, VPS deployment, full Lot 5.7 authorization, Lot 5.8+ authorization or merge to main is authorized."
   }
 }
