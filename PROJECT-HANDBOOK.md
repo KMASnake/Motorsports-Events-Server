@@ -1,15 +1,18 @@
 # Motorsports Events Server — Project Handbook
-## Version 1.39
+## Version 1.40
 
 Ce document est la source de vérité permanente du projet.
 
 ## Hiérarchie documentaire
 
 - `PROJECT-HANDBOOK.md` et `docs/handbook/` portent les règles permanentes ;
-- `docs/handoff/` porte le périmètre, l'avancement et les critères du lot courant sans pouvoir contredire le Handbook ;
-- `docs/handover/` et la documentation historique restent conservés comme preuves et contexte des lots terminés ;
-- `PROJECT-STATUS.json` distingue l'état validé de l'état en développement ;
-- `docs/handoff/PROGRESS.json` est le suivi canonique du lot courant.
+- `docs/handoff/PROGRESS.json` est l'unique source canonique de l'état courant : lot/gate actif, avancement, validations, autorisations, interdictions et prochaine action ;
+- les autres documents de `docs/handoff/` portent les contrats, critères et preuves du périmètre actif sans pouvoir contredire le Handbook ni redéfinir l'état courant ;
+- `docs/handbook/roadmap/ROADMAP.md` décrit uniquement la trajectoire fonctionnelle et ne définit aucun état d'exécution ;
+- `PROJECT_STATUS.md`, `PROJECT-STATUS.json` et `NEXT_STEPS.md` sont uniquement des pointeurs de compatibilité et ne doivent contenir aucune vérité d'état indépendante ;
+- `docs/handover/` et `docs/archive/` conservent les preuves et le contexte historiques et ne définissent jamais l'état courant.
+
+En cas de divergence sur l'état d'exécution, `docs/handoff/PROGRESS.json` prévaut. En cas de divergence sur une règle permanente, le Handbook et les ADR applicables prévalent.
 
 Une règle spécifique à un lot ne devient permanente qu'après mise à jour du Handbook, du journal des décisions, du changelog du Handbook et d'un ADR.
 
@@ -103,29 +106,19 @@ La validation utilisateur est explicite et consignée dans les fichiers d'état 
 `main` reçoit uniquement des versions ayant déjà fait l'objet d'une validation utilisateur explicite ; `develop` sert à l'intégration ; `codex/*` aux travaux Codex ; `feature/*` aux fonctionnalités ; `release/*` à la préparation.
 Fusionner une branche dans `main` ne constitue jamais, à lui seul, une validation utilisateur.
 
-## État
-Le Lot 5.4 et son scheduler persistant décrit par l'ADR-0015 sont validés par le mainteneur. La consolidation sécurité pré‑5.5 décrite par l'ADR-0016 a été auditée, corrigée et **validée explicitement par le mainteneur le 2026-08-14**.
+## État courant
 
-Le Concept et l'Acceptance du Lot **5.5 — Quotas et cadence** ont été audités contre les invariants 5.4 et la baseline sécurité, corrigés puis validés par le mainteneur. Son implémentation a ensuite été auditée, les constats P1/P2/P3 ont été clos et le ré-audit final a réussi. Le **Lot 5.5 est validé par le mainteneur depuis le 2026-08-14**. Les preuves historiques sont conservées dans `docs/archive/handoff-history/handoff/LOT-5.5-MAINTAINER-VALIDATION.md` et la décision permanente dans `docs/handbook/architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
+Le Handbook ne duplique plus l'état opérationnel du projet. Lire exclusivement `docs/handoff/PROGRESS.json` pour connaître le lot/gate courant, les validations, les autorisations, les interdictions, les SHA de preuve et la prochaine action.
 
-Le Concept, le contrat UI et l'Acceptance du **Lot 5.6 — Acquisition fournisseur durable** ont été formalisés, audités contre 5.4/5.5, la baseline sécurité et la frontière 5.7, puis consolidés après fermeture des constats. Après le PASS final de 5.6-I, le mainteneur a **globalement validé le Lot 5.6 le 2026-08-21**.
-
-`authorized_sub_lot = 5.7-P` autorise la tranche verticale de normalisation Production Preview depuis le 2026-08-21. Sa conception technique, son Acceptance PP-T01 à PP-T42 et ses six gates A→F sont validés par le mainteneur. 5.7-P-A/B sont validés depuis le 2026-08-22 ; la correction additive d'historique public de 5.7-P-C est revalidée mainteneur et 5.7-P-D est validé mainteneur avec preuve VPS au SHA `90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96`. L’état public C associe état courant, versions canoniques immuables, révision et journal dans une transaction ; D reconstruit les snapshots historiques et fonde la rétention sur la frontière réelle. 5.7-P-E est implémenté et revalidé mainteneur/VPS depuis le 2026-08-25 au SHA `74f45b7d341ca214d4569b5d9917a46bb1d38254`, avec migration head 0029 et Preview remise OFF. Ses clés client restent distinctes de l’admin et stockées uniquement sous forme de digest HMAC avec pepper hors base. L’activation Preview Production reste désactivée par défaut et aucun client externe n’est onboardé. **5.7-P-F, le Lot 5.7 complet, les Lots 5.8+ et le merge main restent non autorisés**. Voir ADR-0021 et ADR-0022.
-
-Lots 4.1, 4.2 et 4.3 validés par l'utilisateur. Le Lot 4.3 combine les preuves VPS isolées des migrations, API, corrections et contrôles visuels avec la recette Windows complète réussie le 2026-08-11 (qualité, données synthétiques et 11 scénarios Chromium). Il attend sa fusion contrôlée dans `main` ; cette fusion ne constitue pas elle-même la validation, déjà acquise explicitement.
+Les validations devenues des règles ou décisions permanentes restent documentées dans les ADR et les sections thématiques du Handbook ; leur présence ici ne doit pas être interprétée comme un suivi d'avancement concurrent.
 
 ## Règles Codex
-Avant toute modification : lire ce Handbook, `CODEX.md`, `PROJECT-STATUS.json`, `docs/handoff/PROGRESS.json`, tous les ADR du Handbook et les spécifications du lot dans `docs/handoff/`.
+Avant toute modification : lire ce Handbook, `CODEX.md`, `docs/handoff/PROGRESS.json`, tous les ADR du Handbook applicables et les spécifications du lot dans `docs/handoff/`. `PROJECT_STATUS.md`, `PROJECT-STATUS.json` et `NEXT_STEPS.md` sont des pointeurs de compatibilité et ne sont pas des sources d'état.
 
 # Sécurité HTTP transversale
 
-La frontière HTTP applique les règles permanentes de l’ADR-0016 : confiance proxy fermée par défaut et explicitement bornée par CIDR, corps de requête limité, headers de sécurité, redaction des secrets, et sorties fournisseur HTTPS limitées à une allowlist avec timeout et streaming borné.
+Toute requête HTTP sortante vers un fournisseur est refusée par défaut et n'est autorisée que si l'URL finale respecte une allowlist HTTPS explicite par fournisseur (schémas, hôtes et ports). Les redirections sont désactivées ou revalidées à chaque saut avec un nombre maximal borné ; aucune URL utilisateur arbitraire n'est suivie.
 
-Une API fournisseur qui impose un secret dans le chemin ou les paramètres
-d’URL ne peut normalement pas être utilisée sous cette forme. L’unique
-exception approuvée est la clé gratuite TheSportsDB dans le segment imposé de
-l’API v1. Elle n’autorise ni secret en query string, ni URL user/password, ni
-fuite de l’URL credentialisée dans les logs, erreurs, audits, traces, données
-persistées ou surfaces retournées. Voir ADR-0020.
+Les résolutions DNS sont contrôlées contre les destinations privées, loopback, link-local et réservées lorsque la politique fournisseur ne les autorise pas explicitement. Les connexions ont des timeouts bornés, des tailles de réponse maximales et une lecture streaming bornée. Les erreurs et journaux ne doivent jamais exposer secret, token, clé API, Authorization header ni contenu sensible de réponse.
 
-Les projections publiques sont explicites et séparées des projections administratives. Un championnat désactivé est absent des API publiques sans suppression de ses données. Nginx protège l’ACP par une CSP alignée sur l’origine API du build ; la terminaison TLS de production reste propriétaire de HSTS.
+Voir `docs/handbook/architecture/ADR-0016-PROVIDER-HTTP-SECURITY.md`.
