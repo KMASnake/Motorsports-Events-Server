@@ -6,6 +6,7 @@ import type { JsonObject } from '../providers/contracts.js';
 import { ProviderMasterKeyError } from '../providers/providerSecrets.js';
 import { ProviderConfigurationService } from '../providers/providerService.js';
 import type { QuotaCadenceService } from '../providers/quotaCadenceService.js';
+import type { ProviderSourcesAdminService } from '../providers/providerSourcesAdminService.js';
 
 const uuid = z.string().uuid();
 const validTimezone=(value:string)=>{try{new Intl.DateTimeFormat('fr-FR',{timeZone:value}).format();return true;}catch{return false;}};
@@ -14,6 +15,7 @@ const providerBody = z.object({
   adapter_key: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   config: z.record(z.string(), z.json()).default({}),
   enabled: z.boolean().default(false),
+  discovery_enabled: z.boolean().default(false),
   max_concurrency: z.number().int().min(1).max(100).default(1),
   current_year_reserve_percent: z.number().min(0).max(50).default(20),
   missing_cycles_threshold: z.number().int().min(1).max(1000).default(3),
@@ -24,6 +26,7 @@ const providerPatch = z.object({
   adapter_key: providerBody.shape.adapter_key.optional(),
   config: z.record(z.string(), z.json()).optional(),
   enabled: z.boolean().optional(),
+  discovery_enabled: z.boolean().optional(),
   max_concurrency: z.number().int().min(1).max(100).optional(),
   current_year_reserve_percent: z.number().min(0).max(50).optional(),
   missing_cycles_threshold: z.number().int().min(1).max(1000).optional(),
@@ -56,7 +59,7 @@ const mutationContext = (request: FastifyRequest) => ({
   requestId: request.id
 });
 const input = (value: z.infer<typeof providerBody>) => ({
-  name: value.name, adapterKey: value.adapter_key, config: value.config as JsonObject, enabled: value.enabled,
+  name: value.name, adapterKey: value.adapter_key, config: value.config as JsonObject, enabled: value.enabled, discoveryEnabled:value.discovery_enabled,
   maxConcurrency: value.max_concurrency, currentYearReservePercent: value.current_year_reserve_percent,
   missingCyclesThreshold: value.missing_cycles_threshold, logRetentionDays: value.log_retention_days
 });
@@ -67,7 +70,12 @@ const fail = (reply: { code(status: number): { send(value: unknown): unknown } }
   throw error;
 };
 
-export async function providerRoutes(app: FastifyInstance, options: { service: ProviderConfigurationService; quota?:QuotaCadenceService }): Promise<void> {
+const championshipPatch=z.object({external_championship_id:z.string().trim().min(1).max(160),is_primary:z.boolean()}).strict();
+const sourceBody=z.object({config:z.record(z.string(),z.json())}).strict();
+const mappingBody=z.object({version_label:z.string().trim().min(1).max(128),rules_version:z.string().trim().min(1).max(128),mapping_document:z.object({championshipIds:z.record(z.string(),z.string()),circuitIds:z.record(z.string(),z.string()),sessionTypes:z.record(z.string(),z.enum(['practice','qualifying','sprint_qualifying','sprint','race','other'])),statuses:z.record(z.string(),z.enum(['scheduled','confirmed','postponed','cancelled','completed']))}).strict()}).strict();
+const preflightBody=z.object({max_provider_requests:z.number().int().positive().max(100).default(1)}).strict();
+
+export async function providerRoutes(app: FastifyInstance, options: { service: ProviderConfigurationService; quota?:QuotaCadenceService;sources?:ProviderSourcesAdminService }): Promise<void> {
   const service = options.service;
   app.get('/api/v1/admin/providers', async () => service.list());
   app.get('/api/v1/admin/providers/:id', async (request, reply) => {
@@ -87,7 +95,7 @@ export async function providerRoutes(app: FastifyInstance, options: { service: P
     const current = await service.get(id.data);
     if (!current) return reply.code(404).send({message:'Fournisseur introuvable.'});
     const complete = providerBody.parse({
-      name:current.name,adapter_key:current.adapter_key,config:current.config,enabled:current.enabled,
+      name:current.name,adapter_key:current.adapter_key,config:current.config,enabled:current.enabled,discovery_enabled:current.discovery_enabled,
       max_concurrency:current.max_concurrency,current_year_reserve_percent:current.current_year_reserve_percent,
       missing_cycles_threshold:current.missing_cycles_threshold,log_retention_days:current.log_retention_days,...body.data
     });
@@ -118,4 +126,10 @@ export async function providerRoutes(app: FastifyInstance, options: { service: P
     if (!result) return reply.code(404).send({message:'Fournisseur introuvable.'}); markAtomicallyAudited(request); return result;
   });
   app.get('/api/v1/admin/providers/:id/quota-diagnostics',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id);if(!id.success)return reply.code(400).send({message:'Identifiant fournisseur invalide.'});if(!options.quota)return reply.code(503).send({message:'Diagnostic quota indisponible.'});if(!await service.get(id.data))return reply.code(404).send({message:'Fournisseur introuvable.'});return options.quota.diagnostics(id.data);});
+  app.get('/api/v1/admin/providers/:id/championships',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id);if(!id.success)return reply.code(400).send({message:'Identifiant fournisseur invalide.'});if(!options.sources)return reply.code(503).send({message:'Administration des sources indisponible.'});return await options.sources.championships(id.data)??reply.code(404).send({message:'Fournisseur introuvable.'});});
+  app.patch('/api/v1/admin/provider-championships/:id',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id),body=championshipPatch.safeParse(request.body);if(!id.success||!body.success)return reply.code(400).send({message:'Configuration championnat invalide.'});if(!options.sources)return reply.code(503).send({message:'Administration des sources indisponible.'});const result=await options.sources.updateChampionship(id.data,{externalChampionshipId:body.data.external_championship_id,isPrimary:body.data.is_primary},mutationContext(request));if(!result)return reply.code(404).send({message:'Association introuvable.'});markAtomicallyAudited(request);return result;});
+  app.put('/api/v1/admin/provider-championships/:id/source-config',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id),body=sourceBody.safeParse(request.body);if(!id.success||!body.success)return reply.code(400).send({message:'Configuration source invalide.'});if(!options.sources)return reply.code(503).send({message:'Administration des sources indisponible.'});try{const result=await options.sources.updateSourceConfig(id.data,body.data.config as JsonObject,mutationContext(request));if(!result)return reply.code(404).send({message:'Association introuvable.'});markAtomicallyAudited(request);return result;}catch(error){return fail(reply,error);}});
+  app.get('/api/v1/admin/provider-championships/:id/normalization-mappings',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id);if(!id.success)return reply.code(400).send({message:'Identifiant association invalide.'});if(!options.sources)return reply.code(503).send({message:'Administration des sources indisponible.'});return options.sources.mappingState(id.data);});
+  app.post('/api/v1/admin/provider-championships/:id/normalization-mappings',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id),body=mappingBody.safeParse(request.body);if(!id.success||!body.success)return reply.code(400).send({message:'Mapping invalide.'});if(!options.sources)return reply.code(503).send({message:'Administration des sources indisponible.'});try{const result=await options.sources.createMapping(id.data,{versionLabel:body.data.version_label,rulesVersion:body.data.rules_version,mappingDocument:body.data.mapping_document},mutationContext(request));markAtomicallyAudited(request);return reply.code(201).send(result);}catch(error){return fail(reply,error);}});
+  app.post('/api/v1/admin/provider-championships/:id/preflight',async(request,reply)=>{const id=uuid.safeParse((request.params as {id:string}).id),body=preflightBody.safeParse(request.body??{});if(!id.success||!body.success)return reply.code(400).send({message:'Preflight invalide.'});if(!options.sources)return reply.code(503).send({message:'Administration des sources indisponible.'});const result=await options.sources.preflight(id.data,body.data.max_provider_requests);return result??reply.code(404).send({message:'Association introuvable.'});});
 }

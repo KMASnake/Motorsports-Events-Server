@@ -12,6 +12,7 @@ export type ProviderInput = {
   adapterKey: string;
   config: JsonObject;
   enabled: boolean;
+  discoveryEnabled: boolean;
   maxConcurrency: number;
   currentYearReservePercent: number;
   missingCyclesThreshold: number;
@@ -45,9 +46,10 @@ async function audit(client: PoolClient, context: ProviderMutationContext, actio
   );
 }
 
-const projection = `p.id,p.adapter_key,p.name,p.enabled,p.state,p.config,p.max_concurrency,
+const projection = `p.id,p.adapter_key,p.name,p.enabled,p.state,p.config,p.discovery_enabled,p.max_concurrency,
   p.current_year_reserve_percent::float8,p.missing_cycles_threshold,p.log_retention_days,
   p.created_at,p.updated_at,
+  (select count(*)::int from provider_championships pc where pc.provider_instance_id=p.id) as championship_count,
   coalesce((select jsonb_agg(jsonb_build_object('name',s.secret_name,'configured',true,'updated_at',s.updated_at)
     order by s.secret_name) from provider_secrets s where s.provider_instance_id=p.id),'[]'::jsonb) as secrets`;
 
@@ -73,10 +75,10 @@ export class ProviderConfigurationService {
   async create(input: ProviderInput, context: ProviderMutationContext) {
     const value = this.validate(input); const id = randomUUID();
     return transaction(async (client) => {
-      await client.query(`insert into provider_instances(id,adapter_key,name,enabled,state,config,max_concurrency,
+      await client.query(`insert into provider_instances(id,adapter_key,name,enabled,state,config,discovery_enabled,max_concurrency,
         current_year_reserve_percent,missing_cycles_threshold,log_retention_days)
-        values($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10)`, [id,value.adapterKey,value.name,value.enabled,
-        value.enabled ? 'active' : 'draft',JSON.stringify(value.config),value.maxConcurrency,value.currentYearReservePercent,
+        values($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10,$11)`, [id,value.adapterKey,value.name,value.enabled,
+        value.enabled ? 'active' : 'draft',JSON.stringify(value.config),value.discoveryEnabled,value.maxConcurrency,value.currentYearReservePercent,
         value.missingCyclesThreshold,value.logRetentionDays]);
       const created = await this.get(id, client);
       await audit(client, context, 'provider.created', id, null, created);
@@ -88,10 +90,10 @@ export class ProviderConfigurationService {
     const value = this.validate(input);
     return transaction(async (client) => {
       const before = await this.get(id, client); if (!before) return null;
-      await client.query(`update provider_instances set adapter_key=$2,name=$3,enabled=$4,state=$5,config=$6::jsonb,
-        max_concurrency=$7,current_year_reserve_percent=$8,missing_cycles_threshold=$9,log_retention_days=$10,updated_at=now()
+      await client.query(`update provider_instances set adapter_key=$2,name=$3,enabled=$4,state=$5,config=$6::jsonb,discovery_enabled=$7,
+        max_concurrency=$8,current_year_reserve_percent=$9,missing_cycles_threshold=$10,log_retention_days=$11,updated_at=now()
         where id=$1`, [id,value.adapterKey,value.name,value.enabled,value.enabled ? 'active' : 'paused',JSON.stringify(value.config),
-        value.maxConcurrency,value.currentYearReservePercent,value.missingCyclesThreshold,value.logRetentionDays]);
+        value.discoveryEnabled,value.maxConcurrency,value.currentYearReservePercent,value.missingCyclesThreshold,value.logRetentionDays]);
       const after = await this.get(id, client); await audit(client, context, 'provider.configuration_changed', id, before, after); return after;
     });
   }

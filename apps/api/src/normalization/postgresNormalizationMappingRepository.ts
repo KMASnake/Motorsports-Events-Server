@@ -48,6 +48,12 @@ export class PostgresNormalizationMappingRepository{
     const row=(await pool.query<MappingRow>(`insert into normalization_mapping_versions(id,provider_championship_id,version_label,rules_version,mapping_document,created_by) values($1,$2,$3,$4,$5::jsonb,$6) returning *`,[id,input.providerChampionshipId,input.versionLabel,input.rulesVersion,JSON.stringify(document),input.actor])).rows[0];
     return mapping(row!);
   }
+  async createAndActivateMappingVersion(input:{providerChampionshipId:string;versionLabel:string;rulesVersion:string;mappingDocument:MappingDocument;actor:string}){return transaction(async client=>{
+    const document=parseNormalizationMappingDocument(input.mappingDocument),id=randomUUID();
+    const row=(await client.query<MappingRow>(`insert into normalization_mapping_versions(id,provider_championship_id,version_label,rules_version,mapping_document,created_by) values($1,$2,$3,$4,$5::jsonb,$6) returning *`,[id,input.providerChampionshipId,input.versionLabel,input.rulesVersion,JSON.stringify(document),input.actor])).rows[0];
+    await client.query(`insert into provider_championship_active_normalization_mappings(provider_championship_id,mapping_version_id,activated_at,activated_by) values($1,$2,now(),$3) on conflict(provider_championship_id) do update set mapping_version_id=excluded.mapping_version_id,activated_at=excluded.activated_at,activated_by=excluded.activated_by`,[input.providerChampionshipId,id,input.actor]);
+    return mapping(row!);
+  });}
   async getMappingVersion(id:string,client:PoolClient|typeof pool=pool){const row=(await client.query<MappingRow>('select * from normalization_mapping_versions where id=$1',[id])).rows[0];return row?mapping(row):null;}
   async listMappingVersions(providerChampionshipId:string){return (await pool.query<MappingRow>('select * from normalization_mapping_versions where provider_championship_id=$1 order by created_at,id',[providerChampionshipId])).rows.map(mapping);}
   async getActiveMapping(providerChampionshipId:string){const row=(await pool.query<MappingRow>(`select version.* from provider_championship_active_normalization_mappings active join normalization_mapping_versions version on version.id=active.mapping_version_id and version.provider_championship_id=active.provider_championship_id where active.provider_championship_id=$1`,[providerChampionshipId])).rows[0];return row?mapping(row):null;}
