@@ -51,3 +51,14 @@ La résolution métier complète « À associer » pour les ambiguïtés de norm
 ## Absence de conflit de réconciliation
 
 Aucun `RECONCILIATION_CONFLICT` bloquant n'a été trouvé. Les changements demandés peuvent rester UI et clients API, sans migration ni modification du moteur fournisseur.
+
+## Audit mainteneur — corrections fermées
+
+Baseline de correction : `7cfab5e061a0b79126f61a969a2cb557af17ad0f`.
+
+| FINDING | CORRECTION | PREUVE | STATUT |
+|---|---|---|---|
+| Liste générale des fournisseurs trop pauvre | Agrégation frontend parallèle et bornée des diagnostics quota, associations, streams et runs ; affichage quota/restant/reset/cadence/éligibilité/dernière synchronisation/prochaine action/alertes avec états neutres explicites | `providerListSummary()` et tests Sources | FERMÉ |
+| `Connexion = Credential configuré` | Credential et connexion API deviennent deux lignes distinctes ; connexion reste `Non vérifiée`, y compris après preflight zéro crédit | Vue d'ensemble Sources et tests de non-assimilation | FERMÉ |
+
+Aucun endpoint, service backend ou appel fournisseur n'a été ajouté pour ces corrections.

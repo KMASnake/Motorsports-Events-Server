@@ -1,7 +1,7 @@
 # Lot 5.7-P-F1-UI-R — acceptation de la réconciliation
 
 Date : 2026-08-26
-Statut : **PASS LOCAL — REVUE MAINTENEUR REQUISE**
+Statut : **PASS LOCAL — REVUE VISUELLE MAINTENEUR REQUISE**
 
 ## Critères
 
@@ -20,7 +20,13 @@ Statut : **PASS LOCAL — REVUE MAINTENEUR REQUISE**
 - [x] aucun écran de cron ou fréquence manuelle ajouté ;
 - [x] secrets jamais relus ni affichés ;
 - [x] preflight conserve `PROVIDER_CALLS=0` et sépare configuration/exécution ;
-- [x] tests ciblés Web : 37/37 PASS ;
+- [x] liste générale : état quota, restant, reset, cadence automatique, prochaine éligibilité, dernière synchronisation, prochaine action et alertes issus des APIs existantes ;
+- [x] absence de données représentée par `Indisponible`, `Non déterminé` ou `Aucune donnée` ;
+- [x] credential et connexion API sont deux états distincts ;
+- [x] connexion API reste `Non vérifiée` sans véritable test fournisseur autorisé ;
+- [x] un preflight réussi ne transforme jamais la connexion API en `OK` ;
+- [x] tests ciblés Web : 42/42 PASS ;
+- [x] non-régression Web complète : 71/71 PASS ;
 - [x] typecheck Web : PASS ;
 - [x] lint Web : PASS ;
 - [x] build Web : PASS ;

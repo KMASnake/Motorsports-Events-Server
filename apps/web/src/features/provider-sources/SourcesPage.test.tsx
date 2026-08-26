@@ -1,9 +1,12 @@
 import {describe,expect,it} from 'vitest';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {forbiddenSourcesActions,mappingPrimaryExperience,providerDetailTabs,quotaFormFields,readinessPresentation,resolveSelectedChampionship,safeJson,SourcesPage} from './SourcesPage';
-import type {ProviderChampionship} from './sourcesApi';
+import {adapterLabel,emptyProviderListSummary,forbiddenSourcesActions,mappingPrimaryExperience,providerDetailTabs,providerListSummary,quotaFormFields,readinessPresentation,resolveSelectedChampionship,safeJson,SourcesPage} from './SourcesPage';
+import type {ProviderChampionship,QuotaDiagnostics,SyncRun,SyncStream} from './sourcesApi';
 
 const association=(id:string,name:string):ProviderChampionship=>({id,championship_id:id,championship_name:name,external_championship_id:`external-${id}`,sync_state:'inactive',is_primary:false,source_config:{strategy:`strategy-${id}`},current_stream_id:null});
+const diagnostics:QuotaDiagnostics={policy:{short_window_seconds:null,short_limit:null,minute_limit:60,hourly_limit:null,daily_limit:null,monthly_limit:1000,limits_source:'configured',reset_timezone:null,reset_at:'2026-09-01T00:00:00Z',minimum_interval_seconds:1,safety_margin_percent:5,current_reserve_mode:'percent',current_reserve_value:20,provider_timezone:'UTC'},runtime:null,windows:[],observations:[],summary:{limit:1000,operational_ceiling:950,current_reserve:190,normal_budget:760,usage:100,remaining_estimated:850,distance_before_reserve:660,source:'local_counter',state:'normal',next_eligible_at:'2026-08-27T10:00:00Z',blocking_reason:'dynamic_pacing'}};
+const stream:SyncStream={id:'stream',phase:'current',state:'ready',cursor:null,historical_state:null,last_progress_at:null,next_eligible_at:'2026-08-27T10:00:00Z',priority_boost_until:null,lease_owner:null,lease_expires_at:null,stream_backoff_until:null,stream_failure_count:0,last_error_code:null,season:2026};
+const run:SyncRun={id:'run',work_class:'current',status:'completed',started_at:'2026-08-26T09:00:00Z',finished_at:'2026-08-26T09:01:00Z',requests_count:1,items_read:2,items_created:1,items_updated:0,items_unchanged:1,warnings_count:0,errors_count:0,error_summary:null};
 
 describe('Sources page contract',()=>{
   it('renders the existing Sources shell and a loading state without a real-run action',()=>{const html=renderToStaticMarkup(<SourcesPage/>);expect(html).toContain('SOURCES');expect(html).toContain('Chargement');expect(html).not.toMatch(/Synchroniser maintenant|Tester OCBlackTop|Run now|Importer/);});
@@ -15,6 +18,11 @@ describe('Sources page contract',()=>{
   it('structure le détail fournisseur selon le contrat validé',()=>{expect(providerDetailTabs).toEqual(['Vue d’ensemble','Configuration','Quotas','Championnats','Synchronisation','Historique & logs']);});
   it('administre les quotas avec des champs métier sans JSON obligatoire',()=>{expect(quotaFormFields).toContain('monthly_limit');expect(quotaFormFields).toContain('safety_margin_percent');expect(quotaFormFields).toContain('current_reserve_value');});
   it('réserve le mapping JSON au mode avancé',()=>{expect(mappingPrimaryExperience).toEqual({mode:'summary',advancedLabel:'Paramètres avancés du mapping',unresolvedLabel:'À associer'});});
+  it('résume quota, reset, cadence, éligibilité et dernière synchronisation depuis les APIs existantes',()=>{const summary=providerListSummary(diagnostics,[stream],[run]);expect(summary).toMatchObject({quotaState:'normal',quotaRemaining:'850',nextAction:'dynamic_pacing',alerts:'Aucune alerte'});expect(summary.nextReset).not.toBe('Non déterminé');expect(summary.nextEligibility).not.toBe('Non déterminée');expect(summary.lastSync).not.toBe('Aucune donnée');});
+  it('présente des états neutres sans inventer de donnée',()=>{expect(providerListSummary(null,[],[])).toEqual(emptyProviderListSummary);});
+  it('affiche un libellé adaptateur compréhensible',()=>{expect(adapterLabel('ocblacktop')).toBe('OCBlackTop');expect(adapterLabel('thesportsdb')).toBe('TheSportsDB');});
+  it('sépare toujours credential et connexion API non vérifiée',()=>{const source=SourcesPage.toString();expect(source).toContain('Connexion API');expect(source).toContain('Non vérifiée');expect(source).not.toMatch(/Connexion API.{0,80}Credential configuré/);});
+  it('le preflight ne peut pas transformer la connexion en OK',()=>{expect(readinessPresentation({configuration_ready:true,execution_ready:true,PROVIDER_CALLS:0})).toEqual({configurationReady:true,executionReady:true,blockers:[]});expect(SourcesPage.toString()).not.toContain('Connexion API : OK');});
   it('presents a paused but configured source as ready and execution as non-authorized',()=>{expect(readinessPresentation({configuration_ready:true,execution_ready:false,execution_blockers:['provider_disabled','provider_paused','championship_inactive'],PROVIDER_CALLS:0})).toEqual({configurationReady:true,executionReady:false,blockers:['Provider désactivé','Provider en pause','Championnat inactif']});});
   it('presents structural configuration failures separately',()=>{expect(readinessPresentation({configuration_ready:false,execution_ready:false,execution_blockers:['configuration_not_ready']})).toEqual({configurationReady:false,executionReady:false,blockers:['Configuration technique incomplète']});});
 });

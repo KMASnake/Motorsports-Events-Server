@@ -8,6 +8,11 @@ Commit final : commit contenant ce rapport, à relever par `git rev-parse HEAD`.
 
 L'audit de réconciliation contient 19 findings. Le backend est conforme ou conforme mais mal exposé pour les contrats structurants. Les dérives confirmées portent sur l'UX JSON, la hiérarchie de la fiche fournisseur et l'absence de supervision Scheduler sur `/tasks`.
 
+Les deux corrections demandées lors de l'audit mainteneur suivant sont fermées sur la baseline `7cfab5e061a0b79126f61a969a2cb557af17ad0f` :
+
+- liste générale enrichie par agrégation frontend des APIs existantes, avec états neutres lorsque la donnée manque ;
+- séparation sémantique stricte entre credential configuré et connexion API non vérifiée.
+
 ## Backend conservé
 
 - ProviderAdapter et adaptateurs réels ;
@@ -33,6 +38,8 @@ Corrections backend : **0**. Migrations : **0**.
 7. Synchronisations transverse : terminologie métier et panneau quota/éligibilité explicite.
 8. Scheduler : nouvelle page de supervision dynamique sur `/tasks`, sans cron ni action de contournement.
 9. Styles : extension du langage MEDS existant, responsive, sans nouvelle identité visuelle.
+10. Liste fournisseurs : résumé opérationnel quota, synchronisation, prochaine action et alertes.
+11. Connexion : état `Non vérifiée` indépendant du credential, du preflight, de l'URL et de l'activation.
 
 ## Fichiers modifiés
 
@@ -49,8 +56,8 @@ Corrections backend : **0**. Migrations : **0**.
 
 ## Validation
 
-- tests ciblés Sources/Synchronisations/Scheduler/API : 37 PASS ;
-- non-régression Web complète : 66 PASS ;
+- tests ciblés Sources/Synchronisations/Scheduler/API : 42 PASS après corrections mainteneur ;
+- non-régression Web complète : 71 PASS après corrections mainteneur ;
 - typecheck Web : PASS ;
 - lint Web : PASS ;
 - build Web : PASS ;
