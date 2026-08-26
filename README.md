@@ -1,9 +1,20 @@
 # Motorsports Events Server
 
-> **Source de vérité permanente :** consultez le
-> [Project Handbook](PROJECT-HANDBOOK.md) avant toute modification du dépôt.
-> L’état courant d’un lot est suivi dans `docs/handoff/PROGRESS.json` et les
-> documents de `docs/handoff/` apportent les preuves de validation associées.
+> **Règles permanentes :** [Project Handbook](PROJECT-HANDBOOK.md)  
+> **État courant et prochaine action :** [docs/handoff/PROGRESS.json](docs/handoff/PROGRESS.json)
+
+## Navigation documentaire
+
+Les documents actifs sont accessibles directement depuis cette page :
+
+- [Project Handbook](PROJECT-HANDBOOK.md) — règles permanentes et architecture normative ;
+- [État courant](docs/handoff/PROGRESS.json) — lot/gate actif, validations, autorisations, interdictions et prochaine action ;
+- [Documentation active du lot courant](docs/handoff/README.md) — contrats et preuves, avec accès direct au dossier 5.7-P-F ;
+- [Roadmap](docs/handbook/roadmap/ROADMAP.md) — trajectoire fonctionnelle uniquement ;
+- [Décisions permanentes](docs/handbook/DECISIONS.md) et [ADR](docs/handbook/architecture/) ;
+- [Archives documentaires](docs/archive/README.md) — preuves et documents clôturés.
+
+`PROJECT_STATUS.md`, `PROJECT-STATUS.json` et `NEXT_STEPS.md` sont uniquement des pointeurs de compatibilité. Ils ne définissent pas l'état du projet.
 
 ## Architecture actuelle
 
@@ -75,15 +86,7 @@ Les maquettes restent le contrat visuel de référence.
 
 ## Documentation historique
 
-Les anciens handovers, décisions et références restent conservés sous :
-
-```text
-docs/handover/
-docs/decisions/
-docs/reference/
-```
-
-Ils servent d’historique et ne doivent pas être confondus avec les sources de vérité actives.
+Les documents historiques sont indexés dans [docs/archive/README.md](docs/archive/README.md). Des répertoires historiques plus anciens peuvent encore subsister (`docs/handover/`, `docs/decisions/`, `docs/reference/`) pendant la transition, mais ils ne constituent aucune source de vérité active.
 
 ## Plateforme cible
 
