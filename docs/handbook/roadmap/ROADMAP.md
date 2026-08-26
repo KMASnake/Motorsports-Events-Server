@@ -11,7 +11,7 @@
 
 Le Lot 4.4 a été fusionné dans `main` via la PR #28, commit de fusion `b42a97129a8aa1cb9a42ce01ba0affb8e5a848a1`.
 
-Capacités validées : authentification administrateur, Argon2id, sessions serveur, CSRF, cookies sécurisés, expiration, anti-bruteforce et audit. Validation finale Windows + Docker Desktop + Chromium et VPS Docker isolé réussie. La clôture post-fusion est consignée dans `docs/handoff/LOT-4.4-POST-MERGE-CLOSURE.md`.
+Capacités validées : authentification administrateur, Argon2id, sessions serveur, CSRF, cookies sécurisés, expiration, anti-bruteforce et audit. Validation finale Windows + Docker Desktop + Chromium et VPS Docker isolé réussie. La clôture post-fusion est consignée dans `docs/archive/handoff-history/handoff/LOT-4.4-POST-MERGE-CLOSURE.md`.
 
 ## Lot 5 — Fournisseurs et moteur de synchronisation API
 
