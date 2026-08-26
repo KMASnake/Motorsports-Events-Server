@@ -31,5 +31,16 @@ try{
   assert.equal((await repository.resolveTraversalMappingConfig(traversal)).version,`mapping:${first.id}`);
   await fails(()=>repository.resolveTraversalMappingConfig(legacy),'traversal_mapping_absent');
   assert.equal(Number((await pool.query('select count(*) count from provider_acquisition_traversal_mappings where traversal_id=$1',[legacy])).rows[0].count),0);
+  const atomic=await repository.createAndActivateMappingVersion({providerChampionshipId:owner,versionLabel:'atomic-v3',rulesVersion:'rules-v3',mappingDocument,actor:'repository-test',audit:{requestId:'atomic-success'}});
+  assert.equal((await repository.getActiveMapping(owner))?.id,atomic.id);
+  assert.equal(Number((await pool.query("select count(*) count from admin_audit_log where request_id='atomic-success'")).rows[0].count),1);
+  await pool.query(`create function fail_mapping_audit_fixture() returns trigger language plpgsql as $$ begin if new.request_id='atomic-failure' then raise exception 'forced audit failure'; end if; return new; end $$`);
+  await pool.query(`create trigger fail_mapping_audit_fixture before insert on admin_audit_log for each row execute function fail_mapping_audit_fixture()`);
+  const beforeFailure=Number((await pool.query('select count(*) count from normalization_mapping_versions where provider_championship_id=$1',[owner])).rows[0].count),activeBeforeFailure=(await repository.getActiveMapping(owner))?.id;
+  await assert.rejects(()=>repository.createAndActivateMappingVersion({providerChampionshipId:owner,versionLabel:'must-rollback',rulesVersion:'rules-rollback',mappingDocument,actor:'repository-test',audit:{requestId:'atomic-failure'}}),/forced audit failure/);
+  assert.equal(Number((await pool.query('select count(*) count from normalization_mapping_versions where provider_championship_id=$1',[owner])).rows[0].count),beforeFailure);
+  assert.equal((await repository.getActiveMapping(owner))?.id,activeBeforeFailure);
+  await pool.query('drop trigger fail_mapping_audit_fixture on admin_audit_log');await pool.query('drop function fail_mapping_audit_fixture()');
   console.log('PostgresNormalizationMappingRepository activation/binding/resolution/concurrency: PASS');
+  console.log('Mapping create/activate/admin-audit atomic rollback: PASS');
 }finally{await pool.end();}

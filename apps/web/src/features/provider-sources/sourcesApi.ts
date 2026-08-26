@@ -10,7 +10,6 @@ export const replaceCredential=(id:string,value:string)=>request<{secretConfigur
 export const listChampionships=(id:string)=>request<ProviderChampionship[]>(`/api/v1/admin/providers/${id}/championships`);
 export const createChampionship=(id:string,value:unknown)=>request(`/api/v1/admin/providers/${id}/championship-sources/manual`,{method:'POST',body:JSON.stringify(value)});
 export const updateChampionship=(id:string,value:unknown)=>request(`/api/v1/admin/provider-championships/${id}`,{method:'PATCH',body:JSON.stringify(value)});
-export const updateSyncState=(id:string,state:'inactive'|'active'|'paused',current:string)=>request(`/api/v1/admin/provider-championships/${id}/sync/${state==='active'?(current==='paused'?'resume':'activate'):state==='paused'?'pause':'deactivate'}`,{method:'POST'});
 export const updateSourceConfig=(id:string,config:unknown)=>request(`/api/v1/admin/provider-championships/${id}/source-config`,{method:'PUT',body:JSON.stringify({config})});
 export const quota=(id:string)=>request<Record<string,unknown>>(`/api/v1/admin/providers/${id}/quota-policy`);
 export const saveQuota=(id:string,value:unknown)=>request(`/api/v1/admin/providers/${id}/quota-policy`,{method:'PUT',body:JSON.stringify(value)});

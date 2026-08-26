@@ -48,10 +48,11 @@ export class PostgresNormalizationMappingRepository{
     const row=(await pool.query<MappingRow>(`insert into normalization_mapping_versions(id,provider_championship_id,version_label,rules_version,mapping_document,created_by) values($1,$2,$3,$4,$5::jsonb,$6) returning *`,[id,input.providerChampionshipId,input.versionLabel,input.rulesVersion,JSON.stringify(document),input.actor])).rows[0];
     return mapping(row!);
   }
-  async createAndActivateMappingVersion(input:{providerChampionshipId:string;versionLabel:string;rulesVersion:string;mappingDocument:MappingDocument;actor:string}){return transaction(async client=>{
+  async createAndActivateMappingVersion(input:{providerChampionshipId:string;versionLabel:string;rulesVersion:string;mappingDocument:MappingDocument;actor:string;audit?:{requestId:string}}){return transaction(async client=>{
     const document=parseNormalizationMappingDocument(input.mappingDocument),id=randomUUID();
     const row=(await client.query<MappingRow>(`insert into normalization_mapping_versions(id,provider_championship_id,version_label,rules_version,mapping_document,created_by) values($1,$2,$3,$4,$5::jsonb,$6) returning *`,[id,input.providerChampionshipId,input.versionLabel,input.rulesVersion,JSON.stringify(document),input.actor])).rows[0];
     await client.query(`insert into provider_championship_active_normalization_mappings(provider_championship_id,mapping_version_id,activated_at,activated_by) values($1,$2,now(),$3) on conflict(provider_championship_id) do update set mapping_version_id=excluded.mapping_version_id,activated_at=excluded.activated_at,activated_by=excluded.activated_by`,[input.providerChampionshipId,id,input.actor]);
+    if(input.audit)await client.query(`insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,old_value,new_value) values($1,'provider.normalization_mapping_activated','provider_championship',$2,$3,null,$4::jsonb)`,[input.actor,input.providerChampionshipId,input.audit.requestId,JSON.stringify({id,versionLabel:input.versionLabel,rulesVersion:input.rulesVersion})]);
     return mapping(row!);
   });}
   async getMappingVersion(id:string,client:PoolClient|typeof pool=pool){const row=(await client.query<MappingRow>('select * from normalization_mapping_versions where id=$1',[id])).rows[0];return row?mapping(row):null;}

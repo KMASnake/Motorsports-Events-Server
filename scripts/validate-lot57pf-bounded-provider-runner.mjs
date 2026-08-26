@@ -8,6 +8,8 @@ import {ProviderConfigurationService} from '../apps/api/dist/providers/providerS
 import {ProviderAdapterRegistry} from '../apps/api/dist/providers/registry.js';
 import {OcBlackTopAdapter} from '../apps/api/dist/providers/realAdapters.js';
 import {ProviderSecretCipher} from '../apps/api/dist/providers/providerSecrets.js';
+import {ProviderSourcesAdminService} from '../apps/api/dist/providers/providerSourcesAdminService.js';
+import {PostgresNormalizationMappingRepository} from '../apps/api/dist/normalization/postgresNormalizationMappingRepository.js';
 import {previewReadRoutes} from '../apps/api/dist/routes/previewRead.js';
 
 const provider='57000000-0000-4000-8000-000000003401',championship='57000000-0000-4000-8000-000000003403',stream='57000000-0000-4000-8000-000000003404',historical='57000000-0000-4000-8000-000000003405',mapping='57000000-0000-4000-8000-000000003406',mappingV2='57000000-0000-4000-8000-000000003407';
@@ -29,6 +31,12 @@ async function resetAcquisition(){await pool.query('truncate table provider_acqu
 const app=Fastify({logger:false});await app.register(previewReadRoutes,{cursorSecret:'bounded-runner-fixture-cursor-secret'});
 try{
   const preflightHarness=harness([]),beforePreflight=await counts();const preflight=await preflightHarness.runner.run({...target(1),preflight:true});assert.equal(preflight.status,'preflight_ok');assert.equal(preflight.mapping_source,'active');assert.equal(preflight.effective_mapping_uuid,mapping);assert.equal(preflight.resumable_traversal_id,null);assert.equal(preflight.PROVIDER_CALLS,0);assert.equal(preflightHarness.calls(),0);assert.deepEqual(await counts(),beforePreflight);assertSecretSafe(preflight);
+  const sources=new ProviderSourcesAdminService(preflightHarness.runner.providers,new PostgresNormalizationMappingRepository(),preflightHarness.runner);
+  const sourceContext={principal:{sub:'sources-test',role:'admin'},requestId:'sources-validation'};
+  assert.equal((await sources.updateSourceConfig(championship,{strategy:'series-events-v1',external_id:'formula1',endpoint_template:'/{series}/events'},sourceContext))?.config.external_id,'formula1');
+  await assert.rejects(()=>sources.updateSourceConfig(championship,{strategy:'invalid',external_id:'formula1'},sourceContext),error=>error?.statusCode===400);
+  assert.equal(await sources.updateSourceConfig('57000000-0000-4000-8000-000000003499',{strategy:'series-events-v1'},sourceContext),null);
+  const adminPreflight=await sources.preflight(championship,1);assert.equal(adminPreflight.PROVIDER_CALLS,0);assert.equal(adminPreflight.provider_requests_emitted,0);assert.equal(preflightHarness.calls(),0);assert.deepEqual(await counts(),beforePreflight);
   const wrong=await preflightHarness.runner.run({...target(1),providerChampionshipId:'57000000-0000-4000-8000-000000003499',preflight:true});assert.equal(wrong.status,'configuration_invalid');const historyResult=await preflightHarness.runner.run({...target(1),streamId:historical,preflight:true});assert.equal(historyResult.status,'configuration_invalid');assert.equal(preflightHarness.calls(),0);
 
   await pool.query('delete from provider_championship_active_normalization_mappings where provider_championship_id=$1',[championship]);const noMapCharges=await chargeCount(),noMapping=await preflightHarness.runner.run(target(1));assert.equal(noMapping.status,'configuration_invalid');assert.equal(preflightHarness.calls(),0);assert.equal(await chargeCount(),noMapCharges);await pool.query('insert into provider_championship_active_normalization_mappings(provider_championship_id,mapping_version_id,activated_at,activated_by) values($1,$2,now(),$3)',[championship,mapping,'test']);

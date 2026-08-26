@@ -40,8 +40,7 @@ export class ProviderSourcesAdminService{
 
   async mappingState(id:string){const versions=await this.mappings.listMappingVersions(id),active=await this.mappings.getActiveMapping(id);return {active,versions};}
   async createMapping(id:string,value:{versionLabel:string;rulesVersion:string;mappingDocument:unknown},context:Context){
-    const created=await this.mappings.createAndActivateMappingVersion({providerChampionshipId:id,versionLabel:value.versionLabel,rulesVersion:value.rulesVersion,mappingDocument:value.mappingDocument as never,actor:context.principal.sub});
-    await pool.query(`insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,old_value,new_value) values($1,'provider.normalization_mapping_activated','provider_championship',$2,$3,null,$4::jsonb)`,[context.principal.sub,id,context.requestId,JSON.stringify({id:created.id,versionLabel:created.versionLabel,rulesVersion:created.rulesVersion})]);return created;
+    return this.mappings.createAndActivateMappingVersion({providerChampionshipId:id,versionLabel:value.versionLabel,rulesVersion:value.rulesVersion,mappingDocument:value.mappingDocument as never,actor:context.principal.sub,audit:{requestId:context.requestId}});
   }
   async preflight(id:string,maxProviderRequests:number){const row=(await pool.query(`select pc.provider_instance_id,s.id stream_id from provider_championships pc left join lateral(select id from sync_streams where provider_championship_id=pc.id and phase='current' order by created_at limit 1)s on true where pc.id=$1`,[id])).rows[0];if(!row)return null;if(!row.stream_id)return {status:'configuration_invalid',reason:'current_stream_absent',PROVIDER_CALLS:0,provider_requests_emitted:0};return this.runner.preflight({providerInstanceId:row.provider_instance_id,providerChampionshipId:id,streamId:row.stream_id,maxProviderRequests,preflight:true});}
 }
