@@ -26,6 +26,12 @@ export function eventToForm(event: EventRow): EventFormState {
   };
 }
 
+export function eventPresentationStatus(event: Pick<EventRow, 'status' | 'starts_at' | 'ends_at'>, reference = new Date()): EventRow['status'] {
+  if (event.status !== 'scheduled') return event.status;
+  const boundary = new Date(event.ends_at ?? event.starts_at);
+  return Number.isFinite(boundary.getTime()) && boundary <= reference ? 'completed' : 'scheduled';
+}
+
 export function slugify(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

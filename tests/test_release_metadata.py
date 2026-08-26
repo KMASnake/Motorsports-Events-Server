@@ -32,3 +32,11 @@ def test_api_image_receives_release_metadata_as_build_arguments():
     assert "x-api-build: &api-build" in compose
     assert compose.count("build: *api-build") == 2
     assert "GIT_SHA: ${GIT_SHA:-unknown}" not in compose.split("environment:", 1)[1]
+
+
+def test_preproduction_recipe_builds_images_with_generated_release_metadata():
+    readiness = (ROOT / "docs" / "handoff" / "VPS-PREPRODUCTION-READINESS.md").read_text(encoding="utf-8")
+
+    assert "./scripts/build-release.sh" in readiness
+    assert readiness.count("--env-file .env.preprod --env-file dist/release-build.env") >= 2
+    assert "build --pull" in readiness

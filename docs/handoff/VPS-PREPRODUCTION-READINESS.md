@@ -78,12 +78,17 @@ date -u +%FT%TZ
 Before deployment, create and verify a backup. Then:
 
 ```sh
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml config --quiet
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml build --pull
+./scripts/build-release.sh
+docker compose --env-file .env.preprod --env-file dist/release-build.env -f docker-compose.yml -f docker-compose.preprod.yml config --quiet
+docker compose --env-file .env.preprod --env-file dist/release-build.env -f docker-compose.yml -f docker-compose.preprod.yml build --pull
 docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml up -d --wait postgres
 docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml run --rm migrate
 docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml up -d --wait api web
 ```
+
+Le second fichier d’environnement est généré à chaque release depuis `VERSION`,
+le HEAD Git et l’heure UTC. Il ne contient aucun secret et ne doit jamais être
+remplacé par des valeurs `unknown` lors de la construction des images API/worker.
 
 Migration head must be `0025_lot57pc_publication_state`. DOWN migrations are
 never automatic on VPS.

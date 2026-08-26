@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, persistOptimisticEvent, resizeEvent, slugify, sortEventList } from './eventUtils';
+import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, eventPresentationStatus, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, persistOptimisticEvent, resizeEvent, slugify, sortEventList } from './eventUtils';
 import type { EventRow } from './eventTypes';
 import { availableProviderOptions, providerLabel } from './providerDisplay';
 
@@ -18,6 +18,12 @@ describe('eventUtils', () => {
     expect(days).toHaveLength(42);
     expect(days[0].date.getDay()).toBe(1);
     expect(days.find((day) => day.key === '2026-06-11')?.events).toHaveLength(1);
+  });
+
+  it('ne présente pas comme à venir un événement planifié dont la borne temporelle est passée', () => {
+    expect(eventPresentationStatus(event(), new Date('2026-06-12T00:00:00Z'))).toBe('completed');
+    expect(eventPresentationStatus(event({ends_at:null}), new Date('2026-06-12T00:00:00Z'))).toBe('completed');
+    expect(eventPresentationStatus(event({status:'cancelled'}), new Date('2026-06-12T00:00:00Z'))).toBe('cancelled');
   });
 
   it('partage les filtres entre calendrier et liste', () => {

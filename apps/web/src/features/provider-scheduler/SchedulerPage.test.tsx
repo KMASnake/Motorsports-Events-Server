@@ -8,4 +8,5 @@ const diagnostic=(reason:string|null):QuotaDiagnostics=>({policy:null,runtime:nu
 describe('Scheduler supervision',()=>{
   it('présente les classes canoniques sans fréquence arbitraire',()=>{expect(schedulerWorkClass(stream())).toBe('recent_catchup');expect(schedulerWorkClass(stream({phase:'current'}))).toBe('current')});
   it('explique quota, cadence et backoff',()=>{expect(schedulerWaitReason(stream(),diagnostic('dynamic_pacing'))).toBe('dynamic_pacing');expect(schedulerWaitReason(stream({stream_backoff_until:'2026-08-27T00:00:00Z'}),diagnostic(null))).toBe('Backoff du flux');expect(schedulerWaitReason(stream({next_eligible_at:'2026-08-27T00:00:00Z'}),null)).toBe('Cadence calculée')});
+  it('explique qu’un flux READY reste bloqué par le provider ou son association',()=>{expect(schedulerWaitReason(stream(),diagnostic(null),{enabled:true,state:'paused'},{sync_state:'active'})).toBe('Provider en pause');expect(schedulerWaitReason(stream(),diagnostic(null),{enabled:true,state:'active'},{sync_state:'paused'})).toBe('Association non active')});
 });

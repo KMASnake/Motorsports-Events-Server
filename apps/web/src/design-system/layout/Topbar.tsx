@@ -40,17 +40,6 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
         <span>Europe/Paris</span>
       </div>
 
-      <div className="system">
-        <i />
-        SYSTÈME
-        <b>OPÉRATIONNEL</b>
-      </div>
-
-      <div className="bell">
-        <MedsIcon name="bell" size={20} />
-        <b>3</b>
-      </div>
-
       <div className="avatar" aria-hidden="true">●</div>
       <div className="user">
         <b>{auth.session?.administrator.username}</b>

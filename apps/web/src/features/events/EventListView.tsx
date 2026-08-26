@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { StatusChip as Pill } from '../../design-system';
 import { eventColor } from './eventColors';
-import { eventPage, fullDate, sortEventList, type EventListSortDirection, type EventListSortKey } from './eventUtils';
+import { eventPage, eventPresentationStatus, fullDate, sortEventList, type EventListSortDirection, type EventListSortKey } from './eventUtils';
 import type { Championship, EventRow } from './eventTypes';
 
 const statusMeta = {
@@ -52,15 +52,15 @@ export function EventListView({ events, championships, selectedId, onSelect, onE
   return <div className="events-list-wrap">
     <div className="events-list-head">{header('starts_at', 'DATE ET HEURE')}{header('name', 'ÉVÉNEMENT')}{header('championship', 'CHAMPIONNAT')}{header('circuit', 'CIRCUIT')}{header('status', 'STATUT')}{header('publication', 'API')}<b>ACTIONS</b></div>
     <div className="events-list">
-      {visible.map((event) => <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
+      {visible.map((event) => {const visualStatus=eventPresentationStatus(event);return <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
         <time><strong>{fullDate(event.starts_at)}</strong><small>{event.timezone}</small></time>
         <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.name}</strong><small>{event.session_title || event.category || event.slug}</small></span></div>
         <div><strong>{event.championship_name}</strong><small>{event.origin === 'manual' ? 'Gestion manuelle' : event.origin === 'mixed' ? 'Gestion hybride' : 'Synchronisé'}</small></div>
         <div><strong>{event.circuit_name || 'Circuit non défini'}</strong><small>{[event.circuit_city, event.country_code].filter(Boolean).join(' · ') || event.timezone}</small></div>
-        <Pill text={statusMeta[event.status].text} tone={statusMeta[event.status].tone} />
+        <Pill text={statusMeta[visualStatus].text} tone={statusMeta[visualStatus].tone} />
         <button className={`events-publish ${event.published ? 'on' : ''}`} onClick={(click) => { click.stopPropagation(); onTogglePublication(event); }}>{event.published ? 'PUBLIÉ' : 'PRIVÉ'}</button>
         <div className="events-row-actions"><button title="Modifier" onClick={(click) => { click.stopPropagation(); onEdit(event); }}>✎</button><button className="delete" title="Supprimer" onClick={(click) => { click.stopPropagation(); onDelete(event); }}>⌫</button></div>
-      </article>)}
+      </article>})}
       {!events.length && <div className="events-empty">Aucun événement ne correspond aux filtres.</div>}
     </div>
     {events.length > 0 && <nav className="events-pagination" aria-label="Pagination des événements">

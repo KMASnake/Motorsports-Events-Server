@@ -1,6 +1,6 @@
 import { StatusChip as Pill } from '../../design-system';
 import { eventColor } from './eventColors';
-import { fullDate } from './eventUtils';
+import { eventPresentationStatus, fullDate } from './eventUtils';
 import type { Championship, EventRow } from './eventTypes';
 import { assetRegistry } from '../../assets/assetRegistry';
 import { providerLabel } from './providerDisplay';
@@ -26,8 +26,8 @@ export function EventDetailsPanel({ event, championships, onEdit, onDuplicate, o
       <div><dt>Fin</dt><dd>{event.ends_at ? fullDate(event.ends_at) : 'Non définie'}</dd></div>
       <div><dt>Fuseau</dt><dd>{event.timezone}</dd></div>
       <div><dt>Catégorie</dt><dd>{event.category ?? 'Non définie'}</dd></div>
-      <div><dt>Intitulé</dt><dd>{event.session_title ?? 'Non défini'}</dd></div>
-      <div><dt>Statut</dt><dd>{event.status}</dd></div>
+      <div><dt>Intitulé de session</dt><dd>{event.session_title ?? 'Non défini'}</dd></div>
+      <div><dt>Statut affiché</dt><dd>{eventPresentationStatus(event)==='completed'?'Terminé':eventPresentationStatus(event)==='scheduled'?'À venir':eventPresentationStatus(event)==='cancelled'?'Annulé':eventPresentationStatus(event)==='postponed'?'Reporté':'Brouillon'}</dd></div>
       <div><dt>Fournisseur</dt><dd>{providerLabel(event.origin,event.provider_key)}</dd></div>
     </dl>
     {event.description && <p className="event-details-description">{event.description}</p>}
