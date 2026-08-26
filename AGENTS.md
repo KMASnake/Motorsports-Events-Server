@@ -1,38 +1,40 @@
 # Instructions communes aux assistants
 
-Ce dépôt est la mémoire officielle du projet. Une conversation ChatGPT ou Codex ne remplace jamais le code, les tests et les documents versionnés.
+`AGENTS.md` est le contrat commun minimal pour les assistants qui modifient ce dépôt. Il ne duplique ni les règles métier permanentes ni l'état courant.
 
-## Sources de vérité
-
-Deux niveaux seulement sont actifs :
-
-1. `PROJECT-HANDBOOK.md` — règles permanentes, invariants et architecture normative ;
-2. `docs/handoff/PROGRESS.json` — état courant, autorisations, prochaine action et validation du lot en cours.
-
-`docs/handbook/DECISIONS.md` et les ADR de `docs/handbook/architecture/` expliquent et historisent les décisions permanentes. `docs/handoff/` contient les contrats et preuves du lot courant. `docs/handover/` et `docs/decisions/` sont historiques et ne doivent jamais être interprétés comme l'état courant.
-
-Les fichiers racine `PROJECT-STATUS.json`, `PROJECT_STATUS.md`, `NEXT_STEPS.md` et `DECISIONS.md` sont uniquement des points de compatibilité/documentation ; ils ne constituent plus des sources de vérité.
-
-## Démarrage d'une session
+## Sources à lire
 
 Avant toute modification :
 
-1. lire `PROJECT-HANDBOOK.md` ;
-2. lire `docs/handoff/PROGRESS.json` ;
-3. lire les ADR permanents et la documentation du lot concerné ;
-4. vérifier l'état Git et les changements non commités ;
-5. exécuter `./scripts/validate-repository.sh` lorsqu'il est applicable ;
-6. reprendre uniquement la prochaine action autorisée par `PROGRESS.json`.
+1. `PROJECT-HANDBOOK.md` — règles permanentes, invariants et architecture normative ;
+2. `docs/handoff/PROGRESS.json` — unique source canonique de l'état courant, des validations, autorisations, interdictions et de la prochaine action ;
+3. les ADR applicables dans `docs/handbook/architecture/` ;
+4. les contrats du périmètre actif dans `docs/handoff/` ;
+5. les instructions propres à l'outil utilisé, par exemple `CODEX.md` pour Codex.
 
-## Principes permanents
+Les pointeurs de compatibilité `PROJECT_STATUS.md`, `PROJECT-STATUS.json` et `NEXT_STEPS.md`, les archives et les conversations ne doivent jamais servir à reconstruire l'état courant.
 
-- ne pas introduire de changement fonctionnel pendant une refactorisation sans demande explicite ;
-- ne jamais commiter `.env`, clé API, mot de passe, sauvegarde ou donnée VPS ;
-- ne jamais afficher un secret dans un journal, un test ou une documentation ;
-- préserver les contrats publics versionnés et les migrations historiques ;
-- conserver les mécanismes de sauvegarde, rollback, audit et contrôle d'accès ;
-- une CI verte, un build réussi, un déploiement ou un merge ne remplacent jamais une validation explicite du mainteneur.
+## Avant d'écrire
+
+- vérifier la branche, le SHA et l'état du worktree ;
+- respecter strictement le périmètre autorisé dans `PROGRESS.json` ;
+- ne pas introduire de changement fonctionnel dans une refactorisation ou un cleanup sans autorisation explicite ;
+- identifier les validations adaptées au changement avant de modifier le dépôt.
+
+## Invariants communs
+
+- ne jamais commiter ou exposer `.env`, clé API, mot de passe, token, sauvegarde ou donnée VPS sensible ;
+- préserver les contrats publics versionnés et l'historique des migrations ;
+- ne pas contourner les contrôles de sécurité, sauvegarde, rollback, audit ou contrôle d'accès ;
+- ne jamais interpréter une CI verte, un build, un déploiement ou un merge comme une validation mainteneur ;
+- ne pas fusionner dans `main` sans autorisation explicite de l'état canonique.
 
 ## Documentation
 
-Toute règle durable doit être portée par le Handbook et, lorsqu'elle représente une décision d'architecture, par l'ADR correspondant. L'état courant ne doit être écrit qu'une fois dans `docs/handoff/PROGRESS.json`.
+- règle permanente : `PROJECT-HANDBOOK.md` et, si nécessaire, ADR correspondant ;
+- décision permanente : `docs/handbook/DECISIONS.md` et ADR correspondant ;
+- état, validation, autorisation, interdiction ou prochaine action : uniquement `docs/handoff/PROGRESS.json` ;
+- contrat/preuve du périmètre actif : `docs/handoff/` ;
+- preuve historique clôturée : `docs/archive/`.
+
+Les fichiers propres à un assistant doivent uniquement ajouter les différences nécessaires à cet assistant et ne doivent pas recopier ces règles communes.
