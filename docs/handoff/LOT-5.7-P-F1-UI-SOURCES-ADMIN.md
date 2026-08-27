@@ -1,6 +1,9 @@
 # Lot 5.7-P-F1-UI — administration des sources
 
-Statut : implémenté après corrections d’audit, en attente de réaudit mainteneur.
+Statut : **PASS — validé par le mainteneur le 2026-08-27**.
+
+SHA validé et déployé en préproduction :
+`298356fdcba4375582ea2d36588afb16815c55dd`.
 
 ## Responsabilités
 
@@ -31,6 +34,40 @@ Une source volontairement désactivée ou en pause peut donc être techniquement
 
 Les éditeurs JSON quota/mapping refusent localement un document invalide et affichent une erreur contrôlée, sans exception React.
 
+Une édition purement configurationnelle conserve également l’état opérationnel
+existant. La preuve préproduction a confirmé qu’un provider
+`enabled=true`, `state=paused`, `discovery_enabled=false` reste `paused` après
+édition de sa configuration. Seul le chemin opérationnel explicite peut
+demander une transition d’état.
+
+## Validation mainteneur et préproduction
+
+Le réaudit mainteneur est **PASS** et le MVP Sources administration est validé.
+Sur le SHA certifié, le preflight borné a retourné :
+
+- `status=preflight_ok` ;
+- `configuration_ready=true` et aucun `configuration_blocker` ;
+- `execution_ready=false` avec `execution_blockers=["provider_paused"]` ;
+- `provider_enabled=true` et `provider_state=paused` ;
+- budget 1, aucune requête émise, budget restant 1 ;
+- `PROVIDER_CALLS=0`.
+
+La sentinelle quota est restée à trois charges avec `last_charge=3`. Aucun
+traversal n’a été créé. Le worker est resté arrêté. API, Web, PostgreSQL et
+Prometheus sont restés healthy, et `/health` exposait le SHA certifié.
+
+Les validations déjà auditées restent acquises : API ciblée 27/27, Web ciblé
+38/38, intégration HTTP/service/AES-GCM/PostgreSQL PASS, bounded runner
+PostgreSQL avec transport mock PASS, typecheck et lint API/Web PASS,
+`validate-repository.sh` 54 PASS / 18 SKIPPED et `git diff --check` PASS.
+
+Aucun appel fournisseur réel ni crédit fournisseur n’a été consommé pendant
+la validation.
+
 ## Hors périmètre
 
 Aucun endpoint ou bouton d’exécution réelle n’est ajouté. Aucun appel fournisseur réel, migration, déploiement VPS, activation Production Preview, onboarding externe ou merge vers `main` n’est autorisé par ce sous-lot.
+
+Cette validation ne clôt pas Gate F : sa validation fournisseur réelle et ses
+autres preuves externes obligatoires restent requises. Aucune sous-phase
+suivante n’est autorisée automatiquement.
