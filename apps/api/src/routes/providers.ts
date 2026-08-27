@@ -34,7 +34,7 @@ const providerPatch = z.object({
 }).strict();
 const secretBody = z.object({ value: z.string().min(1).max(8192) }).strict();
 const secretParams = z.object({ id: uuid, name: z.string().regex(/^[a-z][a-z0-9_-]{0,63}$/) });
-const quotaBody = z.object({
+export const quotaBody = z.object({
   short_window_seconds: z.number().int().positive().nullable().default(null),
   short_limit: z.number().int().positive().nullable().default(null),
   monthly_limit: z.number().int().positive().nullable().default(null),

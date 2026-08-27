@@ -1,14 +1,21 @@
 import Fastify from 'fastify';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { registerAdminAuth, signAdminToken } from '../src/lib/adminAuth.js';
 import type { ProviderConfigurationService } from '../src/providers/providerService.js';
-import { providerRoutes } from '../src/routes/providers.js';
+import { providerRoutes, quotaBody } from '../src/routes/providers.js';
 import type { ProviderSourcesAdminService } from '../src/providers/providerSourcesAdminService.js';
 
 const authSecret = 'lot-5-2-technical-auth-secret-at-least-32-characters';
 const providerId = '10000000-0000-4000-8000-000000000001';
 const sentinel = 'SUPER_SECRET_SENTINEL_5_2';
 const token = (role: 'admin' | 'viewer') => signAdminToken({ sub: 'test', role, exp: Math.floor(Date.now()/1000)+60 }, authSecret);
+const deployedProviderId = '57f10000-0000-4000-8000-000000000001';
+const quotaPayload = {
+  short_window_seconds: null, short_limit: null, monthly_limit: 5000, limits_source: 'configured',
+  reset_timezone: null, reset_at: null, minute_limit: 1, hourly_limit: 30, daily_limit: 200,
+  minimum_interval_seconds: 60, safety_margin_percent: 5, current_reserve_mode: 'percent',
+  current_reserve_value: 20, provider_timezone: 'UTC'
+} as const;
 
 describe('Provider administration routes', () => {
   let app: ReturnType<typeof Fastify>;
@@ -56,6 +63,24 @@ describe('Provider administration routes', () => {
       headers:{authorization:`Bearer ${token('admin')}`},payload:{name:'Fake',adapter_key:'INVALID KEY'}});
     expect(response.statusCode).toBe(400);
     expect(response.body).not.toContain('issues');
+  });
+
+  it('accepts the deployed quota payload in the isolated strict Zod schema', () => {
+    const parsed = quotaBody.safeParse(quotaPayload);
+    expect(parsed.success, parsed.success ? undefined : JSON.stringify(parsed.error.issues)).toBe(true);
+  });
+
+  it('parses the deployed JSON quota payload through Fastify without string coercion', async () => {
+    const setQuotaPolicy = vi.fn().mockResolvedValue({provider_instance_id:deployedProviderId,monthly_limit:5000});
+    const diagnosticApp = Fastify({logger:false});
+    await diagnosticApp.register(providerRoutes,{service:{get:async()=>({id:deployedProviderId}),setQuotaPolicy} as unknown as ProviderConfigurationService});
+    const response = await diagnosticApp.inject({method:'PUT',url:`/api/v1/admin/providers/${deployedProviderId}/quota-policy`,headers:{'content-type':'application/json'},payload:JSON.stringify(quotaPayload)});
+    expect(response.statusCode).toBe(200);
+    expect(setQuotaPolicy).toHaveBeenCalledOnce();
+    const received = setQuotaPolicy.mock.calls[0][1] as Record<string,unknown>;
+    expect(received).toMatchObject({minuteLimit:1,hourlyLimit:30,dailyLimit:200,monthlyLimit:5000,minimumIntervalSeconds:60,safetyMarginPercent:5,currentReserveValue:20,providerTimezone:'UTC'});
+    for (const key of ['minuteLimit','hourlyLimit','dailyLimit','monthlyLimit','minimumIntervalSeconds','safetyMarginPercent','currentReserveValue']) expect(typeof received[key]).toBe('number');
+    await diagnosticApp.close();
   });
 
   it('exposes source administration without provider execution',async()=>{
