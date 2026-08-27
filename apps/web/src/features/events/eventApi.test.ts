@@ -9,9 +9,10 @@ describe('event mutation DTO',()=>{
   beforeEach(()=>{vi.stubGlobal('fetch',vi.fn(response));vi.stubGlobal('document',{cookie:'mse_admin_csrf=test-csrf'});vi.stubGlobal('window',{dispatchEvent:vi.fn()});});
 
   it('préserve une catégorie existante en l’omettant du PATCH',async()=>{
-    await saveEvent({...form,category:'Grand Prix'} as EventFormState&{category:string},'event-1');
+    await saveEvent({...form,category:'Grand Prix',meeting_id:'meeting-1',meeting_name:'Singapore Grand Prix'} as EventFormState&{category:string;meeting_id:string;meeting_name:string},'event-1');
     const [url,init]=vi.mocked(fetch).mock.calls[0];const payload=JSON.parse(String(init?.body));
     expect(String(url)).toMatch(/\/api\/v1\/admin\/events\/event-1$/);expect(init?.method).toBe('PATCH');expect(payload).not.toHaveProperty('category');
+    expect(payload).not.toHaveProperty('meeting_id');expect(payload).not.toHaveProperty('meeting_name');
   });
 
   it('crée un Event sans inventer de catégorie',async()=>{

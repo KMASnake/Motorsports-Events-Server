@@ -68,10 +68,13 @@ const publicSelect = `
 const adminSelect = `
   select e.*,c.name championship_name,c.slug championship_slug,c.logo_url championship_logo_url,c.active championship_active,
     ci.name circuit_name,ci.city circuit_city,ci.country_code,
+    me.meeting_id,m.name meeting_name,
     (select count(*)::int from event_corrections ec where ec.event_id=e.id and ec.status in ('active','conflict')) correction_count
   from events e
   join championships c on c.id=e.championship_id
   left join circuits ci on ci.id=e.circuit_id
+  left join meeting_events me on me.event_id=e.id
+  left join meetings m on m.id=me.meeting_id
 `;
 
 function clean(value: unknown): string | null {
@@ -126,7 +129,7 @@ export async function eventRoutes(app: FastifyInstance, options: EventRouteOptio
     if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
     const query = parsedQuery.data;
     const where: string[] = []; const params: unknown[] = [];
-    if (query.search?.trim()) { params.push(`%${query.search.trim()}%`); where.push(`(e.name ilike $${params.length} or e.slug ilike $${params.length} or coalesce(ci.name,'') ilike $${params.length})`); }
+    if (query.search?.trim()) { params.push(`%${query.search.trim()}%`); where.push(`(e.name ilike $${params.length} or e.slug ilike $${params.length} or coalesce(ci.name,'') ilike $${params.length} or coalesce(m.name,'') ilike $${params.length})`); }
     if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
     if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
     if (query.published === 'true' || query.published === 'false') { params.push(query.published === 'true'); where.push(`e.published=$${params.length}`); }
@@ -136,7 +139,7 @@ export async function eventRoutes(app: FastifyInstance, options: EventRouteOptio
     const sortColumns = { starts_at: 'e.starts_at', name: 'e.name', championship: 'c.name', status: 'e.status', updated_at: 'e.updated_at' } as const;
     const order = `${sortColumns[query.sort]} ${query.direction},e.id asc`;
     if (!query.page) return (await pool.query(`${adminSelect}${whereSql} order by ${order}`, params)).rows;
-    const total = Number((await pool.query(`select count(*)::int total from events e join championships c on c.id=e.championship_id left join circuits ci on ci.id=e.circuit_id${whereSql}`, params)).rows[0].total);
+    const total = Number((await pool.query(`select count(*)::int total from events e join championships c on c.id=e.championship_id left join circuits ci on ci.id=e.circuit_id left join meeting_events me on me.event_id=e.id left join meetings m on m.id=me.meeting_id${whereSql}`, params)).rows[0].total);
     params.push(query.page_size, (query.page - 1) * query.page_size);
     const items = (await pool.query(`${adminSelect}${whereSql} order by ${order} limit $${params.length - 1} offset $${params.length}`, params)).rows;
     return paginated(items, total, query.page, query.page_size);

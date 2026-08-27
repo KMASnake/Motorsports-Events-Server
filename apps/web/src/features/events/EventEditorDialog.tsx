@@ -6,6 +6,7 @@ interface Props {
   editing: boolean;
   saving: boolean;
   value: EventFormState;
+  meetingName: string | null;
   championships: Championship[];
   circuits: Circuit[];
   sessionTitles: string[];
@@ -16,7 +17,7 @@ interface Props {
   onSubmit: (event: FormEvent) => void;
 }
 
-export function EventEditorDialog({ open, editing, saving, value, championships, circuits, sessionTitles, error, onChange, onNameChange, onClose, onSubmit }: Props) {
+export function EventEditorDialog({ open, editing, saving, value, meetingName, championships, circuits, sessionTitles, error, onChange, onNameChange, onClose, onSubmit }: Props) {
   const [sessionTitlesOpen, setSessionTitlesOpen] = useState(false);
   const [filterSessionTitles, setFilterSessionTitles] = useState(false);
   const matchingSessionTitles = useMemo(() => {
@@ -31,7 +32,9 @@ export function EventEditorDialog({ open, editing, saving, value, championships,
       <form onSubmit={onSubmit}>
         {error && <div className="events-form-error" role="alert">{error}</div>}
         <div className="lot3-form-grid">
-          <label className="wide">Nom public *<input required minLength={2} value={value.name} onChange={(event) => onNameChange(event.target.value)} /></label>
+          {meetingName
+            ? <label className="wide">Épreuve<input value={meetingName} readOnly aria-readonly="true" /></label>
+            : <label className="wide">Nom public *<input required minLength={2} value={value.name} onChange={(event) => onNameChange(event.target.value)} /></label>}
           <label>Championnat *<select required value={value.championship_id} onChange={(event) => onChange({ ...value, championship_id: event.target.value })}><option value="">Sélectionner</option>{championships.filter((item) => item.active || item.id === value.championship_id).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
           <label>Circuit<select value={value.circuit_id} onChange={(event) => onChange({ ...value, circuit_id: event.target.value })}><option value="">Non défini</option>{circuits.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country_code ? ` · ${item.country_code}` : ''}</option>)}</select></label>
           <label className="wide">Intitulé de session

@@ -39,7 +39,7 @@ export function slugify(value: string) {
 export function filterEvents(events: EventRow[], filters: EventFiltersState) {
   const query = filters.search.trim().toLowerCase();
   return events.filter((event) => {
-    const haystack = `${event.name} ${event.slug} ${event.championship_name} ${event.circuit_name ?? ''}`.toLowerCase();
+    const haystack = `${event.meeting_name ?? ''} ${event.name} ${event.session_title ?? ''} ${event.slug} ${event.championship_name} ${event.circuit_name ?? ''}`.toLowerCase();
     return (!query || haystack.includes(query))
       && (filters.championship === 'all' || event.championship_id === filters.championship)
       && (filters.status === 'all' || event.status === filters.status)

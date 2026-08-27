@@ -6,7 +6,7 @@ import { availableProviderOptions, providerLabel } from './providerDisplay';
 const event = (overrides: Partial<EventRow> = {}): EventRow => ({
   id: 'event-1', championship_id: 'champ-1', championship_name: 'Formule 1',
   championship_slug: 'formula-1', circuit_id: null, circuit_name: null,
-  circuit_city: null, country_code: null, name: 'Grand Prix de France',
+  circuit_city: null, country_code: null, meeting_id:null, meeting_name:null, name: 'Grand Prix de France',
   slug: 'grand-prix-france', category: 'Course', starts_at: '2026-06-11T14:00:00.000Z',
   ends_at: '2026-06-11T16:00:00.000Z', timezone: 'UTC', status: 'scheduled',
   published: true, origin: 'manual', description: null, ...overrides
@@ -39,6 +39,11 @@ describe('eventUtils', () => {
   it('partage les filtres entre calendrier et liste', () => {
     const rows = [event(), event({ id: 'event-2', championship_id: 'champ-2', name: 'Rallye du Portugal', published: false })];
     expect(filterEvents(rows, { search: 'rallye', championship: 'all', status: 'all', publication: 'private', provider: 'all' }).map((row) => row.id)).toEqual(['event-2']);
+  });
+
+  it('retrouve les sessions par le nom du Meeting parent',()=>{
+    const rows=[event({name:'Qualifying',session_title:'Qualifying',meeting_id:'meeting-1',meeting_name:'Singapore Grand Prix'})];
+    expect(filterEvents(rows,{search:'Singapore Grand Prix',championship:'all',status:'all',publication:'all',provider:'all'})).toEqual(rows);
   });
 
   it('filtre les événements par fournisseur administratif', () => {

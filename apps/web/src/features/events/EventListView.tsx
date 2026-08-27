@@ -55,7 +55,7 @@ export function EventListView({ events, championships, selectedId, onSelect, onE
     <div className="events-list">
       {visible.map((event) => {const visualStatus=eventPresentationStatus(event);return <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)} onDoubleClick={()=>onEdit(event)}>
         <time><strong>{fullDate(event.starts_at)}</strong><small>{event.timezone}</small></time>
-        <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.name}</strong><small>{event.session_title || event.category || event.slug}</small></span></div>
+        <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.meeting_name ?? event.name}</strong><small>{event.session_title || (event.meeting_name ? event.name : event.category || event.slug)}</small></span></div>
         <div><strong>{event.championship_name}</strong><small>{providerLabel(event.origin,event.provider_key)}</small></div>
         <div><strong>{event.circuit_name || 'Circuit non défini'}</strong><small>{[event.circuit_city, event.country_code].filter(Boolean).join(' · ') || event.timezone}</small></div>
         <Pill text={statusMeta[visualStatus].text} tone={statusMeta[visualStatus].tone} />

@@ -29,6 +29,8 @@ export interface EventRow {
   circuit_name: string | null;
   circuit_city: string | null;
   country_code: string | null;
+  meeting_id?: string | null;
+  meeting_name?: string | null;
   name: string;
   slug: string;
   category: string | null;
