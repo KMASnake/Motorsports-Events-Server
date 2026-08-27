@@ -74,9 +74,11 @@ export function resolveIdentity(state:NormalizedState,candidates:readonly MatchC
   candidates=candidates.filter(candidate=>!rejectedTargetIds.includes(candidate.id));
   if(state.resourceKind==='meeting'){
     const plausible=candidates.filter(item=>item.championshipId===state.championshipId&&item.season===state.season&&(!state.round||!item.round||item.round===state.round)).sort((a,b)=>a.id.localeCompare(b.id,'en'));
-    const roundMatches=state.round?plausible.filter(item=>item.round===state.round):plausible;
-    if(roundMatches.length===1)return {decision:'linked',targetId:roundMatches[0].id,score:null,signals:['championship','season',...(state.round?['round']:[])],reason:'deterministic_meeting_identity'};
-    if(roundMatches.length>1)return {decision:'review',targetId:null,score:null,signals:['championship','season'],reason:'ambiguous_meeting'};
+    const identityMatches=state.round
+      ?plausible.filter(item=>item.round===state.round)
+      :plausible.filter(item=>state.startsAt!==null&&item.startsAt!==null&&new Date(item.startsAt).valueOf()===new Date(state.startsAt).valueOf()&&item.name.toLocaleLowerCase('en')===state.name.toLocaleLowerCase('en'));
+    if(identityMatches.length===1)return {decision:'linked',targetId:identityMatches[0].id,score:null,signals:['championship','season',...(state.round?['round']:['name','starts_at'])],reason:'deterministic_meeting_identity'};
+    if(identityMatches.length>1)return {decision:'review',targetId:null,score:null,signals:['championship','season'],reason:'ambiguous_meeting'};
     return state.startsAt!==null&&state.status!==null?{decision:'create',targetId:null,score:null,signals:[],reason:'no_plausible_meeting'}:{decision:'review',targetId:null,score:null,signals:[],reason:'required_identity_unknown'};
   }
   const ranked=candidates.filter(item=>!incompatible(state,item)).map(item=>({item,...score(state,item)})).sort((a,b)=>b.value-a.value||a.item.id.localeCompare(b.item.id,'en'));
