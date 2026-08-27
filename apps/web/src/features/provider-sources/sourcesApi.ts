@@ -16,7 +16,8 @@ export const createChampionship=(id:string,value:unknown)=>request(`/api/v1/admi
 export const updateChampionship=(id:string,value:unknown)=>request(`/api/v1/admin/provider-championships/${id}`,{method:'PATCH',body:JSON.stringify(value)});
 export const updateSourceConfig=(id:string,config:unknown)=>request(`/api/v1/admin/provider-championships/${id}/source-config`,{method:'PUT',body:JSON.stringify({config})});
 export const quota=(id:string)=>request<QuotaPolicy>(`/api/v1/admin/providers/${id}/quota-policy`);
-export const saveQuota=(id:string,value:unknown)=>request(`/api/v1/admin/providers/${id}/quota-policy`,{method:'PUT',body:JSON.stringify(value)});
+export function quotaMutationDto(value:QuotaPolicy):QuotaPolicy{return {short_window_seconds:value.short_window_seconds,short_limit:value.short_limit,monthly_limit:value.monthly_limit,limits_source:value.limits_source,reset_timezone:value.reset_timezone,reset_at:value.reset_at,minute_limit:value.minute_limit,hourly_limit:value.hourly_limit,daily_limit:value.daily_limit,minimum_interval_seconds:value.minimum_interval_seconds,safety_margin_percent:value.safety_margin_percent,current_reserve_mode:value.current_reserve_mode,current_reserve_value:value.current_reserve_value,provider_timezone:value.provider_timezone};}
+export const saveQuota=(id:string,value:QuotaPolicy)=>request(`/api/v1/admin/providers/${id}/quota-policy`,{method:'PUT',body:JSON.stringify(quotaMutationDto(value))});
 export const quotaDiagnostics=(id:string)=>request<QuotaDiagnostics>(`/api/v1/admin/providers/${id}/quota-diagnostics`);
 export const syncStreams=(id:string)=>request<SyncStream[]>(`/api/v1/admin/provider-championships/${id}/sync-streams`);
 export const syncRuns=(id:string)=>request<SyncRun[]>(`/api/v1/admin/provider-championships/${id}/sync-runs`);
