@@ -70,7 +70,7 @@
       "vps_preproduction_validation_date": "2026-08-22",
       "vps_preproduction_validated_sha": "cb7d04795b156dc23af6c57efe2bce788569e3da",
       "authorized_gate": "5.7-P-F",
-      "authorized_technical_sub_lot": "5.7-P-F1-UI",
+      "authorized_technical_sub_lot": "5.7-P-F2-RPV",
       "technical_gates": {
         "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-B": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
@@ -92,7 +92,7 @@
           "vps_validation_required":true,
           "real_provider_validation_required":true,
           "evidence":"docs/handoff/LOT-5.7-P-F-IMPLEMENTATION.md",
-          "authorized_subphase":"5.7-P-F1-UI",
+          "authorized_subphase":"5.7-P-F2-RPV",
           "sources_admin_mvp_authorized":true,
           "sources_admin_mvp_authorization_date":"2026-08-26",
           "sources_admin_mvp_implementation_complete":true,
@@ -110,14 +110,32 @@
           "sources_admin_mvp_evidence":"docs/handoff/LOT-5.7-P-F1-UI-SOURCES-ADMIN.md",
           "sources_admin_mvp_scope":"Implement the existing Providers > Sources administration UI by reusing the existing provider backend, credentials encryption, championships, source configuration, quota/cadence, immutable normalization mappings and bounded-runner preflight. Preserve the validated Sources / Synchronisations / Taches planifiees separation and existing UI contract.",
           "sources_admin_zero_credit_preflight_required":true,
-          "real_provider_execution_authorized":false,
+          "real_provider_validation_authorized":true,
+          "real_provider_validation_authorization_date":"2026-08-27",
+          "real_provider_validation_status":"authorized-not-started",
+          "real_provider_validation_implementation_started":false,
+          "real_provider_validation_implementation_complete":false,
+          "real_provider_validation_maintainer_validated":false,
+          "real_provider_validation_evidence":"docs/handoff/LOT-5.7-P-F2-REAL-PROVIDER-VALIDATION.md",
+          "real_provider_validation_scope":"One strictly controlled bounded real-provider validation of OCBlackTop F1 in preproduction, manually triggered by the maintainer through the canonical providerAcquireOnce CLI, with explicit per-execution request budget and the worker stopped.",
+          "real_provider_validation_environment":"preproduction-only",
+          "real_provider_validation_provider":"ocblacktop",
+          "real_provider_validation_championship":"f1",
+          "real_provider_validation_manual_only":true,
+          "real_provider_validation_bounded_requests_required":true,
+          "real_provider_validation_worker_must_remain_stopped":true,
+          "real_provider_validation_backup_required":true,
+          "real_provider_validation_zero_credit_preflight_required":true,
+          "real_provider_validation_exact_call_accounting_required":true,
+          "real_provider_execution_authorized":true,
+          "real_provider_execution_authorization_scope":"OCBlackTop F1 preproduction only; manual maintainer execution through providerAcquireOnce with an explicitly approved low --max-provider-requests budget; worker, scheduler and discovery remain stopped.",
           "production_preview_activation_authorized":false,
           "external_client_onboarding_authorized":false
         }
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite and the 5.7-P-F1-UI Sources administration MVP are maintainer-validated. Gate F remains incomplete pending mandatory external evidence, including the required real-provider validation. No subsequent Gate F subphase is authorized. Real provider calls, Production Preview activation, external client onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite and 5.7-P-F1-UI are maintainer-validated. Gate F remains incomplete. Subphase 5.7-P-F2-RPV authorizes only bounded manual OCBlackTop F1 real-provider validation in preproduction under its documented safeguards. Production Preview activation, external client onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -140,6 +158,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Decide whether and which subsequent Gate F subphase may be authorized after the maintainer validation of 5.7-P-F1-UI. No subsequent subphase is currently authorized. Real provider execution, Production Preview activation, external onboarding, full Lot 5.7 authorization, Lot 5.8+ authorization and merge to main remain unauthorized."
+    "task": "Prepare and execute the bounded OCBlackTop F1 real-provider validation manually in preproduction according to the 5.7-P-F2-RPV safeguards. Each execution requires a backup, zero-credit preflight, explicit low request budget, exact quota/call accounting and a stopped worker. This does not authorize Production Preview, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main."
   }
 }
