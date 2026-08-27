@@ -53,7 +53,7 @@ export function EventListView({ events, championships, selectedId, onSelect, onE
   return <div className="events-list-wrap">
     <div className="events-list-head">{header('starts_at', 'DATE ET HEURE')}{header('name', 'ÉVÉNEMENT')}{header('championship', 'CHAMPIONNAT')}{header('circuit', 'CIRCUIT')}{header('status', 'STATUT')}{header('publication', 'API')}<b>ACTIONS</b></div>
     <div className="events-list">
-      {visible.map((event) => {const visualStatus=eventPresentationStatus(event);return <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)}>
+      {visible.map((event) => {const visualStatus=eventPresentationStatus(event);return <article key={event.id} className={selectedId === event.id ? 'selected' : ''} onClick={() => onSelect(event)} onDoubleClick={()=>onEdit(event)}>
         <time><strong>{fullDate(event.starts_at)}</strong><small>{event.timezone}</small></time>
         <div className="events-list-name"><i style={{ background: eventColor(event, championships) }}>{event.championship_name.slice(0, 3).toUpperCase()}</i><span><strong>{event.name}</strong><small>{event.session_title || event.category || event.slug}</small></span></div>
         <div><strong>{event.championship_name}</strong><small>{providerLabel(event.origin,event.provider_key)}</small></div>

@@ -49,7 +49,6 @@ export interface EventFormState {
   championship_id: string;
   circuit_id: string;
   name: string;
-  category: string;
   starts_at: string;
   ends_at: string;
   status: EventStatus;

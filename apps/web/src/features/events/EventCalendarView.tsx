@@ -10,6 +10,7 @@ interface Props {
   championships: Championship[];
   selectedId: string | null;
   onSelect: (event: EventRow) => void;
+  onEdit: (event: EventRow) => void;
   onCreateAt: (date: Date) => void;
   onCreateRange: (start: Date, end: Date) => void;
   onMove: (event: EventRow, date: Date) => void;
@@ -17,7 +18,7 @@ interface Props {
 
 const week = ['LUN.', 'MAR.', 'MER.', 'JEU.', 'VEN.', 'SAM.', 'DIM.'];
 
-export function EventCalendarView({ month, events, championships, selectedId, onSelect, onCreateAt, onCreateRange, onMove }: Props) {
+export function EventCalendarView({ month, events, championships, selectedId, onSelect, onEdit, onCreateAt, onCreateRange, onMove }: Props) {
   const days = buildCalendarDays(month, events);
   const [rangeStart, setRangeStart] = useState<Date | null>(null);
   function selectRange(date: Date) { if (!rangeStart) setRangeStart(date); else { onCreateRange(rangeStart, date); setRangeStart(null); } }
@@ -34,6 +35,7 @@ export function EventCalendarView({ month, events, championships, selectedId, on
           className={`events-calendar-chip status-${event.status}${selectedId === event.id ? ' selected' : ''}`}
           style={{ '--event-color': eventColor(event, championships) } as React.CSSProperties}
           onClick={(click) => { click.stopPropagation(); onSelect(event); }}
+          onDoubleClick={(click) => { click.stopPropagation(); onEdit(event); }}
           aria-pressed={selectedId === event.id}
         >
           <strong className="event-chip-brand"><img src={assetRegistry.championship(event.championship_slug,event.championship_logo_url).src} alt=""/><span>{event.championship_name}</span>{assetRegistry.country(event.country_code).src&&<img className="event-chip-flag" src={assetRegistry.country(event.country_code).src!} alt={assetRegistry.country(event.country_code).alt}/>}</strong>

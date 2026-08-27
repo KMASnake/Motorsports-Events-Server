@@ -64,6 +64,27 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByLabel(/Mode de gestion/i)).toHaveCount(0);
   });
 
+  test('un double-clic sur un Event existant ouvre son édition préremplie, jamais une création',async({page,request})=>{
+    const rows=await (await request.get(`${apiUrl}/api/v1/admin/events`)).json();
+    const source=rows.find((event:{circuit_id:string|null;ends_at:string|null})=>event.circuit_id&&event.ends_at);
+    expect(source).toBeTruthy();
+    await page.clock.setFixedTime(new Date(source.starts_at));
+    await page.goto('/events');
+    const chip=page.locator('.events-calendar-chip').filter({hasText:source.name}).first();
+    await expect(chip).toBeVisible();await chip.dblclick();
+    const dialog=page.getByRole('dialog');
+    await expect(dialog.getByRole('heading',{name:'Modifier l’événement'})).toBeVisible();
+    await expect(dialog.getByRole('button',{name:'Enregistrer les modifications'})).toBeVisible();
+    await expect(dialog.getByLabel('Nom public *')).toHaveValue(source.name);
+    await expect(dialog.getByLabel('Circuit')).toHaveValue(source.circuit_id);
+    await expect(dialog.getByLabel('Fin')).not.toHaveValue('');
+    await expect(dialog.getByRole('heading',{name:'Nouvel événement'})).toHaveCount(0);
+    await dialog.getByRole('button',{name:'Annuler'}).click();
+    await page.getByLabel(/Créer un événement le/).first().click();
+    await expect(page.getByRole('heading',{name:'Nouvel événement'})).toBeVisible();
+    await expect(page.getByRole('button',{name:'Créer l’événement'})).toBeVisible();
+  });
+
   test('expose les vues interactives et les captures du lot 4.2', async ({ page, request }) => {
     const eventsResponse = await request.get(`${apiUrl}/api/v1/admin/events`);
     const events = await eventsResponse.json();

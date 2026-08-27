@@ -25,6 +25,22 @@ async function app() {
 beforeEach(() => clientQuery.mockReset());
 
 describe('sécurité des corrections événement fournisseur', () => {
+  it('préserve la catégorie existante lorsqu’elle est absente du PATCH de l’éditeur',async()=>{
+    const current={...base,origin:'manual',provider_key:null,external_id:null};
+    clientQuery.mockImplementation(async(sql:string)=>{
+      if(String(sql).startsWith('select * from events'))return {rowCount:1,rows:[current]};
+      if(String(sql).startsWith('update events set'))return {rowCount:1,rows:[{...current,name:'Nom modifié'}]};
+      return {rowCount:1,rows:[]};
+    });
+    const instance=await app();
+    const response=await instance.inject({method:'PATCH',url:'/api/v1/admin/events/evt-002',payload:{name:'Nom modifié'}});
+    expect(response.statusCode).toBe(200);
+    const update=clientQuery.mock.calls.find(([sql])=>String(sql).startsWith('update events set'));
+    expect(update?.[1][5]).toBe('Grand Prix');
+    expect(response.json().category).toBe('Grand Prix');
+    await instance.close();
+  });
+
   it('bloque une édition silencieuse si l’origine provider n’a aucune identité', async () => {
     clientQuery.mockResolvedValueOnce({ rowCount: 1, rows: [{ ...base, origin: 'provider', provider_key: null, external_id: null }] });
     const instance = await app();

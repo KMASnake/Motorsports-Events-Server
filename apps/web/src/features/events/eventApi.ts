@@ -30,11 +30,13 @@ export async function loadEventWorkspace() {
 
 export function saveEvent(form: EventFormState, eventId?: string) {
   const payload = {
-    ...form,
+    championship_id: form.championship_id,
     circuit_id: form.circuit_id || null,
-    category: form.category || null,
+    name: form.name,
     starts_at: toIso(form.starts_at),
     ends_at: toIso(form.ends_at),
+    status: form.status,
+    published: form.published,
     session_title: form.session_title.trim() || null,
     description: form.description || null
   };

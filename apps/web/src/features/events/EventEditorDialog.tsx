@@ -32,9 +32,8 @@ export function EventEditorDialog({ open, editing, saving, value, championships,
         {error && <div className="events-form-error" role="alert">{error}</div>}
         <div className="lot3-form-grid">
           <label className="wide">Nom public *<input required minLength={2} value={value.name} onChange={(event) => onNameChange(event.target.value)} /></label>
-          <label>Catégorie facultative<input value={value.category} onChange={(event) => onChange({ ...value, category: event.target.value })} placeholder="Ex. Grand Prix, Rallye…" /></label>
           <label>Championnat *<select required value={value.championship_id} onChange={(event) => onChange({ ...value, championship_id: event.target.value })}><option value="">Sélectionner</option>{championships.filter((item) => item.active || item.id === value.championship_id).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-          <label>Circuit facultatif<select value={value.circuit_id} onChange={(event) => onChange({ ...value, circuit_id: event.target.value })}><option value="">Non défini</option>{circuits.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country_code ? ` · ${item.country_code}` : ''}</option>)}</select></label>
+          <label>Circuit<select value={value.circuit_id} onChange={(event) => onChange({ ...value, circuit_id: event.target.value })}><option value="">Non défini</option>{circuits.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country_code ? ` · ${item.country_code}` : ''}</option>)}</select></label>
           <label className="wide">Intitulé de session
             <span className="event-session-title-combobox">
               <input role="combobox" aria-controls="event-session-title-options" aria-expanded={sessionTitlesOpen} aria-autocomplete="list" maxLength={160} autoComplete="off" value={value.session_title} onFocus={() => { setFilterSessionTitles(false); setSessionTitlesOpen(true); }} onChange={(event) => { onChange({ ...value, session_title: event.target.value }); setFilterSessionTitles(true); setSessionTitlesOpen(true); }} placeholder="FP1, Qualifications, Warm-up…" />

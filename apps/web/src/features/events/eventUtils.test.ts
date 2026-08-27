@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, eventPresentationStatus, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, persistOptimisticEvent, resizeEvent, slugify, sortEventList } from './eventUtils';
+import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, eventPresentationStatus, eventToForm, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, persistOptimisticEvent, resizeEvent, slugify, sortEventList } from './eventUtils';
 import type { EventRow } from './eventTypes';
 import { availableProviderOptions, providerLabel } from './providerDisplay';
 
@@ -13,6 +13,16 @@ const event = (overrides: Partial<EventRow> = {}): EventRow => ({
 });
 
 describe('eventUtils', () => {
+  it('préremplit tous les champs métier de l’éditeur depuis l’Event API', () => {
+    const row=event({championship_id:'f1',circuit_id:'silverstone',name:'British Grand Prix',ends_at:'2026-07-05T16:00:00.000Z',status:'postponed',published:false,description:'Pluie',session_title:'Race'});
+    const form=eventToForm(row);
+    expect(form).toMatchObject({championship_id:'f1',circuit_id:'silverstone',name:'British Grand Prix',status:'postponed',published:false,description:'Pluie',session_title:'Race'});
+    expect(new Date(form.starts_at).toISOString()).toBe(row.starts_at);
+    expect(new Date(form.ends_at).toISOString()).toBe(row.ends_at);
+  });
+
+  it('laisse la fin vide lorsque ends_at est null',()=>expect(eventToForm(event({ends_at:null})).ends_at).toBe(''));
+
   it('construit une grille mensuelle de six semaines commençant un lundi', () => {
     const days = buildCalendarDays(new Date(2026, 5, 1), [event()]);
     expect(days).toHaveLength(42);
