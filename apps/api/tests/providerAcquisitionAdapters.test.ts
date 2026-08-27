@@ -7,6 +7,7 @@ import { OcBlackTopAdapter, TheSportsDbAdapter } from '../src/providers/realAdap
 import { mapSource, normalize, type MappingConfig, type SourceEnvelope } from '../src/normalization/deterministicNormalization.js';
 
 const ocBlackTopF1GrandPrix = JSON.parse(readFileSync(new URL('./fixtures/ocblacktop-f1-2026-grand-prix.json', import.meta.url), 'utf8')) as JsonObject;
+const ocBlackTopF1Mapping = JSON.parse(readFileSync(new URL('../../../infra/postgres/reference-data/ocblacktop-f1-v2.json', import.meta.url), 'utf8')) as MappingConfig;
 
 const response = (value: unknown, status = 200) => new Response(JSON.stringify(value), {
   status,
@@ -36,6 +37,16 @@ function ocInput(overrides: Partial<FetchWorkUnitInput<JsonObject, JsonObject, J
 }
 
 describe('Lot 5.6-B provider acquisition adapters', () => {
+  it('uses the audited F1 mapping while leaving unknown and incoherent circuit identities in review', () => {
+    const source=(circuitId:string,sessionType='practice'):SourceEnvelope=>({id:`event-${circuitId}`,kind:'event',sourceHash:'fixture',providerKey:'ocblacktop',championshipSourceId:'formula1',season:2026,data:{name:'Fixture',circuit_id:circuitId,session_type:sessionType,status:'scheduled',starts_at:'2026-12-04T09:30:00Z'},corrections:[],lastChangedAt:'2026-08-27T00:00:00Z',lastObservedAt:'2026-08-27T00:00:00Z',observation:'present',traversalComplete:true,providerStartedAt:'2026-12-04T09:30:00Z',providerEndedAt:null,theoreticalEndAt:null,endEstimated:false,endProvenance:'provider',now:'2026-08-27T00:00:00Z'});
+    const config={...ocBlackTopF1Mapping,version:'ocblacktop-f1-v2',rulesVersion:'v2'};
+    expect(mapSource(source('6c6c3380-e4f0-4b5d-b84d-47bf8e50c324'),config)).toMatchObject({championshipId:'f1',circuitId:'monza',sessionType:'practice',status:'scheduled'});
+    expect(mapSource(source('2d8e0ba8-2e48-4914-88cf-8025661b3b47','sprint_qualifying'),config)).toMatchObject({circuitId:'silverstone',sessionType:'sprint_qualifying'});
+    expect(normalize(source('e1f7b92f-1920-4561-9a62-870cf7c5f8fe'),config,[],null).resolution).toMatchObject({decision:'review',reason:'required_identity_unknown'});
+    expect(normalize(source('unknown-provider-circuit'),config,[],null).resolution).toMatchObject({decision:'review',reason:'required_identity_unknown'});
+    expect(mapSource(source('10358903-f251-4a40-8301-8966c208d860','future-format'),config).sessionType).toBe('other');
+  });
+
   it('projects a real OCBlackTop Grand Prix into one meeting and its canonical Event-as-Session children', async () => {
     const transport=vi.fn(async()=>response({data:[ocBlackTopF1GrandPrix],pagination:{next_page:null,total_pages:1}}));
     const result=await new OcBlackTopAdapter(transport).fetchWorkUnit(ocInput());

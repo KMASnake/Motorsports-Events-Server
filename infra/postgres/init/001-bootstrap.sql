@@ -70,10 +70,3 @@ insert into circuits(id,name,city,country_code,timezone) values
   ('monza','Autodromo Nazionale Monza','Monza','IT','Europe/Rome'),
   ('sachsenring','Sachsenring','Hohenstein-Ernstthal','DE','Europe/Berlin')
 on conflict (id) do update set city=excluded.city, timezone=excluded.timezone;
-
-insert into events(
-  id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,origin,provider_key,external_id,description
-) values
-  ('evt-001','motogp','lemans','Grand Prix de France','grand-prix-de-france-2026','Grand Prix','2026-05-10T12:00:00Z','2026-05-10T14:00:00Z','Europe/Paris','scheduled',true,'manual',null,null,'Grand Prix de France MotoGP.'),
-  ('evt-002','f1','silverstone','Grand Prix de Grande-Bretagne','grand-prix-de-grande-bretagne-2026','Grand Prix','2026-07-05T14:00:00Z','2026-07-05T16:00:00Z','Europe/London','completed',true,'provider','primary','british-gp-2026','Grand Prix de Grande-Bretagne de Formule 1.')
-on conflict (id) do nothing;
