@@ -30,7 +30,8 @@ describe('canonical meeting/event publication relation',()=>{
     });
     await expect(new PostgresPublicationService().publishCandidateInTransaction({query} as unknown as PoolClient,{candidateId:'meeting-candidate',occurredAt:new Date('2026-08-27T00:00:00Z')})).resolves.toMatchObject({outcome:'created'});
     expect(query.mock.calls.some(([sql])=>String(sql).includes('insert into meetings('))).toBe(true);
-    expect(query.mock.calls.some(([sql])=>String(sql).includes('insert into meeting_source_links'))).toBe(true);
+    expect(query.mock.calls.some(([sql])=>String(sql).startsWith('insert into meeting_source_links('))).toBe(true);
+    expect(query.mock.calls.some(([sql])=>String(sql).startsWith('insert into meeting_source_link('))).toBe(false);
   });
   it('materializes a provider Event and its already-resolved parent relation atomically',async()=>{
     const {client,query}=database();

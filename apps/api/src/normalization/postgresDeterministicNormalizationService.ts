@@ -50,7 +50,7 @@ export class PostgresDeterministicNormalizationService{
       values($1,$2,$3,$4,$5,$6,$7,'deterministic-normalizer',$8) on conflict do nothing`,[decisionId,input.sourceEntityId,persisted.id,result.resolution.decision,targetKind,targetId,input.mapping.version,result.resolution.reason]);
     if(result.resolution.decision==='linked'&&!existing&&targetId){
       if(envelope.kind==='event'){const target=(await client.query('select normalized_uuid from events where id=$1 and normalized_uuid is not null',[targetId])).rows[0];if(!target)throw new Error('normalization_target_not_found');await client.query(`insert into event_source_links(source_entity_id,event_id,normalized_event_uuid,normalization_version) values($1,$2,$3,$4)`,[input.sourceEntityId,targetId,target.normalized_uuid,input.mapping.version]);}
-      else await client.query(`insert into meeting_source_links(source_entity_id,meeting_id,normalization_version) values($1,$2,$3,$4)`,[input.sourceEntityId,targetId,input.mapping.version]);
+      else await client.query(`insert into meeting_source_links(source_entity_id,meeting_id,normalization_version) values($1,$2,$3)`,[input.sourceEntityId,targetId,input.mapping.version]);
     }
     const currentCheckpoint=(await client.query('select * from normalization_checkpoints where scope_key=$1 for update',[input.scopeKey])).rows[0];
     if(currentCheckpoint&&Number(currentCheckpoint.fence_generation)!==input.expectedFenceGeneration)throw new Error('normalization_checkpoint_stale');
