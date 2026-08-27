@@ -9,6 +9,7 @@ describe('Lot 5.7-P-B deterministic normalization',()=>{
   it('B01 deterministic replay',()=>expect(normalize(source(),mapping,[candidate()],null)).toEqual(normalize(source(),mapping,[candidate()],null)));
   it('B02 provider update keeps proposed UUID',()=>expect(normalize(source(),mapping,[],null).proposedUuid).toBe(normalize(source({sourceHash:'hash-2',data:{...source().data,name:'Updated'}}),mapping,[],null).proposedUuid));
   it('B03 durable source link wins',()=>expect(normalize(source(),mapping,[candidate({id:'other'})],'event-linked').resolution).toMatchObject({decision:'linked',targetId:'event-linked',reason:'existing_link'}));
+  it('keeps a durable link when an update omits creation-only fields',()=>expect(normalize(source({data:{...source().data,status:null,starts_at:null}}),mapping,[],'event-linked').resolution).toMatchObject({decision:'linked',targetId:'event-linked'}));
   it('B04 hard incompatibility prevents auto-link',()=>expect(resolveIdentity(mapSource(source(),mapping),[candidate({championshipId:'wec'})],null).decision).toBe('create'));
   it('B05 deterministic candidate selection',()=>expect(resolveIdentity(mapSource(source(),mapping),[candidate({id:'z'}),candidate({id:'a',startsAt:'1965-09-12T18:00:00Z'})],null).targetId).toBe('z'));
   it('B06 equal candidates become review',()=>expect(resolveIdentity(mapSource(source(),mapping),[candidate({id:'a'}),candidate({id:'b'})],null)).toMatchObject({decision:'review',reason:'ambiguous_margin'}));

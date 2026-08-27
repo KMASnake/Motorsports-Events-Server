@@ -19,6 +19,35 @@ const OC_BLACKTOP_SOURCE_STRATEGIES={
 const OC_BLACKTOP_CATALOG_WITH_WRC:readonly AdapterCatalogEntry[]=[...OC_BLACKTOP_CATALOG,{externalId:'wrc',name:'WRC',strategy:'season-rallies-v1',endpointTemplate:'/{series}/seasons/{year}'}];
 
 function object(value:unknown):Record<string,unknown>{if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Objet attendu.');return value as Record<string,unknown>;}
+function optionalObject(value:unknown):Record<string,unknown>|null{return value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:null;}
+function nonEmptyString(value:unknown):string|null{return typeof value==='string'&&value.trim()?value.trim():null;}
+function ocBlackTopSeriesItems(rows:readonly unknown[],season:number){
+  const ordinary:unknown[]=[],meetings:unknown[]=[],events:unknown[]=[],structuralAnomalies=[],sessionIdentities=new Set<string>();
+  for(const [index,raw] of rows.entries()){
+    const row=optionalObject(raw);
+    if(!row||!Object.hasOwn(row,'schedule')){ordinary.push(raw);continue;}
+    if(!Array.isArray(row.schedule)){structuralAnomalies.push({scope:'item' as const,index,code:'invalid_provider_item',message:'Schedule fournisseur invalide.',externalId:nonEmptyString(row.id)??nonEmptyString(row.event_id)??nonEmptyString(row.external_id)});continue;}
+    const schedule=row.schedule;
+    const meetingId=nonEmptyString(row.id)??nonEmptyString(row.event_id)??nonEmptyString(row.external_id);
+    const location=optionalObject(row.location),circuitId=nonEmptyString(location?.id);
+    const temporal=schedule.map(item=>{const session=optionalObject(item),id=nonEmptyString(session?.id),start=nonEmptyString(session?.startTime),end=nonEmptyString(session?.endTime);return {session,id,start,end,valid:session!==null&&id!==null&&start!==null&&end!==null&&!Number.isNaN(Date.parse(start))&&!Number.isNaN(Date.parse(end))&&Date.parse(end)>=Date.parse(start)};});
+    const completeSchedule=temporal.every(item=>item.valid)&&new Set(temporal.map(item=>item.id)).size===temporal.length;
+    const starts=completeSchedule?temporal.map(item=>item.start!).sort((left,right)=>Date.parse(left)-Date.parse(right)):[];
+    const ends=completeSchedule?temporal.map(item=>item.end!).sort((left,right)=>Date.parse(left)-Date.parse(right)):[];
+    meetings.push({...row,season,circuit_id:circuitId,starts_at:starts[0]??null,ends_at:ends.at(-1)??null,timezone:'UTC'});
+    if(!meetingId)continue;
+    for(const [position,rawSession] of schedule.entries()){
+      const session=optionalObject(rawSession);
+      if(!session){events.push(rawSession);continue;}
+      const sessionId=nonEmptyString(session.id);if(sessionId&&sessionIdentities.has(sessionId)){structuralAnomalies.push({scope:'item' as const,index:position,code:'invalid_provider_item',message:'Identité de session dupliquée dans la réponse.',externalId:sessionId});continue;}if(sessionId)sessionIdentities.add(sessionId);
+      events.push({...session,season,meeting_external_id:meetingId,parent_position:position,circuit_id:circuitId,session_type:session.type??null,starts_at:session.startTime??null,ends_at:session.endTime??null,timezone:'UTC'});
+    }
+  }
+  const legacy=validateProviderSourceItems({rows:ordinary,season,entityKind:'event',idKeys:['id','event_id','external_id']});
+  const meeting=validateProviderSourceItems({rows:meetings,season,entityKind:'meeting',idKeys:['id','event_id','external_id']});
+  const event=validateProviderSourceItems({rows:events,season,entityKind:'event',idKeys:['id','event_id','external_id'],parentIdKeys:['meeting_external_id'],parentEntityKind:'meeting'});
+  return {items:[...legacy.items,...meeting.items,...event.items],anomalies:[...structuralAnomalies,...legacy.anomalies,...meeting.anomalies,...event.anomalies]};
+}
 function baseConfig(value:unknown,expectedHost:string,extras=false):Config{const row=object(value),raw=row.base_url;if(typeof raw!=='string')throw new Error('URL requise.');const url=new URL(raw);if(url.protocol!=='https:'||url.hostname!==expectedHost||url.username||url.password)throw new Error('URL non autorisée.');const result:Config={base_url:url.toString().replace(/\/$/,'')};if(extras){if(row.discovery_complete!==undefined&&typeof row.discovery_complete!=='boolean')throw new Error('Complétude invalide.');result.discovery_complete=row.discovery_complete===true;}return result;}
 function sourceConfig(value:unknown):Source{const row=object(value),allowed=new Set(['strategy','external_id','endpoint_template']);if(Object.keys(row).some(key=>!allowed.has(key)))throw new Error('Champ source inconnu ou sensible.');if(typeof row.strategy!=='string'||typeof row.external_id!=='string'||!row.external_id.trim())throw new Error('Source invalide.');if(row.endpoint_template!==undefined&&typeof row.endpoint_template!=='string')throw new Error('Endpoint invalide.');return {strategy:row.strategy.trim(),external_id:row.external_id.trim(),...(row.endpoint_template?{endpoint_template:row.endpoint_template.trim()}:{})};}
 abstract class DiscoveryAdapter implements ProviderAdapter<Config,Source,Cursor,AcquiredProviderSourceItem>{
@@ -51,7 +80,7 @@ export class OcBlackTopAdapter extends DiscoveryAdapter{
     const path=source.endpoint_template!.replace('{series}',encodeURIComponent(source.external_id));
     const payload=await this.json(path,input,{page:String(input.cursor.page),limit:'100',year:String(input.season)},input.signal);
     const rows=providerRows(payload,['data','events']);
-    const parsed=validateProviderSourceItems({rows,season:input.season,entityKind:'event',idKeys:['id','event_id','external_id']});
+    const parsed=ocBlackTopSeriesItems(rows,input.season);
     const page=resolveProviderPage(payload,input.cursor,rows.length);
     if(page.complete)return {status:'complete',items:parsed.items,itemAnomalies:parsed.anomalies,nextCursor:input.cursor,requestCount:1,complete:true,completionReason:page.completionReason};
     return {status:'progress',items:parsed.items,itemAnomalies:parsed.anomalies,nextCursor:page.nextCursor,requestCount:1,complete:false,completionReason:null};

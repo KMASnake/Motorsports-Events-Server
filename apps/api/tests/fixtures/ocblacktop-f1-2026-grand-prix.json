@@ -1,0 +1,21 @@
+{
+  "id": "5df7b804-f7bd-48d5-9bbe-07db372ed72f",
+  "name": "Abu Dhabi Grand Prix",
+  "status": "scheduled",
+  "dateStart": "2026-12-04",
+  "dateEnd": "2026-12-06",
+  "sportId": "formula-1",
+  "location": {
+    "id": "10358903-f251-4a40-8301-8966c208d860",
+    "city": "Yas Island",
+    "name": "Yas Marina Circuit",
+    "country": { "name": "United Arab Emirates", "twoCode": "AE", "threeCode": "ARE" }
+  },
+  "schedule": [
+    { "id": "cfb05997-ba80-4d6b-bf04-bcd5ebf3d9f9", "name": "FP1", "type": "practice", "status": "scheduled", "startTime": "2026-12-04T09:30:00.000Z", "endTime": "2026-12-04T10:30:00.000Z" },
+    { "id": "3f88f172-20df-4d23-9dee-8d18718747e6", "name": "FP2", "type": "practice", "status": "scheduled", "startTime": "2026-12-04T13:00:00.000Z", "endTime": "2026-12-04T14:00:00.000Z" },
+    { "id": "442b969d-e32c-4e76-8e0a-5c86b1ad86ff", "name": "FP3", "type": "practice", "status": "scheduled", "startTime": "2026-12-05T10:30:00.000Z", "endTime": "2026-12-05T11:30:00.000Z" },
+    { "id": "3c56d900-ec40-450e-b8ac-bb11b7bf7a71", "name": "Qualifying", "type": "qualifying", "status": "scheduled", "startTime": "2026-12-05T14:00:00.000Z", "endTime": "2026-12-05T15:00:00.000Z" },
+    { "id": "2c54fa38-a48f-4b12-8f62-af26244226ae", "name": "Race", "type": "race", "status": "scheduled", "startTime": "2026-12-06T13:00:00.000Z", "endTime": "2026-12-06T15:00:00.000Z" }
+  ]
+}

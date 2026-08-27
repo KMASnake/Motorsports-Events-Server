@@ -9,6 +9,8 @@ export class CanonicalHandoffError extends Error{
 }
 export function canonicalNormalizationScope(providerChampionshipId:string,phase:'current'|'historical',mappingVersionId:string){return `provider-championship:${providerChampionshipId}:phase:${phase}:mapping:${mappingVersionId}`;}
 export type CanonicalHandoffResult={traversal_id:string;provider_championship_id:string;mapping_version_id:string;normalization_scope:string;fence_generation:number;entities_seen:number;entities_normalized:number;candidates_ready:number;candidates_review:number;publications_created:number;publications_unchanged:number;highest_change_sequence:number|null;status:'completed'|'no_changes'|'review_required'|'rejected'};
+export function finalCandidateClassification(decision:string,publicationOutcome?:string){if(decision==='review'||publicationOutcome==='review_required')return 'review';if(decision==='rejected')return 'rejected';if(['created','updated','unchanged'].includes(publicationOutcome??''))return 'ready';return 'deferred';}
+export function finalHandoffStatus(entities:number,review:number,ready:number,rejected:number,created:number):CanonicalHandoffResult['status']{return entities===0?'no_changes':review>0?'review_required':ready===0&&rejected>0?'rejected':created===0?'no_changes':'completed';}
 
 export class CanonicalAcquisitionPublicationService{
   constructor(readonly mappings=new PostgresNormalizationMappingRepository(),readonly normalization=new PostgresDeterministicNormalizationService(),readonly publication=new PostgresPublicationService()){}
@@ -33,16 +35,17 @@ export class CanonicalAcquisitionPublicationService{
     const entities=(await client.query(`select entity.id,observation.observation_kind from provider_source_observations observation
       join provider_source_entities entity on entity.id=observation.source_entity_id
       where observation.traversal_id=$1 and entity.provider_championship_id=$2
-      order by entity.last_changed_at,entity.id`,[traversalId,traversal.provider_championship_id])).rows;
+      order by entity.parent_source_entity_id nulls first,entity.last_changed_at,entity.id`,[traversalId,traversal.provider_championship_id])).rows;
     let normalized=0,ready=0,review=0,rejected=0,created=0,unchanged=0,highest:number|null=null;
     for(const entity of entities){
       const candidate=await this.normalization.normalizeUnitInTransaction(client,{sourceEntityId:String(entity.id),scopeKey:scope,expectedFenceGeneration:fence,normalizationNow:now,mapping,traversalId});normalized+=1;
-      if(candidate.resolution.decision==='review'){review+=1;continue;}if(candidate.resolution.decision==='rejected'){rejected+=1;continue;}ready+=1;
+      if(candidate.resolution.decision==='review'){review+=1;continue;}if(candidate.resolution.decision==='rejected'){rejected+=1;continue;}
       const receiptExists=Boolean((await client.query('select 1 from publication_receipts where candidate_id=$1',[candidate.candidateId])).rowCount);
       const published=await this.publication.publishCandidateInTransaction(client,{candidateId:candidate.candidateId,scopeKey:scope,expectedFenceGeneration:fence,occurredAt:now});
+      const classification=finalCandidateClassification(candidate.resolution.decision,published.outcome);if(classification==='review'){review+=1;continue;}if(classification==='ready')ready+=1;
       if(receiptExists)unchanged+=1;else if(published.outcome==='created'||published.outcome==='updated'){created+=1;if(published.sequence!=null)highest=Math.max(highest??0,published.sequence);}else if(published.outcome==='unchanged')unchanged+=1;
     }
-    const status=entities.length===0?'no_changes':review>0?'review_required':ready===0&&rejected>0?'rejected':created===0?'no_changes':'completed';
+    const status=finalHandoffStatus(entities.length,review,ready,rejected,created);
     return {traversal_id:traversalId,provider_championship_id:String(traversal.provider_championship_id),mapping_version_id:version.id,normalization_scope:scope,fence_generation:fence,entities_seen:entities.length,entities_normalized:normalized,candidates_ready:ready,candidates_review:review,publications_created:created,publications_unchanged:unchanged,highest_change_sequence:highest,status};
   }
 }

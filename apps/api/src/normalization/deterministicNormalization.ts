@@ -68,6 +68,7 @@ function score(state:NormalizedState,candidate:MatchCandidate){let value=0;const
 export function resolveIdentity(state:NormalizedState,candidates:readonly MatchCandidate[],existingLink:string|null,rejectedTargetIds:readonly string[]=[]):Resolution{
   if(existingLink)return {decision:'linked',targetId:existingLink,score:null,signals:['durable_source_link'],reason:'existing_link'};
   if(state.championshipId===null||state.circuitId===null)return {decision:'review',targetId:null,score:null,signals:[],reason:'required_identity_unknown'};
+  const create=():Resolution=>state.startsAt!==null&&state.status!==null?{decision:'create',targetId:null,score:0,signals:[],reason:'no_plausible_candidate'}:{decision:'review',targetId:null,score:null,signals:[],reason:'required_identity_unknown'};
   if(candidates.length>MAX_MATCH_CANDIDATES)throw new Error('normalization_candidate_search_unbounded');
   candidates=candidates.filter(candidate=>!rejectedTargetIds.includes(candidate.id));
   if(state.resourceKind==='meeting'){
@@ -75,13 +76,13 @@ export function resolveIdentity(state:NormalizedState,candidates:readonly MatchC
     const roundMatches=state.round?plausible.filter(item=>item.round===state.round):plausible;
     if(roundMatches.length===1)return {decision:'linked',targetId:roundMatches[0].id,score:null,signals:['championship','season',...(state.round?['round']:[])],reason:'deterministic_meeting_identity'};
     if(roundMatches.length>1)return {decision:'review',targetId:null,score:null,signals:['championship','season'],reason:'ambiguous_meeting'};
-    return {decision:'create',targetId:null,score:null,signals:[],reason:'no_plausible_meeting'};
+    return state.startsAt!==null&&state.status!==null?{decision:'create',targetId:null,score:null,signals:[],reason:'no_plausible_meeting'}:{decision:'review',targetId:null,score:null,signals:[],reason:'required_identity_unknown'};
   }
   const ranked=candidates.filter(item=>!incompatible(state,item)).map(item=>({item,...score(state,item)})).sort((a,b)=>b.value-a.value||a.item.id.localeCompare(b.item.id,'en'));
-  const first=ranked[0],second=ranked[1];if(!first)return {decision:'create',targetId:null,score:0,signals:[],reason:'no_plausible_candidate'};
+  const first=ranked[0],second=ranked[1];if(!first)return create();
   const structural=first.signals.filter(value=>value!=='name').length,margin=first.value-(second?.value??0);
   if(first.value>=EVENT_AUTO_MATCH_SCORE&&margin>=EVENT_AUTO_MATCH_MARGIN&&structural>=2)return {decision:'linked',targetId:first.item.id,score:first.value,signals:first.signals,reason:'score_and_margin'};
   if(first.value>=EVENT_REVIEW_SCORE||ranked.length>1)return {decision:'review',targetId:null,score:first.value,signals:first.signals,reason:second&&margin<EVENT_AUTO_MATCH_MARGIN?'ambiguous_margin':'insufficient_auto_match'};
-  return {decision:'create',targetId:null,score:first.value,signals:first.signals,reason:'below_review_threshold'};
+  return state.startsAt!==null&&state.status!==null?{decision:'create',targetId:null,score:first.value,signals:first.signals,reason:'below_review_threshold'}:{decision:'review',targetId:null,score:first.value,signals:first.signals,reason:'required_identity_unknown'};
 }
 export function normalize(input:SourceEnvelope,config:MappingConfig,candidates:readonly MatchCandidate[],existingLink:string|null,rejectedTargetIds:readonly string[]=[]){const state=mapSource(input,config),resolution=resolveIdentity(state,candidates,existingLink,rejectedTargetIds);return {state,resolution,candidateId:stableUuid('mse-normalized-candidate',{sourceId:input.id,sourceHash:input.sourceHash,version:config.version}),proposedUuid:resolution.decision==='create'?stableUuid('mse-normalized-identity',{sourceId:input.id,kind:input.kind}):resolution.targetId,checksum:stableHash({state,resolution})};}

@@ -26,7 +26,8 @@ export function changedPublicFields(before:Readonly<Record<string,unknown>>|null
 export function publicationQuality(candidate:Readonly<Record<string,unknown>>,decision:string):PublicationQuality{
   if(decision==='review')return 'review_required';
   if(decision==='rejected')return 'blocked';
-  return candidate.championshipId&&candidate.circuitId?'ready':'review_required';
+  if(!candidate.championshipId||!candidate.circuitId)return 'review_required';
+  return decision!=='create'||candidate.startsAt&&candidate.status&&!(candidate.resourceKind==='event'&&candidate.status==='confirmed')?'ready':'review_required';
 }
 
 export function granularQuality(input:{event:PublicationQuality;criticalEvent?:boolean;meeting?:PublicationQuality}):{event:PublicationQuality;meeting:'healthy'|'degraded'|'blocked';championship:'healthy'|'degraded'}{

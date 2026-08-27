@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { MAX_PROVIDER_ITEMS_PER_UNIT, seasonRestartAfterCursorInvalidation } from '../src/providers/acquisition.js';
 import type { FetchWorkUnitInput, JsonObject, ProviderRequestGate } from '../src/providers/contracts.js';
 import { ProviderAcquisitionError } from '../src/providers/contracts.js';
 import { OcBlackTopAdapter, TheSportsDbAdapter } from '../src/providers/realAdapters.js';
+import { mapSource, normalize, type MappingConfig, type SourceEnvelope } from '../src/normalization/deterministicNormalization.js';
+
+const ocBlackTopF1GrandPrix = JSON.parse(readFileSync(new URL('./fixtures/ocblacktop-f1-2026-grand-prix.json', import.meta.url), 'utf8')) as JsonObject;
 
 const response = (value: unknown, status = 200) => new Response(JSON.stringify(value), {
   status,
@@ -32,6 +36,64 @@ function ocInput(overrides: Partial<FetchWorkUnitInput<JsonObject, JsonObject, J
 }
 
 describe('Lot 5.6-B provider acquisition adapters', () => {
+  it('projects a real OCBlackTop Grand Prix into one meeting and its canonical Event-as-Session children', async () => {
+    const transport=vi.fn(async()=>response({data:[ocBlackTopF1GrandPrix],pagination:{next_page:null,total_pages:1}}));
+    const result=await new OcBlackTopAdapter(transport).fetchWorkUnit(ocInput());
+    expect(transport).toHaveBeenCalledTimes(1);
+    expect(result.itemAnomalies).toEqual([]);
+    expect(result.items).toHaveLength(6);
+    const [meeting,...events]=result.items;
+    expect(meeting).toMatchObject({entityKind:'meeting',externalId:'5df7b804-f7bd-48d5-9bbe-07db372ed72f',season:2026,parentExternalId:null,sourceData:{name:'Abu Dhabi Grand Prix',status:'scheduled',circuit_id:'10358903-f251-4a40-8301-8966c208d860',starts_at:'2026-12-04T09:30:00.000Z',ends_at:'2026-12-06T15:00:00.000Z'}});
+    expect(events.map(item=>({id:item.externalId,parent:item.parentExternalId,kind:item.entityKind,name:item.sourceData.name,type:item.sourceData.session_type,start:item.sourceData.starts_at,end:item.sourceData.ends_at}))).toEqual([
+      {id:'cfb05997-ba80-4d6b-bf04-bcd5ebf3d9f9',parent:meeting?.externalId,kind:'event',name:'FP1',type:'practice',start:'2026-12-04T09:30:00.000Z',end:'2026-12-04T10:30:00.000Z'},
+      {id:'3f88f172-20df-4d23-9dee-8d18718747e6',parent:meeting?.externalId,kind:'event',name:'FP2',type:'practice',start:'2026-12-04T13:00:00.000Z',end:'2026-12-04T14:00:00.000Z'},
+      {id:'442b969d-e32c-4e76-8e0a-5c86b1ad86ff',parent:meeting?.externalId,kind:'event',name:'FP3',type:'practice',start:'2026-12-05T10:30:00.000Z',end:'2026-12-05T11:30:00.000Z'},
+      {id:'3c56d900-ec40-450e-b8ac-bb11b7bf7a71',parent:meeting?.externalId,kind:'event',name:'Qualifying',type:'qualifying',start:'2026-12-05T14:00:00.000Z',end:'2026-12-05T15:00:00.000Z'},
+      {id:'2c54fa38-a48f-4b12-8f62-af26244226ae',parent:meeting?.externalId,kind:'event',name:'Race',type:'race',start:'2026-12-06T13:00:00.000Z',end:'2026-12-06T15:00:00.000Z'}
+    ]);
+
+    const mapping:MappingConfig={version:'fixture',rulesVersion:'fixture',championshipIds:{formula1:'f1'},circuitIds:{'10358903-f251-4a40-8301-8966c208d860':'yas-marina'},sessionTypes:{practice:'practice',qualifying:'qualifying',race:'race'},statuses:{scheduled:'scheduled'}};
+    const envelope=(item:typeof result.items[number]):SourceEnvelope=>({id:item.externalId,kind:item.entityKind==='meeting'?'meeting':'event',sourceHash:'fixture',providerKey:'ocblacktop',championshipSourceId:'formula1',season:item.season,data:item.sourceData,corrections:[],lastChangedAt:'2026-08-27T00:00:00.000Z',lastObservedAt:'2026-08-27T00:00:00.000Z',observation:'present',traversalComplete:true,providerStartedAt:item.sourceData.starts_at as string,providerEndedAt:item.sourceData.ends_at as string,theoreticalEndAt:null,endEstimated:false,endProvenance:'provider',now:'2026-08-27T00:00:00.000Z'});
+    expect(mapSource(envelope(meeting!),mapping)).toMatchObject({resourceKind:'meeting',name:'Abu Dhabi Grand Prix',championshipId:'f1',circuitId:'yas-marina',status:'scheduled',startsAt:'2026-12-04T09:30:00.000Z',endsAt:'2026-12-06T15:00:00.000Z'});
+    expect(mapSource(envelope(events[0]!),mapping)).toMatchObject({resourceKind:'event',name:'FP1',championshipId:'f1',circuitId:'yas-marina',sessionType:'practice',status:'scheduled',startsAt:'2026-12-04T09:30:00.000Z',endsAt:'2026-12-04T10:30:00.000Z'});
+    expect(normalize(envelope(events[0]!),{...mapping,circuitIds:{}},[],null).resolution).toMatchObject({decision:'review',reason:'required_identity_unknown'});
+  });
+
+  it.each([
+    ['practice','practice'],['qualifying','qualifying'],['sprint','sprint'],['sprint qualifying','sprint_qualifying'],['sprint shootout','sprint_qualifying'],['race','race'],['future-format','other']
+  ] as const)('keeps provider session type %s configurable as %s',async(rawType,canonical)=>{
+    const fixture={...ocBlackTopF1GrandPrix,schedule:[{id:`session-${rawType}`,name:rawType,type:rawType,status:'scheduled',startTime:'2026-12-04T09:30:00.000Z',endTime:'2026-12-04T10:30:00.000Z'}]};
+    const result=await new OcBlackTopAdapter(async()=>response({data:[fixture],pagination:{next_page:null}})).fetchWorkUnit(ocInput());
+    const item=result.items[1]!;
+    const config:MappingConfig={version:'types',rulesVersion:'types',championshipIds:{formula1:'f1'},circuitIds:{'10358903-f251-4a40-8301-8966c208d860':'yas-marina'},sessionTypes:{practice:'practice',qualifying:'qualifying',sprint:'sprint','sprint qualifying':'sprint_qualifying','sprint shootout':'sprint_qualifying',race:'race'},statuses:{scheduled:'scheduled'}};
+    const mapped=mapSource({id:item.externalId,kind:'event',sourceHash:'fixture',providerKey:'ocblacktop',championshipSourceId:'formula1',season:2026,data:item.sourceData,corrections:[],lastChangedAt:'2026-08-27T00:00:00Z',lastObservedAt:'2026-08-27T00:00:00Z',traversalComplete:true,providerStartedAt:null,providerEndedAt:null,theoreticalEndAt:null,endEstimated:false,endProvenance:null,now:'2026-08-27T00:00:00Z'},config);
+    expect(mapped).toMatchObject({sessionType:canonical,name:rawType});
+  });
+
+  it('distinguishes absent, empty and structurally invalid schedules',async()=>{
+    const absent=await new OcBlackTopAdapter(async()=>response({data:[{id:'legacy'}],pagination:{next_page:null}})).fetchWorkUnit(ocInput());
+    expect(absent.items).toHaveLength(1);expect(absent.items[0]).toMatchObject({entityKind:'event',externalId:'legacy'});
+    const empty=await new OcBlackTopAdapter(async()=>response({data:[{id:'empty',status:'scheduled',schedule:[]}],pagination:{next_page:null}})).fetchWorkUnit(ocInput());
+    expect(empty.items).toHaveLength(1);expect(empty.items[0]).toMatchObject({entityKind:'meeting',sourceData:{starts_at:null,ends_at:null}});
+    const malformed=await new OcBlackTopAdapter(async()=>response({data:[{id:'bad',schedule:'nope'}],pagination:{next_page:null}})).fetchWorkUnit(ocInput());
+    expect(malformed.items).toEqual([]);expect(malformed.itemAnomalies).toEqual([expect.objectContaining({externalId:'bad',code:'invalid_provider_item'})]);
+  });
+
+  it('never truncates meeting bounds when one scheduled session has invalid temporality',async()=>{
+    const fixture={...ocBlackTopF1GrandPrix,schedule:[...(ocBlackTopF1GrandPrix.schedule as JsonObject[]).slice(0,4),{...(ocBlackTopF1GrandPrix.schedule as JsonObject[])[4],endTime:'invalid'}]};
+    const result=await new OcBlackTopAdapter(async()=>response({data:[fixture],pagination:{next_page:null}})).fetchWorkUnit(ocInput());
+    expect(result.items[0]).toMatchObject({entityKind:'meeting',sourceData:{starts_at:null,ends_at:null}});
+    expect(result.itemAnomalies).toEqual([expect.objectContaining({externalId:'2c54fa38-a48f-4b12-8f62-af26244226ae',code:'invalid_provider_item'})]);
+  });
+
+  it('rejects incomplete and colliding source identities without synthesizing them',async()=>{
+    const schedule=[{name:'No id',type:'practice',status:'scheduled',startTime:'2026-12-04T09:30:00Z',endTime:'2026-12-04T10:30:00Z'},null,{id:'duplicate',name:'A',type:'race',status:'scheduled',startTime:'2026-12-06T13:00:00Z',endTime:'2026-12-06T15:00:00Z'},{id:'duplicate',name:'B',type:'race',status:'scheduled',startTime:'2026-12-06T13:00:00Z',endTime:'2026-12-06T15:00:00Z'}];
+    const result=await new OcBlackTopAdapter(async()=>response({data:[{...ocBlackTopF1GrandPrix,schedule}],pagination:{next_page:null}})).fetchWorkUnit(ocInput());
+    expect(result.items.filter(item=>item.entityKind==='event')).toHaveLength(1);
+    expect(result.items.some(item=>item.identityIsSynthetic)).toBe(false);
+    expect(result.itemAnomalies).toHaveLength(3);
+  });
+
   it('paginates OCBlackTop until explicit provider termination and charges through the request gate', async () => {
     const transport = vi.fn()
       .mockResolvedValueOnce(response({ data: [{ id: 'evt-1', date: '1950-01-01T12:00:00Z', apiKey: 'must-disappear' }], pagination: { next_page: 2, total_pages: 2 } }))

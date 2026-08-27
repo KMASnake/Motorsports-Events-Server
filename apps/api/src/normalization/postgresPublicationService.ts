@@ -4,6 +4,7 @@ import {canonicalPublicState,changedPublicFields,publicationQuality,publicStateC
 
 interface PublishInput{candidateId:string;expectedFenceGeneration?:number;scopeKey?:string;occurredAt:Date;failBeforeCommit?:boolean}
 interface RemoveInput{resourceType:PublicResourceType;resourceId:string;occurredAt:Date}
+const slug=(value:unknown,id:string)=>`${String(value??'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'event'}-${id.slice(0,8)}`;
 
 export class PostgresPublicationService{
   publishCandidate(input:PublishInput){return withTransaction(client=>this.publishCandidateInTransaction(client,input));}
@@ -15,8 +16,10 @@ export class PostgresPublicationService{
       const checkpoint=(await client.query('select fence_generation from normalization_checkpoints where scope_key=$1 for share',[input.scopeKey])).rows[0];
       if(!checkpoint||Number(checkpoint.fence_generation)!==input.expectedFenceGeneration)throw new Error('publication_checkpoint_stale');
     }
-    const row=(await client.query(`select candidate.*,decision.decision,decision.target_id
-      from normalized_candidates candidate join lateral(
+    const row=(await client.query(`select candidate.*,decision.decision,decision.target_id,source.external_id source_external_id,
+      source.parent_source_entity_id,source.source_data->>'parent_position' source_position,provider.adapter_key
+      from normalized_candidates candidate join provider_source_entities source on source.id=candidate.source_entity_id
+      join provider_instances provider on provider.id=source.provider_instance_id join lateral(
         select decision,target_id from normalization_decisions where candidate_id=candidate.id order by decided_at desc,id desc limit 1
       ) decision on true where candidate.id=$1 for update of candidate`,[input.candidateId])).rows[0];
     if(!row)throw new Error('publication_candidate_not_found');
@@ -26,6 +29,12 @@ export class PostgresPublicationService{
     const quality=publicationQuality(normalized,String(row.decision));
     if(quality!=='ready')return {outcome:quality,revision:null,sequence:null};
     const resourceType=String(row.resource_kind) as 'event'|'meeting';
+    let parentMeetingId:string|null=null;
+    if(resourceType==='event'&&row.parent_source_entity_id){
+      const parent=(await client.query('select meeting_id from meeting_source_links where source_entity_id=$1',[row.parent_source_entity_id])).rows[0];
+      if(!parent?.meeting_id)return {outcome:'review_required',revision:null,sequence:null};
+      parentMeetingId=String(parent.meeting_id);
+    }
     let resourceId=String(data.proposed_uuid);
     if(row.decision==='linked'&&row.target_id){
       if(resourceType==='event'){
@@ -35,10 +44,31 @@ export class PostgresPublicationService{
       }else resourceId=String(row.target_id);
     }
     if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(resourceId))throw new Error('publication_resource_uuid_invalid');
+    await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[`${resourceType}:${resourceId}`]);
     const state=canonicalPublicState(normalized),checksum=publicStateChecksum(state);
     const receipt=(await client.query('select * from publication_receipts where candidate_id=$1',[input.candidateId])).rows[0];
     if(receipt)return {outcome:String(receipt.outcome),revision:Number(receipt.resource_revision),sequence:receipt.change_sequence==null?null:Number(receipt.change_sequence)};
-    await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[`${resourceType}:${resourceId}`]);
+    if(String(row.decision)==='create'){
+      if(resourceType==='meeting'){
+        await client.query(`insert into meetings(id,championship_id,name,season,round,starts_at,ends_at,timezone,updated_at) values($1,$2,$3,$4,$5,$6,$7,$8,$9)
+          on conflict(id) do update set championship_id=excluded.championship_id,name=excluded.name,season=excluded.season,round=excluded.round,starts_at=excluded.starts_at,ends_at=excluded.ends_at,timezone=excluded.timezone,updated_at=excluded.updated_at`,[resourceId,state.championshipId,state.name,state.season,state.round??null,state.startsAt,state.endsAt??null,state.timezone??'UTC',input.occurredAt]);
+        await client.query(`insert into meeting_source_links(source_entity_id,meeting_id,normalization_version,linked_at) values($1,$2,$3,$4) on conflict(source_entity_id) do nothing`,[row.source_entity_id,resourceId,row.normalization_version,input.occurredAt]);
+        const link=(await client.query('select meeting_id from meeting_source_links where source_entity_id=$1',[row.source_entity_id])).rows[0];if(String(link?.meeting_id)!==resourceId)throw new Error('publication_source_identity_conflict');
+      }else if(parentMeetingId){
+        await client.query(`insert into events(id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,origin,provider_key,external_id,session_title,normalized_uuid,updated_at)
+          values($1::text,$2,$3,$4,$5,$6,$7,$8,$9,$10,true,'provider',$11,$12,$4,$1::uuid,$13)
+          on conflict(id) do update set championship_id=excluded.championship_id,circuit_id=excluded.circuit_id,name=excluded.name,category=excluded.category,starts_at=excluded.starts_at,ends_at=excluded.ends_at,timezone=excluded.timezone,status=excluded.status,provider_key=excluded.provider_key,external_id=excluded.external_id,session_title=excluded.session_title,normalized_uuid=excluded.normalized_uuid,updated_at=excluded.updated_at`,[resourceId,state.championshipId,state.circuitId,state.name,slug(state.name,resourceId),state.sessionType,state.startsAt,state.endsAt??null,state.timezone??'UTC',state.status,row.adapter_key,row.source_external_id,input.occurredAt]);
+        await client.query(`insert into event_source_links(source_entity_id,event_id,normalized_event_uuid,normalization_version,linked_at) values($1,$2::text,$2::uuid,$3,$4) on conflict(source_entity_id) do nothing`,[row.source_entity_id,resourceId,row.normalization_version,input.occurredAt]);
+        const link=(await client.query('select normalized_event_uuid from event_source_links where source_entity_id=$1',[row.source_entity_id])).rows[0];if(String(link?.normalized_event_uuid)!==resourceId)throw new Error('publication_source_identity_conflict');
+      }
+    }
+    if(resourceType==='event'&&parentMeetingId){
+      await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[`meeting:${parentMeetingId}`]);
+      const sourcePosition=Number(row.source_position),position=Number.isInteger(sourcePosition)&&sourcePosition>=0?sourcePosition:Number((await client.query('select coalesce(max(position)+1,0) position from meeting_events where meeting_id=$1',[parentMeetingId])).rows[0]?.position??0);
+      await client.query(`insert into meeting_events(meeting_id,event_id,position) values($1,$2,$3) on conflict(event_id) do nothing`,[parentMeetingId,String(row.decision)==='linked'?String(row.target_id):resourceId,position]);
+      const relation=(await client.query('select meeting_id from meeting_events where event_id=$1',[String(row.decision)==='linked'?String(row.target_id):resourceId])).rows[0];
+      if(String(relation?.meeting_id)!==parentMeetingId)throw new Error('publication_parent_identity_conflict');
+    }
     const current=(await client.query('select * from public_resource_states where resource_type=$1 and resource_id=$2 for update',[resourceType,resourceId])).rows[0];
     if(current?.lifecycle==='removed')throw new Error('publication_tombstone_permanent');
     if(current?.state_checksum===checksum){
