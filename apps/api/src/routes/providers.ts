@@ -99,7 +99,7 @@ export async function providerRoutes(app: FastifyInstance, options: { service: P
       max_concurrency:current.max_concurrency,current_year_reserve_percent:current.current_year_reserve_percent,
       missing_cycles_threshold:current.missing_cycles_threshold,log_retention_days:current.log_retention_days,...body.data
     });
-    try { const result = await service.update(id.data,input(complete),mutationContext(request)); if (!result) return reply.code(404).send({message:'Fournisseur introuvable.'}); markAtomicallyAudited(request); return result; }
+    try { const result = await service.update(id.data,input(complete),mutationContext(request),{transitionOperationalState:body.data.enabled!==undefined}); if (!result) return reply.code(404).send({message:'Fournisseur introuvable.'}); markAtomicallyAudited(request); return result; }
     catch (error) { if ((error as {code?:string}).code === '23505') return reply.code(409).send({message:'Ce nom de fournisseur existe déjà.'}); return fail(reply,error); }
   });
   app.put('/api/v1/admin/providers/:id/secrets/:name', async (request, reply) => {

@@ -7,6 +7,7 @@ import type { ProviderAdapterRegistry } from './registry.js';
 import { assertProviderConfigContainsNoSecrets, ProviderMasterKeyError, ProviderSecretCipher, redactProviderData } from './providerSecrets.js';
 
 export type ProviderMutationContext = { principal: AdminPrincipal; requestId: string };
+export type ProviderUpdateOptions = { transitionOperationalState?: boolean };
 export type ProviderInput = {
   name: string;
   adapterKey: string;
@@ -86,14 +87,17 @@ export class ProviderConfigurationService {
     });
   }
 
-  async update(id: string, input: ProviderInput, context: ProviderMutationContext) {
+  async update(id: string, input: ProviderInput, context: ProviderMutationContext, options: ProviderUpdateOptions = {}) {
     const value = this.validate(input);
     return transaction(async (client) => {
       const before = await this.get(id, client); if (!before) return null;
-      await client.query(`update provider_instances set adapter_key=$2,name=$3,enabled=$4,state=$5,config=$6::jsonb,discovery_enabled=$7,
-        max_concurrency=$8,current_year_reserve_percent=$9,missing_cycles_threshold=$10,log_retention_days=$11,updated_at=now()
-        where id=$1`, [id,value.adapterKey,value.name,value.enabled,value.enabled ? 'active' : 'paused',JSON.stringify(value.config),
-        value.discoveryEnabled,value.maxConcurrency,value.currentYearReservePercent,value.missingCyclesThreshold,value.logRetentionDays]);
+      await client.query(`update provider_instances set adapter_key=$2,name=$3,enabled=$4,
+        state=case when $11::boolean then case when $4 then 'active' else 'paused' end else state end,
+        config=$5::jsonb,discovery_enabled=$6,
+        max_concurrency=$7,current_year_reserve_percent=$8,missing_cycles_threshold=$9,log_retention_days=$10,updated_at=now()
+        where id=$1`, [id,value.adapterKey,value.name,value.enabled,JSON.stringify(value.config),
+        value.discoveryEnabled,value.maxConcurrency,value.currentYearReservePercent,value.missingCyclesThreshold,value.logRetentionDays,
+        options.transitionOperationalState === true]);
       const after = await this.get(id, client); await audit(client, context, 'provider.configuration_changed', id, before, after); return after;
     });
   }

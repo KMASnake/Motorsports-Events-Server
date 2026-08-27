@@ -51,6 +51,24 @@ try {
   await appV1.close(); appV1 = undefined;
 
   ({app:appV2,service:serviceV2} = await application(new ProviderSecretCipher(keys,2)));
+  const activateResponse = await request(appV2,'PATCH',`/api/v1/admin/providers/${providerId}`,{enabled:true});
+  assert.equal(activateResponse.statusCode,200);
+  assert.deepEqual((await pool.query('select enabled,state from provider_instances where id=$1',[providerId])).rows[0],{enabled:true,state:'active'});
+  await pool.query("update provider_instances set state='paused' where id=$1",[providerId]);
+  for (const patch of [{name:'Lot 5.2 renamed'},{config:{mode:'fixture'}},{max_concurrency:2}]) {
+    const response = await request(appV2,'PATCH',`/api/v1/admin/providers/${providerId}`,patch);
+    assert.equal(response.statusCode,200);
+    assert.deepEqual((await pool.query('select enabled,state from provider_instances where id=$1',[providerId])).rows[0],{enabled:true,state:'paused'});
+  }
+  for (const state of ['suspended','error']) {
+    await pool.query('update provider_instances set state=$2 where id=$1',[providerId,state]);
+    const response = await request(appV2,'PATCH',`/api/v1/admin/providers/${providerId}`,{name:`Lot 5.2 ${state}`});
+    assert.equal(response.statusCode,200);
+    assert.equal((await pool.query('select state from provider_instances where id=$1',[providerId])).rows[0].state,state);
+  }
+  const disableResponse = await request(appV2,'PATCH',`/api/v1/admin/providers/${providerId}`,{enabled:false});
+  assert.equal(disableResponse.statusCode,200);
+  assert.deepEqual((await pool.query('select enabled,state from provider_instances where id=$1',[providerId])).rows[0],{enabled:false,state:'paused'});
   assert.equal(await serviceV2.readSecretForAdapter(providerId,'api_key'),sentinelA);
   const secondResponse = await request(appV2,'PUT',`/api/v1/admin/providers/${providerId}/secrets/api_key`,{value:sentinelB});
   assert.equal(secondResponse.statusCode,200); assert.deepEqual(secondResponse.json(),{name:'api_key',secretConfigured:true}); assertNoSentinel(secondResponse.body,'PUT secret B');

@@ -19,14 +19,16 @@ const quotaPayload = {
 
 describe('Provider administration routes', () => {
   let app: ReturnType<typeof Fastify>;
+  let updateProvider: ReturnType<typeof vi.fn>;
   beforeEach(async () => {
     app = Fastify({ logger: false });
     registerAdminAuth(app, authSecret);
+    updateProvider = vi.fn(async () => ({ id: providerId, adapter_key: 'fake', config: {}, secrets: [] }));
     const service = {
       list: async () => [{ id: providerId, adapter_key: 'fake', config: {}, secrets: [{name:'api_key',configured:true}] }],
-      get: async () => ({ id: providerId, adapter_key: 'fake', config: {}, secrets: [{name:'api_key',configured:true}] }),
+      get: async () => ({ id: providerId, name:'Fixture', adapter_key: 'fake', config: {}, enabled:true, state:'paused', discovery_enabled:false, max_concurrency:1, current_year_reserve_percent:20, missing_cycles_threshold:3, log_retention_days:30, secrets: [{name:'api_key',configured:true}] }),
       create: async () => ({ id: providerId, adapter_key: 'fake', config: {}, secrets: [] }),
-      update: async () => ({ id: providerId, adapter_key: 'fake', config: {}, secrets: [] }),
+      update: updateProvider,
       replaceSecret: async () => ({ name: 'api_key', secretConfigured: true }),
       removeSecret: async () => ({ name: 'api_key', secretConfigured: false }),
       quotaPolicy: async () => null,
@@ -63,6 +65,22 @@ describe('Provider administration routes', () => {
       headers:{authorization:`Bearer ${token('admin')}`},payload:{name:'Fake',adapter_key:'INVALID KEY'}});
     expect(response.statusCode).toBe(400);
     expect(response.body).not.toContain('issues');
+  });
+
+  it.each([
+    ['name',{name:'Fixture renommée'}],
+    ['base URL',{config:{base_url:'https://provider.fixture.test'}}],
+    ['concurrency',{max_concurrency:2}]
+  ])('keeps a %s edit configuration-only',async(_label,payload)=>{
+    const response=await app.inject({method:'PATCH',url:`/api/v1/admin/providers/${providerId}`,headers:{authorization:`Bearer ${token('admin')}`},payload});
+    expect(response.statusCode).toBe(200);
+    expect(updateProvider).toHaveBeenCalledWith(providerId,expect.any(Object),expect.any(Object),{transitionOperationalState:false});
+  });
+
+  it('keeps the existing explicit enabled transition path',async()=>{
+    const response=await app.inject({method:'PATCH',url:`/api/v1/admin/providers/${providerId}`,headers:{authorization:`Bearer ${token('admin')}`},payload:{enabled:false}});
+    expect(response.statusCode).toBe(200);
+    expect(updateProvider).toHaveBeenCalledWith(providerId,expect.objectContaining({enabled:false}),expect.any(Object),{transitionOperationalState:true});
   });
 
   it('accepts the deployed quota payload in the isolated strict Zod schema', () => {
