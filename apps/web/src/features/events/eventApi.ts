@@ -1,4 +1,5 @@
 import type { Championship, Circuit, EventFormState, EventRow, SessionTitleSuggestion } from './eventTypes';
+import {isEventCategory} from './eventCategories';
 import { adminAuthorization, notifyAuthenticationRequired } from '../../lib/adminAuth';
 
 const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
@@ -33,6 +34,7 @@ export function saveEvent(form: EventFormState, eventId?: string) {
     championship_id: form.championship_id,
     circuit_id: form.circuit_id || null,
     name: form.name,
+    ...(isEventCategory(form.category)?{category:form.category}:{}),
     starts_at: toIso(form.starts_at),
     ends_at: toIso(form.ends_at),
     status: form.status,

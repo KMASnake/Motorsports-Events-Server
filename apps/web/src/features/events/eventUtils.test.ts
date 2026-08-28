@@ -7,7 +7,7 @@ const event = (overrides: Partial<EventRow> = {}): EventRow => ({
   id: 'event-1', championship_id: 'champ-1', championship_name: 'Formule 1',
   championship_slug: 'formula-1', circuit_id: null, circuit_name: null,
   circuit_city: null, country_code: null, meeting_id:null, meeting_name:null, name: 'Grand Prix de France',
-  slug: 'grand-prix-france', category: 'Course', starts_at: '2026-06-11T14:00:00.000Z',
+  slug: 'grand-prix-france', category: 'race', starts_at: '2026-06-11T14:00:00.000Z',
   ends_at: '2026-06-11T16:00:00.000Z', timezone: 'UTC', status: 'scheduled',
   published: true, origin: 'manual', description: null, ...overrides
 });
@@ -16,12 +16,14 @@ describe('eventUtils', () => {
   it('préremplit tous les champs métier de l’éditeur depuis l’Event API', () => {
     const row=event({championship_id:'f1',circuit_id:'silverstone',name:'British Grand Prix',ends_at:'2026-07-05T16:00:00.000Z',status:'postponed',published:false,description:'Pluie',session_title:'Race'});
     const form=eventToForm(row);
-    expect(form).toMatchObject({championship_id:'f1',circuit_id:'silverstone',name:'British Grand Prix',status:'postponed',published:false,description:'Pluie',session_title:'Race'});
+    expect(form).toMatchObject({championship_id:'f1',circuit_id:'silverstone',name:'British Grand Prix',category:'race',status:'postponed',published:false,description:'Pluie',session_title:'Race'});
     expect(new Date(form.starts_at).toISOString()).toBe(row.starts_at);
     expect(new Date(form.ends_at).toISOString()).toBe(row.ends_at);
   });
 
   it('laisse la fin vide lorsque ends_at est null',()=>expect(eventToForm(event({ends_at:null})).ends_at).toBe(''));
+
+  it('préserve une valeur de catégorie historique dans le formulaire',()=>expect(eventToForm(event({category:'Grand Prix'})).category).toBe('Grand Prix'));
 
   it('construit une grille mensuelle de six semaines commençant un lundi', () => {
     const days = buildCalendarDays(new Date(2026, 5, 1), [event()]);

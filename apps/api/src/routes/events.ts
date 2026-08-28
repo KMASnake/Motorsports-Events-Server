@@ -18,6 +18,7 @@ const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional()
 const nullableSessionTitle = z.union([z.string().trim().min(1).max(160), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
 const eventOrigin = z.enum(['manual', 'provider', 'mixed']);
+const eventCategory = z.enum(['practice', 'qualifying', 'sprint', 'race', 'other']);
 const businessEventBody = z.object({
   championship_id: z.string().trim().min(1),
   circuit_id: z.union([z.string().trim().min(1), z.null()]).optional(),
@@ -30,6 +31,9 @@ const businessEventBody = z.object({
   session_title: nullableSessionTitle,
   description: nullableText
 });
+const adminBusinessEventBody = businessEventBody.extend({
+  category: z.union([eventCategory, z.null()]).optional()
+});
 const eventBody = businessEventBody.extend({
   slug: z.string().trim().min(1).max(180).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   timezone: z.string().trim().min(1).max(80),
@@ -37,7 +41,7 @@ const eventBody = businessEventBody.extend({
   provider_key: nullableText,
   external_id: nullableText
 });
-const updateBody = businessEventBody.partial();
+const updateBody = adminBusinessEventBody.partial();
 const providerCreateBody = businessEventBody.extend({
   provider_key: z.string().trim().min(1).max(120),
   external_id: z.string().trim().min(1).max(300)
@@ -157,8 +161,8 @@ export async function eventRoutes(app: FastifyInstance, options: EventRouteOptio
     if (technicalFields.length) return reply.code(400).send({
       message: `Les champs techniques suivants sont calculés par le serveur : ${technicalFields.join(', ')}.`
     });
-    const parsed = businessEventBody.safeParse(request.body);
-    if (!parsed.success) return reply.code(400).send({ message: 'Données invalides.', issues: parsed.error.issues });
+    const parsed = adminBusinessEventBody.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ message: parsed.error.issues.some(issue=>issue.path[0]==='category')?'Catégorie invalide.':'Données invalides.', issues: parsed.error.issues });
     const dateError = validateDates(parsed.data as z.infer<typeof eventBody>); if (dateError) return reply.code(400).send({ message: dateError });
     const championship = await pool.query('select id from championships where id=$1', [parsed.data.championship_id]);
     if (!championship.rowCount) return reply.code(400).send({ message: 'Le championnat sélectionné n’existe pas.' });
@@ -196,7 +200,7 @@ export async function eventRoutes(app: FastifyInstance, options: EventRouteOptio
       message: `Les champs techniques suivants sont calculés par le serveur : ${technicalFields.join(', ')}.`
     });
     const parsed = updateBody.safeParse(request.body);
-    if (!parsed.success) return reply.code(400).send({ message: 'Données invalides.', issues: parsed.error.issues });
+    if (!parsed.success) return reply.code(400).send({ message: parsed.error.issues.some(issue=>issue.path[0]==='category')?'Catégorie invalide.':'Données invalides.', issues: parsed.error.issues });
     const requested = request.body && typeof request.body === 'object' ? request.body as Record<string, unknown> : {};
     const patch = Object.fromEntries(Object.entries(parsed.data).filter(([field]) => field in requested));
     try {

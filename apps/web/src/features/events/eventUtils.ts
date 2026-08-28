@@ -3,6 +3,7 @@ import { providerSource } from './providerDisplay';
 
 export const emptyEventForm = (): EventFormState => ({
   championship_id: '', circuit_id: '', name: '',
+  category: '',
   starts_at: '', ends_at: '', status: 'scheduled',
   published: true, description: '', session_title: ''
 });
@@ -16,6 +17,7 @@ export function eventToForm(event: EventRow): EventFormState {
     championship_id: event.championship_id,
     circuit_id: event.circuit_id ?? '',
     name: event.name,
+    category: event.category ?? '',
     starts_at: localDateTimeInput(event.starts_at),
     ends_at: localDateTimeInput(event.ends_at),
     status: event.status,
