@@ -11,6 +11,7 @@ cleanup
 npm run build --workspace @mse/api >/dev/null
 docker compose up -d --wait postgres >/dev/null
 docker compose run --rm migrate >/dev/null
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql >/dev/null
 docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events <<'SQL' >/dev/null
 update events set category='race',normalized_uuid='57000000-0000-4000-8000-000000003210',circuit_id='silverstone',starts_at='2026-07-05T14:00:00Z' where id='evt-002';
 insert into meetings(id,championship_id,name,season,starts_at,timezone) values('57000000-0000-4000-8000-000000003211','f1','British Grand Prix',2026,'2026-07-05T10:00:00Z','Europe/London');

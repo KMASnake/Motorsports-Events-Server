@@ -17,6 +17,7 @@ docker compose run --rm migrate >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0018_lot56_traversal_fencing >/dev/null
 docker compose run --rm migrate sh /migrations/migrate.sh down 0017_lot56_durable_parent_reference >/dev/null
 docker compose run --rm migrate >/dev/null
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql >/dev/null
 docker run --rm --network "${PROJECT}_default" \
   -e DATABASE_URL="$DATABASE_URL" \
   -v "$PWD":/source:ro -w /tmp/project node:22-alpine sh -lc '

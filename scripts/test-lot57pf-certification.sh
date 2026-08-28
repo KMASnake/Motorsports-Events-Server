@@ -13,6 +13,7 @@ cleanup
 npm run build --workspace @mse/api >/dev/null
 docker compose up -d --wait postgres >/dev/null
 docker compose run --rm migrate >/dev/null
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql >/dev/null
 
 docker compose exec -T postgres psql -U mse -d motorsports_events -v ON_ERROR_STOP=1 <<'SQL' >/dev/null
 update events set category='race',normalized_uuid='57000000-0000-4000-8000-000000000610',circuit_id='silverstone',starts_at='2026-07-05T14:00:00Z' where id='evt-002';
