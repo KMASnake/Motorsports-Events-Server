@@ -25,6 +25,7 @@ type Championship = {
 };
 
 type FormState = Omit<Championship, 'id' | 'event_count' | 'updated_at'>;
+type Provider = { id: string; name: string; adapter_key: string };
 const emptyForm = (): FormState => ({
   slug: '', name: '', short_name: '', official_name: '', category: '',
   season: new Date().getFullYear(), active: true, sync_enabled: false,
@@ -65,6 +66,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export function ChampionshipsPage() {
   const [rows, setRows] = useState<Championship[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -76,7 +78,15 @@ export function ChampionshipsPage() {
 
   async function load() {
     setLoading(true);
-    try { setRows(await request<Championship[]>('/api/v1/admin/championships')); }
+    try {
+      const championships = await request<Championship[]>('/api/v1/admin/championships');
+      setRows(championships);
+      try {
+        setProviders(await request<Provider[]>('/api/v1/admin/providers'));
+      } catch {
+        setProviders([]);
+      }
+    }
     catch (error) { setMessage({ text: (error as Error).message, error: true }); }
     finally { setLoading(false); }
   }
@@ -130,6 +140,10 @@ export function ChampionshipsPage() {
 
   const activeCount = rows.filter(row => row.active).length;
   const syncedCount = rows.filter(row => row.sync_enabled).length;
+  const providerChoices = [...new Map(providers.map(provider => [provider.adapter_key, provider.name])).entries()];
+  if (form.provider_key && !providerChoices.some(([key]) => key === form.provider_key)) {
+    providerChoices.push([form.provider_key, `Provider enregistré (${form.provider_key})`]);
+  }
 
   return <>
     <PageHeader title="CHAMPIONNATS" subtitle="Créez et configurez les championnats disponibles sur la plateforme" />
@@ -185,8 +199,8 @@ export function ChampionshipsPage() {
             <label className="wide">Description<textarea rows={3} value={form.description ?? ''} onChange={e => setForm({...form,description:e.target.value})}/></label>
           </div>
           <fieldset><legend>Disponibilité</legend><label className="lot3-check"><input type="checkbox" checked={form.active} onChange={e => setForm({...form,active:e.target.checked})}/><span><b>Championnat actif</b><small>Autorise son utilisation dans les événements et les écrans d’administration.</small></span></label></fieldset>
-          <fieldset><legend>Synchronisation externe</legend><label className="lot3-check"><input type="checkbox" checked={form.sync_enabled} onChange={e => setForm({...form,sync_enabled:e.target.checked,provider_key:e.target.checked ? (form.provider_key || 'primary') : null})}/><span><b>Activer la synchronisation</b><small>Le nom du provider reste une donnée d’administration et ne sera pas publié dans les événements.</small></span></label>
-            {form.sync_enabled && <div className="lot3-form-grid inset"><label>Provider *<select required value={form.provider_key ?? ''} onChange={e => setForm({...form,provider_key:e.target.value})}><option value="">Sélectionner</option><option value="primary">Provider principal</option><option value="secondary">Provider secondaire</option><option value="custom">Connecteur personnalisé</option></select></label><label>Identifiant externe<input value={form.external_id ?? ''} onChange={e => setForm({...form,external_id:e.target.value})}/></label></div>}
+          <fieldset><legend>Synchronisation externe</legend><label className="lot3-check"><input type="checkbox" checked={form.sync_enabled} disabled={!providerChoices.length} onChange={e => setForm({...form,sync_enabled:e.target.checked,provider_key:e.target.checked ? form.provider_key : null})}/><span><b>Activer la synchronisation</b><small>{providerChoices.length?'Le provider doit être choisi parmi les providers réellement configurés.':'Indisponible — aucun provider configuré.'}</small></span></label>
+            {form.sync_enabled && <div className="lot3-form-grid inset"><label>Provider *<select required value={form.provider_key ?? ''} onChange={e => setForm({...form,provider_key:e.target.value||null})}><option value="">Sélectionner</option>{providerChoices.map(([key,name])=><option key={key} value={key}>{name}</option>)}</select></label><label>Identifiant externe<input value={form.external_id ?? ''} onChange={e => setForm({...form,external_id:e.target.value})}/></label></div>}
           </fieldset>
           <footer><button type="button" onClick={() => setOpen(false)}>Annuler</button><button className="danger" disabled={saving}>{saving ? 'Enregistrement…' : editing ? 'Enregistrer les modifications' : 'Créer le championnat'}</button></footer>
         </form>

@@ -31,7 +31,6 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
 
       <div className="context">
         <strong>MOTORSPORTS EVENTS SERVER</strong>
-        <span>Phase 1.1 — Shell global MEDS</span>
       </div>
 
       <div className="clock">

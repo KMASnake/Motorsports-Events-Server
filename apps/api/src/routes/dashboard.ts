@@ -12,8 +12,7 @@ export async function dashboardRoutes(app: FastifyInstance): Promise<void> {
     return {
       championships: championships.rows[0].count,
       events: events.rows[0].count,
-      circuits: circuits.rows[0].count,
-      synchronizationsToday: 0
+      circuits: circuits.rows[0].count
     };
   });
 }

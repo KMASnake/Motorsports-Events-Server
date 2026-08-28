@@ -10,7 +10,7 @@ export interface ProviderOption {
   label: string;
 }
 
-export const providerOptions: ReadonlyArray<ProviderOption> = [
+const providerLabels: ReadonlyArray<ProviderOption> = [
   { value: 'ocblacktop', label: 'OC BlackTop' },
   { value: 'thesportsdb', label: 'TheSportsDB' },
   { value: 'motorsports-events', label: 'Motorsports Events' }
@@ -38,18 +38,16 @@ function readableProviderKey(providerKey: string) {
 export function providerLabel(origin: EventOrigin | undefined, providerKey: string | null | undefined) {
   if (origin !== undefined && origin !== 'manual' && !normalizedKey(providerKey)) return 'Identité fournisseur manquante';
   const source = providerSource(origin, providerKey);
-  const known = providerOptions.find((option) => option.value === source);
+  const known = providerLabels.find((option) => option.value === source);
   return known?.label ?? readableProviderKey(providerKey?.trim() || 'Motorsports Events');
 }
 
 export function availableProviderOptions(identities: ProviderIdentity[]): ProviderOption[] {
-  const dynamic = new Map<string, string>();
+  const present = new Map<string, string>();
   for (const identity of identities) {
     const value = providerSource(identity.origin, identity.provider_key);
-    if (!providerOptions.some((option) => option.value === value)) {
-      dynamic.set(value, providerLabel(identity.origin, identity.provider_key));
-    }
+    present.set(value, providerLabel(identity.origin, identity.provider_key));
   }
-  return [...providerOptions, ...[...dynamic].map(([value, label]) => ({ value, label }))
-    .sort((left, right) => left.label.localeCompare(right.label, 'fr'))];
+  return [...present].map(([value, label]) => ({ value, label }))
+    .sort((left, right) => left.label.localeCompare(right.label, 'fr'));
 }

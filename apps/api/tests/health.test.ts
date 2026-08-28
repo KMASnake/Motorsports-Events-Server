@@ -70,13 +70,13 @@ describe('health boundary', () => {
     await app.close();
   });
 
-  it('keeps explicit local fallbacks when image metadata is absent', async () => {
+  it('reports missing build metadata as unknown instead of inventing a release version', async () => {
     delete process.env.APP_VERSION;
     delete process.env.GIT_SHA;
     delete process.env.BUILD_TIME;
     const app = await application();
     expect((await app.inject('/health/live')).json()).toMatchObject({
-      version: '8.1.0-alpha.2-lot.4.4', git_sha: 'unknown', build_time: 'unknown'
+      version: 'unknown', git_sha: 'unknown', build_time: 'unknown'
     });
     await app.close();
   });

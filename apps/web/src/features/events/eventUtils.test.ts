@@ -57,10 +57,15 @@ describe('eventUtils', () => {
 
   it('ajoute automatiquement un futur fournisseur au filtre', () => {
     const options = availableProviderOptions([{ origin: 'provider', provider_key: 'future-racing-api' }]);
-    expect(options).toContainEqual({ value: 'provider:future-racing-api', label: 'Future Racing API' });
+    expect(options).toEqual([{ value: 'provider:future-racing-api', label: 'Future Racing API' }]);
     expect(providerLabel('manual', null)).toBe('Motorsports Events');
     expect(providerLabel('provider', null)).toBe('Identité fournisseur manquante');
     expect(availableProviderOptions([{origin:'provider',provider_key:null}])).toContainEqual({value:'provider-identity-missing',label:'Identité fournisseur manquante'});
+  });
+
+  it('ne propose que les fournisseurs réellement présents dans les événements chargés', () => {
+    expect(availableProviderOptions([])).toEqual([]);
+    expect(availableProviderOptions([{origin:'provider',provider_key:'ocblacktop'}])).toEqual([{value:'ocblacktop',label:'OC BlackTop'}]);
   });
 
   it('prépare une création depuis un jour et normalise le slug', () => {

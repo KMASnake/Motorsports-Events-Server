@@ -5,7 +5,7 @@ const service = 'motorsports-events-api';
 function runtimeMetadata() {
   return {
     service,
-    version: process.env.APP_VERSION ?? '8.1.0-alpha.2-lot.4.4',
+    version: process.env.APP_VERSION ?? 'unknown',
     git_sha: process.env.GIT_SHA ?? 'unknown',
     build_time: process.env.BUILD_TIME ?? 'unknown'
   };

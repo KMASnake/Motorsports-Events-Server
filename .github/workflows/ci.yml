@@ -84,9 +84,12 @@ jobs:
       - run: npm run validate:lot4
       - run: npm run validate:step2
       - run: npm run validate:step3
+      - name: Load Lot 4.3 historical events fixture
+        if: steps.changes.outputs.playwright == 'true'
+        run: docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql
       - name: Load Lot 4.3 UI acceptance fixture
         if: steps.changes.outputs.playwright == 'true'
-        run: docker compose exec -T postgres psql -U mse -d motorsports_events < tests/fixtures/lot43_ui.sql
+        run: docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_ui.sql
       - name: Install Chromium for Playwright
         if: steps.changes.outputs.playwright == 'true'
         run: npx playwright install --with-deps chromium
