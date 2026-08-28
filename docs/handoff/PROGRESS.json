@@ -4,7 +4,7 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-f1-ui-maintainer-validated-awaiting-next-maintainer-authorization",
+    "status": "lot-5.7-p-f2-rpv-maintainer-validated-gate-f-incomplete",
     "updated_at": "2026-08-27",
     "implementation_percent": 100,
     "architecture_percent": 100,
@@ -78,7 +78,7 @@
         "5.7-P-D": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"vps_validated":true,"vps_validation_date":"2026-08-22","vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-E": {"status":"maintainer-vps-revalidated","authorization_date":"2026-08-23","implementation_started":true,"implementation_complete":true,"integration_correction_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-25","maintainer_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","vps_revalidated":true,"vps_revalidation_date":"2026-08-25","vps_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","migration_head":"0029_lot57pe_canonical_championship_entitlements","authorization":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-AUTHORIZATION.md","implementation":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-IMPLEMENTATION.md"},
         "5.7-P-F": {
-          "status":"implemented-locally-awaiting-external-evidence",
+          "status":"f2-rpv-maintainer-validated-awaiting-remaining-gate-f-audit",
           "authorization_date":"2026-08-25",
           "worker_isolation_correction_authorized":true,
           "worker_isolation_correction_complete":true,
@@ -124,10 +124,22 @@
           "events_admin_meeting_projection_evidence":"docs/handoff/LOT-5.7-P-F1-UI-EVENT-MEETING-VALIDATION.md",
           "real_provider_validation_authorized":true,
           "real_provider_validation_authorization_date":"2026-08-27",
-          "real_provider_validation_status":"authorized-not-started",
-          "real_provider_validation_implementation_started":false,
-          "real_provider_validation_implementation_complete":false,
-          "real_provider_validation_maintainer_validated":false,
+          "real_provider_validation_status":"maintainer-validated",
+          "real_provider_validation_implementation_started":true,
+          "real_provider_validation_implementation_complete":true,
+          "real_provider_validation_maintainer_validated":true,
+          "real_provider_validation_maintainer_validation_date":"2026-08-27",
+          "real_provider_validation_application_sha":"e21c9d6f85678236ea92712a8e758957790f7e60",
+          "real_provider_validation_documentation_base_sha":"ab0d458cae59850a38f768418cb19f24d05a0a40",
+          "real_provider_validation_external_calls":1,
+          "real_provider_validation_provider_credits":1,
+          "real_provider_validation_traversal_id":"de03e4cf-3c51-41da-8f4a-d0427fbe2ec8",
+          "real_provider_validation_run_id":"fc320dcf-7531-444b-a52d-4bf673ca0e79",
+          "real_provider_validation_replay_idempotent":true,
+          "real_provider_validation_orphan_events":0,
+          "real_provider_validation_expected_reviews":33,
+          "real_provider_validation_final_provider_safe":true,
+          "real_provider_validation_worker_remained_stopped":true,
           "real_provider_validation_evidence":"docs/handoff/LOT-5.7-P-F2-REAL-PROVIDER-VALIDATION.md",
           "real_provider_validation_scope":"One strictly controlled bounded real-provider validation of OCBlackTop F1 in preproduction, manually triggered by the maintainer through the canonical providerAcquireOnce CLI, with explicit per-execution request budget and the worker stopped.",
           "real_provider_validation_environment":"preproduction-only",
@@ -147,7 +159,7 @@
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite and 5.7-P-F1-UI are maintainer-validated. Gate F remains incomplete. Subphase 5.7-P-F2-RPV authorizes only bounded manual OCBlackTop F1 real-provider validation in preproduction under its documented safeguards. Production Preview activation, external client onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and the bounded real-provider subphase 5.7-P-F2-RPV are maintainer-validated. Gate F remains incomplete and not maintainer-validated pending a separate audit of all remaining Gate F criteria. Production Preview activation, external client onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -170,6 +182,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Prepare and execute the bounded OCBlackTop F1 real-provider validation manually in preproduction according to the 5.7-P-F2-RPV safeguards. Each execution requires a backup, zero-credit preflight, explicit low request budget, exact quota/call accounting and a stopped worker. This does not authorize Production Preview, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main."
+    "task": "Audit the remaining 5.7-P-F criteria separately from the now maintainer-validated F2-RPV evidence. Do not close Gate F or authorize another phase without an explicit maintainer decision. Production Preview, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   }
 }

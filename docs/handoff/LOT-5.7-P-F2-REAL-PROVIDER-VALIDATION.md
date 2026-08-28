@@ -1,7 +1,80 @@
 # 5.7-P-F2-RPV — validation fournisseur réelle F1
 
-Statut : **AUTORISÉE — NON EXÉCUTÉE — NON VALIDÉE**  
+Statut : **EXÉCUTÉE — PASS — VALIDÉE PAR LE MAINTENEUR**
+
 Date d’autorisation : 2026-08-27
+
+Date d’exécution et de validation : 2026-08-27
+
+SHA applicatif validé : `e21c9d6f85678236ea92712a8e758957790f7e60`
+
+SHA documentaire de départ : `ab0d458cae59850a38f768418cb19f24d05a0a40`
+
+## Résultat mainteneur
+
+La validation fournisseur réelle bornée OCBlackTop/F1 en préproduction est
+**PASS**. Elle a consommé exactement **un nouvel appel fournisseur** et un
+crédit. Aucun appel fournisseur n'est effectué par la présente mise à jour
+documentaire.
+
+### Sauvegarde et état initial
+
+- backup préalable : `backup-pre-f2-rpv-20260827T154004Z.sql.gz` ;
+- SHA-256 : `4f9cb40fce9f4ef940826b32eaa26e06af90c88557f50973e07fe1652fcafd69` ;
+- provider initialement `enabled=true`, `state=paused`, discovery désactivée ;
+- `max_concurrency=1`, worker arrêté, trois charges historiques ;
+- premier preflight : configuration prête, exécution bloquée par `provider_paused`, zéro appel.
+
+L'activation temporaire a utilisé l'API admin auditée. Le second preflight a
+confirmé configuration et exécution prêtes, sans blocker et avec un budget de
+un appel. Discovery est restée désactivée et le worker arrêté.
+
+### Acquisition réelle bornée
+
+- budget CLI : `--max-provider-requests 1` ;
+- traversal : `de03e4cf-3c51-41da-8f4a-d0427fbe2ec8` ;
+- run : `fc320dcf-7531-444b-a52d-4bf673ca0e79` ;
+- unité : `current_global:2026` ;
+- statut `complete`, `received_items=158`, `valid_items=158`, `anomaly_items=0` ;
+- 27 sources Meeting et 131 sources Event ;
+- charge 4, émise, HTTP 200, à `2026-08-27 15:50:44.781+00`.
+
+Une seconde tentative trop rapprochée a été refusée avant émission avec
+`quota_deferred/minimum_interval`. Son traversal partiel est
+`25a7472e-8961-420f-a177-e46524d8e740`. Elle a produit zéro appel et aucune
+charge supplémentaire : il n'existe pas de charge 5.
+
+### Publication et replay
+
+L'état canonique observé après acquisition contient 26 Meetings, 126 Events,
+126 relations `meeting_events`, 26 liens source Meeting, 126 liens source
+Event et **zéro Event orphelin**.
+
+Le replay du traversal persisté a émis zéro appel fournisseur et produit :
+
+- `entities_seen=185`, `entities_normalized=185` ;
+- `candidates_ready=152`, `publications_created=0`, `publications_unchanged=152` ;
+- `candidates_review=33`, `highest_change_sequence=null` ;
+- version active `mapping:d976f26c-d9f1-4658-a59d-1827dc82639d`.
+
+Les 33 reviews sont entièrement expliquées : 27 Events
+`required_identity_unknown`, cinq Events `parent_identity_unresolved` et un
+Meeting `required_identity_unknown`. Les 126 Events et 26 Meetings de cette
+version sont promus, soit 152 promus + 33 reviews = 185 normalisés.
+
+Les candidats `pending` de l'ancienne version
+`mapping:4a868e8e-db64-4dc5-afab-272ac86e0148` sont historiques et ne font pas
+partie du résultat courant.
+
+### État final sûr
+
+- quatre charges fournisseur au total, aucune cinquième charge ;
+- provider `enabled=false`, `state=paused` ;
+- discovery désactivée ;
+- worker arrêté.
+
+La sous-phase F2-RPV est validée. Gate F reste toutefois incomplète et non
+validée jusqu'à une décision mainteneur séparée couvrant ses autres critères.
 
 ## Autorisation bornée
 
