@@ -66,4 +66,4 @@ PY
 
 echo "Release créée : ${ARCHIVE}"
 echo "Empreinte : ${ARCHIVE}.sha256"
-echo "Build Docker reproductible : docker compose --env-file ${BUILD_ENV} build api worker"
+echo "Build Docker reproductible : docker compose --env-file ${BUILD_ENV} build api worker web"

@@ -3,11 +3,12 @@ import {spawnSync} from 'node:child_process';
 
 const fail=message=>{throw new Error(`F3 runtime probe refused: ${message}`);};
 const args=process.argv.slice(2),value=name=>{const index=args.indexOf(name);return index<0?null:args[index+1]??null;};
-if(args.length!==6)fail('usage: capture-lot57pf3-runtime-snapshot.mjs --n-image REF@sha256:DIGEST --n-plus-one-image REF@sha256:DIGEST --output FILE');
-const nRef=value('--n-image'),n1Ref=value('--n-plus-one-image'),output=value('--output');
-if(!nRef||!n1Ref||!output)fail('all arguments are mandatory');
+if(args.length!==12)fail('usage: capture-lot57pf3-runtime-snapshot.mjs --n-api-image REF@sha256:DIGEST --n-web-image REF@sha256:DIGEST --n-plus-one-api-image REF@sha256:DIGEST --n-plus-one-web-image REF@sha256:DIGEST --runtime-release n|n-plus-one --output FILE');
+const refs={n:{api:value('--n-api-image'),web:value('--n-web-image')},n_plus_1:{api:value('--n-plus-one-api-image'),web:value('--n-plus-one-web-image')}};
+const runtimeReleaseInput=value('--runtime-release'),runtimeRelease=runtimeReleaseInput==='n'?'n':runtimeReleaseInput==='n-plus-one'?'n_plus_1':null,output=value('--output');
+if(!runtimeRelease||!output||Object.values(refs).some(release=>Object.values(release).some(ref=>!ref)))fail('all arguments are mandatory');
 const immutable=/@sha256:([0-9a-f]{64})$/;
-if(!immutable.test(nRef)||!immutable.test(n1Ref))fail('N and N+1 must be immutable digest references');
+for(const [release,components] of Object.entries(refs))for(const [component,ref] of Object.entries(components))if(!immutable.test(ref))fail(`${release}.${component} must be an immutable digest reference`);
 const envFile=process.env.F3_PREPROD_ENV_FILE??'.env.preprod';
 if(!fs.existsSync(envFile))fail('preproduction env file is absent');
 const compose=['compose','--env-file',envFile,'-p','mse-preprod','-f','docker-compose.yml','-f','docker-compose.preprod.yml'];
@@ -19,9 +20,9 @@ const inspectNamedContainer=(name,label)=>{const inspected=json(['inspect',name]
 const envMap=inspected=>Object.fromEntries((inspected.Config?.Env??[]).map(entry=>{const index=entry.indexOf('=');return index<0?[entry,'']:[entry.slice(0,index),entry.slice(index+1)];}));
 const projectOf=inspected=>inspected.Config?.Labels?.['com.docker.compose.project'];
 
-const postgres=inspectContainer('postgres'),api=inspectContainer('api'),worker=inspectContainer('worker');
-for(const [name,container] of [['postgres',postgres],['api',api],['worker',worker]])if(projectOf(container)!=='mse-preprod')fail(`${name} does not belong to the explicit preproduction project`);
-if(postgres.State?.Running!==true||api.State?.Running!==true)fail('preproduction API/PostgreSQL runtime is not running');
+const postgres=inspectContainer('postgres'),api=inspectContainer('api'),web=inspectContainer('web'),worker=inspectContainer('worker');
+for(const [name,container] of [['postgres',postgres],['api',api],['web',web],['worker',worker]])if(projectOf(container)!=='mse-preprod')fail(`${name} does not belong to the explicit preproduction project`);
+if(postgres.State?.Running!==true||api.State?.Running!==true||web.State?.Running!==true)fail('preproduction API/Web/PostgreSQL runtime is not running');
 if(typeof worker.State?.Running!=='boolean')fail('worker runtime state is unknown');
 if(worker.State.Running)fail('worker is running');
 const apiEnv=envMap(api),postgresEnv=envMap(postgres);
@@ -54,9 +55,14 @@ if(!certificationNetworks||typeof certificationNetworks!=='object'||Array.isArra
 const attachedNetworks=Object.keys(certificationNetworks);
 if(attachedNetworks.length!==1||attachedNetworks[0]!==networkName)fail('certification runner has an externally routed or unknown network attached');
 const inspectImage=ref=>{const rows=json(['image','inspect',ref],`image ${ref}`);if(!Array.isArray(rows)||rows.length!==1)fail(`image ${ref} is ambiguous`);const row=rows[0],digest=ref.slice(ref.indexOf('@')+1);if(!Array.isArray(row.RepoDigests)||!row.RepoDigests.includes(ref))fail(`image ${ref} digest is not locally verified`);if(typeof row.Id!=='string'||!/^sha256:[0-9a-f]{64}$/.test(row.Id))fail(`image ${ref} ID is unknown`);const metadata=envMap(row);for(const key of ['APP_VERSION','GIT_SHA','BUILD_TIME'])if(!metadata[key]||metadata[key].toLowerCase()==='unknown')fail(`image ${ref} ${key} is unknown`);if(!/^[0-9a-f]{40}$/.test(metadata.GIT_SHA)||Number.isNaN(Date.parse(metadata.BUILD_TIME)))fail(`image ${ref} metadata is invalid`);return {version:metadata.APP_VERSION,git_sha:metadata.GIT_SHA,build_time:metadata.BUILD_TIME,image_id:row.Id,image_digest:digest};};
-const releases={n:inspectImage(nRef),n_plus_1:inspectImage(n1Ref)};
-if(releases.n.image_digest===releases.n_plus_1.image_digest)fail('N and N+1 images are identical');
-if(certification.Image!==releases.n_plus_1.image_id)fail('certification runner does not use the inspected N+1 image');
-const snapshot={worker_running:false,provider_execution_enabled:false,scheduler_enabled:false,discovery_enabled:false,provider_network_blocked:true,provider_network_block_mechanism:'container-egress-deny',preview_production_enabled:false,production_target:false,releases,probe:{source:'repository-runtime-inspection',compose_project:'mse-preprod',certification_container:certificationContainerName,certification_image_id:certification.Image,certification_network:networkName,network_internal:true,exclusive_network_attachment:true}};
+const releases={n:{api:inspectImage(refs.n.api),web:inspectImage(refs.n.web)},n_plus_1:{api:inspectImage(refs.n_plus_1.api),web:inspectImage(refs.n_plus_1.web)}};
+for(const component of ['api','web'])if(releases.n[component].image_digest===releases.n_plus_1[component].image_digest)fail(`N and N+1 ${component} images are identical`);
+for(const release of ['n','n_plus_1'])if(releases[release].api.image_digest===releases[release].web.image_digest)fail(`${release} API and Web images are not distinct`);
+if(certification.Image!==releases.n_plus_1.api.image_id)fail('certification runner does not use the inspected N+1 API image');
+const expectedRuntime=releases[runtimeRelease];
+if(api.Image!==expectedRuntime.api.image_id)fail(`runtime API does not use the inspected ${runtimeRelease} API image`);
+if(web.Image!==expectedRuntime.web.image_id)fail(`runtime Web does not use the inspected ${runtimeRelease} Web image`);
+if(worker.Image!==expectedRuntime.api.image_id)fail(`stopped worker does not identify the inspected ${runtimeRelease} API image`);
+const snapshot={worker_running:false,provider_execution_enabled:false,scheduler_enabled:false,discovery_enabled:false,provider_network_blocked:true,provider_network_block_mechanism:'container-egress-deny',preview_production_enabled:false,production_target:false,runtime_release:runtimeRelease,releases,probe:{source:'repository-runtime-inspection',compose_project:'mse-preprod',certification_container:certificationContainerName,certification_image_id:certification.Image,certification_network:networkName,network_internal:true,exclusive_network_attachment:true}};
 fs.writeFileSync(output,`${JSON.stringify(snapshot,null,2)}\n`,{encoding:'utf8',mode:0o600});
 console.log('F3 runtime safety snapshot captured from inspected state.');

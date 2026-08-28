@@ -31,7 +31,18 @@ def test_api_image_receives_release_metadata_as_build_arguments():
 
     assert "x-api-build: &api-build" in compose
     assert compose.count("build: *api-build") == 2
-    assert "GIT_SHA: ${GIT_SHA:-unknown}" not in compose.split("environment:", 1)[1]
+    api_environment = compose.split("  api:\n", 1)[1].split("  worker:\n", 1)[0]
+    assert "GIT_SHA: ${GIT_SHA:-unknown}" not in api_environment.split("environment:", 1)[1]
+
+
+def test_web_image_receives_verifiable_release_metadata():
+    dockerfile = (ROOT / "apps" / "web" / "Dockerfile").read_text(encoding="utf-8")
+    compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+
+    for name in ("APP_VERSION", "GIT_SHA", "BUILD_TIME"):
+        assert f"ARG {name}=unknown" in dockerfile
+        assert f"{name}=${{{name}}}" in dockerfile
+        assert f"{name}: ${{{name}:-unknown}}" in compose
 
 
 def test_preproduction_recipe_builds_images_with_generated_release_metadata():

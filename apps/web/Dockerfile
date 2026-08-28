@@ -9,6 +9,12 @@ COPY apps/web apps/web
 RUN npm run build --workspace @mse/web
 
 FROM nginx:1.29-alpine
+ARG APP_VERSION=unknown
+ARG GIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ENV APP_VERSION=${APP_VERSION} \
+    GIT_SHA=${GIT_SHA} \
+    BUILD_TIME=${BUILD_TIME}
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
 ARG VITE_API_URL=
 COPY apps/web/nginx.conf /tmp/default.conf.template

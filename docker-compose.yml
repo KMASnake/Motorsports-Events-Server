@@ -100,6 +100,9 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+        APP_VERSION: ${APP_VERSION:-unknown}
+        GIT_SHA: ${GIT_SHA:-unknown}
+        BUILD_TIME: ${BUILD_TIME:-unknown}
     ports:
       - "${WEB_HOST_PORT:-3000}:3000"
     depends_on:

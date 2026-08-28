@@ -10,7 +10,10 @@ let raw;
 try{raw=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));}catch{fail('input is not valid JSON');}
 exact(raw,['release','migration_heads','db_fingerprints','comparisons','incremental_change','checks','backup_restore','provider_calls','worker_state'],'root');
 const releases=exact(raw.release,['n','n_plus_1'],'release');
-for(const name of ['n','n_plus_1'])exact(releases[name],['version','git_sha','build_time','image_id','image_digest'],`release.${name}`);
+for(const name of ['n','n_plus_1']){
+  exact(releases[name],['api','web'],`release.${name}`);
+  for(const component of ['api','web'])exact(releases[name][component],['version','git_sha','build_time','image_id','image_digest'],`release.${name}.${component}`);
+}
 const heads=exact(raw.migration_heads,['before','n_plus_1','rollback_n','final_n_plus_1'],'migration_heads');
 const fingerprints=exact(raw.db_fingerprints,['before','n_plus_1','rollback_n','final_n_plus_1','restored_disposable'],'db_fingerprints');
 const comparisons=exact(raw.comparisons,['meeting_uuid_stable','event_uuid_stable','revision_monotone','sequence_monotone','cursor_before_valid_after_rollback','cursor_after_valid_after_rollback'],'comparisons');
@@ -18,13 +21,16 @@ const incremental=exact(raw.incremental_change,['count','operation','changed_fie
 const checks=exact(raw.checks,['health','health_live','health_ready','cors_allowed_origin','cors_foreign_denied','tls','metrics'],'checks');
 const backup=exact(raw.backup_restore,['backup_verified','disposable_restore_db','restore_integrity_match'],'backup_restore');
 for(const [name,release] of Object.entries(releases)){
-  for(const [key,value] of Object.entries(release))string(value,`release.${name}.${key}`);
-  if(!/^[0-9a-f]{40}$/.test(release.git_sha))fail(`release.${name}.git_sha must be 40 lowercase hex characters`);
-  if(!/^sha256:[0-9a-f]{64}$/.test(release.image_id))fail(`release.${name}.image_id must be sha256`);
-  if(!/^sha256:[0-9a-f]{64}$/.test(release.image_digest))fail(`release.${name}.image_digest must be sha256`);
-  if(Number.isNaN(Date.parse(release.build_time)))fail(`release.${name}.build_time is invalid`);
+  for(const [component,image] of Object.entries(release)){
+    for(const [key,value] of Object.entries(image))string(value,`release.${name}.${component}.${key}`);
+    if(!/^[0-9a-f]{40}$/.test(image.git_sha))fail(`release.${name}.${component}.git_sha must be 40 lowercase hex characters`);
+    if(!/^sha256:[0-9a-f]{64}$/.test(image.image_id))fail(`release.${name}.${component}.image_id must be sha256`);
+    if(!/^sha256:[0-9a-f]{64}$/.test(image.image_digest))fail(`release.${name}.${component}.image_digest must be sha256`);
+    if(Number.isNaN(Date.parse(image.build_time)))fail(`release.${name}.${component}.build_time is invalid`);
+  }
+  if(release.api.image_digest===release.web.image_digest)fail(`release.${name} API and Web image digests must be distinct`);
 }
-if(releases.n.image_digest===releases.n_plus_1.image_digest)fail('N and N+1 image digests must be distinct');
+for(const component of ['api','web'])if(releases.n[component].image_digest===releases.n_plus_1[component].image_digest)fail(`N and N+1 ${component} image digests must be distinct`);
 for(const [key,value] of Object.entries(heads)){const head=string(value,`migration_heads.${key}`);if(!/^[0-9]{4}_[a-z0-9][a-z0-9_]*$/.test(head))fail(`migration_heads.${key} is not canonical`);}
 for(const [key,value] of Object.entries(fingerprints)){const digest=string(value,`db_fingerprints.${key}`);if(!/^[0-9a-f]{64}$/.test(digest))fail(`db_fingerprints.${key} must be sha256`);}
 for(const [key,value] of Object.entries(comparisons))success(value,`comparisons.${key}`);
