@@ -45,6 +45,32 @@ Use the principal Compose plus `docker-compose.preprod.yml`. The override does
 not duplicate services: it binds PostgreSQL/API/Web to loopback only, sets
 production mode, restart policies and a stable named PostgreSQL volume.
 
+The mandatory runtime Compose context is:
+
+- `--env-file .env.preprod`;
+- `-p mse-preprod`;
+- `-f docker-compose.yml`;
+- `-f docker-compose.preprod.yml`.
+
+The mandatory build/release Compose context is:
+
+- `--env-file .env.preprod`;
+- `--env-file dist/release-build.env`;
+- `-p mse-preprod`;
+- `-f docker-compose.yml`;
+- `-f docker-compose.preprod.yml`.
+
+`.env.preprod` provides the preproduction runtime configuration.
+`dist/release-build.env` provides release/build metadata when the release
+workflow requires it; it is not required for ordinary runtime commands.
+`docker-compose.preprod.yml` enforces preproduction Web behavior, including an
+empty `VITE_API_URL`. Omitting the appropriate context can create a parasite
+Compose project, compile the Web with `http://localhost:3001`, recreate the API
+with incorrect database parameters, or leave `/health` metadata as `unknown`
+when the release build is not used. Never repair such a mistake by changing the
+existing PostgreSQL password or volume; remove only the parasite project, then
+recreate the intended services with the appropriate complete context.
+
 | Service | Container port | VPS publication | Persistence/readiness |
 |---|---:|---|---|
 | PostgreSQL | 5432 | loopback only; never Internet | named volume + `pg_isready` |
@@ -67,8 +93,8 @@ Record every deployment with:
 
 ```sh
 git rev-parse HEAD
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml images
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml exec -T postgres \
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml images
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml exec -T postgres \
   psql -U mse -d motorsports_events -Atc "select max(version) from schema_migrations"
 date -u +%FT%TZ
 ```
@@ -79,11 +105,11 @@ Before deployment, create and verify a backup. Then:
 
 ```sh
 ./scripts/build-release.sh
-docker compose --env-file .env.preprod --env-file dist/release-build.env -f docker-compose.yml -f docker-compose.preprod.yml config --quiet
-docker compose --env-file .env.preprod --env-file dist/release-build.env -f docker-compose.yml -f docker-compose.preprod.yml build --pull
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml up -d --wait postgres
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml run --rm migrate
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml up -d --wait api web
+docker compose --env-file .env.preprod --env-file dist/release-build.env -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml config --quiet
+docker compose --env-file .env.preprod --env-file dist/release-build.env -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml build --pull
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml up -d --wait postgres
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml run --rm migrate
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml up -d --wait api web
 ```
 
 Le second fichier d’environnement est généré à chaque release depuis `VERSION`,
@@ -98,9 +124,9 @@ never automatic on VPS.
 ```sh
 curl -fsS http://127.0.0.1:3001/health
 curl -fsS http://127.0.0.1:3000/
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml ps
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml logs --since 10m api postgres web
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml restart
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml ps
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml logs --since 10m api postgres web
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml restart
 ```
 
 Docker already rotates JSON logs (`10m`, five files, compressed). Logs must not
@@ -112,7 +138,7 @@ Before every migration/deployment:
 
 ```sh
 umask 077
-docker compose --env-file .env.preprod -f docker-compose.yml -f docker-compose.preprod.yml exec -T postgres \
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml exec -T postgres \
   pg_dump --no-owner --no-privileges -U mse motorsports_events | gzip -9 > "backup-$(date -u +%Y%m%dT%H%M%SZ).sql.gz"
 gzip -t backup-*.sql.gz
 ```

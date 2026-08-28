@@ -50,10 +50,40 @@ La recette manuelle préproduction est **PASS** pour :
 
 ## Frontières maintenues
 
-5.7-P-F2-RPV reste `authorized-not-started` : implémentation non démarrée,
-incomplète et non validée. L'autorisation d'une exécution fournisseur réelle
-bornée reste inchangée, mais aucune acquisition F2-RPV n'a été exécutée pour
-cette validation.
+5.7-P-F2-RPV est maintainer-validated par sa preuve séparée. La validation
+Events/Meeting initiale n'avait elle-même déclenché aucun appel fournisseur.
 
 Gate F reste incomplète. Production Preview, onboarding client externe, Lot
 5.7 complet, Lot 5.8+ et merge vers `main` restent non autorisés.
+
+## Extension validée — édition contrôlée de `Event.category`
+
+Date : 2026-08-28
+
+SHA applicatif validé : `4b22f5315cfc03a54bd56c03eec34b80eea99b33`
+
+Résultat mainteneur préproduction : **PASS**
+
+La recette graphique a confirmé sur la session Race du Dutch Grand Prix :
+
+- Catégorie est un select sans texte libre ;
+- les valeurs canoniques sont `practice`, `qualifying`, `sprint`, `race` et `other` ;
+- les libellés visibles sont Non définie, Essais, Qualifications, Sprint, Course et Autre ;
+- la valeur provider `race` est préremplie et présentée comme « Course » ;
+- Épreuve reste en lecture seule et les autres champs restent correctement préremplis.
+
+Le cycle provider-origin complet est validé :
+
+1. modification exclusive `category: race -> qualifying` ;
+2. création d'une seule correction locale Catégorie, avec valeur fournisseur `race` et valeur effective `qualifying` ;
+3. `session_title=Race`, Meeting Dutch Grand Prix, circuit et horaires inchangés ;
+4. restauration fournisseur ;
+5. retour à `category=race`, affichée « Course », sans correction résiduelle.
+
+L'API, le Web et PostgreSQL étaient healthy. Le worker est resté arrêté. Aucun
+appel fournisseur supplémentaire n'a été effectué : le compteur réel reste à
+quatre, sans cinquième charge. Le provider et la préproduction n'ont subi
+aucune autre mutation.
+
+Cette validation ne clôt pas Gate F et n'autorise ni Production Preview, ni
+onboarding externe, ni Lot 5.7 complet, ni Lot 5.8+, ni merge vers `main`.
