@@ -9,14 +9,20 @@ ROOT = Path(__file__).resolve().parent.parent
 PREFLIGHT = ROOT / "scripts" / "validate-lot57pf3-preflight.mjs"
 EVIDENCE = ROOT / "scripts" / "build-lot57pf3-evidence.mjs"
 RUNTIME_PROBE = ROOT / "scripts" / "capture-lot57pf3-runtime-snapshot.mjs"
+BASELINE_PROBE = ROOT / "scripts" / "capture-lot57pf3-prospective-baseline.mjs"
 
 
 def snapshot(**overrides):
     def image(version, sha_digit, id_digit, digest_digit, hour):
-        return {"version": version, "git_sha": sha_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z", "image_id": "sha256:" + id_digit * 64, "image_digest": "sha256:" + digest_digit * 64}
+        component = "api" if id_digit in ("a", "c") else "web"
+        release = "release-n" if version == "1.0.0" else "release-n1"
+        digest = "sha256:" + digest_digit * 64
+        tree_digit = "e" if version == "1.0.0" else "f"
+        return {"immutable_ref": f"registry.example/{release}-{component}@{digest}", "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z", "image_id": "sha256:" + id_digit * 64, "image_digest": digest}
     value = {
         "worker_running": False,
         "provider_execution_enabled": False,
+        "championship_execution_enabled": False,
         "scheduler_enabled": False,
         "discovery_enabled": False,
         "provider_network_blocked": True,
@@ -33,11 +39,26 @@ def snapshot(**overrides):
     return value
 
 
-def run_preflight(value):
+def baseline_artifact():
+    release = snapshot()["releases"]["n"]
+    return {
+        "schema": "lot57pf3-prospective-baseline-v1", "prospective_certification_baseline": True,
+        "classification": "prospective-certification-baseline", "historical_pre_existing_release": False,
+        "established_at": "2026-08-28T10:30:00Z", "release": {"git_sha": release["api"]["git_sha"], "git_tree": release["api"]["git_tree"], "version": release["api"]["version"], **release},
+        "migration_head": "0031_dynamic_test", "database_integrity": {"classification": "aggregate-integrity-anchor", "aggregate_anchor": "f" * 64, "values": {}, "continuity_requires_independent_checks": True},
+        "continuity": {"change_sequence": 7, "event_revision": 3, "meeting_revision": 2, "normalization_checkpoint_count": 1},
+        "runtime_safety": {"target": "preproduction", "worker_state": "stopped", "provider_execution_enabled": False, "championship_execution_enabled": False, "scheduler_enabled": False, "discovery_enabled": False, "preview_production_enabled": False, "provider_network_blocked": True, "provider_network_block_mechanism": "container-egress-deny"},
+        "provenance": {"source": "repository-runtime-inspection", "git_tree_source": "git-rev-parse-commit-tree", "compose_project": "mse-preprod", "certification_container": "mse-f3-certification-runner", "certification_network": "mse-f3-certification-internal", "exclusive_network_attachment": True},
+    }
+
+
+def run_preflight(value, baseline_value=None):
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / "snapshot.json"
         path.write_text(json.dumps(value), encoding="utf-8")
-        return subprocess.run(["node", str(PREFLIGHT), str(path)], cwd=ROOT, text=True, capture_output=True, check=False)
+        baseline = Path(directory) / "baseline.json"
+        baseline.write_text(json.dumps(baseline_value or baseline_artifact()), encoding="utf-8")
+        return subprocess.run(["node", str(PREFLIGHT), str(path), str(baseline)], cwd=ROOT, text=True, capture_output=True, check=False)
 
 
 def fake_docker(directory, mode="safe"):
@@ -48,6 +69,8 @@ a=sys.argv[1:];mode=os.environ.get('F3_FAKE_MODE','safe')
 if a[0]=='compose' and 'ps' in a:
     service=a[-1];print({'postgres':'postgres-id','api':'api-id','web':'web-id','worker':'worker-id'}[service]);sys.exit(0)
 if a[0]=='compose' and 'exec' in a:
+    if 'schema_migrations' in a[-1]:
+        print(json.dumps({'migration_head':'0031_dynamic_test','events_count':2,'meetings_count':1,'changes_max_sequence':7,'events_max_revision':3,'meetings_max_revision':2,'normalization_checkpoints_count':1,'orphan_meeting_events':0}));sys.exit(0)
     state={'provider_execution_enabled':False,'championship_execution_enabled':False,'scheduler_execution_active':False,'discovery_enabled':False}
     if mode=='provider':state['provider_execution_enabled']=True
     if mode=='unknown':sys.exit(2)
@@ -57,10 +80,10 @@ if a[0]=='inspect':
     env=['POSTGRES_USER=mse','POSTGRES_DB=motorsports_events'] if name=='postgres-id' else ['NODE_ENV=production','PREVIEW_API_ENABLED='+('true' if mode=='preview' else 'false')]
     networks={'mse-f3-certification-internal':{}}
     labels={'com.docker.compose.project':project}
-    image='sha256:'+('d' if name=='web-id' else 'c')*64
+    image='sha256:'+((('b' if name=='web-id' else 'a') if mode.startswith('baseline') else ('d' if name=='web-id' else 'c')))*64
     if mode=='runtime-api-wrong' and name=='api-id':image='sha256:'+'a'*64
     if mode=='runtime-web-wrong' and name=='web-id':image='sha256:'+'b'*64
-    if mode=='runtime-worker-wrong' and name=='worker-id':image='sha256:'+'a'*64
+    if mode.endswith('runtime-worker-wrong') and name=='worker-id':image='sha256:'+('c' if mode.startswith('baseline') else 'a')*64
     if name=='mse-f3-certification-runner':
         labels={'com.mse.certification':'lot57pf3','com.mse.certification.target':'preproduction'}
         running=mode!='runner-stopped'
@@ -84,8 +107,19 @@ sys.exit(3)
     return executable
 
 
+def fake_git(directory):
+    executable = Path(directory) / "git"
+    executable.write_text("""#!/usr/bin/env python3
+import sys
+sha=sys.argv[-1].split('^',1)[0]
+print(('e' if sha.startswith('1') else 'f')*40)
+""", encoding="utf-8")
+    executable.chmod(0o755)
+
+
 def run_runtime_probe(tmp_path, mode="safe", extra_args=()):
     fake_docker(tmp_path, mode)
+    fake_git(tmp_path)
     env = dict(__import__("os").environ)
     env["PATH"] = f"{tmp_path}:{env['PATH']}"
     env["F3_FAKE_MODE"] = mode
@@ -103,8 +137,24 @@ def run_runtime_probe(tmp_path, mode="safe", extra_args=()):
     return result, output
 
 
+def run_baseline_probe(tmp_path, mode="baseline-safe"):
+    fake_docker(tmp_path, mode)
+    fake_git(tmp_path)
+    env = dict(__import__("os").environ)
+    env["PATH"] = f"{tmp_path}:{env['PATH']}"
+    env["F3_FAKE_MODE"] = mode
+    env_file, output = Path(tmp_path) / ".env.preprod", Path(tmp_path) / "baseline.json"
+    env_file.write_text("non-secret-test-config=true\n", encoding="utf-8")
+    env["F3_PREPROD_ENV_FILE"] = str(env_file)
+    n = snapshot()["releases"]["n"]
+    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["immutable_ref"], "--n-web-image", n["web"]["immutable_ref"], "--output", str(output)]
+    result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
+    return result, output
+
+
 def evidence_input():
     return {
+        "prospective_baseline": baseline_artifact(),
         "release": snapshot()["releases"],
         "migration_heads": {name: "0031_dynamic_test" for name in ("before", "n_plus_1", "rollback_n", "final_n_plus_1")},
         "db_fingerprints": {name: "a" * 64 for name in ("before", "n_plus_1", "rollback_n", "final_n_plus_1", "restored_disposable")},
@@ -118,6 +168,58 @@ def evidence_input():
 
 
 class Lot57Pf3ToolingTests(unittest.TestCase):
+    def test_prospective_baseline_is_captured_from_inspected_runtime(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result, output = run_baseline_probe(directory)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            baseline = json.loads(output.read_text(encoding="utf-8"))
+            self.assertTrue(baseline["prospective_certification_baseline"])
+            self.assertFalse(baseline["historical_pre_existing_release"])
+            self.assertEqual(baseline["release"]["api"]["immutable_ref"], snapshot()["releases"]["n"]["api"]["immutable_ref"])
+            self.assertEqual(baseline["runtime_safety"]["worker_state"], "stopped")
+            self.assertFalse(baseline["runtime_safety"]["championship_execution_enabled"])
+            self.assertEqual(baseline["database_integrity"]["classification"], "aggregate-integrity-anchor")
+            self.assertTrue(baseline["database_integrity"]["continuity_requires_independent_checks"])
+
+    def test_preflight_refuses_invalid_or_reclassified_prospective_baseline(self):
+        mutations = (
+            lambda value: value.update(prospective_certification_baseline=False),
+            lambda value: value["provenance"].update(source="operator-declaration"),
+            lambda value: value["release"]["api"].update(image_digest="sha256:" + "9" * 64),
+            lambda value: value["release"]["web"].update(image_digest="sha256:" + "9" * 64),
+            lambda value: value["release"]["api"].update(immutable_ref="registry.example/replaced@sha256:" + "1" * 64),
+            lambda value: value.update(classification="historical-release", historical_pre_existing_release=True),
+        )
+        for index, mutate in enumerate(mutations):
+            with self.subTest(case=index):
+                baseline = baseline_artifact(); mutate(baseline)
+                self.assertNotEqual(run_preflight(snapshot(), baseline).returncode, 0)
+
+    def test_preflight_refuses_different_commit_with_identical_git_tree(self):
+        value = snapshot()
+        value["releases"]["n_plus_1"]["api"]["git_tree"] = value["releases"]["n"]["api"]["git_tree"]
+        value["releases"]["n_plus_1"]["web"]["git_tree"] = value["releases"]["n"]["web"]["git_tree"]
+        self.assertNotEqual(run_preflight(value).returncode, 0)
+
+    def test_preflight_refuses_api_web_release_incoherence(self):
+        for field, value in (("git_sha", "9" * 40), ("version", "9.9.9"), ("git_tree", "9" * 40)):
+            with self.subTest(field=field):
+                data = snapshot()
+                data["releases"]["n_plus_1"]["web"][field] = value
+                self.assertNotEqual(run_preflight(data).returncode, 0)
+
+    def test_championship_execution_is_preserved_and_fail_closed(self):
+        self.assertNotEqual(run_preflight(snapshot(championship_execution_enabled=True)).returncode, 0)
+        baseline = baseline_artifact()
+        baseline["runtime_safety"]["championship_execution_enabled"] = True
+        self.assertNotEqual(run_preflight(snapshot(), baseline).returncode, 0)
+
+    def test_prospective_baseline_refuses_worker_image_mismatch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result, output = run_baseline_probe(directory, "baseline-runtime-worker-wrong")
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse(output.exists())
+
     def test_preflight_accepts_only_complete_sanitized_safe_state(self):
         result = run_preflight(snapshot())
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -223,6 +325,10 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             lambda value: value["release"]["n_plus_1"]["web"].update(image_digest=value["release"]["n"]["web"]["image_digest"]),
             lambda value: value["release"]["n_plus_1"]["web"].update(image_id="unknown"),
             lambda value: value["release"]["n"]["web"].update(build_time="unknown"),
+            lambda value: value["release"]["n_plus_1"]["api"].update(git_tree=value["release"]["n"]["api"]["git_tree"]),
+            lambda value: value["release"]["n_plus_1"]["web"].update(git_tree=value["release"]["n"]["web"]["git_tree"]),
+            lambda value: value["prospective_baseline"]["database_integrity"].update(classification="full-database-fingerprint"),
+            lambda value: value["prospective_baseline"]["database_integrity"].update(continuity_requires_independent_checks=False),
         )
         for index, mutate in enumerate(mutations):
             with self.subTest(case=index), tempfile.TemporaryDirectory() as directory:

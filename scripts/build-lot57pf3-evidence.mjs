@@ -8,11 +8,18 @@ const success=(value,label)=>{if(value!==true)fail(`${label} must be true`);retu
 const integer=(value,label)=>{if(!Number.isSafeInteger(value)||value<0)fail(`${label} must be a non-negative integer`);return value;};
 let raw;
 try{raw=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));}catch{fail('input is not valid JSON');}
-exact(raw,['release','migration_heads','db_fingerprints','comparisons','incremental_change','checks','backup_restore','provider_calls','worker_state'],'root');
+exact(raw,['prospective_baseline','release','migration_heads','db_fingerprints','comparisons','incremental_change','checks','backup_restore','provider_calls','worker_state'],'root');
+const baseline=exact(raw.prospective_baseline,['schema','prospective_certification_baseline','classification','historical_pre_existing_release','established_at','release','migration_head','database_integrity','continuity','runtime_safety','provenance'],'prospective_baseline');
+if(baseline.schema!=='lot57pf3-prospective-baseline-v1'||baseline.prospective_certification_baseline!==true||baseline.classification!=='prospective-certification-baseline'||baseline.historical_pre_existing_release!==false)fail('prospective baseline classification is invalid');
+if(Number.isNaN(Date.parse(baseline.established_at))||baseline.provenance?.source!=='repository-runtime-inspection'||baseline.provenance?.git_tree_source!=='git-rev-parse-commit-tree'||baseline.provenance?.compose_project!=='mse-preprod'||baseline.provenance?.certification_container!=='mse-f3-certification-runner'||baseline.provenance?.certification_network!=='mse-f3-certification-internal'||baseline.provenance?.exclusive_network_attachment!==true)fail('prospective baseline provenance is invalid');
+if(!/^\d{4}_[a-z0-9][a-z0-9_]*$/.test(baseline.migration_head??''))fail('prospective baseline migration head is invalid');
+if(baseline.database_integrity?.classification!=='aggregate-integrity-anchor'||baseline.database_integrity?.continuity_requires_independent_checks!==true||!/^[0-9a-f]{64}$/.test(baseline.database_integrity?.aggregate_anchor??''))fail('prospective baseline aggregate integrity anchor is invalid');
+for(const field of ['change_sequence','event_revision','meeting_revision','normalization_checkpoint_count'])integer(baseline.continuity?.[field],`prospective_baseline.continuity.${field}`);
+if(baseline.runtime_safety?.target!=='preproduction'||baseline.runtime_safety?.worker_state!=='stopped'||baseline.runtime_safety?.provider_execution_enabled!==false||baseline.runtime_safety?.championship_execution_enabled!==false||baseline.runtime_safety?.scheduler_enabled!==false||baseline.runtime_safety?.discovery_enabled!==false||baseline.runtime_safety?.preview_production_enabled!==false||baseline.runtime_safety?.provider_network_blocked!==true)fail('prospective baseline runtime safety is invalid');
 const releases=exact(raw.release,['n','n_plus_1'],'release');
 for(const name of ['n','n_plus_1']){
   exact(releases[name],['api','web'],`release.${name}`);
-  for(const component of ['api','web'])exact(releases[name][component],['version','git_sha','build_time','image_id','image_digest'],`release.${name}.${component}`);
+  for(const component of ['api','web'])exact(releases[name][component],['immutable_ref','version','git_sha','git_tree','build_time','image_id','image_digest'],`release.${name}.${component}`);
 }
 const heads=exact(raw.migration_heads,['before','n_plus_1','rollback_n','final_n_plus_1'],'migration_heads');
 const fingerprints=exact(raw.db_fingerprints,['before','n_plus_1','rollback_n','final_n_plus_1','restored_disposable'],'db_fingerprints');
@@ -24,13 +31,19 @@ for(const [name,release] of Object.entries(releases)){
   for(const [component,image] of Object.entries(release)){
     for(const [key,value] of Object.entries(image))string(value,`release.${name}.${component}.${key}`);
     if(!/^[0-9a-f]{40}$/.test(image.git_sha))fail(`release.${name}.${component}.git_sha must be 40 lowercase hex characters`);
+    if(!/^[0-9a-f]{40}$/.test(image.git_tree))fail(`release.${name}.${component}.git_tree must be 40 lowercase hex characters`);
     if(!/^sha256:[0-9a-f]{64}$/.test(image.image_id))fail(`release.${name}.${component}.image_id must be sha256`);
     if(!/^sha256:[0-9a-f]{64}$/.test(image.image_digest))fail(`release.${name}.${component}.image_digest must be sha256`);
+    if(!/@sha256:[0-9a-f]{64}$/.test(image.immutable_ref)||!image.immutable_ref.endsWith(`@${image.image_digest}`))fail(`release.${name}.${component}.immutable_ref must match its digest`);
     if(Number.isNaN(Date.parse(image.build_time)))fail(`release.${name}.${component}.build_time is invalid`);
   }
   if(release.api.image_digest===release.web.image_digest)fail(`release.${name} API and Web image digests must be distinct`);
+  if(release.api.git_sha!==release.web.git_sha||release.api.version!==release.web.version||release.api.git_tree!==release.web.git_tree)fail(`release.${name} API/Web identity is incoherent`);
 }
 for(const component of ['api','web'])if(releases.n[component].image_digest===releases.n_plus_1[component].image_digest)fail(`N and N+1 ${component} image digests must be distinct`);
+if(releases.n.api.git_tree===releases.n_plus_1.api.git_tree)fail('N+1 must contain a distinct Git tree, not an empty commit or BUILD_TIME-only rebuild');
+if(baseline.release?.git_sha!==releases.n.api.git_sha||baseline.release?.git_tree!==releases.n.api.git_tree||baseline.release?.version!==releases.n.api.version)fail('prospective baseline identity does not match N');
+for(const component of ['api','web'])for(const field of ['immutable_ref','version','git_sha','git_tree','build_time','image_id','image_digest'])if(baseline.release?.[component]?.[field]!==releases.n[component][field])fail(`prospective baseline ${component}.${field} does not match N`);
 for(const [key,value] of Object.entries(heads)){const head=string(value,`migration_heads.${key}`);if(!/^[0-9]{4}_[a-z0-9][a-z0-9_]*$/.test(head))fail(`migration_heads.${key} is not canonical`);}
 for(const [key,value] of Object.entries(fingerprints)){const digest=string(value,`db_fingerprints.${key}`);if(!/^[0-9a-f]{64}$/.test(digest))fail(`db_fingerprints.${key} must be sha256`);}
 for(const [key,value] of Object.entries(comparisons))success(value,`comparisons.${key}`);
@@ -41,6 +54,6 @@ for(const [key,value] of Object.entries(checks))success(value,`checks.${key}`);
 for(const [key,value] of Object.entries(backup))success(value,`backup_restore.${key}`);
 if(integer(raw.provider_calls,'provider_calls')!==0)fail('provider_calls must equal zero');
 if(raw.worker_state!=='stopped')fail('worker_state must equal stopped');
-const evidence={schema:'lot57pf3-operational-closure-evidence-v1',sanitized:true,release:releases,migration_heads:heads,db_fingerprints:fingerprints,comparisons,incremental_change:incremental,checks,backup_restore:backup,provider_calls:0,provider_credits:0,worker_state:'stopped'};
+const evidence={schema:'lot57pf3-operational-closure-evidence-v1',sanitized:true,prospective_baseline:{schema:baseline.schema,classification:baseline.classification,established_at:baseline.established_at,migration_head:baseline.migration_head,database_integrity_classification:'aggregate-integrity-anchor',database_aggregate_anchor:baseline.database_integrity?.aggregate_anchor},release:releases,migration_heads:heads,db_fingerprints:fingerprints,comparisons,incremental_change:incremental,checks,backup_restore:backup,provider_calls:0,provider_credits:0,worker_state:'stopped'};
 fs.writeFileSync(process.argv[3],`${JSON.stringify(evidence,null,2)}\n`,{encoding:'utf8',mode:0o600});
 console.log('F3 sanitized evidence written.');
