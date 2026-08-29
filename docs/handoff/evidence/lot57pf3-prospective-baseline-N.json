@@ -1,0 +1,70 @@
+{
+  "schema": "lot57pf3-prospective-baseline-v1",
+  "prospective_certification_baseline": true,
+  "classification": "prospective-certification-baseline",
+  "historical_pre_existing_release": false,
+  "established_at": "2026-08-29T18:20:15.538Z",
+  "release": {
+    "git_sha": "992ced15ca1bc7ab7a504aa3b4b138403d1c177b",
+    "git_tree": "b98015daf2eac4b50b1939050056c979cdf0aa14",
+    "version": "2.7.0",
+    "api": {
+      "immutable_ref": "mse-preprod-api@sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f",
+      "version": "2.7.0",
+      "git_sha": "992ced15ca1bc7ab7a504aa3b4b138403d1c177b",
+      "git_tree": "b98015daf2eac4b50b1939050056c979cdf0aa14",
+      "build_time": "2026-08-29T17:53:32Z",
+      "image_id": "sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f",
+      "image_digest": "sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f"
+    },
+    "web": {
+      "immutable_ref": "mse-preprod-web@sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f",
+      "version": "2.7.0",
+      "git_sha": "992ced15ca1bc7ab7a504aa3b4b138403d1c177b",
+      "git_tree": "b98015daf2eac4b50b1939050056c979cdf0aa14",
+      "build_time": "2026-08-29T17:53:32Z",
+      "image_id": "sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f",
+      "image_digest": "sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f"
+    }
+  },
+  "migration_head": "0031_real_circuit_reference_data",
+  "database_integrity": {
+    "classification": "aggregate-integrity-anchor",
+    "aggregate_anchor": "b8945a77cae94b704e49ff533f5076b6580f683ab210433d81524e967c5a0981",
+    "values": {
+      "events_count": 126,
+      "meetings_count": 26,
+      "changes_max_sequence": 461,
+      "events_max_revision": 1,
+      "meetings_max_revision": 1,
+      "normalization_checkpoints_count": 2,
+      "orphan_meeting_events": 0
+    },
+    "continuity_requires_independent_checks": true
+  },
+  "continuity": {
+    "change_sequence": 461,
+    "event_revision": 1,
+    "meeting_revision": 1,
+    "normalization_checkpoint_count": 2
+  },
+  "runtime_safety": {
+    "target": "preproduction",
+    "worker_state": "stopped",
+    "provider_execution_enabled": false,
+    "championship_execution_enabled": false,
+    "scheduler_enabled": false,
+    "discovery_enabled": false,
+    "preview_production_enabled": false,
+    "provider_network_blocked": true,
+    "provider_network_block_mechanism": "container-egress-deny"
+  },
+  "provenance": {
+    "source": "repository-runtime-inspection",
+    "git_tree_source": "git-rev-parse-commit-tree",
+    "compose_project": "mse-preprod",
+    "certification_container": "mse-f3-certification-runner",
+    "certification_network": "mse-f3-certification-internal",
+    "exclusive_network_attachment": true
+  }
+}
