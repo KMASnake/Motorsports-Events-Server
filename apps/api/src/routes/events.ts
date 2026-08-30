@@ -18,7 +18,7 @@ const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional()
 const nullableSessionTitle = z.union([z.string().trim().min(1).max(160), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
 const eventOrigin = z.enum(['manual', 'provider', 'mixed']);
-const eventCategory = z.enum(['practice', 'qualifying', 'sprint', 'race', 'other']);
+const eventCategory = z.enum(['practice', 'qualifying', 'sprint_qualifying', 'sprint', 'race', 'other']);
 const businessEventBody = z.object({
   championship_id: z.string().trim().min(1),
   circuit_id: z.union([z.string().trim().min(1), z.null()]).optional(),
