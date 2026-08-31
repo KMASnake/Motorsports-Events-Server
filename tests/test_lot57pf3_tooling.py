@@ -10,6 +10,9 @@ PREFLIGHT = ROOT / "scripts" / "validate-lot57pf3-preflight.mjs"
 EVIDENCE = ROOT / "scripts" / "build-lot57pf3-evidence.mjs"
 RUNTIME_PROBE = ROOT / "scripts" / "capture-lot57pf3-runtime-snapshot.mjs"
 BASELINE_PROBE = ROOT / "scripts" / "capture-lot57pf3-prospective-baseline.mjs"
+PHASE2_RUNNER = ROOT / "scripts" / "run-lot57pf3-phase2.sh"
+PHASE2_CURSOR = ROOT / "scripts" / "validate-lot57pf3-phase2-cursor.mjs"
+PHASE2_EVIDENCE = ROOT / "scripts" / "validate-lot57pf3-phase2-evidence.mjs"
 
 
 def snapshot(**overrides):
@@ -167,7 +170,131 @@ def evidence_input():
     }
 
 
+def phase2_evidence_input():
+    names = ["n-pre-migration", "n-post-forward-migration", "n-plus-one", "rollback-n", "final-n-plus-one"]
+    runtimes = ["n", "n", "n_plus_1", "n", "n_plus_1"]
+    states = {}
+    for index, (name, runtime) in enumerate(zip(names, runtimes)):
+        runtime_snapshot = snapshot(runtime_release=runtime)
+        runtime_snapshot["provider_network_block_mechanism"] = "container-egress-deny"
+        states[name] = {
+            "label": name,
+            "runtime_release": runtime,
+            "snapshot": runtime_snapshot,
+            "database": {
+                "migration_head": "0031_dynamic_test" if index == 0 else "0032_forward_test",
+                "change_sequence": 7 + index,
+                "event_revision": 3 + index,
+                "meeting_revision": 2 + index,
+                "normalization_checkpoint_count": 1,
+                "uuid_anchor": "a" * 32,
+                "relationship_anchor": "b" * 32,
+                "orphan_relationships": 0,
+            },
+            "checks": {key: True for key in ("health", "health_live", "health_ready", "tls", "cors_allowed_origin", "cors_foreign_denied", "metrics")},
+            "cursor_before_valid": True,
+            "cursor_after_valid": index >= 2,
+        }
+    return {
+        "schema": "lot57pf3-phase2-raw-v1",
+        "sequence": names,
+        "prospective_baseline": baseline_artifact(),
+        "states": states,
+        "backup_restore": {"backup_verified": True, "disposable_restore_db": True, "restore_integrity_match": True},
+        "provider_calls": 0,
+        "provider_credits": 0,
+        "worker_started": False,
+        "cleanup_verified": True,
+    }
+
+
+def run_phase2_evidence(value):
+    directory = tempfile.TemporaryDirectory()
+    source, output = Path(directory.name) / "raw.json", Path(directory.name) / "evidence.json"
+    source.write_text(json.dumps(value), encoding="utf-8")
+    result = subprocess.run(["node", str(PHASE2_EVIDENCE), str(source), str(output)], cwd=ROOT, text=True, capture_output=True, check=False)
+    return directory, result, output
+
+
 class Lot57Pf3ToolingTests(unittest.TestCase):
+    def test_phase2_runner_is_dedicated_fail_closed_and_never_uses_destructive_rollback(self):
+        runner = PHASE2_RUNNER.read_text(encoding="utf-8")
+        self.assertIn("F3_PHASE2_EXECUTION_AUTHORIZED", runner)
+        self.assertIn("validate-lot57pf3-preflight.mjs", runner)
+        self.assertIn("capture-lot57pf3-runtime-snapshot.mjs", runner)
+        self.assertEqual(runner.count("up -d --no-build --no-deps api web"), 1)
+        self.assertIn("transition n-plus-one", runner)
+        self.assertIn("transition rollback-n", runner)
+        self.assertIn("transition final-n-plus-one", runner)
+        self.assertNotIn("compose down", runner)
+        self.assertNotIn("migrate.sh down", runner)
+        self.assertNotIn("docker prune", runner)
+        self.assertNotIn("test-lot57pf3-operational-closure.sh", runner)
+        self.assertIn("SAFE_RUNTIME_LEFT", runner)
+        self.assertIn("disposable restore integrity", runner)
+        self.assertIn("cursor_verify", runner)
+        self.assertIn("n-post-forward-migration", runner)
+        self.assertLess(runner.index('run --rm -T migrate'), runner.index('transition n-plus-one'))
+        self.assertLess(runner.index('record_state n-post-forward-migration'), runner.index('transition n-plus-one'))
+        self.assertIn("dropdb --if-exists", runner)
+        self.assertIn("grep -Fxq -- \"$restore_db\"", runner)
+        self.assertIn('docker inspect "$cert_runner"', runner)
+        self.assertIn("label=com.mse.certification=lot57pf3", runner)
+        self.assertIn("validate-lot57pf3-phase2-evidence.mjs", runner)
+
+    def test_phase2_evidence_requires_complete_five_state_sequence(self):
+        directory, result, output = run_phase2_evidence(phase2_evidence_input())
+        with directory:
+            self.assertEqual(result.returncode, 0, result.stderr)
+            evidence = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(evidence["status"], "eligible-for-maintainer-validation")
+            self.assertFalse(evidence["pp178_automatically_claimed_pass"])
+            self.assertEqual(len(evidence["states"]), 5)
+
+    def test_phase2_evidence_fails_closed_on_cleanup_state_and_continuity(self):
+        mutations = (
+            lambda value: value.update(cleanup_verified=False),
+            lambda value: value["states"]["n-post-forward-migration"]["checks"].update(health_ready=False),
+            lambda value: value["states"]["n-post-forward-migration"].update(cursor_before_valid=False),
+            lambda value: value["states"]["n-post-forward-migration"]["database"].update(uuid_anchor="c" * 32),
+            lambda value: value["states"]["rollback-n"]["database"].update(migration_head="0033_wrong_head"),
+            lambda value: value.update(provider_calls=1),
+            lambda value: value.update(worker_started=True),
+        )
+        for index, mutate in enumerate(mutations):
+            with self.subTest(case=index):
+                raw = phase2_evidence_input(); mutate(raw)
+                directory, result, output = run_phase2_evidence(raw)
+                with directory:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertFalse(output.exists())
+
+    def test_phase2_evidence_refuses_release_identity_regressions(self):
+        mutations = (
+            lambda value: value["states"]["n-plus-one"]["snapshot"]["releases"]["n_plus_1"]["web"].update(git_sha="9" * 40),
+            lambda value: [state["snapshot"]["releases"]["n_plus_1"][component].update(git_tree="e" * 40) for state in value["states"].values() for component in ("api", "web")],
+            lambda value: value["states"]["final-n-plus-one"]["snapshot"]["releases"]["n"]["api"].update(image_digest="sha256:" + "9" * 64),
+        )
+        for index, mutate in enumerate(mutations):
+            with self.subTest(case=index):
+                raw = phase2_evidence_input(); mutate(raw)
+                directory, result, output = run_phase2_evidence(raw)
+                with directory:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertFalse(output.exists())
+
+    def test_phase2_cursor_probe_blocks_fetch_and_uses_real_preview_repository(self):
+        probe = PHASE2_CURSOR.read_text(encoding="utf-8")
+        self.assertIn("external_provider_network_blocked", probe)
+        self.assertIn("PostgresPreviewRepository", probe)
+        self.assertIn("previewReadRoutes", probe)
+        self.assertIn("provider_calls:0", probe)
+
+    def test_runtime_probe_binds_certification_runner_to_each_selected_runtime(self):
+        probe = RUNTIME_PROBE.read_text(encoding="utf-8")
+        self.assertIn("certification.Image!==expectedRuntime.api.image_id", probe)
+        self.assertNotIn("certification.Image!==releases.n_plus_1.api.image_id", probe)
+
     def test_prospective_baseline_is_captured_from_inspected_runtime(self):
         with tempfile.TemporaryDirectory() as directory:
             result, output = run_baseline_probe(directory)

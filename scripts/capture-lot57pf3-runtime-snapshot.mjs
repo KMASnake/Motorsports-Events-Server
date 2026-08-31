@@ -61,8 +61,8 @@ for(const component of ['api','web'])if(releases.n[component].image_digest===rel
 for(const release of ['n','n_plus_1'])if(releases[release].api.git_sha!==releases[release].web.git_sha||releases[release].api.version!==releases[release].web.version||releases[release].api.git_tree!==releases[release].web.git_tree)fail(`${release} API/Web release identity is incoherent`);
 if(releases.n.api.git_tree===releases.n_plus_1.api.git_tree)fail('N+1 has the same Git tree as N; empty commits and BUILD_TIME-only rebuilds are forbidden');
 for(const release of ['n','n_plus_1'])if(releases[release].api.image_digest===releases[release].web.image_digest)fail(`${release} API and Web images are not distinct`);
-if(certification.Image!==releases.n_plus_1.api.image_id)fail('certification runner does not use the inspected N+1 API image');
 const expectedRuntime=releases[runtimeRelease];
+if(certification.Image!==expectedRuntime.api.image_id)fail(`certification runner does not use the inspected ${runtimeRelease} API image`);
 if(api.Image!==expectedRuntime.api.image_id)fail(`runtime API does not use the inspected ${runtimeRelease} API image`);
 if(web.Image!==expectedRuntime.web.image_id)fail(`runtime Web does not use the inspected ${runtimeRelease} Web image`);
 if(worker.Image!==expectedRuntime.api.image_id)fail(`stopped worker does not identify the inspected ${runtimeRelease} API image`);
