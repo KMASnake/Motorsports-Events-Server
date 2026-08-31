@@ -24,6 +24,10 @@ describe('eventUtils', () => {
   it('laisse la fin vide lorsque ends_at est null',()=>expect(eventToForm(event({ends_at:null})).ends_at).toBe(''));
 
   it('préserve une valeur de catégorie historique dans le formulaire',()=>expect(eventToForm(event({category:'Grand Prix'})).category).toBe('Grand Prix'));
+  it('présente les anciens types Sprint dans leur famille métier sans toucher à la session',()=>{
+    expect(eventToForm(event({category:'sprint',session_title:'Sprint'}))).toMatchObject({category:'race',session_title:'Sprint'});
+    expect(eventToForm(event({category:'sprint_qualifying',session_title:'Qualifications Sprint'}))).toMatchObject({category:'qualifying',session_title:'Qualifications Sprint'});
+  });
 
   it('construit une grille mensuelle de six semaines commençant un lundi', () => {
     const days = buildCalendarDays(new Date(2026, 5, 1), [event()]);

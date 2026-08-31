@@ -89,16 +89,25 @@ describe('sécurité des corrections événement fournisseur', () => {
     await instance.close();
   });
 
-  it('accepte la catégorie canonique sprint_qualifying sans renommer la session',async()=>{
-    const current={...base,name:'Sprint Shootout',session_title:'Sprint Shootout',category:'sprint',origin:'manual',provider_key:null,external_id:null};
+  it.each([
+    ['practice','FP1'],['qualifying','Qualifications'],['qualifying','Qualifications Sprint'],
+    ['race','Race'],['race','Race 1'],['race','Race 2'],['race','Sprint']
+  ])('accepte la famille %s avec la session précise %s',async(category,sessionTitle)=>{
+    const current={...base,name:sessionTitle,session_title:sessionTitle,category:'other',origin:'manual',provider_key:null,external_id:null};
     clientQuery.mockImplementation(async(sql:string,args?:unknown[])=>{
       if(String(sql).startsWith('select * from events'))return {rowCount:1,rows:[current]};
       if(String(sql).startsWith('update events set'))return {rowCount:1,rows:[{...current,category:args?.[5]}]};
       return {rowCount:1,rows:[]};
     });
-    const instance=await app(),response=await instance.inject({method:'PATCH',url:'/api/v1/admin/events/evt-002',payload:{category:'sprint_qualifying'}});
-    expect(response.statusCode).toBe(200);expect(response.json()).toMatchObject({category:'sprint_qualifying',name:'Sprint Shootout',session_title:'Sprint Shootout'});
+    const instance=await app(),response=await instance.inject({method:'PATCH',url:'/api/v1/admin/events/evt-002',payload:{category}});
+    expect(response.statusCode).toBe(200);expect(response.json()).toMatchObject({category,name:sessionTitle,session_title:sessionTitle});
     await instance.close();
+  });
+
+  it.each(['sprint','sprint_qualifying'])('accepte encore la valeur historique %s pour compatibilité',async(category)=>{
+    const current={...base,category,origin:'manual',provider_key:null,external_id:null};
+    clientQuery.mockImplementation(async(sql:string,args?:unknown[])=>String(sql).startsWith('select * from events')?{rowCount:1,rows:[current]}:String(sql).startsWith('update events set')?{rowCount:1,rows:[{...current,category:args?.[5]}]}:{rowCount:1,rows:[]});
+    const instance=await app(),response=await instance.inject({method:'PATCH',url:'/api/v1/admin/events/evt-002',payload:{category}});expect(response.statusCode).toBe(200);await instance.close();
   });
 
   it('crée un Event manuel avec la catégorie practice',async()=>{

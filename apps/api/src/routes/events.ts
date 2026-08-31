@@ -18,7 +18,10 @@ const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional()
 const nullableSessionTitle = z.union([z.string().trim().min(1).max(160), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
 const eventOrigin = z.enum(['manual', 'provider', 'mixed']);
-const eventCategory = z.enum(['practice', 'qualifying', 'sprint_qualifying', 'sprint', 'race', 'other']);
+const eventCategory = z.enum(['practice', 'qualifying', 'race', 'other']);
+// Valeurs historiques encore produites par le contrat de normalisation détaillé.
+// L'administration n'en propose plus la saisie, mais doit pouvoir relire et corriger ces Events sans rupture.
+const compatibleEventCategory = z.union([eventCategory, z.enum(['sprint_qualifying', 'sprint'])]);
 const businessEventBody = z.object({
   championship_id: z.string().trim().min(1),
   circuit_id: z.union([z.string().trim().min(1), z.null()]).optional(),
@@ -32,7 +35,7 @@ const businessEventBody = z.object({
   description: nullableText
 });
 const adminBusinessEventBody = businessEventBody.extend({
-  category: z.union([eventCategory, z.null()]).optional()
+  category: z.union([compatibleEventCategory, z.null()]).optional()
 });
 const eventBody = businessEventBody.extend({
   slug: z.string().trim().min(1).max(180).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),

@@ -21,10 +21,15 @@ describe('event mutation DTO',()=>{
     expect(String(url)).toMatch(/\/api\/v1\/admin\/events$/);expect(init?.method).toBe('POST');expect(payload.category).toBe('practice');
   });
 
-  it('sérialise sprint_qualifying sans modifier l’intitulé de session',async()=>{
-    await saveEvent({...form,category:'sprint_qualifying',session_title:'Sprint Shootout'},'event-1');
+  it('sérialise la famille Qualifications sans modifier la session Qualifications Sprint',async()=>{
+    await saveEvent({...form,category:'qualifying',session_title:'Qualifications Sprint'},'event-1');
     const payload=JSON.parse(String(vi.mocked(fetch).mock.calls[0][1]?.body));
-    expect(payload).toMatchObject({category:'sprint_qualifying',session_title:'Sprint Shootout',name:'British Grand Prix'});
+    expect(payload).toMatchObject({category:'qualifying',session_title:'Qualifications Sprint',name:'British Grand Prix'});
+  });
+
+  it.each(['Race','Race 1','Race 2','Sprint'])('sérialise Course avec la session précise %s',async(session_title)=>{
+    await saveEvent({...form,category:'race',session_title},'event-1');
+    const payload=JSON.parse(String(vi.mocked(fetch).mock.calls[0][1]?.body));expect(payload).toMatchObject({category:'race',session_title,name:'British Grand Prix'});
   });
 
   it('ne renvoie pas une valeur historique non canonique tant qu’elle n’est pas remplacée',async()=>{

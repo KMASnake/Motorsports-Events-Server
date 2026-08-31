@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Championship, Circuit, EventFormState } from './eventTypes';
-import {eventCategoryOptions,isEventCategory} from './eventCategories';
+import {eventCategoryOptions,eventSessionTitleSuggestions,isEventCategory,sessionTitleCategory} from './eventCategories';
 
 interface Props {
   open: boolean;
@@ -21,10 +21,12 @@ interface Props {
 export function EventEditorDialog({ open, editing, saving, value, meetingName, championships, circuits, sessionTitles, error, onChange, onNameChange, onClose, onSubmit }: Props) {
   const [sessionTitlesOpen, setSessionTitlesOpen] = useState(false);
   const [filterSessionTitles, setFilterSessionTitles] = useState(false);
+  const categorySessionTitles=useMemo(()=>eventSessionTitleSuggestions(value.category,sessionTitles),[sessionTitles,value.category]);
   const matchingSessionTitles = useMemo(() => {
     const query = value.session_title.trim().toLocaleLowerCase('fr-FR');
-    return sessionTitles.filter((title) => !filterSessionTitles || !query || title.toLocaleLowerCase('fr-FR').includes(query));
-  }, [filterSessionTitles, sessionTitles, value.session_title]);
+    return categorySessionTitles.filter((title) => !filterSessionTitles || !query || title.toLocaleLowerCase('fr-FR').includes(query));
+  }, [categorySessionTitles, filterSessionTitles, value.session_title]);
+  const incompatibleSession=Boolean(value.session_title&&isEventCategory(value.category)&&sessionTitleCategory(value.session_title)!=='other'&&sessionTitleCategory(value.session_title)!==value.category);
   useEffect(() => { setSessionTitlesOpen(false); setFilterSessionTitles(false); }, [open]);
   if (!open) return null;
   return <div className="lot3-modal-backdrop" onMouseDown={() => !saving && onClose()}>
@@ -48,6 +50,7 @@ export function EventEditorDialog({ open, editing, saving, value, meetingName, c
               </span>}
             </span>
             <small>Choisissez une suggestion connue ou saisissez un nouvel intitulé.</small>
+            {incompatibleSession&&<small>La session actuelle est conservée. Choisissez explicitement un autre intitulé si nécessaire.</small>}
           </label>
           <label>Début *<input required type="datetime-local" value={value.starts_at} onChange={(event) => onChange({ ...value, starts_at: event.target.value })} /></label>
           <label>Fin<input type="datetime-local" min={value.starts_at} value={value.ends_at} onChange={(event) => onChange({ ...value, ends_at: event.target.value })} /></label>

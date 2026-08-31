@@ -1,6 +1,6 @@
 export type EventStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'postponed';
 export type EventOrigin = 'manual' | 'provider' | 'mixed';
-export type EventCategory = 'practice' | 'qualifying' | 'sprint_qualifying' | 'sprint' | 'race' | 'other';
+export type EventCategory = 'practice' | 'qualifying' | 'race' | 'other';
 export type EventView = 'month' | 'week' | 'day' | 'agenda' | 'list';
 
 export interface Championship {

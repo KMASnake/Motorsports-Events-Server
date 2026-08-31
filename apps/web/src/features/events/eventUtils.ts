@@ -1,5 +1,6 @@
 import type { EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 import { providerSource } from './providerDisplay';
+import {eventCategoryForForm} from './eventCategories';
 
 export const emptyEventForm = (): EventFormState => ({
   championship_id: '', circuit_id: '', name: '',
@@ -17,7 +18,7 @@ export function eventToForm(event: EventRow): EventFormState {
     championship_id: event.championship_id,
     circuit_id: event.circuit_id ?? '',
     name: event.name,
-    category: event.category ?? '',
+    category: eventCategoryForForm(event.category),
     starts_at: localDateTimeInput(event.starts_at),
     ends_at: localDateTimeInput(event.ends_at),
     status: event.status,
