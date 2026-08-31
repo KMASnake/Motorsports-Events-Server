@@ -14,4 +14,10 @@ describe('catégories et intitulés de session Event',()=>{
     expect(eventSessionTitleSuggestions('race',[])).toEqual(expect.arrayContaining(['Race','Race 1','Race 2','Sprint']));
     expect(eventSessionTitleSuggestions('other',['Superpole'])).toContain('Superpole');
   });
+
+  it('classe Sprint Q uniquement parmi les suggestions de qualifications',()=>{
+    expect(sessionTitleCategory('Sprint Q')).toBe('qualifying');
+    expect(eventSessionTitleSuggestions('qualifying',['Sprint Q'])).toContain('Sprint Q');
+    expect(eventSessionTitleSuggestions('race',['Sprint Q'])).not.toContain('Sprint Q');
+  });
 });

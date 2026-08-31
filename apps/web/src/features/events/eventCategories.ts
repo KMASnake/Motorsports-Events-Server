@@ -25,7 +25,7 @@ const defaultSessionTitles:Readonly<Record<EventCategory,readonly string[]>>={
 
 export function sessionTitleCategory(title:string):EventCategory {
   const normalized=title.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('fr-FR');
-  if(/\b(sprint qualifying|qualifications? sprint|sprint shootout|qualifying|qualifications?)\b/.test(normalized))return 'qualifying';
+  if(/\b(sprint (?:q|qualifying)|qualifications? sprint|sprint shootout|qualifying|qualifications?)\b/.test(normalized))return 'qualifying';
   if(/^(fp\s*\d+|free practice\b|practice\b|essais? libres?\b)/.test(normalized))return 'practice';
   if(/\b(race|course|sprint)\b/.test(normalized))return 'race';
   return 'other';
