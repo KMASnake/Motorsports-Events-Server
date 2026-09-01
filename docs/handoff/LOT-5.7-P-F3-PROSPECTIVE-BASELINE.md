@@ -31,6 +31,33 @@ Phase 1 does not test release rollback:
 
 Both N images and the sanitized baseline artifact must be retained unchanged.
 
+### OCI provenance versus executable identity
+
+F3 distinguishes two cryptographic identities. The OCI export provenance keeps
+the immutable historical index/reference and BuildKit attestation descriptors.
+The executable identity separately binds the platform runtime manifest, its
+config digest, the ordered rootfs diff IDs and embedded release metadata
+(`APP_VERSION`, `GIT_SHA`, Git tree and `BUILD_TIME`). A BuildKit attestation is
+not executed by the application. Its garbage collection therefore does not
+change runtime bytes, but it also never authorizes rewriting the historical OCI
+index or substituting a reconstruction.
+
+An executable N is accepted only when the inspected local runtime manifest,
+config and ordered rootfs identity match the maintainer-validated historical
+chain exactly. Matching Git metadata, an apparently equal filesystem, a tag,
+or a newly rebuilt image is insufficient. A different OCI index may be used as
+a locator only when it resolves to the exact retained runtime manifest and the
+complete executable identity matches; historical provenance remains unchanged.
+
+The repository artifact migrated to schema v2 preserves the historical Web OCI
+index `sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f`,
+runtime manifest `sha256:475dea105d6c5c9c1ee29dd00bce077590b2004c86b3b866eaa154b347705093`
+and config `sha256:d3f6f745eff9a71bd54404c4874af363ea0bdb3d5a0d69b40b6e7a4e8ee90146`.
+It is deliberately marked incomplete because the ordered historical layer and
+rootfs identities and the API chain are not present in Git. No value is
+guessed. Phase 2 fails closed until a maintainer validates and records that
+complete chain. Schema v1 artifacts are never accepted silently.
+
 ## Phase 2 — certify a genuinely distinct N+1
 
 Phase 2 may begin only after a separately authorized N+1 contains meaningful
@@ -54,6 +81,8 @@ database integrity and UUID/revision/sequence/cursor continuity. PP-T38 and
 PP-178 may pass only after the complete Phase 2 succeeds. Provider calls,
 provider credits, worker starts, Production Preview and Production mutations
 remain forbidden by the F3 safety contract.
+
+PP-T38 and PP-178 remain **NOT PROVEN** after this identity-model correction.
 
 ## Dedicated Phase 2 runner
 

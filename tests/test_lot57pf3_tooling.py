@@ -21,7 +21,7 @@ def snapshot(**overrides):
         release = "release-n" if version == "1.0.0" else "release-n1"
         digest = "sha256:" + digest_digit * 64
         tree_digit = "e" if version == "1.0.0" else "f"
-        return {"immutable_ref": f"registry.example/{release}-{component}@{digest}", "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z", "image_id": "sha256:" + id_digit * 64, "image_digest": digest}
+        return {"runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": "sha256:" + id_digit * 64, "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
     value = {
         "worker_running": False,
         "provider_execution_enabled": False,
@@ -44,10 +44,12 @@ def snapshot(**overrides):
 
 def baseline_artifact():
     release = snapshot()["releases"]["n"]
+    def component(value):
+        return {"oci_provenance": {"historical_immutable_ref": value["runtime_ref"], "historical_index_digest": value["runtime_manifest_digest"], "attestation_digest": None, "attestation_blob_available": None}, "executable_identity": value}
     return {
-        "schema": "lot57pf3-prospective-baseline-v1", "prospective_certification_baseline": True,
-        "classification": "prospective-certification-baseline", "historical_pre_existing_release": False,
-        "established_at": "2026-08-28T10:30:00Z", "release": {"git_sha": release["api"]["git_sha"], "git_tree": release["api"]["git_tree"], "version": release["api"]["version"], **release},
+        "schema": "lot57pf3-prospective-baseline-v2", "prospective_certification_baseline": True,
+        "classification": "prospective-certification-baseline", "historical_pre_existing_release": False, "runtime_identity_complete": True,
+        "established_at": "2026-08-28T10:30:00Z", "release": {"git_sha": release["api"]["git_sha"], "git_tree": release["api"]["git_tree"], "version": release["api"]["version"], "api": component(release["api"]), "web": component(release["web"])},
         "migration_head": "0031_dynamic_test", "database_integrity": {"classification": "aggregate-integrity-anchor", "aggregate_anchor": "f" * 64, "values": {}, "continuity_requires_independent_checks": True},
         "continuity": {"change_sequence": 7, "event_revision": 3, "meeting_revision": 2, "normalization_checkpoint_count": 1},
         "runtime_safety": {"target": "preproduction", "worker_state": "stopped", "provider_execution_enabled": False, "championship_execution_enabled": False, "scheduler_enabled": False, "discovery_enabled": False, "preview_production_enabled": False, "provider_network_blocked": True, "provider_network_block_mechanism": "container-egress-deny"},
@@ -103,7 +105,7 @@ if a[:2]==['image','inspect']:
     selected=next(value for marker,value in values.items() if marker in ref);image_digit,sha_digit,patch,hour=selected
     metadata=['APP_VERSION=1.0.'+patch,'GIT_SHA='+sha_digit*40,'BUILD_TIME=2026-08-28T'+hour+':00:00Z']
     if mode=='web-metadata-unknown' and 'web@' in ref:metadata=['APP_VERSION=unknown','GIT_SHA=unknown','BUILD_TIME=unknown']
-    print(json.dumps([{'Id':'sha256:'+image_digit*64,'RepoDigests':[ref],'Config':{'Env':metadata}}]));sys.exit(0)
+    print(json.dumps([{'Id':'sha256:'+image_digit*64,'RepoDigests':[ref],'RootFS':{'Type':'layers','Layers':['sha256:'+ref.rsplit(':',1)[1], 'sha256:'+image_digit*64]},'Config':{'Env':metadata}}]));sys.exit(0)
 sys.exit(3)
 """, encoding="utf-8")
     executable.chmod(0o755)
@@ -150,7 +152,7 @@ def run_baseline_probe(tmp_path, mode="baseline-safe"):
     env_file.write_text("non-secret-test-config=true\n", encoding="utf-8")
     env["F3_PREPROD_ENV_FILE"] = str(env_file)
     n = snapshot()["releases"]["n"]
-    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["immutable_ref"], "--n-web-image", n["web"]["immutable_ref"], "--output", str(output)]
+    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["runtime_ref"], "--n-web-image", n["web"]["runtime_ref"], "--output", str(output)]
     result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
     return result, output
 
@@ -273,7 +275,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         mutations = (
             lambda value: value["states"]["n-plus-one"]["snapshot"]["releases"]["n_plus_1"]["web"].update(git_sha="9" * 40),
             lambda value: [state["snapshot"]["releases"]["n_plus_1"][component].update(git_tree="e" * 40) for state in value["states"].values() for component in ("api", "web")],
-            lambda value: value["states"]["final-n-plus-one"]["snapshot"]["releases"]["n"]["api"].update(image_digest="sha256:" + "9" * 64),
+            lambda value: value["states"]["final-n-plus-one"]["snapshot"]["releases"]["n"]["api"].update(runtime_manifest_digest="sha256:" + "9" * 64),
         )
         for index, mutate in enumerate(mutations):
             with self.subTest(case=index):
@@ -292,8 +294,8 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
 
     def test_runtime_probe_binds_certification_runner_to_each_selected_runtime(self):
         probe = RUNTIME_PROBE.read_text(encoding="utf-8")
-        self.assertIn("certification.Image!==expectedRuntime.api.image_id", probe)
-        self.assertNotIn("certification.Image!==releases.n_plus_1.api.image_id", probe)
+        self.assertIn("certification.Image!==expectedRuntime.api.config_digest", probe)
+        self.assertNotIn("certification.Image!==releases.n_plus_1.api.config_digest", probe)
 
     def test_prospective_baseline_is_captured_from_inspected_runtime(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -302,7 +304,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             baseline = json.loads(output.read_text(encoding="utf-8"))
             self.assertTrue(baseline["prospective_certification_baseline"])
             self.assertFalse(baseline["historical_pre_existing_release"])
-            self.assertEqual(baseline["release"]["api"]["immutable_ref"], snapshot()["releases"]["n"]["api"]["immutable_ref"])
+            self.assertEqual(baseline["release"]["api"]["executable_identity"]["runtime_ref"], snapshot()["releases"]["n"]["api"]["runtime_ref"])
             self.assertEqual(baseline["runtime_safety"]["worker_state"], "stopped")
             self.assertFalse(baseline["runtime_safety"]["championship_execution_enabled"])
             self.assertEqual(baseline["database_integrity"]["classification"], "aggregate-integrity-anchor")
@@ -312,15 +314,44 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         mutations = (
             lambda value: value.update(prospective_certification_baseline=False),
             lambda value: value["provenance"].update(source="operator-declaration"),
-            lambda value: value["release"]["api"].update(image_digest="sha256:" + "9" * 64),
-            lambda value: value["release"]["web"].update(image_digest="sha256:" + "9" * 64),
-            lambda value: value["release"]["api"].update(immutable_ref="registry.example/replaced@sha256:" + "1" * 64),
+            lambda value: value["release"]["api"]["executable_identity"].update(config_digest="sha256:" + "9" * 64),
+            lambda value: value["release"]["web"]["executable_identity"].update(runtime_manifest_digest="sha256:" + "9" * 64),
+            lambda value: value["release"]["api"]["oci_provenance"].update(historical_index_digest="unknown"),
             lambda value: value.update(classification="historical-release", historical_pre_existing_release=True),
         )
         for index, mutate in enumerate(mutations):
             with self.subTest(case=index):
                 baseline = baseline_artifact(); mutate(baseline)
                 self.assertNotEqual(run_preflight(snapshot(), baseline).returncode, 0)
+
+    def test_runtime_identity_accepts_missing_attestation_and_changed_oci_locator(self):
+        baseline = baseline_artifact()
+        baseline["release"]["web"]["oci_provenance"].update(attestation_digest="sha256:" + "8" * 64, attestation_blob_available=False)
+        value = snapshot()
+        value["releases"]["n"]["web"]["runtime_ref"] = "mirror.example/historical-web@" + value["releases"]["n"]["web"]["runtime_manifest_digest"]
+        self.assertEqual(run_preflight(value, baseline).returncode, 0)
+
+    def test_runtime_identity_refuses_manifest_config_and_rootfs_differences(self):
+        mutations = (
+            lambda value: value["releases"]["n"]["web"].update(runtime_manifest_digest="sha256:" + "9" * 64, runtime_ref="registry.example/release-n-web@sha256:" + "9" * 64),
+            lambda value: value["releases"]["n"]["web"].update(config_digest="sha256:" + "9" * 64),
+            lambda value: value["releases"]["n"]["web"].update(rootfs_diff_ids=["sha256:" + "9" * 64]),
+        )
+        for index, mutate in enumerate(mutations):
+            with self.subTest(case=index):
+                value = snapshot(); mutate(value)
+                self.assertNotEqual(run_preflight(value).returncode, 0)
+
+    def test_runtime_identity_refuses_same_git_metadata_with_different_runtime(self):
+        value = snapshot()
+        value["releases"]["n"]["api"].update(runtime_manifest_digest="sha256:" + "9" * 64, runtime_ref="registry.example/release-n-api@sha256:" + "9" * 64)
+        self.assertNotEqual(run_preflight(value).returncode, 0)
+
+    def test_v1_baseline_and_incomplete_v2_are_fail_closed(self):
+        v1 = baseline_artifact(); v1["schema"] = "lot57pf3-prospective-baseline-v1"
+        incomplete = baseline_artifact(); incomplete["runtime_identity_complete"] = False
+        for baseline in (v1, incomplete):
+            self.assertNotEqual(run_preflight(snapshot(), baseline).returncode, 0)
 
     def test_preflight_refuses_different_commit_with_identical_git_tree(self):
         value = snapshot()
@@ -369,7 +400,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
                 self.assertIn("preflight refused", result.stderr.lower())
 
     def test_preflight_rejects_unknown_or_mutable_release_identity(self):
-        for release, component, field, value in [("n", "api", "git_sha", "unknown"), ("n_plus_1", "web", "build_time", "unknown"), ("n", "web", "image_digest", "latest")]:
+        for release, component, field, value in [("n", "api", "git_sha", "unknown"), ("n_plus_1", "web", "build_time", "unknown"), ("n", "web", "runtime_manifest_digest", "latest")]:
             with self.subTest(release=release, component=component, field=field):
                 data = snapshot()
                 data["releases"][release][component][field] = value
@@ -447,10 +478,10 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             lambda value: value.update(provider_calls=1),
             lambda value: value.update(worker_state="running"),
             lambda value: value["release"]["n"]["api"].update(git_sha="ABC"),
-            lambda value: value["release"]["n"]["web"].update(image_digest="latest"),
-            lambda value: value["release"]["n_plus_1"]["api"].update(image_digest=value["release"]["n"]["api"]["image_digest"]),
-            lambda value: value["release"]["n_plus_1"]["web"].update(image_digest=value["release"]["n"]["web"]["image_digest"]),
-            lambda value: value["release"]["n_plus_1"]["web"].update(image_id="unknown"),
+            lambda value: value["release"]["n"]["web"].update(runtime_manifest_digest="latest"),
+            lambda value: value["release"]["n_plus_1"]["api"].update(runtime_manifest_digest=value["release"]["n"]["api"]["runtime_manifest_digest"]),
+            lambda value: value["release"]["n_plus_1"]["web"].update(runtime_manifest_digest=value["release"]["n"]["web"]["runtime_manifest_digest"]),
+            lambda value: value["release"]["n_plus_1"]["web"].update(config_digest="unknown"),
             lambda value: value["release"]["n"]["web"].update(build_time="unknown"),
             lambda value: value["release"]["n_plus_1"]["api"].update(git_tree=value["release"]["n"]["api"]["git_tree"]),
             lambda value: value["release"]["n_plus_1"]["web"].update(git_tree=value["release"]["n"]["web"]["git_tree"]),
