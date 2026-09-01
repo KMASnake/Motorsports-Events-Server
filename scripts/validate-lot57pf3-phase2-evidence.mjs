@@ -23,8 +23,8 @@ const releaseIdentity=(release,label)=>{
   exact(release,['api','web'],label);
   for(const component of ['api','web']){
     const image=release[component];
-    exact(image,['runtime_ref','runtime_manifest_digest','config_digest','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`${label}.${component}`);
-    if(!immutable(image.runtime_ref)||!image.runtime_ref.endsWith(`@${image.runtime_manifest_digest}`)||!image.version||image.version==='unknown'||!sha(image.git_sha)||!sha(image.git_tree)||!digest(image.runtime_manifest_digest)||!digest(image.config_digest)||!Array.isArray(image.rootfs_diff_ids)||image.rootfs_diff_ids.length===0||image.rootfs_diff_ids.some(value=>!digest(value))||!Number.isFinite(Date.parse(image.build_time)))fail(`${label}.${component} identity is invalid`);
+    exact(image,['oci_provenance','runtime_ref','runtime_manifest_digest','config_digest','layer_digests','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`${label}.${component}`);
+    if(!image.oci_provenance||!immutable(image.oci_provenance.historical_immutable_ref)||!digest(image.oci_provenance.historical_index_digest)||!image.oci_provenance.historical_immutable_ref.endsWith(`@${image.oci_provenance.historical_index_digest}`)||!immutable(image.runtime_ref)||!image.runtime_ref.endsWith(`@${image.runtime_manifest_digest}`)||!image.version||image.version==='unknown'||!sha(image.git_sha)||!sha(image.git_tree)||!digest(image.runtime_manifest_digest)||!digest(image.config_digest)||!Array.isArray(image.layer_digests)||image.layer_digests.length===0||image.layer_digests.some(value=>!digest(value))||!Array.isArray(image.rootfs_diff_ids)||image.rootfs_diff_ids.length===0||image.rootfs_diff_ids.some(value=>!digest(value))||!Number.isFinite(Date.parse(image.build_time)))fail(`${label}.${component} identity is invalid`);
   }
   if(release.api.git_sha!==release.web.git_sha||release.api.git_tree!==release.web.git_tree||release.api.version!==release.web.version)fail(`${label} API/Web identity is incoherent`);
 };
@@ -44,6 +44,7 @@ for(const [index,state] of states.entries()){
   for(const component of ['api','web']){
     const expected=baseline.release?.[component]?.executable_identity,current=snapshot.releases?.n?.[component];
     for(const field of ['runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time'])if(current?.[field]!==expected?.[field])fail(`${name} baseline N ${component}.${field} differs`);
+    if(JSON.stringify(current?.layer_digests)!==JSON.stringify(expected?.layer_digests))fail(`${name} baseline N ${component}.layer_digests differs`);
     if(JSON.stringify(current?.rootfs_diff_ids)!==JSON.stringify(expected?.rootfs_diff_ids))fail(`${name} baseline N ${component}.rootfs_diff_ids differs`);
   }
   const db=state.database;exact(db,['migration_head','change_sequence','event_revision','meeting_revision','normalization_checkpoint_count','uuid_anchor','relationship_anchor','orphan_relationships'],`states.${name}.database`);

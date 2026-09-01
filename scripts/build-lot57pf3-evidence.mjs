@@ -23,7 +23,7 @@ if(baseline.runtime_safety?.target!=='preproduction'||baseline.runtime_safety?.w
 const releases=exact(raw.release,['n','n_plus_1'],'release');
 for(const name of ['n','n_plus_1']){
   exact(releases[name],['api','web'],`release.${name}`);
-  for(const component of ['api','web'])exact(releases[name][component],['runtime_ref','runtime_manifest_digest','config_digest','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`release.${name}.${component}`);
+  for(const component of ['api','web'])exact(releases[name][component],['oci_provenance','runtime_ref','runtime_manifest_digest','config_digest','layer_digests','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`release.${name}.${component}`);
 }
 const heads=exact(raw.migration_heads,['before','n_plus_1','rollback_n','final_n_plus_1'],'migration_heads');
 const fingerprints=exact(raw.db_fingerprints,['before','n_plus_1','rollback_n','final_n_plus_1','restored_disposable'],'db_fingerprints');
@@ -33,12 +33,14 @@ const checks=exact(raw.checks,['health','health_live','health_ready','cors_allow
 const backup=exact(raw.backup_restore,['backup_verified','disposable_restore_db','restore_integrity_match'],'backup_restore');
 for(const [name,release] of Object.entries(releases)){
   for(const [component,image] of Object.entries(release)){
+    if(!image.oci_provenance||typeof image.oci_provenance.historical_immutable_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(image.oci_provenance.historical_index_digest??'')||!image.oci_provenance.historical_immutable_ref.endsWith(`@${image.oci_provenance.historical_index_digest}`))fail(`release.${name}.${component}.oci_provenance is invalid`);
     for(const key of ['runtime_ref','runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time'])string(image[key],`release.${name}.${component}.${key}`);
     if(!/^[0-9a-f]{40}$/.test(image.git_sha))fail(`release.${name}.${component}.git_sha must be 40 lowercase hex characters`);
     if(!/^[0-9a-f]{40}$/.test(image.git_tree))fail(`release.${name}.${component}.git_tree must be 40 lowercase hex characters`);
     if(!/^sha256:[0-9a-f]{64}$/.test(image.runtime_manifest_digest))fail(`release.${name}.${component}.runtime_manifest_digest must be sha256`);
     if(!/^sha256:[0-9a-f]{64}$/.test(image.config_digest))fail(`release.${name}.${component}.config_digest must be sha256`);
     if(!Array.isArray(image.rootfs_diff_ids)||image.rootfs_diff_ids.length===0||image.rootfs_diff_ids.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value)))fail(`release.${name}.${component}.rootfs_diff_ids must be immutable`);
+    if(!Array.isArray(image.layer_digests)||image.layer_digests.length===0||image.layer_digests.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value)))fail(`release.${name}.${component}.layer_digests must be immutable`);
     if(!/@sha256:[0-9a-f]{64}$/.test(image.runtime_ref)||!image.runtime_ref.endsWith(`@${image.runtime_manifest_digest}`))fail(`release.${name}.${component}.runtime_ref must match its manifest`);
     if(Number.isNaN(Date.parse(image.build_time)))fail(`release.${name}.${component}.build_time is invalid`);
   }
@@ -51,6 +53,7 @@ if(baseline.release?.git_sha!==releases.n.api.git_sha||baseline.release?.git_tre
 for(const component of ['api','web']){
   const expected=baseline.release?.[component]?.executable_identity,current=releases.n[component];
   for(const field of ['runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time'])if(expected?.[field]!==current[field])fail(`prospective baseline ${component}.${field} does not match N`);
+  if(JSON.stringify(expected?.layer_digests)!==JSON.stringify(current.layer_digests))fail(`prospective baseline ${component}.layer_digests does not match N`);
   if(JSON.stringify(expected?.rootfs_diff_ids)!==JSON.stringify(current.rootfs_diff_ids))fail(`prospective baseline ${component}.rootfs_diff_ids does not match N`);
 }
 for(const [key,value] of Object.entries(heads)){const head=string(value,`migration_heads.${key}`);if(!/^[0-9]{4}_[a-z0-9][a-z0-9_]*$/.test(head))fail(`migration_heads.${key} is not canonical`);}

@@ -32,6 +32,7 @@ for(const release of ['n','n_plus_1']){
   for(const component of ['api','web']){
     const image=value[component];
     if(!image||typeof image!=='object')fail(`${release}.${component} identity is absent`);
+    if(!image.oci_provenance||typeof image.oci_provenance.historical_immutable_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(image.oci_provenance.historical_index_digest??'')||!image.oci_provenance.historical_immutable_ref.endsWith(`@${image.oci_provenance.historical_index_digest}`))fail(`${release}.${component} OCI provenance is invalid`);
     for(const field of ['runtime_ref','runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time']){
       if(typeof image[field]!=='string'||image[field].trim()===''||image[field].toLowerCase()==='unknown')fail(`${release}.${component}.${field} is absent or unknown`);
     }
@@ -40,6 +41,7 @@ for(const release of ['n','n_plus_1']){
     if(!/^sha256:[0-9a-f]{64}$/.test(image.runtime_manifest_digest))fail(`${release}.${component}.runtime_manifest_digest is not immutable`);
     if(!/^sha256:[0-9a-f]{64}$/.test(image.config_digest))fail(`${release}.${component}.config_digest is not immutable`);
     if(!/@sha256:[0-9a-f]{64}$/.test(image.runtime_ref)||!image.runtime_ref.endsWith(`@${image.runtime_manifest_digest}`))fail(`${release}.${component}.runtime_ref is not exact`);
+    if(!Array.isArray(image.layer_digests)||image.layer_digests.length===0||image.layer_digests.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value)))fail(`${release}.${component}.layer_digests is invalid`);
     if(!Array.isArray(image.rootfs_diff_ids)||image.rootfs_diff_ids.length===0||image.rootfs_diff_ids.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value)))fail(`${release}.${component}.rootfs_diff_ids is invalid`);
     if(Number.isNaN(Date.parse(image.build_time)))fail(`${release}.${component}.build_time is invalid`);
   }
@@ -52,6 +54,7 @@ if(baseline.release?.git_sha!==input.releases.n.api.git_sha||baseline.release?.g
 for(const component of ['api','web']){
   const expected=baseline.release?.[component]?.executable_identity,current=input.releases.n[component];
   for(const field of ['runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time'])if(expected?.[field]!==current[field])fail(`baseline ${component}.${field} does not match N`);
+  if(JSON.stringify(expected?.layer_digests)!==JSON.stringify(current.layer_digests))fail(`baseline ${component}.layer_digests does not match N`);
   if(JSON.stringify(expected?.rootfs_diff_ids)!==JSON.stringify(current.rootfs_diff_ids))fail(`baseline ${component}.rootfs_diff_ids does not match N`);
 }
 if(baseline.runtime_safety?.championship_execution_enabled!==false)fail('baseline championship execution safety is invalid');

@@ -42,12 +42,17 @@ not executed by the application. Its garbage collection therefore does not
 change runtime bytes, but it also never authorizes rewriting the historical OCI
 index or substituting a reconstruction.
 
-An executable N is accepted only when the inspected local runtime manifest,
-config and ordered rootfs identity match the maintainer-validated historical
-chain exactly. Matching Git metadata, an apparently equal filesystem, a tag,
-or a newly rebuilt image is insufficient. A different OCI index may be used as
-a locator only when it resolves to the exact retained runtime manifest and the
-complete executable identity matches; historical provenance remains unchanged.
+An executable N is accepted only after resolving the immutable OCI index for
+the platform actually reported by the runtime container. The selected platform
+descriptor yields a separate runtime manifest digest; that manifest binds the
+config digest and ordered compressed layer digests, while the inspected config
+binds the ordered rootfs diff IDs. Every element must match the
+maintainer-validated historical chain exactly. Matching Git metadata, an
+apparently equal filesystem, a tag, or a newly rebuilt image is insufficient.
+A different OCI index may be used as a locator only when it resolves to the
+exact retained runtime manifest and the complete executable identity matches;
+historical provenance remains unchanged. An index digest is never inferred to
+be the runtime manifest digest merely because it appears in `RepoDigests`.
 
 The repository artifact migrated to schema v2 preserves the historical Web OCI
 index `sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f`,

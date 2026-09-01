@@ -19,9 +19,11 @@ def snapshot(**overrides):
     def image(version, sha_digit, id_digit, digest_digit, hour):
         component = "api" if id_digit in ("a", "c") else "web"
         release = "release-n" if version == "1.0.0" else "release-n1"
-        digest = "sha256:" + digest_digit * 64
+        index_digest = "sha256:" + digest_digit * 64
+        runtime_digit = {"1":"5","2":"6","3":"7","4":"8"}[digest_digit]
+        digest = "sha256:" + runtime_digit * 64
         tree_digit = "e" if version == "1.0.0" else "f"
-        return {"runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": "sha256:" + id_digit * 64, "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
+        return {"oci_provenance": {"historical_immutable_ref": f"registry.example/{release}-{component}@{index_digest}", "historical_index_digest": index_digest}, "runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": "sha256:" + id_digit * 64, "layer_digests": ["sha256:" + runtime_digit * 64], "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
     value = {
         "worker_running": False,
         "provider_execution_enabled": False,
@@ -45,7 +47,9 @@ def snapshot(**overrides):
 def baseline_artifact():
     release = snapshot()["releases"]["n"]
     def component(value):
-        return {"oci_provenance": {"historical_immutable_ref": value["runtime_ref"], "historical_index_digest": value["runtime_manifest_digest"], "attestation_digest": None, "attestation_blob_available": None}, "executable_identity": value}
+        provenance={**value["oci_provenance"],"attestation_digest":None,"attestation_blob_available":None}
+        identity={key:item for key,item in value.items() if key!="oci_provenance"}
+        return {"oci_provenance": provenance, "executable_identity": identity}
     return {
         "schema": "lot57pf3-prospective-baseline-v2", "prospective_certification_baseline": True,
         "classification": "prospective-certification-baseline", "historical_pre_existing_release": False, "runtime_identity_complete": True,
@@ -95,17 +99,27 @@ if a[0]=='inspect':
         if mode=='network-multi':networks['mse-preprod_default']={}
         if mode=='network-ordinary':networks={'mse-preprod_default':{}}
         if mode=='network-empty':networks={}
-    print(json.dumps([{'State':{'Running':running},'Image':image,'Config':{'Env':env,'Labels':labels},'NetworkSettings':{'Networks':networks}}]));sys.exit(0)
+    print(json.dumps([{'State':{'Running':running},'Image':image,'Platform':'linux/amd64','Config':{'Env':env,'Labels':labels},'NetworkSettings':{'Networks':networks}}]));sys.exit(0)
 if a[:2]==['network','inspect']:
     if mode=='network-unknown':sys.exit(2)
     print(json.dumps([{'Name':'mse-f3-certification-internal','Internal':mode!='network-open'}]));sys.exit(0)
+if a[:3]==['buildx','imagetools','inspect']:
+    ref=a[-1];mapping={'release-n-api@':('5','a'),'release-n-web@':('6','b'),'release-n1-api@':('7','c'),'release-n1-web@':('8','d')}
+    runtime,config=next(value for marker,value in mapping.items() if marker in ref)
+    requested=ref.rsplit(':',1)[1]
+    if len(set(requested))==1 and requested[0] in '1234':
+        platform={'os':'linux','architecture':'arm64'} if mode=='oci-wrong-platform' else {'os':'linux','architecture':'amd64'}
+        print(json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.index.v1+json','manifests':[{'digest':'sha256:'+runtime*64,'platform':platform},{'digest':'sha256:'+'9'*64,'platform':{'os':'unknown','architecture':'unknown'}}]}));sys.exit(0)
+    manifest_config='9' if mode=='oci-wrong-config' else config
+    print(json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.manifest.v1+json','config':{'digest':'sha256:'+manifest_config*64},'layers':[{'digest':'sha256:'+runtime*64}]}));sys.exit(0)
 if a[:2]==['image','inspect']:
     ref=a[2]
     values={'release-n-api@':('a','1','0','10'),'release-n-web@':('b','1','0','10'),'release-n1-api@':('c','2','1','11'),'release-n1-web@':('d','2','1','11')}
     selected=next(value for marker,value in values.items() if marker in ref);image_digit,sha_digit,patch,hour=selected
     metadata=['APP_VERSION=1.0.'+patch,'GIT_SHA='+sha_digit*40,'BUILD_TIME=2026-08-28T'+hour+':00:00Z']
     if mode=='web-metadata-unknown' and 'web@' in ref:metadata=['APP_VERSION=unknown','GIT_SHA=unknown','BUILD_TIME=unknown']
-    print(json.dumps([{'Id':'sha256:'+image_digit*64,'RepoDigests':[ref],'RootFS':{'Type':'layers','Layers':['sha256:'+ref.rsplit(':',1)[1], 'sha256:'+image_digit*64]},'Config':{'Env':metadata}}]));sys.exit(0)
+    index_digit={'a':'1','b':'2','c':'3','d':'4'}[image_digit]
+    print(json.dumps([{'Id':'sha256:'+image_digit*64,'RepoDigests':[ref],'Os':'linux','Architecture':'amd64','RootFS':{'Type':'layers','Layers':['sha256:'+index_digit*64, 'sha256:'+image_digit*64]},'Config':{'Env':metadata}}]));sys.exit(0)
 sys.exit(3)
 """, encoding="utf-8")
     executable.chmod(0o755)
@@ -152,7 +166,7 @@ def run_baseline_probe(tmp_path, mode="baseline-safe"):
     env_file.write_text("non-secret-test-config=true\n", encoding="utf-8")
     env["F3_PREPROD_ENV_FILE"] = str(env_file)
     n = snapshot()["releases"]["n"]
-    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["runtime_ref"], "--n-web-image", n["web"]["runtime_ref"], "--output", str(output)]
+    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["oci_provenance"]["historical_immutable_ref"], "--n-web-image", n["web"]["oci_provenance"]["historical_immutable_ref"], "--output", str(output)]
     result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
     return result, output
 
@@ -335,6 +349,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         mutations = (
             lambda value: value["releases"]["n"]["web"].update(runtime_manifest_digest="sha256:" + "9" * 64, runtime_ref="registry.example/release-n-web@sha256:" + "9" * 64),
             lambda value: value["releases"]["n"]["web"].update(config_digest="sha256:" + "9" * 64),
+            lambda value: value["releases"]["n"]["web"].update(layer_digests=["sha256:" + "9" * 64]),
             lambda value: value["releases"]["n"]["web"].update(rootfs_diff_ids=["sha256:" + "9" * 64]),
         )
         for index, mutate in enumerate(mutations):
@@ -346,6 +361,18 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         value = snapshot()
         value["releases"]["n"]["api"].update(runtime_manifest_digest="sha256:" + "9" * 64, runtime_ref="registry.example/release-n-api@sha256:" + "9" * 64)
         self.assertNotEqual(run_preflight(value).returncode, 0)
+
+    def test_runtime_identity_refuses_index_digest_as_platform_manifest(self):
+        baseline = baseline_artifact()
+        baseline["release"]["web"]["executable_identity"]["runtime_manifest_digest"] = baseline["release"]["web"]["oci_provenance"]["historical_index_digest"]
+        self.assertNotEqual(run_preflight(snapshot(), baseline).returncode, 0)
+
+    def test_oci_resolution_refuses_wrong_platform_and_config_chain(self):
+        for mode in ("oci-wrong-platform", "oci-wrong-config"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
+                result, output = run_runtime_probe(directory, mode)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse(output.exists())
 
     def test_v1_baseline_and_incomplete_v2_are_fail_closed(self):
         v1 = baseline_artifact(); v1["schema"] = "lot57pf3-prospective-baseline-v1"
