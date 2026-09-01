@@ -1,4 +1,5 @@
 import json
+import hashlib
 import subprocess
 import tempfile
 import unittest
@@ -13,15 +14,31 @@ BASELINE_PROBE = ROOT / "scripts" / "capture-lot57pf3-prospective-baseline.mjs"
 PHASE2_RUNNER = ROOT / "scripts" / "run-lot57pf3-phase2.sh"
 PHASE2_CURSOR = ROOT / "scripts" / "validate-lot57pf3-phase2-cursor.mjs"
 PHASE2_EVIDENCE = ROOT / "scripts" / "validate-lot57pf3-phase2-evidence.mjs"
+OCI_RESOLVER = ROOT / "scripts" / "lib" / "lot57pf3-oci-identity.mjs"
+
+
+def oci_fixture(config_digit, layer_digit, media_type="application/vnd.oci.image.manifest.v1+json"):
+    manifest = json.dumps({"schemaVersion": 2, "mediaType": media_type, "config": {"digest": "sha256:" + config_digit * 64}, "layers": [{"digest": "sha256:" + layer_digit * 64}]}, separators=(",", ":"))
+    manifest_digest = "sha256:" + hashlib.sha256(manifest.encode()).hexdigest()
+    index = json.dumps({"schemaVersion": 2, "mediaType": "application/vnd.oci.image.index.v1+json", "manifests": [{"digest": manifest_digest, "platform": {"os": "linux", "architecture": "amd64"}}, {"digest": "sha256:" + "9" * 64, "platform": {"os": "unknown", "architecture": "unknown"}}]}, separators=(",", ":"))
+    return {"manifest": manifest, "manifest_digest": manifest_digest, "index": index, "index_digest": "sha256:" + hashlib.sha256(index.encode()).hexdigest()}
+
+
+def run_oci_resolver(ref, documents, platform="linux/amd64"):
+    with tempfile.TemporaryDirectory() as directory:
+        source = Path(directory) / "documents.json"
+        source.write_text(json.dumps(documents), encoding="utf-8")
+        program = f"import fs from 'node:fs';import {{resolveOciRuntimeIdentity}} from {json.dumps(OCI_RESOLVER.as_uri())};const docs=JSON.parse(fs.readFileSync(process.argv[1]));const result=resolveOciRuntimeIdentity({{ref:process.argv[2],platform:process.argv[3],readRaw:key=>Buffer.from(docs[key]),fail:message=>{{throw Error(message);}}}});console.log(JSON.stringify(result));"
+        return subprocess.run(["node", "--input-type=module", "-e", program, str(source), ref, platform], cwd=ROOT, text=True, capture_output=True, check=False)
 
 
 def snapshot(**overrides):
     def image(version, sha_digit, id_digit, digest_digit, hour):
         component = "api" if id_digit in ("a", "c") else "web"
         release = "release-n" if version == "1.0.0" else "release-n1"
-        index_digest = "sha256:" + digest_digit * 64
         runtime_digit = {"1":"5","2":"6","3":"7","4":"8"}[digest_digit]
-        digest = "sha256:" + runtime_digit * 64
+        fixture = oci_fixture(id_digit, runtime_digit)
+        index_digest, digest = fixture["index_digest"], fixture["manifest_digest"]
         tree_digit = "e" if version == "1.0.0" else "f"
         return {"oci_provenance": {"historical_immutable_ref": f"registry.example/{release}-{component}@{index_digest}", "historical_index_digest": index_digest}, "runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": "sha256:" + id_digit * 64, "layer_digests": ["sha256:" + runtime_digit * 64], "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
     value = {
@@ -73,7 +90,7 @@ def run_preflight(value, baseline_value=None):
 def fake_docker(directory, mode="safe"):
     executable = Path(directory) / "docker"
     executable.write_text("""#!/usr/bin/env python3
-import json,os,sys
+import hashlib,json,os,sys
 a=sys.argv[1:];mode=os.environ.get('F3_FAKE_MODE','safe')
 if a[0]=='compose' and 'ps' in a:
     service=a[-1];print({'postgres':'postgres-id','api':'api-id','web':'web-id','worker':'worker-id'}[service]);sys.exit(0)
@@ -106,12 +123,18 @@ if a[:2]==['network','inspect']:
 if a[:3]==['buildx','imagetools','inspect']:
     ref=a[-1];mapping={'release-n-api@':('5','a'),'release-n-web@':('6','b'),'release-n1-api@':('7','c'),'release-n1-web@':('8','d')}
     runtime,config=next(value for marker,value in mapping.items() if marker in ref)
-    requested=ref.rsplit(':',1)[1]
-    if len(set(requested))==1 and requested[0] in '1234':
-        platform={'os':'linux','architecture':'arm64'} if mode=='oci-wrong-platform' else {'os':'linux','architecture':'amd64'}
-        print(json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.index.v1+json','manifests':[{'digest':'sha256:'+runtime*64,'platform':platform},{'digest':'sha256:'+'9'*64,'platform':{'os':'unknown','architecture':'unknown'}}]}));sys.exit(0)
-    manifest_config='9' if mode=='oci-wrong-config' else config
-    print(json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.manifest.v1+json','config':{'digest':'sha256:'+manifest_config*64},'layers':[{'digest':'sha256:'+runtime*64}]}));sys.exit(0)
+    manifest=json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.manifest.v1+json','config':{'digest':'sha256:'+config*64},'layers':[{'digest':'sha256:'+runtime*64}]},separators=(',',':'))
+    manifest_digest='sha256:'+hashlib.sha256(manifest.encode()).hexdigest()
+    platform={'os':'linux','architecture':'amd64'}
+    index=json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.index.v1+json','manifests':[{'digest':manifest_digest,'platform':platform},{'digest':'sha256:'+'9'*64,'platform':{'os':'unknown','architecture':'unknown'}}]},separators=(',',':'))
+    requested='sha256:'+ref.rsplit(':',1)[1]
+    if requested=='sha256:'+hashlib.sha256(index.encode()).hexdigest():
+        if mode=='oci-wrong-platform':index=index.replace('amd64','arm64')
+        sys.stdout.write(index);sys.exit(0)
+    if requested==manifest_digest:
+        if mode=='oci-wrong-config':manifest=manifest.replace('sha256:'+config*64,'sha256:'+'9'*64)
+        sys.stdout.write(manifest);sys.exit(0)
+    sys.exit(4)
 if a[:2]==['image','inspect']:
     ref=a[2]
     values={'release-n-api@':('a','1','0','10'),'release-n-web@':('b','1','0','10'),'release-n1-api@':('c','2','1','11'),'release-n1-web@':('d','2','1','11')}
@@ -145,11 +168,12 @@ def run_runtime_probe(tmp_path, mode="safe", extra_args=()):
     env_file, output = Path(tmp_path) / ".env.preprod", Path(tmp_path) / "snapshot.json"
     env_file.write_text("non-secret-test-config=true\n", encoding="utf-8")
     env["F3_PREPROD_ENV_FILE"] = str(env_file)
+    releases = snapshot()["releases"]
     refs = {
-        "n_api": "registry.example/release-n-api@sha256:" + "1" * 64,
-        "n_web": "registry.example/release-n-web@sha256:" + "2" * 64,
-        "n1_api": "registry.example/release-n1-api@sha256:" + "3" * 64,
-        "n1_web": "registry.example/release-n1-web@sha256:" + "4" * 64,
+        "n_api": releases["n"]["api"]["oci_provenance"]["historical_immutable_ref"],
+        "n_web": releases["n"]["web"]["oci_provenance"]["historical_immutable_ref"],
+        "n1_api": releases["n_plus_1"]["api"]["oci_provenance"]["historical_immutable_ref"],
+        "n1_web": releases["n_plus_1"]["web"]["oci_provenance"]["historical_immutable_ref"],
     }
     command = ["node", str(RUNTIME_PROBE), "--n-api-image", refs["n_api"], "--n-web-image", refs["n_web"], "--n-plus-one-api-image", refs["n1_api"], "--n-plus-one-web-image", refs["n1_web"], "--runtime-release", "n-plus-one", "--output", str(output), *extra_args]
     result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
@@ -233,6 +257,51 @@ def run_phase2_evidence(value):
 
 
 class Lot57Pf3ToolingTests(unittest.TestCase):
+    def test_oci_resolver_hashes_index_and_selected_runtime_manifest(self):
+        fixture = oci_fixture("a", "5")
+        index_ref = "registry.example/test@" + fixture["index_digest"]
+        runtime_ref = "registry.example/test@" + fixture["manifest_digest"]
+        result = run_oci_resolver(index_ref, {index_ref: fixture["index"], runtime_ref: fixture["manifest"]})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        identity = json.loads(result.stdout)
+        self.assertNotEqual(identity["oci_provenance"]["historical_index_digest"], identity["runtime_manifest_digest"])
+        self.assertEqual(identity["config_digest"], "sha256:" + "a" * 64)
+
+    def test_oci_resolver_refuses_blob_hash_mismatches(self):
+        fixture = oci_fixture("a", "5")
+        index_ref = "registry.example/test@" + fixture["index_digest"]
+        runtime_ref = "registry.example/test@" + fixture["manifest_digest"]
+        cases = (
+            {index_ref: fixture["index"] + " ", runtime_ref: fixture["manifest"]},
+            {index_ref: fixture["index"], runtime_ref: fixture["manifest"] + " "},
+        )
+        for documents in cases:
+            self.assertNotEqual(run_oci_resolver(index_ref, documents).returncode, 0)
+
+    def test_oci_resolver_accepts_only_exact_direct_runtime_manifest(self):
+        fixture = oci_fixture("a", "5")
+        ref = "registry.example/test@" + fixture["manifest_digest"]
+        self.assertEqual(run_oci_resolver(ref, {ref: fixture["manifest"]}).returncode, 0)
+        self.assertNotEqual(run_oci_resolver(ref, {ref: fixture["manifest"] + " "}).returncode, 0)
+
+    def test_oci_resolver_refuses_unsupported_media_types_and_wrong_platform(self):
+        bad_index = json.dumps({"schemaVersion": 2, "mediaType": "application/json", "manifests": []}, separators=(",", ":"))
+        bad_index_ref = "registry.example/test@sha256:" + hashlib.sha256(bad_index.encode()).hexdigest()
+        bad_manifest = json.dumps({"schemaVersion": 2, "mediaType": "application/json", "config": {"digest": "sha256:" + "a" * 64}, "layers": [{"digest": "sha256:" + "5" * 64}]}, separators=(",", ":"))
+        bad_manifest_digest = "sha256:" + hashlib.sha256(bad_manifest.encode()).hexdigest()
+        index = json.dumps({"schemaVersion": 2, "mediaType": "application/vnd.oci.image.index.v1+json", "manifests": [{"digest": bad_manifest_digest, "platform": {"os": "linux", "architecture": "amd64"}}]}, separators=(",", ":"))
+        index_ref = "registry.example/test@sha256:" + hashlib.sha256(index.encode()).hexdigest()
+        runtime_ref = "registry.example/test@" + bad_manifest_digest
+        fixture = oci_fixture("a", "5")
+        wrong_platform = fixture["index"].replace('"architecture":"amd64"', '"architecture":"arm64"')
+        wrong_ref = "registry.example/test@sha256:" + hashlib.sha256(wrong_platform.encode()).hexdigest()
+        for ref, documents in (
+            (bad_index_ref, {bad_index_ref: bad_index}),
+            (index_ref, {index_ref: index, runtime_ref: bad_manifest}),
+            (wrong_ref, {wrong_ref: wrong_platform}),
+        ):
+            self.assertNotEqual(run_oci_resolver(ref, documents).returncode, 0)
+
     def test_phase2_runner_is_dedicated_fail_closed_and_never_uses_destructive_rollback(self):
         runner = PHASE2_RUNNER.read_text(encoding="utf-8")
         self.assertIn("F3_PHASE2_EXECUTION_AUTHORIZED", runner)

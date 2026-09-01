@@ -14,7 +14,7 @@ const envFile=process.env.F3_PREPROD_ENV_FILE??'.env.preprod';
 if(!fs.existsSync(envFile))fail('preproduction env file is absent');
 const compose=['compose','--env-file',envFile,'-p','mse-preprod','-f','docker-compose.yml','-f','docker-compose.preprod.yml'];
 const run=(commandArgs,label)=>{const result=spawnSync('docker',commandArgs,{encoding:'utf8'});if(result.status!==0)fail(`${label} is unknown`);return result.stdout.trim();};
-const rawOci=ref=>run(['buildx','imagetools','inspect','--raw',ref],`OCI identity ${ref}`);
+const rawOci=ref=>{const result=spawnSync('docker',['buildx','imagetools','inspect','--raw',ref]);if(result.status!==0||!Buffer.isBuffer(result.stdout))fail(`OCI identity ${ref} is unknown`);return result.stdout;};
 const json=(commandArgs,label)=>{try{return JSON.parse(run(commandArgs,label));}catch{fail(`${label} is not inspectable JSON`);}};
 const containerId=service=>{const id=run([...compose,'ps','-aq',service],`${service} container`);if(!id)fail(`${service} container is absent`);return id;};
 const inspectContainer=service=>{const inspected=json(['inspect',containerId(service)],`${service} runtime`);if(!Array.isArray(inspected)||inspected.length!==1)fail(`${service} runtime is ambiguous`);return inspected[0];};
