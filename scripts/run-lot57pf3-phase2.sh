@@ -5,13 +5,13 @@ fail(){ printf 'F3 Phase 2 refused: %s\n' "$*" >&2; exit 1; }
 [[ ${1:-} == --execute ]] || fail 'explicit --execute is required after separate maintainer VPS authorization'
 [[ ${F3_PHASE2_EXECUTION_AUTHORIZED:-} == YES ]] || fail 'F3_PHASE2_EXECUTION_AUTHORIZED=YES is required'
 shift
-[[ $# -eq 12 ]] || fail 'usage: --execute --baseline FILE --n-api REF --n-web REF --n-plus-one-api REF --n-plus-one-web REF --evidence-dir DIR'
+[[ $# -eq 20 ]] || fail 'usage: --execute --baseline FILE --n-api REF --n-api-oci-layout DIR --n-web REF --n-web-oci-layout DIR --n-plus-one-api REF --n-plus-one-api-oci-layout DIR --n-plus-one-web REF --n-plus-one-web-oci-layout DIR --evidence-dir DIR'
 while [[ $# -gt 0 ]];do case "$1" in
-  --baseline) baseline=$2;; --n-api) n_api=$2;; --n-web) n_web=$2;;
-  --n-plus-one-api) n1_api=$2;; --n-plus-one-web) n1_web=$2;;
+  --baseline) baseline=$2;; --n-api) n_api=$2;; --n-api-oci-layout) n_api_layout=$2;; --n-web) n_web=$2;; --n-web-oci-layout) n_web_layout=$2;;
+  --n-plus-one-api) n1_api=$2;; --n-plus-one-api-oci-layout) n1_api_layout=$2;; --n-plus-one-web) n1_web=$2;; --n-plus-one-web-oci-layout) n1_web_layout=$2;;
   --evidence-dir) evidence_dir=$2;; *) fail "unknown argument: $1";;
 esac;shift 2;done
-for name in baseline n_api n_web n1_api n1_web evidence_dir;do [[ -n ${!name:-} ]]||fail "$name is required";done
+for name in baseline n_api n_api_layout n_web n_web_layout n1_api n1_api_layout n1_web n1_web_layout evidence_dir;do [[ -n ${!name:-} ]]||fail "$name is required";done
 readonly immutable='^.+@sha256:[0-9a-f]{64}$'
 for ref in "$n_api" "$n_web" "$n1_api" "$n1_web";do [[ $ref =~ $immutable ]]||fail "mutable image reference refused: $ref";done
 [[ -f $baseline ]]||fail 'prospective baseline artifact is absent'
@@ -81,8 +81,11 @@ recreate_cert_runner(){
 }
 snapshot(){
   local release=$1 output=$2
-  node scripts/capture-lot57pf3-runtime-snapshot.mjs --n-api-image "$n_api" --n-web-image "$n_web" \
-    --n-plus-one-api-image "$n1_api" --n-plus-one-web-image "$n1_web" --runtime-release "$release" --output "$output"
+  node scripts/capture-lot57pf3-runtime-snapshot.mjs --n-api-image "$n_api" --n-api-oci-layout "$n_api_layout" \
+    --n-web-image "$n_web" --n-web-oci-layout "$n_web_layout" \
+    --n-plus-one-api-image "$n1_api" --n-plus-one-api-oci-layout "$n1_api_layout" \
+    --n-plus-one-web-image "$n1_web" --n-plus-one-web-oci-layout "$n1_web_layout" \
+    --runtime-release "$release" --output "$output"
   node scripts/validate-lot57pf3-preflight.mjs "$output" "$baseline" >/dev/null
 }
 assert_worker_stopped(){

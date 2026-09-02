@@ -49,10 +49,17 @@ config digest and ordered compressed layer digests, while the inspected config
 binds the ordered rootfs diff IDs. Every element must match the
 maintainer-validated historical chain exactly. Matching Git metadata, an
 apparently equal filesystem, a tag, or a newly rebuilt image is insufficient.
-A different OCI index may be used as a locator only when it resolves to the
-exact retained runtime manifest and the complete executable identity matches;
-historical provenance remains unchanged. An index digest is never inferred to
-be the runtime manifest digest merely because it appears in `RepoDigests`.
+A different OCI index may be used as a recovery locator only when it resolves
+to the exact retained runtime manifest and the complete executable identity
+matches; historical provenance remains unchanged. The runtime snapshot records
+this materialization separately as `locator_ref`/`locator_index_digest` and
+never copies those values into `historical_immutable_ref` or
+`historical_index_digest`. The resolver reads a content-addressed local OCI
+layout (`oci-layout`, `index.json`, `blobs/sha256/*`) and hashes every selected
+index/manifest blob. It performs no registry lookup. An absent, unanchored,
+mutable or cryptographically incoherent local locator is refused. An index
+digest is never inferred to be the runtime manifest digest merely because it
+appears in `RepoDigests`.
 
 The repository artifact migrated to schema v2 preserves the historical Web OCI
 index `sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f`,
@@ -73,8 +80,10 @@ same tree, changing only `BUILD_TIME`, rebuilding the same Git tree, changing a
 mutable tag, or changing `VERSION` solely to manufacture N+1 is refused.
 
 The runtime snapshot and final evidence import the Phase 1 artifact. N's API
-and Web immutable references, metadata, image IDs and digests must match it
-exactly. The procedure is:
+and Web historical references remain those retained in that artifact. A local
+recovery locator may differ, but the selected runtime manifest, config,
+compressed layers, rootfs diff IDs, metadata and Git identity must match the
+historical certified executable identity exactly. The procedure is:
 
 1. exact N API + Web;
 2. exact N+1 API + Web;

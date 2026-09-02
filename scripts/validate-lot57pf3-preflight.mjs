@@ -32,7 +32,7 @@ for(const release of ['n','n_plus_1']){
   for(const component of ['api','web']){
     const image=value[component];
     if(!image||typeof image!=='object')fail(`${release}.${component} identity is absent`);
-    if(!image.oci_provenance||typeof image.oci_provenance.historical_immutable_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(image.oci_provenance.historical_index_digest??'')||!image.oci_provenance.historical_immutable_ref.endsWith(`@${image.oci_provenance.historical_index_digest}`))fail(`${release}.${component} OCI provenance is invalid`);
+    if(!image.oci_locator||typeof image.oci_locator.locator_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(image.oci_locator.locator_index_digest??'')||!image.oci_locator.locator_ref.endsWith(`@${image.oci_locator.locator_index_digest}`))fail(`${release}.${component} local OCI locator is invalid`);
     for(const field of ['runtime_ref','runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time']){
       if(typeof image[field]!=='string'||image[field].trim()===''||image[field].toLowerCase()==='unknown')fail(`${release}.${component}.${field} is absent or unknown`);
     }

@@ -23,7 +23,7 @@ if(baseline.runtime_safety?.target!=='preproduction'||baseline.runtime_safety?.w
 const releases=exact(raw.release,['n','n_plus_1'],'release');
 for(const name of ['n','n_plus_1']){
   exact(releases[name],['api','web'],`release.${name}`);
-  for(const component of ['api','web'])exact(releases[name][component],['oci_provenance','runtime_ref','runtime_manifest_digest','config_digest','layer_digests','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`release.${name}.${component}`);
+  for(const component of ['api','web'])exact(releases[name][component],['oci_locator','runtime_ref','runtime_manifest_digest','config_digest','layer_digests','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`release.${name}.${component}`);
 }
 const heads=exact(raw.migration_heads,['before','n_plus_1','rollback_n','final_n_plus_1'],'migration_heads');
 const fingerprints=exact(raw.db_fingerprints,['before','n_plus_1','rollback_n','final_n_plus_1','restored_disposable'],'db_fingerprints');
@@ -33,7 +33,7 @@ const checks=exact(raw.checks,['health','health_live','health_ready','cors_allow
 const backup=exact(raw.backup_restore,['backup_verified','disposable_restore_db','restore_integrity_match'],'backup_restore');
 for(const [name,release] of Object.entries(releases)){
   for(const [component,image] of Object.entries(release)){
-    if(!image.oci_provenance||typeof image.oci_provenance.historical_immutable_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(image.oci_provenance.historical_index_digest??'')||!image.oci_provenance.historical_immutable_ref.endsWith(`@${image.oci_provenance.historical_index_digest}`))fail(`release.${name}.${component}.oci_provenance is invalid`);
+    if(!image.oci_locator||typeof image.oci_locator.locator_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(image.oci_locator.locator_index_digest??'')||!image.oci_locator.locator_ref.endsWith(`@${image.oci_locator.locator_index_digest}`))fail(`release.${name}.${component}.oci_locator is invalid`);
     for(const key of ['runtime_ref','runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time'])string(image[key],`release.${name}.${component}.${key}`);
     if(!/^[0-9a-f]{40}$/.test(image.git_sha))fail(`release.${name}.${component}.git_sha must be 40 lowercase hex characters`);
     if(!/^[0-9a-f]{40}$/.test(image.git_tree))fail(`release.${name}.${component}.git_tree must be 40 lowercase hex characters`);

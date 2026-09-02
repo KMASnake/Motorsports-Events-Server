@@ -32,6 +32,11 @@ def run_oci_resolver(ref, documents, platform="linux/amd64"):
         return subprocess.run(["node", "--input-type=module", "-e", program, str(source), ref, platform], cwd=ROOT, text=True, capture_output=True, check=False)
 
 
+def run_local_oci_resolver(layout, ref, platform="linux/amd64"):
+    program = f"import {{createLocalOciReader,resolveOciRuntimeIdentity}} from {json.dumps(OCI_RESOLVER.as_uri())};const fail=message=>{{throw Error(message);}};const digest=process.argv[2].slice(process.argv[2].lastIndexOf('@')+1);const readRaw=createLocalOciReader({{layout:process.argv[1],locatorDigest:digest,fail}});console.log(JSON.stringify(resolveOciRuntimeIdentity({{ref:process.argv[2],platform:process.argv[3],readRaw,fail}})));"
+    return subprocess.run(["node", "--input-type=module", "-e", program, str(layout), ref, platform], cwd=ROOT, text=True, capture_output=True, check=False)
+
+
 def snapshot(**overrides):
     def image(version, sha_digit, id_digit, digest_digit, hour):
         component = "api" if id_digit in ("a", "c") else "web"
@@ -40,7 +45,7 @@ def snapshot(**overrides):
         fixture = oci_fixture(id_digit, runtime_digit)
         index_digest, digest = fixture["index_digest"], fixture["manifest_digest"]
         tree_digit = "e" if version == "1.0.0" else "f"
-        return {"oci_provenance": {"historical_immutable_ref": f"registry.example/{release}-{component}@{index_digest}", "historical_index_digest": index_digest}, "runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": "sha256:" + id_digit * 64, "layer_digests": ["sha256:" + runtime_digit * 64], "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
+        return {"oci_locator": {"locator_ref": f"registry.example/{release}-{component}@{index_digest}", "locator_index_digest": index_digest}, "runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": "sha256:" + id_digit * 64, "layer_digests": ["sha256:" + runtime_digit * 64], "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
     value = {
         "worker_running": False,
         "provider_execution_enabled": False,
@@ -64,8 +69,8 @@ def snapshot(**overrides):
 def baseline_artifact():
     release = snapshot()["releases"]["n"]
     def component(value):
-        provenance={**value["oci_provenance"],"attestation_digest":None,"attestation_blob_available":None}
-        identity={key:item for key,item in value.items() if key!="oci_provenance"}
+        provenance={"historical_immutable_ref":value["oci_locator"]["locator_ref"],"historical_index_digest":value["oci_locator"]["locator_index_digest"],"attestation_digest":None,"attestation_blob_available":None}
+        identity={key:item for key,item in value.items() if key!="oci_locator"}
         return {"oci_provenance": provenance, "executable_identity": identity}
     return {
         "schema": "lot57pf3-prospective-baseline-v2", "prospective_certification_baseline": True,
@@ -159,6 +164,20 @@ print(('e' if sha.startswith('1') else 'f')*40)
     executable.chmod(0o755)
 
 
+def write_oci_layout(directory, name, image):
+    layout = Path(directory) / name
+    blobs = layout / "blobs" / "sha256"
+    blobs.mkdir(parents=True)
+    fixture = oci_fixture(image["config_digest"].split(":", 1)[1][0], image["layer_digests"][0].split(":", 1)[1][0])
+    assert fixture["index_digest"] == image["oci_locator"]["locator_index_digest"]
+    assert fixture["manifest_digest"] == image["runtime_manifest_digest"]
+    (layout / "oci-layout").write_text('{"imageLayoutVersion":"1.0.0"}', encoding="utf-8")
+    (layout / "index.json").write_text(json.dumps({"schemaVersion": 2, "manifests": [{"mediaType": "application/vnd.oci.image.index.v1+json", "digest": fixture["index_digest"], "size": len(fixture["index"].encode())}]}, separators=(",", ":")), encoding="utf-8")
+    (blobs / fixture["index_digest"].split(":", 1)[1]).write_bytes(fixture["index"].encode())
+    (blobs / fixture["manifest_digest"].split(":", 1)[1]).write_bytes(fixture["manifest"].encode())
+    return str(layout)
+
+
 def run_runtime_probe(tmp_path, mode="safe", extra_args=()):
     fake_docker(tmp_path, mode)
     fake_git(tmp_path)
@@ -170,12 +189,13 @@ def run_runtime_probe(tmp_path, mode="safe", extra_args=()):
     env["F3_PREPROD_ENV_FILE"] = str(env_file)
     releases = snapshot()["releases"]
     refs = {
-        "n_api": releases["n"]["api"]["oci_provenance"]["historical_immutable_ref"],
-        "n_web": releases["n"]["web"]["oci_provenance"]["historical_immutable_ref"],
-        "n1_api": releases["n_plus_1"]["api"]["oci_provenance"]["historical_immutable_ref"],
-        "n1_web": releases["n_plus_1"]["web"]["oci_provenance"]["historical_immutable_ref"],
+        "n_api": releases["n"]["api"]["oci_locator"]["locator_ref"],
+        "n_web": releases["n"]["web"]["oci_locator"]["locator_ref"],
+        "n1_api": releases["n_plus_1"]["api"]["oci_locator"]["locator_ref"],
+        "n1_web": releases["n_plus_1"]["web"]["oci_locator"]["locator_ref"],
     }
-    command = ["node", str(RUNTIME_PROBE), "--n-api-image", refs["n_api"], "--n-web-image", refs["n_web"], "--n-plus-one-api-image", refs["n1_api"], "--n-plus-one-web-image", refs["n1_web"], "--runtime-release", "n-plus-one", "--output", str(output), *extra_args]
+    layouts = {"n_api": write_oci_layout(tmp_path, "n-api", releases["n"]["api"]), "n_web": write_oci_layout(tmp_path, "n-web", releases["n"]["web"]), "n1_api": write_oci_layout(tmp_path, "n1-api", releases["n_plus_1"]["api"]), "n1_web": write_oci_layout(tmp_path, "n1-web", releases["n_plus_1"]["web"])}
+    command = ["node", str(RUNTIME_PROBE), "--n-api-image", refs["n_api"], "--n-api-oci-layout", layouts["n_api"], "--n-web-image", refs["n_web"], "--n-web-oci-layout", layouts["n_web"], "--n-plus-one-api-image", refs["n1_api"], "--n-plus-one-api-oci-layout", layouts["n1_api"], "--n-plus-one-web-image", refs["n1_web"], "--n-plus-one-web-oci-layout", layouts["n1_web"], "--runtime-release", "n-plus-one", "--output", str(output), *extra_args]
     result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
     return result, output
 
@@ -190,7 +210,8 @@ def run_baseline_probe(tmp_path, mode="baseline-safe"):
     env_file.write_text("non-secret-test-config=true\n", encoding="utf-8")
     env["F3_PREPROD_ENV_FILE"] = str(env_file)
     n = snapshot()["releases"]["n"]
-    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["oci_provenance"]["historical_immutable_ref"], "--n-web-image", n["web"]["oci_provenance"]["historical_immutable_ref"], "--output", str(output)]
+    api_layout=write_oci_layout(tmp_path,"baseline-api",n["api"]);web_layout=write_oci_layout(tmp_path,"baseline-web",n["web"])
+    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["oci_locator"]["locator_ref"], "--n-api-oci-layout", api_layout, "--n-web-image", n["web"]["oci_locator"]["locator_ref"], "--n-web-oci-layout", web_layout, "--output", str(output)]
     result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
     return result, output
 
@@ -264,7 +285,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         result = run_oci_resolver(index_ref, {index_ref: fixture["index"], runtime_ref: fixture["manifest"]})
         self.assertEqual(result.returncode, 0, result.stderr)
         identity = json.loads(result.stdout)
-        self.assertNotEqual(identity["oci_provenance"]["historical_index_digest"], identity["runtime_manifest_digest"])
+        self.assertNotEqual(identity["oci_locator"]["locator_index_digest"], identity["runtime_manifest_digest"])
         self.assertEqual(identity["config_digest"], "sha256:" + "a" * 64)
 
     def test_oci_resolver_refuses_blob_hash_mismatches(self):
@@ -283,6 +304,23 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         ref = "registry.example/test@" + fixture["manifest_digest"]
         self.assertEqual(run_oci_resolver(ref, {ref: fixture["manifest"]}).returncode, 0)
         self.assertNotEqual(run_oci_resolver(ref, {ref: fixture["manifest"] + " "}).returncode, 0)
+
+    def test_local_oci_locator_resolves_without_registry_and_fails_closed(self):
+        image = snapshot()["releases"]["n"]["api"]
+        with tempfile.TemporaryDirectory() as directory:
+            layout = write_oci_layout(directory, "api", image)
+            result = run_local_oci_resolver(layout, image["oci_locator"]["locator_ref"])
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["runtime_manifest_digest"], image["runtime_manifest_digest"])
+            (Path(layout) / "blobs" / "sha256" / image["runtime_manifest_digest"].split(":", 1)[1]).unlink()
+            self.assertNotEqual(run_local_oci_resolver(layout, image["oci_locator"]["locator_ref"]).returncode, 0)
+
+    def test_local_oci_locator_refuses_unanchored_locator(self):
+        image = snapshot()["releases"]["n"]["api"]
+        with tempfile.TemporaryDirectory() as directory:
+            layout = write_oci_layout(directory, "api", image)
+            foreign_ref = "registry.example/recovery@sha256:" + "8" * 64
+            self.assertNotEqual(run_local_oci_resolver(layout, foreign_ref).returncode, 0)
 
     def test_oci_resolver_refuses_unsupported_media_types_and_wrong_platform(self):
         bad_index = json.dumps({"schemaVersion": 2, "mediaType": "application/json", "manifests": []}, separators=(",", ":"))
@@ -411,8 +449,11 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         baseline = baseline_artifact()
         baseline["release"]["web"]["oci_provenance"].update(attestation_digest="sha256:" + "8" * 64, attestation_blob_available=False)
         value = snapshot()
+        original_historical_ref = baseline["release"]["web"]["oci_provenance"]["historical_immutable_ref"]
+        value["releases"]["n"]["web"]["oci_locator"] = {"locator_ref": "mirror.example/recovered-web@sha256:" + "8" * 64, "locator_index_digest": "sha256:" + "8" * 64}
         value["releases"]["n"]["web"]["runtime_ref"] = "mirror.example/historical-web@" + value["releases"]["n"]["web"]["runtime_manifest_digest"]
         self.assertEqual(run_preflight(value, baseline).returncode, 0)
+        self.assertEqual(baseline["release"]["web"]["oci_provenance"]["historical_immutable_ref"], original_historical_ref)
 
     def test_runtime_identity_refuses_manifest_config_and_rootfs_differences(self):
         mutations = (
@@ -436,12 +477,13 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         baseline["release"]["web"]["executable_identity"]["runtime_manifest_digest"] = baseline["release"]["web"]["oci_provenance"]["historical_index_digest"]
         self.assertNotEqual(run_preflight(snapshot(), baseline).returncode, 0)
 
-    def test_oci_resolution_refuses_wrong_platform_and_config_chain(self):
-        for mode in ("oci-wrong-platform", "oci-wrong-config"):
-            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
-                result, output = run_runtime_probe(directory, mode)
-                self.assertNotEqual(result.returncode, 0)
-                self.assertFalse(output.exists())
+    def test_runtime_capture_has_no_registry_resolver_dependency(self):
+        probe = RUNTIME_PROBE.read_text(encoding="utf-8")
+        baseline_probe = BASELINE_PROBE.read_text(encoding="utf-8")
+        for source in (probe, baseline_probe):
+            self.assertIn("createLocalOciReader", source)
+            self.assertNotIn("buildx", source)
+            self.assertNotIn("imagetools", source)
 
     def test_v1_baseline_and_incomplete_v2_are_fail_closed(self):
         v1 = baseline_artifact(); v1["schema"] = "lot57pf3-prospective-baseline-v1"

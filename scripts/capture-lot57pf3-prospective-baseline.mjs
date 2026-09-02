@@ -1,20 +1,20 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import {spawnSync} from 'node:child_process';
-import {resolveOciRuntimeIdentity} from './lib/lot57pf3-oci-identity.mjs';
+import {createLocalOciReader,resolveOciRuntimeIdentity} from './lib/lot57pf3-oci-identity.mjs';
 
 const fail=message=>{throw new Error(`F3 prospective baseline refused: ${message}`);};
 const args=process.argv.slice(2),value=name=>{const index=args.indexOf(name);return index<0?null:args[index+1]??null;};
-if(args.length!==6)fail('usage: capture-lot57pf3-prospective-baseline.mjs --n-api-image REF@sha256:DIGEST --n-web-image REF@sha256:DIGEST --output FILE');
+if(args.length!==10)fail('usage: capture-lot57pf3-prospective-baseline.mjs --n-api-image REF@sha256:DIGEST --n-api-oci-layout DIR --n-web-image REF@sha256:DIGEST --n-web-oci-layout DIR --output FILE');
 const refs={api:value('--n-api-image'),web:value('--n-web-image')},output=value('--output');
-if(!output||Object.values(refs).some(ref=>!ref))fail('all arguments are mandatory');
+const layouts={api:value('--n-api-oci-layout'),web:value('--n-web-oci-layout')};
+if(!output||Object.values(refs).some(ref=>!ref)||Object.values(layouts).some(layout=>!layout))fail('all arguments are mandatory');
 const immutable=/@sha256:([0-9a-f]{64})$/;
 for(const [component,ref] of Object.entries(refs))if(!immutable.test(ref))fail(`${component} must be an immutable digest reference`);
 const envFile=process.env.F3_PREPROD_ENV_FILE??'.env.preprod';
 if(!fs.existsSync(envFile))fail('preproduction env file is absent');
 const compose=['compose','--env-file',envFile,'-p','mse-preprod','-f','docker-compose.yml','-f','docker-compose.preprod.yml'];
 const run=(commandArgs,label)=>{const result=spawnSync('docker',commandArgs,{encoding:'utf8'});if(result.status!==0)fail(`${label} is unknown`);return result.stdout.trim();};
-const rawOci=ref=>{const result=spawnSync('docker',['buildx','imagetools','inspect','--raw',ref]);if(result.status!==0||!Buffer.isBuffer(result.stdout))fail(`OCI identity ${ref} is unknown`);return result.stdout;};
 const json=(commandArgs,label)=>{try{return JSON.parse(run(commandArgs,label));}catch{fail(`${label} is not inspectable JSON`);}};
 const containerId=service=>{const id=run([...compose,'ps','-aq',service],`${service} container`);if(!id)fail(`${service} container is absent`);return id;};
 const inspectContainer=service=>{const rows=json(['inspect',containerId(service)],`${service} runtime`);if(!Array.isArray(rows)||rows.length!==1)fail(`${service} runtime is ambiguous`);return rows[0];};
@@ -39,9 +39,9 @@ if(!Array.isArray(runnerRows)||runnerRows.length!==1)fail('certification runner 
 const runner=runnerRows[0],runnerNetworks=runner.NetworkSettings?.Networks;
 if(runner.State?.Running!==true||runner.Config?.Labels?.['com.mse.certification']!=='lot57pf3'||runner.Config?.Labels?.['com.mse.certification.target']!=='preproduction')fail('certification runner context is not controlled');
 if(!runnerNetworks||Object.keys(runnerNetworks).length!==1||!runnerNetworks[networkName])fail('certification runner egress is not exclusively blocked');
-const inspectImage=(ref,platform)=>{const chain=resolveOciRuntimeIdentity({ref,platform,readRaw:rawOci,fail});const rows=json(['image','inspect',chain.runtime_ref],`image ${chain.runtime_ref}`);if(!Array.isArray(rows)||rows.length!==1)fail(`image ${chain.runtime_ref} is ambiguous`);const row=rows[0],metadata=envMap(row);if(row.Os!==platform.split('/')[0]||row.Architecture!==platform.split('/')[1]||!row.RepoDigests?.includes(chain.runtime_ref))fail(`image ${chain.runtime_ref} platform/runtime manifest is not locally verified`);if(row.Id!==chain.config_digest)fail(`image ${chain.runtime_ref} config differs from its OCI manifest`);if(row.RootFS?.Type!=='layers'||!Array.isArray(row.RootFS.Layers)||row.RootFS.Layers.length===0||row.RootFS.Layers.some(layer=>!/^sha256:[0-9a-f]{64}$/.test(layer)))fail(`image ${chain.runtime_ref} rootfs identity is invalid`);if(!/^[0-9a-f]{40}$/.test(metadata.GIT_SHA??'')||!metadata.APP_VERSION||metadata.APP_VERSION==='unknown'||Number.isNaN(Date.parse(metadata.BUILD_TIME)))fail(`image ${chain.runtime_ref} metadata is invalid`);return {oci_provenance:{...chain.oci_provenance,attestation_digest:null,attestation_blob_available:null},executable_identity:{runtime_ref:chain.runtime_ref,runtime_manifest_digest:chain.runtime_manifest_digest,config_digest:chain.config_digest,layer_digests:chain.layer_digests,rootfs_diff_ids:row.RootFS.Layers,version:metadata.APP_VERSION,git_sha:metadata.GIT_SHA,git_tree:gitTree(metadata.GIT_SHA),build_time:metadata.BUILD_TIME}};};
+const inspectImage=(ref,layout,platform)=>{const locatorDigest=`sha256:${immutable.exec(ref)?.[1]}`;const readRaw=createLocalOciReader({layout,locatorDigest,fail});const chain=resolveOciRuntimeIdentity({ref,platform,readRaw,fail});const rows=json(['image','inspect',ref],`local image ${ref}`);if(!Array.isArray(rows)||rows.length!==1)fail(`local image ${ref} is ambiguous`);const row=rows[0],metadata=envMap(row);if(row.Os!==platform.split('/')[0]||row.Architecture!==platform.split('/')[1]||!row.RepoDigests?.includes(ref))fail(`OCI locator ${ref} platform/materialization is not locally verified`);if(row.Id!==chain.config_digest)fail(`local image ${ref} config differs from its verified OCI runtime manifest`);if(row.RootFS?.Type!=='layers'||!Array.isArray(row.RootFS.Layers)||row.RootFS.Layers.length===0||row.RootFS.Layers.some(layer=>!/^sha256:[0-9a-f]{64}$/.test(layer)))fail(`local image ${ref} rootfs identity is invalid`);if(!/^[0-9a-f]{40}$/.test(metadata.GIT_SHA??'')||!metadata.APP_VERSION||metadata.APP_VERSION==='unknown'||Number.isNaN(Date.parse(metadata.BUILD_TIME)))fail(`local image ${ref} metadata is invalid`);return {oci_provenance:{historical_immutable_ref:chain.oci_locator.locator_ref,historical_index_digest:chain.oci_locator.locator_index_digest,attestation_digest:null,attestation_blob_available:null},executable_identity:{runtime_ref:chain.runtime_ref,runtime_manifest_digest:chain.runtime_manifest_digest,config_digest:chain.config_digest,layer_digests:chain.layer_digests,rootfs_diff_ids:row.RootFS.Layers,version:metadata.APP_VERSION,git_sha:metadata.GIT_SHA,git_tree:gitTree(metadata.GIT_SHA),build_time:metadata.BUILD_TIME}};};
 const platformOf=(container,label)=>{if(typeof container.Platform!=='string')fail(`${label} runtime platform is unknown`);return container.Platform;};
-const release={api:inspectImage(refs.api,platformOf(api,'API')),web:inspectImage(refs.web,platformOf(web,'Web'))};
+const release={api:inspectImage(refs.api,layouts.api,platformOf(api,'API')),web:inspectImage(refs.web,layouts.web,platformOf(web,'Web'))};
 if(release.api.executable_identity.git_sha!==release.web.executable_identity.git_sha||release.api.executable_identity.version!==release.web.executable_identity.version||release.api.executable_identity.git_tree!==release.web.executable_identity.git_tree)fail('API and Web do not identify one coherent release');
 if(release.api.executable_identity.runtime_manifest_digest===release.web.executable_identity.runtime_manifest_digest)fail('API and Web runtime manifests are identical');
 if(api.Image!==release.api.executable_identity.config_digest||web.Image!==release.web.executable_identity.config_digest)fail('runtime does not use the inspected baseline configs');
