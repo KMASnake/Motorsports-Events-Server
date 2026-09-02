@@ -68,14 +68,15 @@ def snapshot(**overrides):
 
 def baseline_artifact():
     release = snapshot()["releases"]["n"]
-    def component(value):
-        provenance={"historical_immutable_ref":value["oci_locator"]["locator_ref"],"historical_index_digest":value["oci_locator"]["locator_index_digest"],"attestation_digest":None,"attestation_blob_available":None}
+    def component(value, historical_digit):
+        historical_digest="sha256:"+historical_digit*64
+        provenance={"historical_immutable_ref":f"historical.example/release-n@{historical_digest}","historical_index_digest":historical_digest,"attestation_digest":None,"attestation_blob_available":None}
         identity={key:item for key,item in value.items() if key!="oci_locator"}
         return {"oci_provenance": provenance, "executable_identity": identity}
     return {
         "schema": "lot57pf3-prospective-baseline-v2", "prospective_certification_baseline": True,
         "classification": "prospective-certification-baseline", "historical_pre_existing_release": False, "runtime_identity_complete": True,
-        "established_at": "2026-08-28T10:30:00Z", "release": {"git_sha": release["api"]["git_sha"], "git_tree": release["api"]["git_tree"], "version": release["api"]["version"], "api": component(release["api"]), "web": component(release["web"])},
+        "established_at": "2026-08-28T10:30:00Z", "release": {"git_sha": release["api"]["git_sha"], "git_tree": release["api"]["git_tree"], "version": release["api"]["version"], "api": component(release["api"],"0"), "web": component(release["web"],"9")},
         "migration_head": "0031_dynamic_test", "database_integrity": {"classification": "aggregate-integrity-anchor", "aggregate_anchor": "f" * 64, "values": {}, "continuity_requires_independent_checks": True},
         "continuity": {"change_sequence": 7, "event_revision": 3, "meeting_revision": 2, "normalization_checkpoint_count": 1},
         "runtime_safety": {"target": "preproduction", "worker_state": "stopped", "provider_execution_enabled": False, "championship_execution_enabled": False, "scheduler_enabled": False, "discovery_enabled": False, "preview_production_enabled": False, "provider_network_blocked": True, "provider_network_block_mechanism": "container-egress-deny"},
@@ -211,7 +212,10 @@ def run_baseline_probe(tmp_path, mode="baseline-safe"):
     env["F3_PREPROD_ENV_FILE"] = str(env_file)
     n = snapshot()["releases"]["n"]
     api_layout=write_oci_layout(tmp_path,"baseline-api",n["api"]);web_layout=write_oci_layout(tmp_path,"baseline-web",n["web"])
-    command = ["node", str(BASELINE_PROBE), "--n-api-image", n["api"]["oci_locator"]["locator_ref"], "--n-api-oci-layout", api_layout, "--n-web-image", n["web"]["oci_locator"]["locator_ref"], "--n-web-oci-layout", web_layout, "--output", str(output)]
+    historical = baseline_artifact()
+    historical_path = Path(tmp_path) / "historical-identity.json"
+    historical_path.write_text(json.dumps({"schema":"lot57pf3-historical-oci-identity-v1","release":{"api":historical["release"]["api"],"web":historical["release"]["web"]}}), encoding="utf-8")
+    command = ["node", str(BASELINE_PROBE), "--historical-identity", str(historical_path), "--n-api-image", n["api"]["oci_locator"]["locator_ref"], "--n-api-oci-layout", api_layout, "--n-web-image", n["web"]["oci_locator"]["locator_ref"], "--n-web-oci-layout", web_layout, "--output", str(output)]
     result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
     return result, output
 
@@ -423,13 +427,33 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             result, output = run_baseline_probe(directory)
             self.assertEqual(result.returncode, 0, result.stderr)
             baseline = json.loads(output.read_text(encoding="utf-8"))
+            expected = baseline_artifact()
             self.assertTrue(baseline["prospective_certification_baseline"])
             self.assertFalse(baseline["historical_pre_existing_release"])
             self.assertEqual(baseline["release"]["api"]["executable_identity"]["runtime_ref"], snapshot()["releases"]["n"]["api"]["runtime_ref"])
+            for component in ("api", "web"):
+                historical = baseline["release"][component]["oci_provenance"]
+                locator = snapshot()["releases"]["n"][component]["oci_locator"]
+                self.assertEqual(historical, expected["release"][component]["oci_provenance"])
+                self.assertNotEqual(historical["historical_index_digest"], locator["locator_index_digest"])
             self.assertEqual(baseline["runtime_safety"]["worker_state"], "stopped")
             self.assertFalse(baseline["runtime_safety"]["championship_execution_enabled"])
             self.assertEqual(baseline["database_integrity"]["classification"], "aggregate-integrity-anchor")
             self.assertTrue(baseline["database_integrity"]["continuity_requires_independent_checks"])
+
+    def test_prospective_baseline_refuses_materialization_different_from_historical_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fake_docker(directory, "baseline-safe");fake_git(directory)
+            env = dict(__import__("os").environ);env["PATH"] = f"{directory}:{env['PATH']}";env["F3_FAKE_MODE"] = "baseline-safe"
+            env_file = Path(directory) / ".env.preprod";env_file.write_text("test=true\n", encoding="utf-8");env["F3_PREPROD_ENV_FILE"] = str(env_file)
+            n = snapshot()["releases"]["n"];api_layout=write_oci_layout(directory,"api",n["api"]);web_layout=write_oci_layout(directory,"web",n["web"])
+            historical=baseline_artifact();historical["release"]["api"]["executable_identity"]["config_digest"]="sha256:"+"8"*64
+            source=Path(directory)/"historical.json";source.write_text(json.dumps({"schema":"lot57pf3-historical-oci-identity-v1","release":{"api":historical["release"]["api"],"web":historical["release"]["web"]}}),encoding="utf-8")
+            output=Path(directory)/"baseline.json"
+            command=["node",str(BASELINE_PROBE),"--historical-identity",str(source),"--n-api-image",n["api"]["oci_locator"]["locator_ref"],"--n-api-oci-layout",api_layout,"--n-web-image",n["web"]["oci_locator"]["locator_ref"],"--n-web-oci-layout",web_layout,"--output",str(output)]
+            result=subprocess.run(command,cwd=ROOT,env=env,text=True,capture_output=True,check=False)
+            self.assertNotEqual(result.returncode,0)
+            self.assertFalse(output.exists())
 
     def test_preflight_refuses_invalid_or_reclassified_prospective_baseline(self):
         mutations = (

@@ -13,6 +13,7 @@ if(baseline?.schema!=='lot57pf3-prospective-baseline-v2'||baseline?.prospective_
 for(const component of ['api','web']){
   const provenance=baseline.release?.[component]?.oci_provenance,identity=baseline.release?.[component]?.executable_identity;
   if(!provenance||!identity||typeof provenance.historical_immutable_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(provenance.historical_index_digest??'')||!provenance.historical_immutable_ref.endsWith(`@${provenance.historical_index_digest}`))fail(`baseline ${component} provenance/runtime chain is invalid`);
+  if(typeof identity.runtime_ref!=='string'||!/^.+@sha256:[0-9a-f]{64}$/.test(identity.runtime_ref)||!/^sha256:[0-9a-f]{64}$/.test(identity.runtime_manifest_digest??'')||!identity.runtime_ref.endsWith(`@${identity.runtime_manifest_digest}`)||!/^sha256:[0-9a-f]{64}$/.test(identity.config_digest??'')||!Array.isArray(identity.layer_digests)||identity.layer_digests.length===0||identity.layer_digests.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value))||!Array.isArray(identity.rootfs_diff_ids)||identity.rootfs_diff_ids.length===0||identity.rootfs_diff_ids.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value)))fail(`baseline ${component} executable identity is invalid`);
 }
 exact(raw.states,sequence,'states');
 const expectedRuntime=['n','n','n_plus_1','n','n_plus_1'],states=sequence.map(name=>raw.states[name]);

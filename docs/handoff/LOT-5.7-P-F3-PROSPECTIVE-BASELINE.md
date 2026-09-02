@@ -61,6 +61,14 @@ mutable or cryptographically incoherent local locator is refused. An index
 digest is never inferred to be the runtime manifest digest merely because it
 appears in `RepoDigests`.
 
+Baseline capture requires a separate, maintainer-controlled
+`lot57pf3-historical-oci-identity-v1` input. Its historical references and
+index digests are preserved byte-for-byte in the resulting baseline; they are
+never derived from the recovery locator. The locally materialized runtime
+manifest, config, compressed layers, rootfs diff IDs and release/Git metadata
+must equal the executable identity carried by that independent input. Missing
+historical provenance, an incomplete identity or any mismatch refuses capture.
+
 The repository artifact migrated to schema v2 preserves the historical Web OCI
 index `sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f`,
 runtime manifest `sha256:475dea105d6c5c9c1ee29dd00bce077590b2004c86b3b866eaa154b347705093`
