@@ -136,7 +136,7 @@ if a[0]=='inspect':
         if mode=='network-multi':networks['mse-preprod_default']={}
         if mode=='network-ordinary':networks={'mse-preprod_default':{}}
         if mode=='network-empty':networks={}
-    print(json.dumps([{'State':{'Running':running},'Image':image,'Platform':'linux/amd64','Config':{'Env':env,'Labels':labels},'NetworkSettings':{'Networks':networks}}]));sys.exit(0)
+    print(json.dumps([{'State':{'Running':running},'Image':image,'Platform':'linux','Config':{'Env':env,'Labels':labels},'NetworkSettings':{'Networks':networks}}]));sys.exit(0)
 if a[:2]==['network','inspect']:
     if mode=='network-unknown':sys.exit(2)
     print(json.dumps([{'Name':'mse-f3-certification-internal','Internal':mode!='network-open'}]));sys.exit(0)
@@ -158,7 +158,18 @@ if a[:3]==['buildx','imagetools','inspect']:
 if a[:2]==['image','inspect']:
     ref=a[2]
     values={'release-n-api@':('a','1','0','10'),'release-n-web@':('b','1','0','10'),'release-n1-api@':('c','2','1','11'),'release-n1-web@':('d','2','1','11')}
-    selected=next(value for marker,value in values.items() if marker in ref);image_digit,sha_digit,patch,hour=selected
+    selected=next((value for marker,value in values.items() if marker in ref),None)
+    if selected is None:
+        runtimes={'a':'5','b':'6','c':'7','d':'8'}
+        by_id={}
+        for value in values.values():
+            image_digit=value[0]
+            image_id,config_digest=locator(image_digit,runtimes[image_digit])
+            by_id[image_id]=value
+            by_id[config_digest]=value
+        selected=by_id.get(ref)
+    if selected is None:sys.exit(4)
+    image_digit,sha_digit,patch,hour=selected
     metadata=['APP_VERSION=1.0.'+patch,'GIT_SHA='+sha_digit*40,'BUILD_TIME=2026-08-28T'+hour+':00:00Z']
     if mode=='web-metadata-unknown' and 'web@' in ref:metadata=['APP_VERSION=unknown','GIT_SHA=unknown','BUILD_TIME=unknown']
     index_digit={'a':'1','b':'2','c':'3','d':'4'}[image_digit]
