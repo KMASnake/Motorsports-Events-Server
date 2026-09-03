@@ -3,9 +3,8 @@
   "prospective_certification_baseline": true,
   "classification": "prospective-certification-baseline",
   "historical_pre_existing_release": false,
-  "runtime_identity_complete": false,
-  "runtime_identity_status": "awaiting-maintainer-validated-runtime-chain",
-  "established_at": "2026-08-29T18:20:15.538Z",
+  "runtime_identity_complete": true,
+  "established_at": "2026-09-03T19:31:59.329Z",
   "release": {
     "git_sha": "992ced15ca1bc7ab7a504aa3b4b138403d1c177b",
     "git_tree": "b98015daf2eac4b50b1939050056c979cdf0aa14",
@@ -14,35 +13,149 @@
       "oci_provenance": {
         "historical_immutable_ref": "mse-preprod-api@sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f",
         "historical_index_digest": "sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f",
-        "attestation_digest": null,
-        "attestation_blob_available": null
+        "attestation_digest": "sha256:9addda50118914b7193384ea075f61e24ba7f23dc4ba5d607998a6a447ab3e24",
+        "attestation_blob_available": true
       },
-      "executable_identity": null
+      "executable_identity": {
+        "runtime_ref": "mse-preprod-api@sha256:7c2d836548dca166103deb6c166b81762d1c67adc3e657945be382dcf016770d",
+        "runtime_manifest_digest": "sha256:7c2d836548dca166103deb6c166b81762d1c67adc3e657945be382dcf016770d",
+        "config_digest": "sha256:e415793fc6005f900a9dd192382801f82106c8623a234459faa9192c4f537994",
+        "layer_digests": [
+          "sha256:55afa1ecc21d2bb5e5045f32dafee56272ffd89860bac26f6c32123439af26a4",
+          "sha256:efbef6f9e333972a10ca323e700496a64e7ddcc3a6725e6afbbae52e690f4a4a",
+          "sha256:a2980c1fee17dfd6263234b253955e0e9d5f38d47c0e71c001139897134899d0",
+          "sha256:16da5a6403776464b5bf551ef294de57da242eac594527ea551a46e7f76ac2d6",
+          "sha256:371930db3afc6969029c0f63de24b378258c429ab0093dbbb2dde1e972de6174",
+          "sha256:22197e284df433bf255ba6d6254591099877a041fe0ced9edffd9f8e0fe4980d",
+          "sha256:efebb0577f9c5378b1b9ab3f2f976349159d81af180750f60e2130bddb851c49",
+          "sha256:0df62413a929c65cd47ec0414aa3f81d02c28fa7f26db2072de4daf8e8438885",
+          "sha256:0cbc57c2caeebcfe6b7a0d3f9ca98d576fea4508e52f6fe5e0ce0473801d5c51",
+          "sha256:15ace096e3bf1234166d777684093d185c97cd140e0a4f273a9a53c5d1c3c3e8"
+        ],
+        "rootfs_diff_ids": [
+          "sha256:34884abbe92863fce933ed7c39c0e045631af0ed86d5cc0dfbdf9fdca426ce3c",
+          "sha256:5654eeaf04645c03fadc59bca7835753203d173222ab6ad8729f75b3dde98784",
+          "sha256:fe2c6446e3d9c78c5f734536452b9ea4bf7c4c46c4b4a575d2973b79691ec57a",
+          "sha256:baf2266664bacf240e13831e4192f8c92196c603ce8a20a4a50035ad87f8f2fb",
+          "sha256:63e4d142d85ff2e6c2f41be2add0d3ee7964b220f2e43e5261665e6b31b9310c",
+          "sha256:c502d7244902d8e125c0a034d48755a974a113e8862699bfed4efd8fc2b85a15",
+          "sha256:1f59ddcd3a87e9d08debb9811d03ff5fb20ee0c216e70ccb69d28259194a8290",
+          "sha256:4fa802565cfebc3be1eac62910ba81171a1558db35d1d319b57eee796237fcac",
+          "sha256:8706abb153f813ae4c411ea05c42e956081b9c000395bdd3ae5fefc063dd7ec7",
+          "sha256:17ee3c97dd1937690a0617139a566c4aad2e6c48fe4e2be12cb12b02a3ea0cb7"
+        ],
+        "version": "2.7.0",
+        "git_sha": "992ced15ca1bc7ab7a504aa3b4b138403d1c177b",
+        "git_tree": "b98015daf2eac4b50b1939050056c979cdf0aa14",
+        "build_time": "2026-08-29T17:53:32Z"
+      },
+      "establishment_materialization": {
+        "oci_locator": {
+          "locator_ref": "mse-preprod-api@sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f",
+          "locator_index_digest": "sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f"
+        },
+        "locator_media_type": "application/vnd.oci.image.index.v1+json",
+        "docker_materialization": {
+          "docker_image_id": "sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f",
+          "descriptor_digest": "sha256:b4f251512b45df5df9dcfc3a570e77b3d5de64c45925b62141c536afb7bc446f",
+          "descriptor_media_type": "application/vnd.oci.image.index.v1+json"
+        }
+      }
     },
     "web": {
       "oci_provenance": {
         "historical_immutable_ref": "mse-preprod-web@sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f",
         "historical_index_digest": "sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f",
         "attestation_digest": "sha256:25944e2d5496280ad55c9ebb46219fd9a796aacc100998c161df17a8b2d50daf",
-        "attestation_blob_available": false,
-        "missing_attestation_blob_digest": "sha256:1e36d058d6dedc90b487561045a82f10f4e23a2e682ad4f0293f0977e01ab2e8"
+        "attestation_blob_available": false
       },
       "executable_identity": {
-        "runtime_ref": null,
+        "runtime_ref": "mse-preprod-web@sha256:475dea105d6c5c9c1ee29dd00bce077590b2004c86b3b866eaa154b347705093",
         "runtime_manifest_digest": "sha256:475dea105d6c5c9c1ee29dd00bce077590b2004c86b3b866eaa154b347705093",
         "config_digest": "sha256:d3f6f745eff9a71bd54404c4874af363ea0bdb3d5a0d69b40b6e7a4e8ee90146",
-        "layer_digests": null,
-        "rootfs_diff_ids": null,
+        "layer_digests": [
+          "sha256:6a0ac1617861a677b045b7ff88545213ec31c0ff08763195a70a4a5adda577bb",
+          "sha256:82736a35d0e7f1309edc13d09115410b81542cf8b91afff80deeace02b6f2f26",
+          "sha256:583599bb7d382e9e986a9ff65204981307bfa71670a29f4190eedae93c4858be",
+          "sha256:aee4e54b3865ee4d98545b6b49f9e8ab3b9b6ed114a2eafedc7a22e984ea5a68",
+          "sha256:781ff50d2644f74714c0d5a4ffa3447bbfd4b293cfb1dc6a637722ae24c89241",
+          "sha256:453da7dbc73e7338c4e201ec3f3c4a5f7751adbf5a6f127792c1cd001a780721",
+          "sha256:4a8b0b2a5b1937755263ac7ac4ee26db2906c13a5d70f1fb1875ba8e370cdd8f",
+          "sha256:612c0c1df4c55a0bf145f84df03cb28de505e6a52fb8e49c9da7b143fc00ad2d",
+          "sha256:4d4bdadd6f3ef1a8769b2ef664280ab7aa8eef8748d97bfc6c61c395fe1d4d15",
+          "sha256:4aba2a2c83916aa0c659d2e76dbc38cbad978fcebbb949fe35505a0fcd2ba68a",
+          "sha256:d3f74d7c6d025bb8e1e8594d3cbda7237a4a52694719e82c12c0a2d46cb5f263"
+        ],
+        "rootfs_diff_ids": [
+          "sha256:29df493baa13de438d6d2ece3a8333032e0b7b9b9d8cce4ee82194da255f61e1",
+          "sha256:e6082cdc2516c48531390c6f369268148ed5189748b4cdbcb30d8de04d4ef146",
+          "sha256:f4eddaa4c30384a3db34177c1132ca20f44c1216fe41ba7f607dcee58b908104",
+          "sha256:00a43f6306382cee5fdb8e738ce0b5c7022448687d5edea1912e169c6ee03ebb",
+          "sha256:f7b74afe8798753eb53d962f1676c409e590b5865b456c309c2e364cfe98f55e",
+          "sha256:646d544dc619be2ab0e784ee691dc06e7a1d5ca76176b6e7fb1c8933b58350ff",
+          "sha256:2b12ccfb247ac0c9ec2d186864ef4f2a893499e24935b14941e74aec27e62143",
+          "sha256:36c003a300d15169fe53876c4c807b1668568414660e5249ba6d168badab54fa",
+          "sha256:3a6d07999365ea65c193fb7477ed5b8a45e24d9f890acb1e5e630f6be24d23be",
+          "sha256:9fd44f52b078df2569173cec2bbb5545e4d1f774a8eaf29e69b9b9fb1ea2f96e",
+          "sha256:06af987f5a352ff691353f3b70e3e3ddf0fa5e374cc72394c033554fd692e1e0"
+        ],
         "version": "2.7.0",
         "git_sha": "992ced15ca1bc7ab7a504aa3b4b138403d1c177b",
         "git_tree": "b98015daf2eac4b50b1939050056c979cdf0aa14",
         "build_time": "2026-08-29T17:53:32Z"
+      },
+      "establishment_materialization": {
+        "oci_locator": {
+          "locator_ref": "mse-preprod-web@sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f",
+          "locator_index_digest": "sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f"
+        },
+        "locator_media_type": "application/vnd.oci.image.index.v1+json",
+        "docker_materialization": {
+          "docker_image_id": "sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f",
+          "descriptor_digest": "sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f",
+          "descriptor_media_type": "application/vnd.oci.image.index.v1+json"
+        }
       }
     }
   },
   "migration_head": "0031_real_circuit_reference_data",
-  "database_integrity": {"classification":"aggregate-integrity-anchor","aggregate_anchor":"b8945a77cae94b704e49ff533f5076b6580f683ab210433d81524e967c5a0981","values":{"events_count":126,"meetings_count":26,"changes_max_sequence":461,"events_max_revision":1,"meetings_max_revision":1,"normalization_checkpoints_count":2,"orphan_meeting_events":0},"continuity_requires_independent_checks":true},
-  "continuity": {"change_sequence":461,"event_revision":1,"meeting_revision":1,"normalization_checkpoint_count":2},
-  "runtime_safety": {"target":"preproduction","worker_state":"stopped","provider_execution_enabled":false,"championship_execution_enabled":false,"scheduler_enabled":false,"discovery_enabled":false,"preview_production_enabled":false,"provider_network_blocked":true,"provider_network_block_mechanism":"container-egress-deny"},
-  "provenance": {"source":"repository-runtime-inspection","git_tree_source":"git-rev-parse-commit-tree","compose_project":"mse-preprod","certification_container":"mse-f3-certification-runner","certification_network":"mse-f3-certification-internal","exclusive_network_attachment":true}
+  "database_integrity": {
+    "classification": "aggregate-integrity-anchor",
+    "aggregate_anchor": "b8945a77cae94b704e49ff533f5076b6580f683ab210433d81524e967c5a0981",
+    "values": {
+      "events_count": 126,
+      "meetings_count": 26,
+      "changes_max_sequence": 461,
+      "events_max_revision": 1,
+      "meetings_max_revision": 1,
+      "normalization_checkpoints_count": 2,
+      "orphan_meeting_events": 0
+    },
+    "continuity_requires_independent_checks": true
+  },
+  "continuity": {
+    "change_sequence": 461,
+    "event_revision": 1,
+    "meeting_revision": 1,
+    "normalization_checkpoint_count": 2
+  },
+  "runtime_safety": {
+    "target": "preproduction",
+    "worker_state": "stopped",
+    "provider_execution_enabled": false,
+    "championship_execution_enabled": false,
+    "scheduler_enabled": false,
+    "discovery_enabled": false,
+    "preview_production_enabled": false,
+    "provider_network_blocked": true,
+    "provider_network_block_mechanism": "container-egress-deny"
+  },
+  "provenance": {
+    "source": "repository-runtime-inspection",
+    "git_tree_source": "git-rev-parse-commit-tree",
+    "compose_project": "mse-preprod",
+    "certification_container": "mse-f3-certification-runner",
+    "certification_network": "mse-f3-certification-internal",
+    "exclusive_network_attachment": true
+  }
 }
