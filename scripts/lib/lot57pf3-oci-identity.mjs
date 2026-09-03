@@ -40,11 +40,15 @@ export function resolveOciRuntimeIdentity({ref,platform,readRaw,fail}){
   const runtimeRef=`${repository}@${runtimeManifestDigest}`;
   if(manifest.schemaVersion!==2||!manifestTypes.has(manifest.mediaType))fail(`runtime manifest ${runtimeRef} mediaType/schema is unsupported`);
   if(!digest.test(manifest?.config?.digest??'')||!Array.isArray(manifest?.layers)||manifest.layers.length===0||manifest.layers.some(layer=>!digest.test(layer?.digest??'')))fail(`runtime manifest ${runtimeRef} has an invalid executable chain`);
+  const configRef=`${repository}@${manifest.config.digest}`,config=parse(readRaw(configRef),manifest.config.digest,`OCI config ${configRef}`);
+  if(config?.rootfs?.type!=='layers'||!Array.isArray(config.rootfs.diff_ids)||config.rootfs.diff_ids.length===0||config.rootfs.diff_ids.some(value=>!digest.test(value)))fail(`OCI config ${configRef} rootfs identity is invalid`);
   return {
     oci_locator:{locator_ref:ref,locator_index_digest:indexDigest},
+    locator_media_type:exported.mediaType,
     runtime_ref:runtimeRef,
     runtime_manifest_digest:runtimeManifestDigest,
     config_digest:manifest.config.digest,
-    layer_digests:manifest.layers.map(layer=>layer.digest)
+    layer_digests:manifest.layers.map(layer=>layer.digest),
+    rootfs_diff_ids:config.rootfs.diff_ids
   };
 }

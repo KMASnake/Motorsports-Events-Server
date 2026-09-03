@@ -6,6 +6,8 @@ const exact=(value,keys,label)=>{if(!value||typeof value!=='object'||Array.isArr
 const string=(value,label)=>{if(typeof value!=='string'||!value.trim()||value.toLowerCase()==='unknown')fail(`${label} is absent or unknown`);return value;};
 const success=(value,label)=>{if(value!==true)fail(`${label} must be true`);return true;};
 const integer=(value,label)=>{if(!Number.isSafeInteger(value)||value<0)fail(`${label} must be a non-negative integer`);return value;};
+const supportedMediaType=value=>['application/vnd.oci.image.index.v1+json','application/vnd.docker.distribution.manifest.list.v2+json','application/vnd.oci.image.manifest.v1+json','application/vnd.docker.distribution.manifest.v2+json'].includes(value);
+const validMaterialization=(locator,media,docker,config)=>{if(!locator||!docker||!supportedMediaType(media)||!/^sha256:[0-9a-f]{64}$/.test(docker.docker_image_id??''))return false;if(docker.descriptor_digest===null||docker.descriptor_media_type===null)return docker.descriptor_digest===null&&docker.descriptor_media_type===null&&docker.docker_image_id===config;return docker.descriptor_digest===locator.locator_index_digest&&docker.descriptor_media_type===media&&docker.docker_image_id===docker.descriptor_digest;};
 let raw;
 try{raw=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));}catch{fail('input is not valid JSON');}
 exact(raw,['prospective_baseline','release','migration_heads','db_fingerprints','comparisons','incremental_change','checks','backup_restore','provider_calls','worker_state'],'root');
@@ -13,9 +15,10 @@ const baseline=exact(raw.prospective_baseline,['schema','prospective_certificati
 if(baseline.schema!=='lot57pf3-prospective-baseline-v2'||baseline.prospective_certification_baseline!==true||baseline.classification!=='prospective-certification-baseline'||baseline.historical_pre_existing_release!==false||baseline.runtime_identity_complete!==true)fail('complete v2 prospective baseline is required; v1 is refused');
 if(Number.isNaN(Date.parse(baseline.established_at))||baseline.provenance?.source!=='repository-runtime-inspection'||baseline.provenance?.git_tree_source!=='git-rev-parse-commit-tree'||baseline.provenance?.compose_project!=='mse-preprod'||baseline.provenance?.certification_container!=='mse-f3-certification-runner'||baseline.provenance?.certification_network!=='mse-f3-certification-internal'||baseline.provenance?.exclusive_network_attachment!==true)fail('prospective baseline provenance is invalid');
 for(const component of ['api','web']){
-  const provenance=baseline.release?.[component]?.oci_provenance,identity=baseline.release?.[component]?.executable_identity;
+  const provenance=baseline.release?.[component]?.oci_provenance,identity=baseline.release?.[component]?.executable_identity,materialization=baseline.release?.[component]?.establishment_materialization;
   if(!provenance||!identity||typeof provenance.historical_immutable_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(provenance.historical_index_digest??'')||!provenance.historical_immutable_ref.endsWith(`@${provenance.historical_index_digest}`))fail(`prospective baseline ${component} provenance/runtime chain is invalid`);
   if(typeof identity.runtime_ref!=='string'||!/^.+@sha256:[0-9a-f]{64}$/.test(identity.runtime_ref)||!/^sha256:[0-9a-f]{64}$/.test(identity.runtime_manifest_digest??'')||!identity.runtime_ref.endsWith(`@${identity.runtime_manifest_digest}`)||!/^sha256:[0-9a-f]{64}$/.test(identity.config_digest??'')||!Array.isArray(identity.layer_digests)||identity.layer_digests.length===0||identity.layer_digests.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value))||!Array.isArray(identity.rootfs_diff_ids)||identity.rootfs_diff_ids.length===0||identity.rootfs_diff_ids.some(value=>!/^sha256:[0-9a-f]{64}$/.test(value)))fail(`prospective baseline ${component} executable identity is invalid`);
+  if(!materialization?.oci_locator||!/^sha256:[0-9a-f]{64}$/.test(materialization.oci_locator.locator_index_digest??'')||!materialization.oci_locator.locator_ref?.endsWith(`@${materialization.oci_locator.locator_index_digest}`)||!validMaterialization(materialization.oci_locator,materialization.locator_media_type,materialization.docker_materialization,identity.config_digest))fail(`prospective baseline ${component} establishment materialization is invalid`);
 }
 if(!/^\d{4}_[a-z0-9][a-z0-9_]*$/.test(baseline.migration_head??''))fail('prospective baseline migration head is invalid');
 if(baseline.database_integrity?.classification!=='aggregate-integrity-anchor'||baseline.database_integrity?.continuity_requires_independent_checks!==true||!/^[0-9a-f]{64}$/.test(baseline.database_integrity?.aggregate_anchor??''))fail('prospective baseline aggregate integrity anchor is invalid');
@@ -24,7 +27,7 @@ if(baseline.runtime_safety?.target!=='preproduction'||baseline.runtime_safety?.w
 const releases=exact(raw.release,['n','n_plus_1'],'release');
 for(const name of ['n','n_plus_1']){
   exact(releases[name],['api','web'],`release.${name}`);
-  for(const component of ['api','web'])exact(releases[name][component],['oci_locator','runtime_ref','runtime_manifest_digest','config_digest','layer_digests','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`release.${name}.${component}`);
+  for(const component of ['api','web'])exact(releases[name][component],['oci_locator','locator_media_type','docker_materialization','runtime_ref','runtime_manifest_digest','config_digest','layer_digests','rootfs_diff_ids','version','git_sha','git_tree','build_time'],`release.${name}.${component}`);
 }
 const heads=exact(raw.migration_heads,['before','n_plus_1','rollback_n','final_n_plus_1'],'migration_heads');
 const fingerprints=exact(raw.db_fingerprints,['before','n_plus_1','rollback_n','final_n_plus_1','restored_disposable'],'db_fingerprints');
@@ -35,6 +38,8 @@ const backup=exact(raw.backup_restore,['backup_verified','disposable_restore_db'
 for(const [name,release] of Object.entries(releases)){
   for(const [component,image] of Object.entries(release)){
     if(!image.oci_locator||typeof image.oci_locator.locator_ref!=='string'||!/^sha256:[0-9a-f]{64}$/.test(image.oci_locator.locator_index_digest??'')||!image.oci_locator.locator_ref.endsWith(`@${image.oci_locator.locator_index_digest}`))fail(`release.${name}.${component}.oci_locator is invalid`);
+    exact(image.docker_materialization,['docker_image_id','descriptor_digest','descriptor_media_type'],`release.${name}.${component}.docker_materialization`);
+    if(!validMaterialization(image.oci_locator,image.locator_media_type,image.docker_materialization,image.config_digest))fail(`release.${name}.${component}.docker_materialization is invalid`);
     for(const key of ['runtime_ref','runtime_manifest_digest','config_digest','version','git_sha','git_tree','build_time'])string(image[key],`release.${name}.${component}.${key}`);
     if(!/^[0-9a-f]{40}$/.test(image.git_sha))fail(`release.${name}.${component}.git_sha must be 40 lowercase hex characters`);
     if(!/^[0-9a-f]{40}$/.test(image.git_tree))fail(`release.${name}.${component}.git_tree must be 40 lowercase hex characters`);

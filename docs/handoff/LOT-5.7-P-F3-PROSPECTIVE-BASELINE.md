@@ -61,6 +61,18 @@ mutable or cryptographically incoherent local locator is refused. An index
 digest is never inferred to be the runtime manifest digest merely because it
 appears in `RepoDigests`.
 
+Docker materialization identity is also separate from the OCI config digest.
+With the Docker 29 containerd image store, `docker image inspect .Id`, the OCI
+`Descriptor.digest` and `docker inspect <container> .Image` may identify the
+selected locator/index rather than the config blob. F3 therefore binds the
+local image through the exact immutable RepoDigest, locator descriptor and
+media type, platform and Docker image ID, then independently verifies the
+runtime manifest, config digest, compressed layers, ordered rootfs diff IDs and
+release metadata. A classic image store without a descriptor is accepted only
+when `.Id` is exactly the cryptographically resolved config digest. Container
+identity is compared to the selected Docker image ID, never assumed to equal
+the OCI config digest.
+
 Baseline capture requires a separate, maintainer-controlled
 `lot57pf3-historical-oci-identity-v1` input. Its historical references and
 index digests are preserved byte-for-byte in the resulting baseline; they are

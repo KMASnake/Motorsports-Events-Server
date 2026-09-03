@@ -17,11 +17,14 @@ PHASE2_EVIDENCE = ROOT / "scripts" / "validate-lot57pf3-phase2-evidence.mjs"
 OCI_RESOLVER = ROOT / "scripts" / "lib" / "lot57pf3-oci-identity.mjs"
 
 
-def oci_fixture(config_digit, layer_digit, media_type="application/vnd.oci.image.manifest.v1+json"):
-    manifest = json.dumps({"schemaVersion": 2, "mediaType": media_type, "config": {"digest": "sha256:" + config_digit * 64}, "layers": [{"digest": "sha256:" + layer_digit * 64}]}, separators=(",", ":"))
+def oci_fixture(config_digit, layer_digit, media_type="application/vnd.oci.image.manifest.v1+json", rootfs_digits=None):
+    rootfs_digits = rootfs_digits or ("1", config_digit)
+    config = json.dumps({"rootfs":{"type":"layers","diff_ids":["sha256:" + digit * 64 for digit in rootfs_digits]}}, separators=(",", ":"))
+    config_digest = "sha256:" + hashlib.sha256(config.encode()).hexdigest()
+    manifest = json.dumps({"schemaVersion": 2, "mediaType": media_type, "config": {"digest": config_digest}, "layers": [{"digest": "sha256:" + layer_digit * 64}]}, separators=(",", ":"))
     manifest_digest = "sha256:" + hashlib.sha256(manifest.encode()).hexdigest()
     index = json.dumps({"schemaVersion": 2, "mediaType": "application/vnd.oci.image.index.v1+json", "manifests": [{"digest": manifest_digest, "platform": {"os": "linux", "architecture": "amd64"}}, {"digest": "sha256:" + "9" * 64, "platform": {"os": "unknown", "architecture": "unknown"}}]}, separators=(",", ":"))
-    return {"manifest": manifest, "manifest_digest": manifest_digest, "index": index, "index_digest": "sha256:" + hashlib.sha256(index.encode()).hexdigest()}
+    return {"config":config,"config_digest":config_digest,"manifest": manifest, "manifest_digest": manifest_digest, "index": index, "index_digest": "sha256:" + hashlib.sha256(index.encode()).hexdigest()}
 
 
 def run_oci_resolver(ref, documents, platform="linux/amd64"):
@@ -42,10 +45,10 @@ def snapshot(**overrides):
         component = "api" if id_digit in ("a", "c") else "web"
         release = "release-n" if version == "1.0.0" else "release-n1"
         runtime_digit = {"1":"5","2":"6","3":"7","4":"8"}[digest_digit]
-        fixture = oci_fixture(id_digit, runtime_digit)
+        fixture = oci_fixture(id_digit, runtime_digit,rootfs_digits=(digest_digit,id_digit))
         index_digest, digest = fixture["index_digest"], fixture["manifest_digest"]
         tree_digit = "e" if version == "1.0.0" else "f"
-        return {"oci_locator": {"locator_ref": f"registry.example/{release}-{component}@{index_digest}", "locator_index_digest": index_digest}, "runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": "sha256:" + id_digit * 64, "layer_digests": ["sha256:" + runtime_digit * 64], "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
+        return {"oci_locator": {"locator_ref": f"registry.example/{release}-{component}@{index_digest}", "locator_index_digest": index_digest}, "locator_media_type": "application/vnd.oci.image.index.v1+json", "docker_materialization": {"docker_image_id": index_digest, "descriptor_digest": index_digest, "descriptor_media_type": "application/vnd.oci.image.index.v1+json"}, "runtime_ref": f"registry.example/{release}-{component}@{digest}", "runtime_manifest_digest": digest, "config_digest": fixture["config_digest"], "layer_digests": ["sha256:" + runtime_digit * 64], "rootfs_diff_ids": ["sha256:" + digest_digit * 64, "sha256:" + id_digit * 64], "version": version, "git_sha": sha_digit * 40, "git_tree": tree_digit * 40, "build_time": f"2026-08-28T{hour}:00:00Z"}
     value = {
         "worker_running": False,
         "provider_execution_enabled": False,
@@ -71,8 +74,9 @@ def baseline_artifact():
     def component(value, historical_digit):
         historical_digest="sha256:"+historical_digit*64
         provenance={"historical_immutable_ref":f"historical.example/release-n@{historical_digest}","historical_index_digest":historical_digest,"attestation_digest":None,"attestation_blob_available":None}
-        identity={key:item for key,item in value.items() if key!="oci_locator"}
-        return {"oci_provenance": provenance, "executable_identity": identity}
+        identity={key:item for key,item in value.items() if key not in ("oci_locator","locator_media_type","docker_materialization")}
+        materialization={"oci_locator":value["oci_locator"],"locator_media_type":value["locator_media_type"],"docker_materialization":value["docker_materialization"]}
+        return {"oci_provenance": provenance, "executable_identity": identity, "establishment_materialization":materialization}
     return {
         "schema": "lot57pf3-prospective-baseline-v2", "prospective_certification_baseline": True,
         "classification": "prospective-certification-baseline", "historical_pre_existing_release": False, "runtime_identity_complete": True,
@@ -98,6 +102,14 @@ def fake_docker(directory, mode="safe"):
     executable.write_text("""#!/usr/bin/env python3
 import hashlib,json,os,sys
 a=sys.argv[1:];mode=os.environ.get('F3_FAKE_MODE','safe')
+def locator(config,runtime):
+    root={'a':'1','b':'2','c':'3','d':'4'}[config]
+    config_json=json.dumps({'rootfs':{'type':'layers','diff_ids':['sha256:'+root*64,'sha256:'+config*64]}},separators=(',',':'))
+    config_digest='sha256:'+hashlib.sha256(config_json.encode()).hexdigest()
+    manifest=json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.manifest.v1+json','config':{'digest':config_digest},'layers':[{'digest':'sha256:'+runtime*64}]},separators=(',',':'))
+    manifest_digest='sha256:'+hashlib.sha256(manifest.encode()).hexdigest()
+    index=json.dumps({'schemaVersion':2,'mediaType':'application/vnd.oci.image.index.v1+json','manifests':[{'digest':manifest_digest,'platform':{'os':'linux','architecture':'amd64'}},{'digest':'sha256:'+'9'*64,'platform':{'os':'unknown','architecture':'unknown'}}]},separators=(',',':'))
+    return 'sha256:'+hashlib.sha256(index.encode()).hexdigest(),config_digest
 if a[0]=='compose' and 'ps' in a:
     service=a[-1];print({'postgres':'postgres-id','api':'api-id','web':'web-id','worker':'worker-id'}[service]);sys.exit(0)
 if a[0]=='compose' and 'exec' in a:
@@ -112,10 +124,12 @@ if a[0]=='inspect':
     env=['POSTGRES_USER=mse','POSTGRES_DB=motorsports_events'] if name=='postgres-id' else ['NODE_ENV=production','PREVIEW_API_ENABLED='+('true' if mode=='preview' else 'false')]
     networks={'mse-f3-certification-internal':{}}
     labels={'com.docker.compose.project':project}
-    image='sha256:'+((('b' if name=='web-id' else 'a') if mode.startswith('baseline') else ('d' if name=='web-id' else 'c')))*64
-    if mode=='runtime-api-wrong' and name=='api-id':image='sha256:'+'a'*64
-    if mode=='runtime-web-wrong' and name=='web-id':image='sha256:'+'b'*64
-    if mode.endswith('runtime-worker-wrong') and name=='worker-id':image='sha256:'+('c' if mode.startswith('baseline') else 'a')*64
+    config,runtime=(('b','6') if name=='web-id' else ('a','5')) if mode.startswith('baseline') else (('d','8') if name=='web-id' else ('c','7'))
+    image,config_digest=locator(config,runtime)
+    if mode=='classic-image-store':image=config_digest
+    if mode=='runtime-api-wrong' and name=='api-id':image='sha256:'+'9'*64
+    if mode=='runtime-web-wrong' and name=='web-id':image='sha256:'+'9'*64
+    if mode.endswith('runtime-worker-wrong') and name=='worker-id':image='sha256:'+'9'*64
     if name=='mse-f3-certification-runner':
         labels={'com.mse.certification':'lot57pf3','com.mse.certification.target':'preproduction'}
         running=mode!='runner-stopped'
@@ -148,7 +162,20 @@ if a[:2]==['image','inspect']:
     metadata=['APP_VERSION=1.0.'+patch,'GIT_SHA='+sha_digit*40,'BUILD_TIME=2026-08-28T'+hour+':00:00Z']
     if mode=='web-metadata-unknown' and 'web@' in ref:metadata=['APP_VERSION=unknown','GIT_SHA=unknown','BUILD_TIME=unknown']
     index_digit={'a':'1','b':'2','c':'3','d':'4'}[image_digit]
-    print(json.dumps([{'Id':'sha256:'+image_digit*64,'RepoDigests':[ref],'Os':'linux','Architecture':'amd64','RootFS':{'Type':'layers','Layers':['sha256:'+index_digit*64, 'sha256:'+image_digit*64]},'Config':{'Env':metadata}}]));sys.exit(0)
+    locator_digest='sha256:'+ref.rsplit(':',1)[1]
+    _,config_digest=locator(image_digit,{'a':'5','b':'6','c':'7','d':'8'}[image_digit])
+    docker_id=config_digest if mode=='classic-image-store' else locator_digest
+    if mode=='descriptor-with-config-id':docker_id=config_digest
+    descriptor=None if mode=='classic-image-store' else {'digest':locator_digest,'mediaType':'application/vnd.oci.image.index.v1+json'}
+    repo_digests=[] if mode=='repo-digest-missing' else [ref]
+    if mode=='descriptor-wrong':descriptor['digest']='sha256:'+'9'*64
+    if mode=='descriptor-media-wrong':descriptor['mediaType']='application/json'
+    if mode=='docker-id-wrong':docker_id='sha256:'+'9'*64
+    rootfs=['sha256:'+index_digit*64,'sha256:'+image_digit*64]
+    if mode=='image-rootfs-wrong':rootfs=['sha256:'+'9'*64]
+    row={'Id':docker_id,'RepoDigests':repo_digests,'Os':'linux','Architecture':'amd64','RootFS':{'Type':'layers','Layers':rootfs},'Config':{'Env':metadata}}
+    if descriptor is not None:row['Descriptor']=descriptor
+    print(json.dumps([row]));sys.exit(0)
 sys.exit(3)
 """, encoding="utf-8")
     executable.chmod(0o755)
@@ -169,13 +196,15 @@ def write_oci_layout(directory, name, image):
     layout = Path(directory) / name
     blobs = layout / "blobs" / "sha256"
     blobs.mkdir(parents=True)
-    fixture = oci_fixture(image["config_digest"].split(":", 1)[1][0], image["layer_digests"][0].split(":", 1)[1][0])
+    rootfs_digits=tuple(value.split(":",1)[1][0] for value in image["rootfs_diff_ids"])
+    fixture = oci_fixture(rootfs_digits[-1], image["layer_digests"][0].split(":", 1)[1][0],rootfs_digits=rootfs_digits)
     assert fixture["index_digest"] == image["oci_locator"]["locator_index_digest"]
     assert fixture["manifest_digest"] == image["runtime_manifest_digest"]
     (layout / "oci-layout").write_text('{"imageLayoutVersion":"1.0.0"}', encoding="utf-8")
     (layout / "index.json").write_text(json.dumps({"schemaVersion": 2, "manifests": [{"mediaType": "application/vnd.oci.image.index.v1+json", "digest": fixture["index_digest"], "size": len(fixture["index"].encode())}]}, separators=(",", ":")), encoding="utf-8")
     (blobs / fixture["index_digest"].split(":", 1)[1]).write_bytes(fixture["index"].encode())
     (blobs / fixture["manifest_digest"].split(":", 1)[1]).write_bytes(fixture["manifest"].encode())
+    (blobs / fixture["config_digest"].split(":", 1)[1]).write_bytes(fixture["config"].encode())
     return str(layout)
 
 
@@ -214,7 +243,8 @@ def run_baseline_probe(tmp_path, mode="baseline-safe"):
     api_layout=write_oci_layout(tmp_path,"baseline-api",n["api"]);web_layout=write_oci_layout(tmp_path,"baseline-web",n["web"])
     historical = baseline_artifact()
     historical_path = Path(tmp_path) / "historical-identity.json"
-    historical_path.write_text(json.dumps({"schema":"lot57pf3-historical-oci-identity-v1","release":{"api":historical["release"]["api"],"web":historical["release"]["web"]}}), encoding="utf-8")
+    historical_release={component:{key:historical["release"][component][key] for key in ("oci_provenance","executable_identity")} for component in ("api","web")}
+    historical_path.write_text(json.dumps({"schema":"lot57pf3-historical-oci-identity-v1","release":historical_release}), encoding="utf-8")
     command = ["node", str(BASELINE_PROBE), "--historical-identity", str(historical_path), "--n-api-image", n["api"]["oci_locator"]["locator_ref"], "--n-api-oci-layout", api_layout, "--n-web-image", n["web"]["oci_locator"]["locator_ref"], "--n-web-oci-layout", web_layout, "--output", str(output)]
     result = subprocess.run(command, cwd=ROOT, env=env, text=True, capture_output=True, check=False)
     return result, output
@@ -286,19 +316,22 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         fixture = oci_fixture("a", "5")
         index_ref = "registry.example/test@" + fixture["index_digest"]
         runtime_ref = "registry.example/test@" + fixture["manifest_digest"]
-        result = run_oci_resolver(index_ref, {index_ref: fixture["index"], runtime_ref: fixture["manifest"]})
+        config_ref = "registry.example/test@" + fixture["config_digest"]
+        result = run_oci_resolver(index_ref, {index_ref: fixture["index"], runtime_ref: fixture["manifest"],config_ref:fixture["config"]})
         self.assertEqual(result.returncode, 0, result.stderr)
         identity = json.loads(result.stdout)
         self.assertNotEqual(identity["oci_locator"]["locator_index_digest"], identity["runtime_manifest_digest"])
-        self.assertEqual(identity["config_digest"], "sha256:" + "a" * 64)
+        self.assertEqual(identity["config_digest"], fixture["config_digest"])
 
     def test_oci_resolver_refuses_blob_hash_mismatches(self):
         fixture = oci_fixture("a", "5")
         index_ref = "registry.example/test@" + fixture["index_digest"]
         runtime_ref = "registry.example/test@" + fixture["manifest_digest"]
+        config_ref = "registry.example/test@" + fixture["config_digest"]
         cases = (
             {index_ref: fixture["index"] + " ", runtime_ref: fixture["manifest"]},
             {index_ref: fixture["index"], runtime_ref: fixture["manifest"] + " "},
+            {index_ref:fixture["index"],runtime_ref:fixture["manifest"],config_ref:fixture["config"]+" "},
         )
         for documents in cases:
             self.assertNotEqual(run_oci_resolver(index_ref, documents).returncode, 0)
@@ -306,7 +339,8 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
     def test_oci_resolver_accepts_only_exact_direct_runtime_manifest(self):
         fixture = oci_fixture("a", "5")
         ref = "registry.example/test@" + fixture["manifest_digest"]
-        self.assertEqual(run_oci_resolver(ref, {ref: fixture["manifest"]}).returncode, 0)
+        config_ref="registry.example/test@"+fixture["config_digest"]
+        self.assertEqual(run_oci_resolver(ref, {ref: fixture["manifest"],config_ref:fixture["config"]}).returncode, 0)
         self.assertNotEqual(run_oci_resolver(ref, {ref: fixture["manifest"] + " "}).returncode, 0)
 
     def test_local_oci_locator_resolves_without_registry_and_fails_closed(self):
@@ -401,6 +435,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             lambda value: value["states"]["n-plus-one"]["snapshot"]["releases"]["n_plus_1"]["web"].update(git_sha="9" * 40),
             lambda value: [state["snapshot"]["releases"]["n_plus_1"][component].update(git_tree="e" * 40) for state in value["states"].values() for component in ("api", "web")],
             lambda value: value["states"]["final-n-plus-one"]["snapshot"]["releases"]["n"]["api"].update(runtime_manifest_digest="sha256:" + "9" * 64),
+            lambda value: value["states"]["n-plus-one"]["snapshot"]["releases"]["n_plus_1"]["api"]["docker_materialization"].update(descriptor_digest="sha256:"+"9"*64),
         )
         for index, mutate in enumerate(mutations):
             with self.subTest(case=index):
@@ -419,8 +454,9 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
 
     def test_runtime_probe_binds_certification_runner_to_each_selected_runtime(self):
         probe = RUNTIME_PROBE.read_text(encoding="utf-8")
-        self.assertIn("certification.Image!==expectedRuntime.api.config_digest", probe)
-        self.assertNotIn("certification.Image!==releases.n_plus_1.api.config_digest", probe)
+        self.assertIn("certification.Image!==expectedRuntime.api.docker_materialization.docker_image_id", probe)
+        self.assertNotIn("certification.Image!==expectedRuntime.api.config_digest", probe)
+        self.assertNotIn("api.Image!==expectedRuntime.api.config_digest", probe)
 
     def test_prospective_baseline_is_captured_from_inspected_runtime(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -448,7 +484,8 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             env_file = Path(directory) / ".env.preprod";env_file.write_text("test=true\n", encoding="utf-8");env["F3_PREPROD_ENV_FILE"] = str(env_file)
             n = snapshot()["releases"]["n"];api_layout=write_oci_layout(directory,"api",n["api"]);web_layout=write_oci_layout(directory,"web",n["web"])
             historical=baseline_artifact();historical["release"]["api"]["executable_identity"]["config_digest"]="sha256:"+"8"*64
-            source=Path(directory)/"historical.json";source.write_text(json.dumps({"schema":"lot57pf3-historical-oci-identity-v1","release":{"api":historical["release"]["api"],"web":historical["release"]["web"]}}),encoding="utf-8")
+            historical_release={component:{key:historical["release"][component][key] for key in ("oci_provenance","executable_identity")} for component in ("api","web")}
+            source=Path(directory)/"historical.json";source.write_text(json.dumps({"schema":"lot57pf3-historical-oci-identity-v1","release":historical_release}),encoding="utf-8")
             output=Path(directory)/"baseline.json"
             command=["node",str(BASELINE_PROBE),"--historical-identity",str(source),"--n-api-image",n["api"]["oci_locator"]["locator_ref"],"--n-api-oci-layout",api_layout,"--n-web-image",n["web"]["oci_locator"]["locator_ref"],"--n-web-oci-layout",web_layout,"--output",str(output)]
             result=subprocess.run(command,cwd=ROOT,env=env,text=True,capture_output=True,check=False)
@@ -475,6 +512,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         value = snapshot()
         original_historical_ref = baseline["release"]["web"]["oci_provenance"]["historical_immutable_ref"]
         value["releases"]["n"]["web"]["oci_locator"] = {"locator_ref": "mirror.example/recovered-web@sha256:" + "8" * 64, "locator_index_digest": "sha256:" + "8" * 64}
+        value["releases"]["n"]["web"]["docker_materialization"] = {"docker_image_id":"sha256:"+"8"*64,"descriptor_digest":"sha256:"+"8"*64,"descriptor_media_type":value["releases"]["n"]["web"]["locator_media_type"]}
         value["releases"]["n"]["web"]["runtime_ref"] = "mirror.example/historical-web@" + value["releases"]["n"]["web"]["runtime_manifest_digest"]
         self.assertEqual(run_preflight(value, baseline).returncode, 0)
         self.assertEqual(baseline["release"]["web"]["oci_provenance"]["historical_immutable_ref"], original_historical_ref)
@@ -644,11 +682,13 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             lambda value: value["release"]["n_plus_1"]["api"].update(runtime_manifest_digest=value["release"]["n"]["api"]["runtime_manifest_digest"]),
             lambda value: value["release"]["n_plus_1"]["web"].update(runtime_manifest_digest=value["release"]["n"]["web"]["runtime_manifest_digest"]),
             lambda value: value["release"]["n_plus_1"]["web"].update(config_digest="unknown"),
+            lambda value: value["release"]["n"]["api"]["docker_materialization"].update(descriptor_digest="sha256:"+"9"*64),
             lambda value: value["release"]["n"]["web"].update(build_time="unknown"),
             lambda value: value["release"]["n_plus_1"]["api"].update(git_tree=value["release"]["n"]["api"]["git_tree"]),
             lambda value: value["release"]["n_plus_1"]["web"].update(git_tree=value["release"]["n"]["web"]["git_tree"]),
             lambda value: value["prospective_baseline"]["database_integrity"].update(classification="full-database-fingerprint"),
             lambda value: value["prospective_baseline"]["database_integrity"].update(continuity_requires_independent_checks=False),
+            lambda value: value["prospective_baseline"]["release"]["api"]["establishment_materialization"]["docker_materialization"].update(descriptor_digest="sha256:"+"9"*64),
         )
         for index, mutate in enumerate(mutations):
             with self.subTest(case=index), tempfile.TemporaryDirectory() as directory:
@@ -666,7 +706,25 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
             snapshot_value = json.loads(output.read_text(encoding="utf-8"))
             self.assertTrue(snapshot_value["provider_network_blocked"])
             self.assertEqual(snapshot_value["provider_network_block_mechanism"], "container-egress-deny")
+            selected=snapshot_value["releases"]["n_plus_1"]["api"]
+            self.assertEqual(selected["docker_materialization"]["docker_image_id"],selected["oci_locator"]["locator_index_digest"])
+            self.assertNotEqual(selected["docker_materialization"]["docker_image_id"],selected["config_digest"])
             self.assertEqual(run_preflight(snapshot_value).returncode, 0)
+
+    def test_runtime_probe_accepts_provable_classic_config_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result, output = run_runtime_probe(directory,"classic-image-store")
+            self.assertEqual(result.returncode,0,result.stderr)
+            selected=json.loads(output.read_text(encoding="utf-8"))["releases"]["n_plus_1"]["api"]
+            self.assertEqual(selected["docker_materialization"]["docker_image_id"],selected["config_digest"])
+            self.assertIsNone(selected["docker_materialization"]["descriptor_digest"])
+
+    def test_runtime_probe_refuses_config_id_when_descriptor_is_present(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result, output = run_runtime_probe(directory,"descriptor-with-config-id")
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn("Docker Id differs from its verified descriptor",result.stderr)
+            self.assertFalse(output.exists())
 
     def test_runtime_probe_refuses_unverifiable_network_and_running_worker(self):
         for mode in ("network-open", "network-unknown", "worker", "unknown", "runner-stopped"):
@@ -690,7 +748,7 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
                 self.assertFalse(output.exists())
 
     def test_runtime_probe_refuses_wrong_api_web_or_worker_runtime_image(self):
-        for mode in ("runtime-api-wrong", "runtime-web-wrong", "runtime-worker-wrong", "web-metadata-unknown"):
+        for mode in ("runtime-api-wrong", "runtime-web-wrong", "runtime-worker-wrong", "web-metadata-unknown", "descriptor-wrong", "descriptor-media-wrong", "docker-id-wrong", "repo-digest-missing", "image-rootfs-wrong"):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as directory:
                 result, output = run_runtime_probe(directory, mode)
                 self.assertNotEqual(result.returncode, 0)
