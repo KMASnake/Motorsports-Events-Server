@@ -1,0 +1,45 @@
+{
+  "championshipIds": {
+    "formula1": "f1"
+  },
+  "circuitIds": {
+    "d98e6a2a-ab3c-494f-b083-c68c0cffef32": "albert-park",
+    "6c6c3380-e4f0-4b5d-b84d-47bf8e50c324": "monza",
+    "1502f15b-4727-403f-a656-e74c46b13b73": "hermanos-rodriguez",
+    "2d74a24b-77da-4676-97b9-6afa9008acd4": "interlagos",
+    "74995fb3-78be-460f-94dc-c9da326cf6d4": "bahrain-international",
+    "2daab29a-f4c4-483a-bd24-4d01123da25f": "baku-city",
+    "b20483fa-8c38-4b2e-a432-552c0a54ba94": "gilles-villeneuve",
+    "c838f6ac-ccc4-40f0-9b7f-55b75dcdd8cd": "zandvoort",
+    "4e1b4663-483d-4f80-a103-caf0a75e593f": "barcelona-catalunya",
+    "889198ad-0100-4208-baec-790e6b41cd8e": "monaco",
+    "8abb72e4-b770-4adf-a9a5-99e02294ca91": "spa-francorchamps",
+    "cc1d44ca-c761-48d5-8f2f-fe826c86483c": "circuit-of-the-americas",
+    "350f8d21-eaaa-4e52-ad56-195bd9074f76": "hungaroring",
+    "e76661b3-6774-4dd8-b35b-1a4bbf7fa4ad": "jeddah-corniche",
+    "aa8b99bd-aa81-4ee5-afa3-ba2db4ba9e39": "las-vegas-strip",
+    "616f8178-869c-41d0-8314-8fcd0640d1b6": "lusail",
+    "261acf15-a4a0-4047-a4ce-626c01c5c403": "madring",
+    "cde038bc-78bf-41e1-a395-b6fd7d7d0d1e": "marina-bay",
+    "f9394af6-ba14-48a9-9612-527ec11781af": "miami-international-autodrome",
+    "2d4d69b8-f6c5-4638-b6ce-1162ff0cad12": "red-bull-ring",
+    "e58a8979-a73c-4b2b-a248-921a0ac0457b": "shanghai-international",
+    "2d8e0ba8-2e48-4914-88cf-8025661b3b47": "silverstone",
+    "c061f0a6-a2d2-49eb-ad68-2fedfdc95bf9": "suzuka",
+    "10358903-f251-4a40-8301-8966c208d860": "yas-marina"
+  },
+  "sessionTypes": {
+    "practice": "practice",
+    "qualifying": "qualifying",
+    "sprint": "sprint",
+    "sprint_qualifying": "sprint_qualifying",
+    "sprint qualifying": "sprint_qualifying",
+    "sprint shootout": "sprint_qualifying",
+    "race": "race"
+  },
+  "statuses": {
+    "scheduled": "scheduled",
+    "cancelled": "cancelled",
+    "completed": "completed"
+  }
+}

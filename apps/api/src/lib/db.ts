@@ -40,6 +40,19 @@ export async function verifyApplicationSchema(): Promise<void> {
     admin_accounts_table: string | null;
     admin_login_guard_table: string | null;
     admin_sessions_table: string | null;
+    provider_instances_table: string | null;
+    provider_secrets_table: string | null;
+    provider_quota_policies_table: string | null;
+    provider_quota_state_table: string | null;
+    provider_championships_table: string | null;
+    provider_source_configs_table: string | null;
+    provider_discoveries_table: string | null;
+    provider_discovery_runs_table: string | null;
+    sync_streams_table: string | null;
+    sync_runs_table: string | null;
+    sync_restore_column: string | null;
+    quota_runtime_table:string|null;
+    api_clients_table:string|null;
     applied_migrations: number;
   }>(`
     select
@@ -52,6 +65,21 @@ export async function verifyApplicationSchema(): Promise<void> {
       to_regclass('public.admin_accounts')::text as admin_accounts_table,
       to_regclass('public.admin_login_guard')::text as admin_login_guard_table,
       to_regclass('public.admin_sessions')::text as admin_sessions_table,
+      to_regclass('public.provider_instances')::text as provider_instances_table,
+      to_regclass('public.provider_secrets')::text as provider_secrets_table,
+      to_regclass('public.provider_quota_policies')::text as provider_quota_policies_table,
+      to_regclass('public.provider_quota_state')::text as provider_quota_state_table,
+      to_regclass('public.provider_championships')::text as provider_championships_table,
+      to_regclass('public.provider_championship_source_configs')::text as provider_source_configs_table,
+      to_regclass('public.provider_discovered_championships')::text as provider_discoveries_table,
+      to_regclass('public.provider_discovery_runs')::text as provider_discovery_runs_table,
+      to_regclass('public.sync_streams')::text as sync_streams_table,
+      to_regclass('public.sync_runs')::text as sync_runs_table,
+      (select column_name from information_schema.columns
+        where table_schema='public' and table_name='provider_championships'
+          and column_name='sync_state_before_championship_disable') as sync_restore_column,
+      to_regclass('public.provider_quota_runtime')::text as quota_runtime_table,
+      to_regclass('public.api_clients')::text as api_clients_table,
       (select count(*)::int from schema_migrations
        where version in (
          '0001_event_corrections',
@@ -59,7 +87,14 @@ export async function verifyApplicationSchema(): Promise<void> {
          '0003_admin_audit_and_provider_identity',
          '0004_sessions',
          '0005_event_session_title',
-         '0006_admin_console_authentication'
+         '0006_admin_console_authentication',
+         '0007_provider_instances',
+         '0008_provider_championship_sources',
+         '0009_provider_discovery',
+         '0010_provider_discovery_completeness',
+         '0011_persistent_sync_scheduler',
+         '0012_scheduler_audit_fixes',
+         '0013_provider_quota_cadence'
        )) as applied_migrations
   `);
 
@@ -73,7 +108,20 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.admin_accounts_table ||
     !schema.admin_login_guard_table ||
     !schema.admin_sessions_table ||
-    schema.applied_migrations !== 6
+    !schema.provider_instances_table ||
+    !schema.provider_secrets_table ||
+    !schema.provider_quota_policies_table ||
+    !schema.provider_quota_state_table ||
+    !schema.provider_championships_table ||
+    !schema.provider_source_configs_table ||
+    !schema.provider_discoveries_table ||
+    !schema.provider_discovery_runs_table ||
+    !schema.sync_streams_table ||
+    !schema.sync_runs_table ||
+    !schema.sync_restore_column ||
+    !schema.quota_runtime_table ||
+    (process.env.PREVIEW_API_ENABLED === 'true' && !schema.api_clients_table) ||
+    schema.applied_migrations !== 13
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }

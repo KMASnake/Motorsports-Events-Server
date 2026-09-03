@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Championship, Circuit, EventFormState } from './eventTypes';
+import {eventCategoryOptions,eventSessionTitleSuggestions,isEventCategory,sessionTitleCategory} from './eventCategories';
 
 interface Props {
   open: boolean;
   editing: boolean;
   saving: boolean;
   value: EventFormState;
+  meetingName: string | null;
   championships: Championship[];
   circuits: Circuit[];
   sessionTitles: string[];
@@ -16,13 +18,15 @@ interface Props {
   onSubmit: (event: FormEvent) => void;
 }
 
-export function EventEditorDialog({ open, editing, saving, value, championships, circuits, sessionTitles, error, onChange, onNameChange, onClose, onSubmit }: Props) {
+export function EventEditorDialog({ open, editing, saving, value, meetingName, championships, circuits, sessionTitles, error, onChange, onNameChange, onClose, onSubmit }: Props) {
   const [sessionTitlesOpen, setSessionTitlesOpen] = useState(false);
   const [filterSessionTitles, setFilterSessionTitles] = useState(false);
+  const categorySessionTitles=useMemo(()=>eventSessionTitleSuggestions(value.category,sessionTitles),[sessionTitles,value.category]);
   const matchingSessionTitles = useMemo(() => {
     const query = value.session_title.trim().toLocaleLowerCase('fr-FR');
-    return sessionTitles.filter((title) => !filterSessionTitles || !query || title.toLocaleLowerCase('fr-FR').includes(query));
-  }, [filterSessionTitles, sessionTitles, value.session_title]);
+    return categorySessionTitles.filter((title) => !filterSessionTitles || !query || title.toLocaleLowerCase('fr-FR').includes(query));
+  }, [categorySessionTitles, filterSessionTitles, value.session_title]);
+  const incompatibleSession=Boolean(value.session_title&&isEventCategory(value.category)&&sessionTitleCategory(value.session_title)!=='other'&&sessionTitleCategory(value.session_title)!==value.category);
   useEffect(() => { setSessionTitlesOpen(false); setFilterSessionTitles(false); }, [open]);
   if (!open) return null;
   return <div className="lot3-modal-backdrop" onMouseDown={() => !saving && onClose()}>
@@ -31,10 +35,12 @@ export function EventEditorDialog({ open, editing, saving, value, championships,
       <form onSubmit={onSubmit}>
         {error && <div className="events-form-error" role="alert">{error}</div>}
         <div className="lot3-form-grid">
-          <label className="wide">Nom public *<input required minLength={2} value={value.name} onChange={(event) => onNameChange(event.target.value)} /></label>
-          <label>Catégorie facultative<input value={value.category} onChange={(event) => onChange({ ...value, category: event.target.value })} placeholder="Ex. Grand Prix, Rallye…" /></label>
+          {meetingName
+            ? <label className="wide">Épreuve<input value={meetingName} readOnly aria-readonly="true" /></label>
+            : <label className="wide">Nom public *<input required minLength={2} value={value.name} onChange={(event) => onNameChange(event.target.value)} /></label>}
           <label>Championnat *<select required value={value.championship_id} onChange={(event) => onChange({ ...value, championship_id: event.target.value })}><option value="">Sélectionner</option>{championships.filter((item) => item.active || item.id === value.championship_id).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-          <label>Circuit facultatif<select value={value.circuit_id} onChange={(event) => onChange({ ...value, circuit_id: event.target.value })}><option value="">Non défini</option>{circuits.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country_code ? ` · ${item.country_code}` : ''}</option>)}</select></label>
+          <label>Circuit<select value={value.circuit_id} onChange={(event) => onChange({ ...value, circuit_id: event.target.value })}><option value="">Non défini</option>{circuits.map((item) => <option key={item.id} value={item.id}>{item.name}{item.country_code ? ` · ${item.country_code}` : ''}</option>)}</select></label>
+          <label>Catégorie<select value={value.category} onChange={(event) => onChange({ ...value, category: event.target.value })}><option value="">Non définie</option>{value.category&&!isEventCategory(value.category)&&<option value={value.category} disabled>Valeur historique · {value.category}</option>}{eventCategoryOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <label className="wide">Intitulé de session
             <span className="event-session-title-combobox">
               <input role="combobox" aria-controls="event-session-title-options" aria-expanded={sessionTitlesOpen} aria-autocomplete="list" maxLength={160} autoComplete="off" value={value.session_title} onFocus={() => { setFilterSessionTitles(false); setSessionTitlesOpen(true); }} onChange={(event) => { onChange({ ...value, session_title: event.target.value }); setFilterSessionTitles(true); setSessionTitlesOpen(true); }} placeholder="FP1, Qualifications, Warm-up…" />
@@ -44,6 +50,7 @@ export function EventEditorDialog({ open, editing, saving, value, championships,
               </span>}
             </span>
             <small>Choisissez une suggestion connue ou saisissez un nouvel intitulé.</small>
+            {incompatibleSession&&<small>La session actuelle est conservée. Choisissez explicitement un autre intitulé si nécessaire.</small>}
           </label>
           <label>Début *<input required type="datetime-local" value={value.starts_at} onChange={(event) => onChange({ ...value, starts_at: event.target.value })} /></label>
           <label>Fin<input type="datetime-local" min={value.starts_at} value={value.ends_at} onChange={(event) => onChange({ ...value, ends_at: event.target.value })} /></label>

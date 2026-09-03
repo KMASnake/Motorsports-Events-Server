@@ -3,6 +3,7 @@ import { pool, withTransaction } from '../lib/db.js';
 import { resolveCorrection } from '../lib/eventCorrections.js';
 import { correctionOverrideBody, correctionReference } from '../lib/correctionValue.js';
 import { correctionQuery, paginated } from '../lib/adminQuery.js';
+import { markAtomicallyAudited, writeAdminAudit } from '../lib/adminAudit.js';
 
 const correctionSelect = `
   select ec.*,e.name event_name,e.slug event_slug,e.championship_id,
@@ -51,9 +52,13 @@ export async function correctionRoutes(app: FastifyInstance): Promise<void> {
       if (!exists.rowCount) return reply.code(400).send({ message: 'La référence sélectionnée n’existe pas.' });
     }
     try {
-      const result = await withTransaction((client) => resolveCorrection(
-        client, id, 'set-override', parsed.data.override_value, parsed.data.field_name
-      ));
+      const result = await withTransaction(async (client) => {
+        const oldValue = (await client.query(`${correctionSelect} where ec.id=$1`, [id])).rows[0] ?? null;
+        const value = await resolveCorrection(client, id, 'set-override', parsed.data.override_value, parsed.data.field_name);
+        await writeAdminAudit(client, { request, resourceType: 'correction', resourceId: id, oldValue, newValue: value.deleted ? null : value.correction });
+        return value;
+      });
+      markAtomicallyAudited(request);
       if (result.deleted) return reply.code(204).send();
       return result.correction;
     } catch (error) {
@@ -71,7 +76,13 @@ export async function correctionRoutes(app: FastifyInstance): Promise<void> {
 async function correctionAction(request: any, reply: any, action: 'accept-provider' | 'keep-override' | 'delete-override') {
   const { id } = request.params as { id: string };
   try {
-    const result = await withTransaction((client) => resolveCorrection(client, id, action));
+    const result = await withTransaction(async (client) => {
+      const oldValue = (await client.query(`${correctionSelect} where ec.id=$1`, [id])).rows[0] ?? null;
+      const value = await resolveCorrection(client, id, action);
+      await writeAdminAudit(client, { request, resourceType: 'correction', resourceId: id, oldValue, newValue: value.deleted ? null : value.correction });
+      return value;
+    });
+    markAtomicallyAudited(request);
     if (result.deleted) return reply.code(204).send();
     return result.correction;
   } catch (error) {

@@ -1,5 +1,211 @@
 # Journal des décisions
 
+> Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
+
+## 2026-08-25 — Revalidation mainteneur et VPS finale de 5.7-P-E
+
+- 5.7-P-E est implémenté et revalidé mainteneur/VPS au SHA
+  `74f45b7d341ca214d4569b5d9917a46bb1d38254` ;
+- E01-E18 et 0028/0029 fresh/upgrade/down/up avec protection du rollback peuplé
+  sont PASS, avec migration head 0029 en préproduction ;
+- Preview OFF/ON, les sept routes protégées, l’entitlement `f1`, les scopes,
+  `/changes`, le lifecycle client/clé et les limites atomiques sont PASS ;
+- l’état final conserve Preview OFF, les services healthy, le client
+  synthétique suspendu et toutes ses clés révoquées ;
+- 5.7-P-F, l’activation Preview Production, l’onboarding externe, le Lot 5.7
+  complet, 5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-24 — Réouverture et correction d’intégration de 5.7-P-E
+
+- la validation VPS a révélé une collision Fastify entre quatre lectures
+  historiques et leurs routes Preview définitives ;
+- la validation mainteneur E est rouverte malgré le PASS confirmé de la
+  migration 0028 et de la recette E01-E18 ;
+- l’assemblage partagé par `server.ts` conserve les lectures historiques avec
+  Preview OFF et installe les lectures Preview sécurisées sans collision avec
+  Preview ON, sans retirer les routes admin/write ;
+- la correction est complète mais exige une revalidation mainteneur et VPS ;
+- 5.7-P-F, la visibilité Production, l’onboarding externe, le Lot 5.7 complet,
+  5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-24 — Validation mainteneur de 5.7-P-E
+
+- l’audit mainteneur de 5.7-P-E est PASS au SHA
+  `bfe6d4818b105a08417e6c524084cae0a176690d` ;
+- PP-T29 à PP-T35, les critères fonctionnels E applicables PP-105 à PP-135 et
+  PP-180, E01-E18 et la migration 0028 fresh/down/up avec protection du
+  rollback peuplé sont PASS ;
+- aucun appel fournisseur réel et aucun crédit fournisseur n’ont été consommés ;
+- aucun gate d’implémentation suivant n’est autorisé ; 5.7-P-F, la visibilité
+  Production, l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge `main`
+  restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-24 — Achèvement de l’implémentation 5.7-P-E
+
+- PP-T29 à PP-T35 sont implémentés et disposent de preuves ciblées et
+  PostgreSQL reproductibles ;
+- l’activation Preview reste désactivée par défaut et aucun client externe
+  n’est onboardé ;
+- 5.7-P-E attend l’audit mainteneur et n’est pas déclaré validé ;
+- `authorized_gate` reste `5.7-P-E` et n’ouvre pas automatiquement F ;
+- 5.7-P-F, la visibilité Production, le Lot 5.7 complet, 5.8+ et merge `main`
+  restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-21 — Validation mainteneur de 5.6-H et ouverture du gate 5.6-I
+
+- l’Acceptance finale de 5.6-H est 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- l’audit mainteneur de 5.6-H est PASS et le sous-lot est validé ;
+- le P3 non bloquant hérité de 5.6-G sur les queries anomalies invalides reste
+  tracé sans rouvrir 5.6-G ou 5.6-H ;
+- le dernier sous-lot technique du plan approuvé est 5.6-I — recette complète,
+  audit et passation ; seul ce gate de validation finale est ouvert ;
+- aucune implémentation fonctionnelle 5.6-I n’est autorisée par cette décision ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés.
+
+## 2026-08-21 — Validation mainteneur de 5.6-G et ouverture de 5.6-H
+
+- l’Acceptance finale de 5.6-G est 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- P1, P2 fonctionnels et P2 preuves ouverts : 0 ;
+- l’audit mainteneur de 5.6-G est PASS et le sous-lot est validé ;
+- le P3 non bloquant sur les filtres invalides de la route anomalies (`[]` au
+  lieu d’un HTTP 400) est tracé sans rouvrir 5.6-G ;
+- le prochain sous-lot du plan approuvé est 5.6-H — interface ACP — dont
+  l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-I, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision n’implémente aucun code 5.6-H.
+
+## 2026-08-21 — Validation mainteneur de 5.6-F et ouverture de 5.6-G
+
+- l’Acceptance finale de 5.6-F est 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- P1, P2 fonctionnels, P2 preuves et P3 bloquants ouverts : 0 ;
+- l’audit mainteneur de 5.6-F est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-G — API et actions ACP — dont
+  l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-H, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision n’implémente aucun code 5.6-G.
+
+## 2026-08-21 — Validation mainteneur de 5.6-E et ouverture de 5.6-F
+
+- l’Acceptance finale de 5.6-E est 35 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- le ré-audit mainteneur de 5.6-E est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-F — protection des corrections
+  et observations — dont l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-G, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision n’implémente aucun code 5.6-F et ne modifie aucun invariant
+  fonctionnel validé de 5.6-E.
+
+## 2026-08-21 — Validation mainteneur de 5.6-D et ouverture de 5.6-E
+
+- le ré-audit mainteneur de 5.6-D est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-E — temporalité et
+  finalization — dont l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-F, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision ne modifie aucun invariant fonctionnel validé de 5.6-D.
+
+## 2026-08-15 — Exception mainteneur TheSportsDB v1
+
+- le mainteneur impose le maintien de TheSportsDB v1 et accepte explicitement
+  que sa clé gratuite apparaisse dans le segment de chemin de l’appel réseau ;
+- cette exception ne s’étend à aucun autre fournisseur ni à une query string ;
+- le secret et l’URL credentialisée restent interdits dans logs, erreurs,
+  traces, audits, stockage et surfaces applicatives ;
+- ADR-0016 reste applicable pour toutes les autres garanties.
+
+Voir `architecture/ADR-0020-THESPORTSDB-V1-CREDENTIAL-PATH.md`.
+
+## 2026-08-15 — Application d’ADR-0016 aux versions d’API fournisseur
+
+- aucune compatibilité fournisseur ne justifie un secret dans une URL ;
+- lorsqu’un fournisseur propose une version authentifiée par header, cette
+  version est obligatoire même si une version historique gratuite utilise une
+  clé dans son chemin ;
+- l’adaptateur TheSportsDB utilise l’API v2 et `X-API-KEY` ; l’API v1
+  credentialisée est refusée pour les appels 5.6 ;
+- cette clarification ne crée aucune exception à AC-5.6-161.
+
+Voir `architecture/ADR-0016-HTTP-SECURITY-BOUNDARY.md`.
+
+## 2026-08-14 — Autorisation d'implémentation du Lot 5.6
+
+- le Concept, le contrat UI et l'Acceptance consolidée du Lot 5.6 ont été audités contre 5.4, 5.5, la baseline sécurité et la frontière 5.7 ;
+- les constats de l'audit ont été corrigés et la revue post-corrections est PASS ;
+- le mainteneur a explicitement déclaré : « Je valide et j'autorise l'implémentation du lot 5.6 » ;
+- `authorized_sub_lot = 5.6` ;
+- l'implémentation du seul Lot 5.6 est autorisée ;
+- cette autorisation ne vaut ni validation finale du Lot 5.6, ni autorisation de fusion dans `main` ;
+- les Lots 5.7 et suivants restent non autorisés à l'implémentation.
+
+Voir `architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`.
+
+## 2026-08-14 — Validation mainteneur du Lot 5.5
+
+- l'audit initial de l'implémentation 5.5 et ses ré-audits ont été menés à
+  terme ;
+- les corrections P1, P2 et P3 sont closes et le ré-audit final est PASS ;
+- la recette PostgreSQL dédiée compte 61 cas réussis ;
+- la sécurité et la non-régression du scheduler 5.4 sont validées ;
+- `REAL PROVIDER REQUESTS = 0` et `PROVIDER CREDITS CONSUMED = 0` ;
+- l'implémentation du Lot 5.5 est validée par le mainteneur le 2026-08-14 ;
+- **à la date de cette décision**, le Lot 5.6 restait non autorisé ; cet état historique a ensuite été remplacé par l'autorisation formalisée dans l'ADR-0019.
+
+Voir `architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
+
+## 2026-08-14 — Autorisation du Lot 5.5 Quotas et cadence
+
+- la baseline sécurité pré-5.5 est explicitement validée par le mainteneur ;
+- le Concept et l'Acceptance 5.5 ont passé l'audit croisé avec 5.4 et sécurité après corrections ;
+- l'implémentation du seul Lot 5.5 est autorisée avec `authorized_sub_lot = 5.5` ;
+- cette autorisation ne vaut pas validation finale de 5.5 ;
+- Codex doit s'arrêter après implémentation et preuves de validation pour audit mainteneur ;
+- **à la date de cette décision**, les Lots 5.6 et suivants restaient non autorisés ; le Lot 5.6 a ensuite été autorisé par l'ADR-0019, tandis que 5.7+ restent non autorisés.
+
+Voir `architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
+
+## 2026-08-14 — Frontière de sécurité HTTP pré‑5.5
+
+- la confiance proxy est fermée par défaut et limitée à `TRUST_PROXY_CIDRS` ;
+- Fastify impose headers de sécurité, redaction des secrets et corps de 1 Mio ;
+- Nginx impose les headers de l’ACP et une CSP dont `connect-src` est aligné
+  sur l’origine API configurée au build ;
+- HSTS appartient à la terminaison qui voit réellement le HTTPS public ;
+- les réponses publiques de championnats sont actives uniquement et utilisent
+  une projection explicite, distincte du contrat administratif ;
+- les mutations sensibles historiques écrivent mutation et audit dans une
+  même transaction ;
+- les transports fournisseurs exigent HTTPS, allowlist exacte et lecture
+  streaming bornée, sans redirection ni destination privée ;
+- ces règles ne démarrent aucune fonctionnalité du Lot 5.5.
+
+Voir `architecture/ADR-0016-HTTP-SECURITY-BOUNDARY.md`.
+
+## 2026-08-12 — Scheduler de synchronisation persistant
+
+- deux flux persistants `current` et `historical` portent trois classes de
+  travail pondérées 3/2/1 ;
+- les leases PostgreSQL, heartbeats et générations de fencing empêchent un
+  worker périmé de valider ;
+- résultat, curseur, état et exécution sont validés dans une transaction unique ;
+- le pool global et la concurrence fournisseur sont tous deux appliqués ;
+- discovery et sync partagent les mêmes plafonds, leases et règles de fencing ;
+- la désactivation mémorise puis restaure l'état exact sans auto-activer un
+  flux inactif ou en pause ;
+- l'ingestion complète et le moteur de quotas restent hors du Lot 5.4.
+
+Voir `architecture/ADR-0015-PERSISTENT-SYNC-SCHEDULER.md`.
+
 ## 2026-08-11 — Authentification humaine de la console
 
 - un compte administrateur unique est initialisé par une commande dédiée ;
@@ -33,6 +239,16 @@ Voir `architecture/ADR-0013-EVENT-AS-SESSION.md`.
   `0004`, sans devenir un second champ visible.
 
 Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
+## 2026-08-14 — Quota gate fournisseur atomique
+
+- le scheduler conserve la sélection et les leases ; le quota gate décide et charge séparément avant tout outbound ;
+- les fenêtres minute/heure/jour/mois et l'intervalle minimal s'appliquent simultanément ;
+- le compteur local est conservateur et les observations fournisseur normalisées ne réécrivent pas la policy ;
+- seule la classe current accède à la réserve, après application de la marge ;
+- seule une non-émission prouvée permet une compensation ; une émission reste chargée malgré timeout ou stale fencing.
+
+Voir `architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
 
 ## 2026-08-10 — Projection publique des Sessions
 
@@ -202,6 +418,7 @@ Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
   continuent d'utiliser le service transactionnel unique.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
+
 ## 2026-08-09 — Protection de l'API d'administration
 
 - toute route `/api/v1/admin/` exige un Bearer HMAC valide et non expiré ;
@@ -212,6 +429,7 @@ Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
   chemin public existant.
 
 Voir `architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.
+
 ## 2026-08-09 — Pagination et audit administratifs
 
 - filtres et tris sont validés et exécutés avant la pagination serveur ;
@@ -229,3 +447,134 @@ Voir `architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.
   les changements d'heure civile.
 
 Voir `architecture/ADR-0007-CALENDAR.md`.
+## 2026-08-21 — Recette finale 5.6-I PASS et décision mainteneur attendue
+
+- la recette complète 5.6-I est PASS et clôt le dernier sous-lot technique du
+  plan approuvé, sans changement fonctionnel ;
+- les preuves PostgreSQL, API, Web, Chromium, sécurité, reprise, régressions
+  5.4/5.5 et release sont consignées dans
+  `docs/handoff/LOT-5.6-I-FINAL-VALIDATION.md` ;
+- cette clôture technique ne vaut pas validation globale du Lot 5.6 ;
+- `merge_authorized` reste faux et la fusion dans `main` reste interdite ;
+- 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
+- le prochain gate appartient au mainteneur : décider explicitement de la
+  validation globale du Lot 5.6.
+
+## 2026-08-21 — Validation mainteneur globale du Lot 5.6
+
+- le mainteneur accepte le dossier final 5.6-I et ses 26/26 PASS ;
+- les sous-lots 5.6-A à 5.6-H sont validés et 5.6-I est un gate final PASS ;
+- P1 ouverts : 0 ; P2 ouverts : 0 ; P3 bloquants : 0 ;
+- le P3 hérité de 5.6-G sur la query anomalies invalide reste connu et non
+  bloquant ;
+- le Lot 5.6 est globalement validé le 2026-08-21 et complet à 100 % ;
+- le prochain gate identifié est 5.7-P — tranche verticale de normalisation
+  Production Preview — déjà conçu mais non autorisé ;
+- 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
+- la fusion dans `main` reste soumise à une décision séparée et non autorisée.
+
+## 2026-08-21 — Autorisation mainteneur de 5.7-P
+
+- le mainteneur autorise 5.7-P, tranche verticale de normalisation Production
+  Preview ;
+- le Concept, l’Acceptance effective PP-001 à PP-183 et les corrections
+  d’audit constituent les normes existantes ;
+- ces normes ne définissent aucun sous-lot technique ni premier gate
+  d’implémentation nommé : seule leur traduction en plan technique ordonné est
+  autorisée dans le premier gate ;
+- l’implémentation 5.7-P reste non commencée et aucun sous-lot technique n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
+- le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.
+
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-A
+
+- les fondations persistantes PP-T01 à PP-T06 sont implémentées et prouvées ;
+- 5.7-P-A est complet et attend l’audit mainteneur, sans être validé mainteneur ;
+- aucun moteur de normalisation, mapping, endpoint Preview, publication ou
+  contrôle client n’est ajouté ;
+- l’autorisation technique de A est consommée et aucun gate B à F n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.
+
+## 2026-08-22 — Validation de 5.7-P-A et autorisation de 5.7-P-B
+
+- l’audit mainteneur de 5.7-P-A est PASS et A est validé mainteneur ;
+- PP-T01 à PP-T06 et la recette dédiée 18/18 sont PASS, sans P1, P2 ni P3
+  bloquant ;
+- seul 5.7-P-B — normalisation déterministe et mapping source — est autorisé et
+  reste non commencé ; son Acceptance est PP-T07 à PP-T16 avec les critères
+  fonctionnels pertinents PP-030 à PP-061 et PP-181 à PP-183 ;
+- B doit s’arrêter aux candidats normalisés persistés, sans publication ;
+- 5.7-P-C à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni 5.6 ni A.
+
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-B
+
+- la normalisation déterministe et le mapping source PP-T07 à PP-T16 sont
+  implémentés et prouvés ;
+- B s’arrête aux candidats, décisions, liens et checkpoints persistés ; aucune
+  publication, API Preview ou surface client n’est ajoutée ;
+- 5.7-P-B est complet et attend l’audit mainteneur, sans être validé
+  mainteneur ;
+- l’autorisation technique de B est consommée et aucun gate C à F n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et inchangé.
+
+## 2026-08-22 — Validation de 5.7-P-B et autorisation de 5.7-P-C
+
+- l’audit mainteneur de 5.7-P-B est PASS et B est validé mainteneur ;
+- 45 critères applicables sont PASS, sans PARTIAL, FAIL ni NOT TESTED ;
+- seul 5.7-P-C — état de publication, last-known-good et journal de
+  changements — est autorisé et reste non commencé ;
+- C couvre PP-T17 à PP-T22 et les critères fonctionnels pertinents PP-062 à
+  PP-073 / PP-086 à PP-104, avec persistance interne atomique mais sans route
+  client ;
+- 5.7-P-D à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni A ni B.
+
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-C
+
+- PP-T17 à PP-T22 sont implémentés et prouvés sur PostgreSQL réel ;
+- état public interne, last-known-good, révisions, journal monotone, kill switch
+  et tombstones sont durables et transactionnels ;
+- 5.7-P-C est complet et attend l’audit mainteneur sans être validé ;
+- aucun gate suivant n’est autorisé et 5.7-P-D ne doit pas commencer ;
+- aucune route Preview ni sécurité client n’est ajoutée ;
+- le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0021-LOT-5.7-P-C-DURABLE-PUBLICATION.md`.
+
+## 2026-08-22 — Validation mainteneur de C et readiness préproduction interne
+
+- l’audit mainteneur de 5.7-P-C est PASS et C est validé mainteneur ;
+- PP-T17 à PP-T22 et 25 critères applicables sont PASS sans constat bloquant ;
+- la stack A/B/C est prête localement pour une préproduction VPS interne avec
+  PostgreSQL persistant, migration 0025, restart, healthchecks et backup/restore ;
+- aucun déploiement/reboot VPS réel n’est encore déclaré ;
+- 5.7-P-D à F, le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
+## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
+
+- la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;
+- le design technique et l’Acceptance PP-T01 à PP-T42 sont complets ;
+- 5.7-P est décomposé en six gates ordonnés 5.7-P-A à 5.7-P-F ;
+- le cross-audit documentaire est PASS sans P1/P2/P3 bloquant ;
+- 5.7-P-A est le premier gate candidat mais reste non autorisé ;
+- l’implémentation reste à 0 % et non commencée ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.
+## 2026-08-21 — Validation du design 5.7-P et autorisation de 5.7-P-A
+
+- l’audit mainteneur du design technique, de l’Acceptance PP-T01 à PP-T42 et
+  de la décomposition A→F est PASS ;
+- le design 5.7-P est validé par le mainteneur le 2026-08-21 ;
+- seul 5.7-P-A — fondations d’identité normalisée et de persistance — est
+  autorisé pour implémentation et reste non commencé ;
+- A couvre PP-T01 à PP-T06 et les critères fonctionnels pertinents PP-001 à
+  PP-009 et PP-024 à PP-036, sans normalisation ni exposition client ;
+- 5.7-P-B à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.

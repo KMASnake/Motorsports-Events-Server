@@ -11,11 +11,17 @@ import {
   type CorrectableEventPatch
 } from '../lib/eventCorrections.js';
 import { adminEventQuery, paginated, publicEventQuery } from '../lib/adminQuery.js';
+import { markAtomicallyAudited, writeAdminAudit } from '../lib/adminAudit.js';
+import { assertCorrectionSafeEvent, IncompleteProviderIdentityError } from '../lib/correctionPolicy.js';
 
 const nullableText = z.union([z.string().trim().max(2000), z.null()]).optional();
 const nullableSessionTitle = z.union([z.string().trim().min(1).max(160), z.null()]).optional();
 const eventStatus = z.enum(['draft', 'scheduled', 'completed', 'cancelled', 'postponed']);
 const eventOrigin = z.enum(['manual', 'provider', 'mixed']);
+const eventCategory = z.enum(['practice', 'qualifying', 'race', 'other']);
+// Valeurs historiques encore produites par le contrat de normalisation détaillé.
+// L'administration n'en propose plus la saisie, mais doit pouvoir relire et corriger ces Events sans rupture.
+const compatibleEventCategory = z.union([eventCategory, z.enum(['sprint_qualifying', 'sprint'])]);
 const businessEventBody = z.object({
   championship_id: z.string().trim().min(1),
   circuit_id: z.union([z.string().trim().min(1), z.null()]).optional(),
@@ -28,6 +34,9 @@ const businessEventBody = z.object({
   session_title: nullableSessionTitle,
   description: nullableText
 });
+const adminBusinessEventBody = businessEventBody.extend({
+  category: z.union([compatibleEventCategory, z.null()]).optional()
+});
 const eventBody = businessEventBody.extend({
   slug: z.string().trim().min(1).max(180).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   timezone: z.string().trim().min(1).max(80),
@@ -35,7 +44,7 @@ const eventBody = businessEventBody.extend({
   provider_key: nullableText,
   external_id: nullableText
 });
-const updateBody = businessEventBody.partial();
+const updateBody = adminBusinessEventBody.partial();
 const providerCreateBody = businessEventBody.extend({
   provider_key: z.string().trim().min(1).max(120),
   external_id: z.string().trim().min(1).max(300)
@@ -66,10 +75,13 @@ const publicSelect = `
 const adminSelect = `
   select e.*,c.name championship_name,c.slug championship_slug,c.logo_url championship_logo_url,c.active championship_active,
     ci.name circuit_name,ci.city circuit_city,ci.country_code,
+    me.meeting_id,m.name meeting_name,
     (select count(*)::int from event_corrections ec where ec.event_id=e.id and ec.status in ('active','conflict')) correction_count
   from events e
   join championships c on c.id=e.championship_id
   left join circuits ci on ci.id=e.circuit_id
+  left join meeting_events me on me.event_id=e.id
+  left join meetings m on m.id=me.meeting_id
 `;
 
 function clean(value: unknown): string | null {
@@ -94,33 +106,37 @@ function technicalFieldsIn(body: unknown): string[] {
   return technicalAdminFields.filter((field) => field in body);
 }
 
-export async function eventRoutes(app: FastifyInstance): Promise<void> {
-  app.get('/api/v1/events', async (request, reply) => {
-    const parsedQuery = publicEventQuery.safeParse(request.query);
-    if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
-    const query = parsedQuery.data;
-    const where = ['e.published=true', 'c.active=true', `e.status <> 'draft'`];
-    const params: unknown[] = [];
-    if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
-    if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
-    if (query.from) { params.push(query.from); where.push(`e.starts_at >= $${params.length}::timestamptz`); }
-    if (query.to) { params.push(query.to); where.push(`e.starts_at <= $${params.length}::timestamptz`); }
-    return (await pool.query(`${publicSelect} where ${where.join(' and ')} order by e.starts_at,e.name`, params)).rows;
-  });
+export interface EventRouteOptions { includePublic?: boolean }
 
-  app.get('/api/v1/events/:id', async (request, reply) => {
-    const { id } = request.params as { id: string };
-    const result = await pool.query(`${publicSelect} where e.id=$1 and e.published=true and c.active=true and e.status <> 'draft'`, [id]);
-    if (!result.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
-    return result.rows[0];
-  });
+export async function eventRoutes(app: FastifyInstance, options: EventRouteOptions = {}): Promise<void> {
+  if (options.includePublic !== false) {
+    app.get('/api/v1/events', async (request, reply) => {
+      const parsedQuery = publicEventQuery.safeParse(request.query);
+      if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
+      const query = parsedQuery.data;
+      const where = ['e.published=true', 'c.active=true', `e.status <> 'draft'`];
+      const params: unknown[] = [];
+      if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
+      if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
+      if (query.from) { params.push(query.from); where.push(`e.starts_at >= $${params.length}::timestamptz`); }
+      if (query.to) { params.push(query.to); where.push(`e.starts_at <= $${params.length}::timestamptz`); }
+      return (await pool.query(`${publicSelect} where ${where.join(' and ')} order by e.starts_at,e.name`, params)).rows;
+    });
+
+    app.get('/api/v1/events/:id', async (request, reply) => {
+      const { id } = request.params as { id: string };
+      const result = await pool.query(`${publicSelect} where e.id=$1 and e.published=true and c.active=true and e.status <> 'draft'`, [id]);
+      if (!result.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
+      return result.rows[0];
+    });
+  }
 
   app.get('/api/v1/admin/events', async (request, reply) => {
     const parsedQuery = adminEventQuery.safeParse(request.query);
     if (!parsedQuery.success) return reply.code(400).send({ message: 'Filtres invalides.', issues: parsedQuery.error.issues });
     const query = parsedQuery.data;
     const where: string[] = []; const params: unknown[] = [];
-    if (query.search?.trim()) { params.push(`%${query.search.trim()}%`); where.push(`(e.name ilike $${params.length} or e.slug ilike $${params.length} or coalesce(ci.name,'') ilike $${params.length})`); }
+    if (query.search?.trim()) { params.push(`%${query.search.trim()}%`); where.push(`(e.name ilike $${params.length} or e.slug ilike $${params.length} or coalesce(ci.name,'') ilike $${params.length} or coalesce(m.name,'') ilike $${params.length})`); }
     if (query.championship_id) { params.push(query.championship_id); where.push(`e.championship_id=$${params.length}`); }
     if (query.status) { params.push(query.status); where.push(`e.status=$${params.length}`); }
     if (query.published === 'true' || query.published === 'false') { params.push(query.published === 'true'); where.push(`e.published=$${params.length}`); }
@@ -130,7 +146,7 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
     const sortColumns = { starts_at: 'e.starts_at', name: 'e.name', championship: 'c.name', status: 'e.status', updated_at: 'e.updated_at' } as const;
     const order = `${sortColumns[query.sort]} ${query.direction},e.id asc`;
     if (!query.page) return (await pool.query(`${adminSelect}${whereSql} order by ${order}`, params)).rows;
-    const total = Number((await pool.query(`select count(*)::int total from events e join championships c on c.id=e.championship_id left join circuits ci on ci.id=e.circuit_id${whereSql}`, params)).rows[0].total);
+    const total = Number((await pool.query(`select count(*)::int total from events e join championships c on c.id=e.championship_id left join circuits ci on ci.id=e.circuit_id left join meeting_events me on me.event_id=e.id left join meetings m on m.id=me.meeting_id${whereSql}`, params)).rows[0].total);
     params.push(query.page_size, (query.page - 1) * query.page_size);
     const items = (await pool.query(`${adminSelect}${whereSql} order by ${order} limit $${params.length - 1} offset $${params.length}`, params)).rows;
     return paginated(items, total, query.page, query.page_size);
@@ -148,8 +164,8 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
     if (technicalFields.length) return reply.code(400).send({
       message: `Les champs techniques suivants sont calculés par le serveur : ${technicalFields.join(', ')}.`
     });
-    const parsed = businessEventBody.safeParse(request.body);
-    if (!parsed.success) return reply.code(400).send({ message: 'Données invalides.', issues: parsed.error.issues });
+    const parsed = adminBusinessEventBody.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ message: parsed.error.issues.some(issue=>issue.path[0]==='category')?'Catégorie invalide.':'Données invalides.', issues: parsed.error.issues });
     const dateError = validateDates(parsed.data as z.infer<typeof eventBody>); if (dateError) return reply.code(400).send({ message: dateError });
     const championship = await pool.query('select id from championships where id=$1', [parsed.data.championship_id]);
     if (!championship.rowCount) return reply.code(400).send({ message: 'Le championnat sélectionné n’existe pas.' });
@@ -167,8 +183,10 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
           id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,
           origin,provider_key,external_id,session_title,description
         ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *`, [randomUUID(), ...values(complete)]);
+        await writeAdminAudit(client, { request, resourceType: 'event', resourceId: result.rows[0].id, oldValue: null, newValue: result.rows[0] });
         return result.rows[0];
       });
+      markAtomicallyAudited(request);
       return reply.code(201).send(created);
     } catch (error: unknown) {
       const code=(error as {code?:string}).code;
@@ -185,13 +203,14 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
       message: `Les champs techniques suivants sont calculés par le serveur : ${technicalFields.join(', ')}.`
     });
     const parsed = updateBody.safeParse(request.body);
-    if (!parsed.success) return reply.code(400).send({ message: 'Données invalides.', issues: parsed.error.issues });
+    if (!parsed.success) return reply.code(400).send({ message: parsed.error.issues.some(issue=>issue.path[0]==='category')?'Catégorie invalide.':'Données invalides.', issues: parsed.error.issues });
     const requested = request.body && typeof request.body === 'object' ? request.body as Record<string, unknown> : {};
     const patch = Object.fromEntries(Object.entries(parsed.data).filter(([field]) => field in requested));
     try {
       const updated = await withTransaction(async (client) => {
         const current = await lockEvent(client, id);
         if (!current) return null;
+        assertCorrectionSafeEvent(current);
         const merged = eventBody.parse({ ...current, ...patch,
           timezone: EVENT_STORAGE_TIMEZONE,
           starts_at: new Date((patch.starts_at as string | undefined) ?? current.starts_at as string | Date).toISOString(),
@@ -203,11 +222,14 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         const result = await client.query(`update events set championship_id=$2,circuit_id=$3,name=$4,slug=$5,
           category=$6,starts_at=$7,ends_at=$8,timezone=$9,status=$10,published=$11,origin=$12,
           provider_key=$13,external_id=$14,session_title=$15,description=$16,updated_at=now() where id=$1 returning *`, [id, ...values(merged)]);
+        await writeAdminAudit(client, { request, resourceType: 'event', resourceId: id, oldValue: current, newValue: result.rows[0] });
         return result.rows[0];
       });
       if (!updated) return reply.code(404).send({ message: 'Événement introuvable.' });
+      markAtomicallyAudited(request);
       return updated;
     } catch (error: unknown) {
+      if (error instanceof IncompleteProviderIdentityError) return reply.code(409).send({ message: error.message, code: 'provider_identity_incomplete' });
       if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
       const code=(error as {code?:string}).code;
       if (code==='23505') return reply.code(409).send({ message: 'Ce slug existe déjà.' });
@@ -233,8 +255,10 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
           id,championship_id,circuit_id,name,slug,category,starts_at,ends_at,timezone,status,published,
           origin,provider_key,external_id,session_title,description
         ) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning *`, [randomUUID(), ...values(complete)]);
+        await writeAdminAudit(client, { request, resourceType: 'provider-event', resourceId: result.rows[0].id, oldValue: null, newValue: result.rows[0] });
         return result.rows[0];
       });
+      markAtomicallyAudited(request);
       return reply.code(201).send(created);
     } catch (error: unknown) {
       const code=(error as {code?:string}).code;
@@ -260,9 +284,12 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
         });
         const dateError = validateDates(merged);
         if (dateError) throw new EventValidationError(dateError);
-        return updateEventFields(client, id, effectivePatch);
+        const result = await updateEventFields(client, id, effectivePatch);
+        await writeAdminAudit(client, { request, resourceType: 'event', resourceId: id, oldValue: current, newValue: result });
+        return result;
       });
       if (!updated) return reply.code(404).send({ message: 'Événement introuvable.' });
+      markAtomicallyAudited(request);
       return updated;
     } catch (error) {
       if (error instanceof EventValidationError) return reply.code(400).send({ message: error.message });
@@ -273,8 +300,15 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
 
   app.delete('/api/v1/admin/events/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
-    const result = await pool.query('delete from events where id=$1 returning id', [id]);
-    if (!result.rowCount) return reply.code(404).send({ message: 'Événement introuvable.' });
+    const deleted = await withTransaction(async (client) => {
+      const current = await client.query('select * from events where id=$1 for update', [id]);
+      if (!current.rowCount) return false;
+      await client.query('delete from events where id=$1', [id]);
+      await writeAdminAudit(client, { request, resourceType: 'event', resourceId: id, oldValue: current.rows[0], newValue: null });
+      return true;
+    });
+    if (!deleted) return reply.code(404).send({ message: 'Événement introuvable.' });
+    markAtomicallyAudited(request);
     return reply.code(204).send();
   });
 }

@@ -1,0 +1,2 @@
+alter table provider_championships drop column sync_state_before_championship_disable;
+delete from schema_migrations where version='0012_scheduler_audit_fixes';

@@ -34,10 +34,10 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
   {
     label: 'QUALITÉ DES DONNÉES',
     items: [
-      { path: '/corrections', label: 'Corrections', icon: 'edit', badge: 12 },
-      { path: '/duplicates', label: 'Doublons', icon: 'duplicates', badge: 3 },
-      { path: '/conflicts', label: 'Conflits', icon: 'warning', badge: 2 },
-      { path: '/alerts', label: 'Alertes', icon: 'warning', badge: 8 },
+      { path: '/corrections', label: 'Corrections', icon: 'edit' },
+      { path: '/duplicates', label: 'Doublons', icon: 'duplicates' },
+      { path: '/conflicts', label: 'Conflits', icon: 'warning' },
+      { path: '/alerts', label: 'Alertes', icon: 'warning' },
     ],
   },
   {
@@ -63,5 +63,5 @@ export const NAVIGATION_SECTIONS: NavigationSection[] = [
 export const ALL_NAVIGATION_ITEMS = NAVIGATION_SECTIONS.flatMap((section) => section.items);
 
 export const PLACEHOLDER_NAVIGATION_ITEMS = ALL_NAVIGATION_ITEMS.filter(
-  ({ path }) => !['/', '/events', '/championships', '/circuits', '/corrections', '/synchronizations'].includes(path),
+  ({ path }) => !['/', '/events', '/championships', '/circuits', '/corrections', '/sources', '/synchronizations'].includes(path),
 );

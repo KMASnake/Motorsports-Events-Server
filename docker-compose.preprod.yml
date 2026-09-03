@@ -1,0 +1,85 @@
+services:
+  postgres:
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+      POSTGRES_INITDB_ARGS: --encoding=UTF8
+    ports: !override
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    restart: unless-stopped
+
+  api:
+    environment:
+      NODE_ENV: production
+      TZ: UTC
+      ADMIN_WEB_ORIGIN: https://preprod.motorsports-events.fr
+      CORS_ALLOWED_ORIGINS: https://preprod.motorsports-events.fr
+      PREVIEW_API_ENABLED: "false"
+    ports: !override
+      - "127.0.0.1:${API_HOST_PORT:-3001}:3001"
+    restart: unless-stopped
+    networks:
+      default: {}
+      preprod_proxy:
+        aliases: [mse-preprod-api]
+
+  worker:
+    environment:
+      NODE_ENV: production
+      TZ: UTC
+    restart: unless-stopped
+
+  web:
+    build:
+      args:
+        VITE_API_URL: ""
+    environment:
+      TZ: UTC
+    ports: !override
+      - "127.0.0.1:${WEB_HOST_PORT:-3000}:3000"
+    restart: unless-stopped
+    networks:
+      default: {}
+      preprod_proxy:
+        aliases: [mse-preprod-web]
+
+  prometheus:
+    image: prom/prometheus:v3.13.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
+      - preprod_prometheus_data:/prometheus
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+        compress: "true"
+
+  migrate:
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+
+volumes:
+  postgres_data:
+    name: ${PREPROD_POSTGRES_VOLUME:-mse_preprod_postgres_data}
+  preprod_prometheus_data:
+    name: ${PREPROD_PROMETHEUS_VOLUME:-mse_preprod_prometheus_data}
+
+networks:
+  preprod_proxy:
+    name: ${PREPROD_PROXY_NETWORK:-mse-preprod-proxy}

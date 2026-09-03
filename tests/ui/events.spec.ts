@@ -24,9 +24,11 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByLabel('Calendrier mensuel des événements')).toBeVisible();
     await expect(page.getByLabel('Légende des couleurs du calendrier')).toBeVisible();
     await expect(page.getByLabel('Fournisseur')).toContainText('Tous les fournisseurs');
-    await expect(page.getByLabel('Fournisseur')).toContainText('OC BlackTop');
-    await expect(page.getByLabel('Fournisseur')).toContainText('TheSportsDB');
-    await expect(page.getByLabel('Fournisseur')).toContainText('Motorsports Events');
+    const loadedEvents = await (await request.get(`${apiUrl}/api/v1/admin/events`)).json();
+    const actualSources = new Set(loadedEvents.map((event: { origin: string; provider_key?: string | null }) =>
+      event.origin === 'manual' ? 'motorsports-events' : event.provider_key === 'ocblacktop' || event.provider_key === 'thesportsdb' ? event.provider_key : event.provider_key ? `provider:${event.provider_key.toLowerCase()}` : 'provider-identity-missing'
+    ));
+    await expect(page.getByLabel('Fournisseur').locator('option')).toHaveCount(actualSources.size + 1);
     await page.screenshot({ path: 'tests/ui/screenshots/events-calendar-1440x900.png' });
 
     await listTab.click();
@@ -62,6 +64,27 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(page.getByLabel(/Slug technique/i)).toHaveCount(0);
     await expect(page.getByLabel(/Fuseau horaire/i)).toHaveCount(0);
     await expect(page.getByLabel(/Mode de gestion/i)).toHaveCount(0);
+  });
+
+  test('un double-clic sur un Event existant ouvre son édition préremplie, jamais une création',async({page,request})=>{
+    const rows=await (await request.get(`${apiUrl}/api/v1/admin/events`)).json();
+    const source=rows.find((event:{circuit_id:string|null;ends_at:string|null})=>event.circuit_id&&event.ends_at);
+    expect(source).toBeTruthy();
+    await page.clock.setFixedTime(new Date(source.starts_at));
+    await page.goto('/events');
+    const chip=page.locator('.events-calendar-chip').filter({hasText:source.name}).first();
+    await expect(chip).toBeVisible();await chip.dblclick();
+    const dialog=page.getByRole('dialog');
+    await expect(dialog.getByRole('heading',{name:'Modifier l’événement'})).toBeVisible();
+    await expect(dialog.getByRole('button',{name:'Enregistrer les modifications'})).toBeVisible();
+    await expect(dialog.getByLabel('Nom public *')).toHaveValue(source.name);
+    await expect(dialog.getByLabel('Circuit')).toHaveValue(source.circuit_id);
+    await expect(dialog.getByLabel('Fin', { exact: true })).not.toHaveValue('');
+    await expect(dialog.getByRole('heading',{name:'Nouvel événement'})).toHaveCount(0);
+    await dialog.getByRole('button',{name:'Annuler'}).click();
+    await page.getByLabel(/Créer un événement le/).first().click();
+    await expect(page.getByRole('heading',{name:'Nouvel événement'})).toBeVisible();
+    await expect(page.getByRole('button',{name:'Créer l’événement'})).toBeVisible();
   });
 
   test('expose les vues interactives et les captures du lot 4.2', async ({ page, request }) => {
@@ -198,10 +221,30 @@ test.describe('Événements lot 4 rev.1', () => {
   });
 
   test('affiche les identités visuelles sur le tableau de bord', async ({ page }) => {
+    const response = await page.request.get(`${apiUrl}/api/v1/admin/events`);
+    expect(response.ok()).toBeTruthy();
+    const events = await response.json() as Array<{id:string;name:string;championship_name:string;starts_at:string}>;
+    const exploitable = events
+      .filter(event => event.id && event.name && event.championship_name && Number.isFinite(new Date(event.starts_at).getTime()))
+      .sort((left,right) => new Date(left.starts_at).getTime()-new Date(right.starts_at).getTime() || left.id.localeCompare(right.id));
+    expect(exploitable.length).toBeGreaterThan(0);
+    const now = new Date(new Date(exploitable[0].starts_at).getTime()-60*60*1000).getTime();
+    const limit = now+48*60*60*1000;
+    const expected = events.filter(event => {
+      const start = new Date(event.starts_at).getTime();
+      return start>=now&&start<=limit;
+    }).sort((left,right) => new Date(left.starts_at).getTime()-new Date(right.starts_at).getTime());
+    expect(expected.length).toBeGreaterThan(0);
+    await page.clock.setFixedTime(new Date(now));
     await page.goto('/');
-    const logos = page.locator('.timeline-championship img');
-    await expect(logos).toHaveCount(6);
-    for (const logo of await logos.all()) {
+    await expect(page.locator('.timeline-row')).toHaveCount(expected.length);
+    for (const event of expected) {
+      const row = page.locator(`.timeline-row[data-event-id="${event.id}"]`);
+      await expect(row).toBeVisible();
+      await expect(row).toContainText(event.name);
+      await expect(row).toContainText(event.championship_name);
+      const logo = row.locator('.timeline-championship img');
+      await expect(logo).toHaveCount(1);
       await expect(logo).toBeVisible();
       expect(await logo.evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
     }

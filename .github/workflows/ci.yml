@@ -1,7 +1,31 @@
-name: CI
+name: CI — Node target
 on:
   push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'PROJECT-STATUS.json'
+      - 'PROJECT_STATUS.md'
+      - 'NEXT_STEPS.md'
+      - 'CHANGELOG.md'
   pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'PROJECT-STATUS.json'
+      - 'PROJECT_STATUS.md'
+      - 'NEXT_STEPS.md'
+      - 'CHANGELOG.md'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -16,6 +40,8 @@ jobs:
       DATABASE_URL: postgresql://mse:ci-only-postgres-password@postgres:5432/motorsports_events
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -28,6 +54,20 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
+      - name: Detect Playwright-relevant changes
+        id: changes
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "playwright=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" > /tmp/changed-files
+          if grep -Eq '^(apps/(api|web)/|packages/|tests/|scripts/data/|playwright\.config\.ts$|package(-lock)?\.json$)' /tmp/changed-files; then
+            echo "playwright=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "playwright=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Start isolated application stack
         run: docker compose up --build --wait -d
       - name: Generate validation token
@@ -44,15 +84,31 @@ jobs:
       - run: npm run validate:lot4
       - run: npm run validate:step2
       - run: npm run validate:step3
+      - name: Load Lot 4.3 historical events fixture
+        if: steps.changes.outputs.playwright == 'true'
+        run: docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql
       - name: Load Lot 4.3 UI acceptance fixture
-        run: docker compose exec -T postgres psql -U mse -d motorsports_events < tests/fixtures/lot43_ui.sql
+        if: steps.changes.outputs.playwright == 'true'
+        run: docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_ui.sql
       - name: Install Chromium for Playwright
+        if: steps.changes.outputs.playwright == 'true'
         run: npx playwright install --with-deps chromium
       - name: Run Chromium acceptance tests
+        if: steps.changes.outputs.playwright == 'true'
         env:
           API_URL: http://127.0.0.1:3001
           WEB_URL: http://127.0.0.1:3000
         run: npx playwright test
+      - name: Upload Playwright diagnostics
+        if: failure() && steps.changes.outputs.playwright == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-diagnostics
+          path: |
+            test-results/playwright/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Show Docker diagnostics
         if: failure()
         run: docker compose ps --all && docker compose logs --no-color

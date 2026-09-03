@@ -1,5 +1,87 @@
 # Changelog
 
+## Pré-5.7-P-F — isolation du worker fournisseur
+
+- maintient explicitement le processus worker vivant entre deux polls tout en
+  conservant les timers historiques non référencés par défaut ;
+- retire le runtime de découverte fournisseur du processus HTTP API ;
+- ajoute un entrypoint et un service Compose worker dédiés sans port HTTP ni
+  secrets Preview/admin ;
+- draine le travail en cours et ferme PostgreSQL lors de SIGTERM/SIGINT ;
+- maintient l’implémentation générale de F et tout appel provider réel non
+  autorisés.
+
+## Lot 5.7-P-E — revalidation mainteneur/VPS finale
+
+- enregistre le PASS final au SHA
+  `74f45b7d341ca214d4569b5d9917a46bb1d38254` avec migration head 0029 ;
+- confirme Preview remise OFF, services healthy, client synthétique suspendu
+  et clés synthétiques révoquées ;
+- maintient 5.7-P-F, l’activation Production et merge `main` non autorisés.
+
+## Lot 5.7-P-E — correction d’intégration des routes Preview
+
+- évite les collisions Fastify entre les lectures historiques et les routes
+  Preview définitives lorsque `PREVIEW_API_ENABLED=true` ;
+- conserve les lectures historiques avec Preview OFF et les routes admin/write
+  dans les deux modes ;
+- ajoute une recette d’assemblage serveur Preview OFF/ON couvrant les sept
+  routes V1 définitives et leur protection ;
+- ne modifie aucune migration et maintient 5.7-P-F non autorisé.
+
+## Lot 5.7-P-E — sécurité client Preview
+
+- ajoute la migration additive 0028, les clés HMAC affichées une fois, scopes,
+  entitlement F1 et compteurs atomiques par client ;
+- protège le plugin D avec droits relus par requête, cursors liés au client,
+  limites, erreurs anti-énumération et observabilité sans secret ;
+- ajoute l’ACP minimal et les preuves PP-T29 à PP-T35 sans activer Production.
+
+## Lot 5.7-P-D — API Preview V1 read-only
+
+- ajoute les contrats définitifs read-only championships, events, meetings et
+  `/changes` dans un plugin non activé avant le gate E ;
+- ajoute projections explicites, requêtes PostgreSQL bornées, pagination de
+  snapshot et curseurs page/sync opaques signés ;
+- ajoute OpenAPI, erreurs sûres, rétention configurable et preuves unitaires
+  et PostgreSQL sans migration ni appel provider.
+
+## Préproduction VPS interne A/B/C
+
+- enregistre la validation mainteneur de 5.7-P-C ;
+- ajoute un override Compose loopback/persistant sans dupliquer la stack ;
+- ajoute la recette fresh/current/restart/health/backup/restore et le runbook VPS ;
+- n’ajoute aucune route Preview ni sécurité client.
+
+## Lot 5.7-P-C — publication durable interne
+
+- ajoute la migration 0025 pour état public, révisions, journal, reçus et kill switch ;
+- conserve le last-known-good et distingue annulation de tombstone permanent ;
+- prouve atomicité, retry, concurrence, rebuild et pré-1970 sans route Preview.
+
+## Lot 5.6-F — protection des corrections et observations
+
+- sépare les corrections et observations locales de la donnée source provider ;
+- conserve provenance, source initiale, raison, acteur, lifecycle et révision ;
+- sérialise acquisition et mutations locales par verrou de l’entité source ;
+- garantit replay et absences non destructifs, avec rollback peuplé protégé ;
+- ajoute la migration 0023 et une recette PostgreSQL à deux processus.
+
+## Lot 5.6-E — temporalité et finalization
+
+- ferme les deux lacunes de preuve d’audit avec un scénario `completed` avant
+  J+30 et une reprise PostgreSQL entre deux processus Node réellement distincts ;
+- intègre le recalcul des fins théoriques et l’évaluation de finalization dans
+  la transaction durable d’acquisition ;
+- persiste la méthode, la provenance, les échantillons/règles, la durée et la
+  version logique des estimations via la migration additive `0022` ;
+- applique une grâce UTC déterministe et crée l’anomalie liée à l’entité à
+  l’échéance exacte sans statut final artificiel ;
+- traite `cancelled` comme final et recalcule/résout le suivi `postponed` depuis
+  la nouvelle planification ;
+- ajoute les preuves unitaires et PostgreSQL de temporalité, idempotence,
+  reprise et non-régression 5.4/5.5/5.6.
+
 ## Lot 4.4 — Authentification administrateur validée
 
 - consigne la validation mainteneur sur Windows et VPS le 2026-08-12 ;

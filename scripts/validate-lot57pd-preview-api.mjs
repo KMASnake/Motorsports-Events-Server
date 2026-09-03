@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import Fastify from 'fastify';
+import {previewReadRoutes} from '../apps/api/dist/routes/previewRead.js';
+import {encodeCursor} from '../apps/api/dist/preview/cursors.js';
+import {pool} from '../apps/api/dist/lib/db.js';
+
+const app=Fastify({logger:false}),secret='lot-5-7-p-d-cursor-proof-secret-32-chars';
+await app.register(previewReadRoutes,{cursorSecret:secret,now:()=>new Date('2026-08-22T12:00:00Z')});
+const get=async url=>{const response=await app.inject(url);assert.equal(response.statusCode,200,`${url}: ${response.body}`);return response.json();};
+try{
+  const first=await get('/api/v1/events?limit=1&championship=formula-1&session_type=race');
+  assert.equal(first.data.length,1);assert.equal(first.data[0].name,'Preview Race 1');assert.equal(first.pagination.has_more,true);
+  assert.equal(JSON.stringify(first).includes('provider'),false);assert.notEqual(first.pagination.next_cursor,first.pagination.sync_cursor);
+  await pool.query('begin');
+  await pool.query(`update public_resource_states set revision=2,canonical_state=canonical_state||'{"status":"postponed"}'::jsonb,state_checksum=repeat('b',64),promoted_at='2026-08-22T12:01:00Z' where resource_id='57000000-0000-4000-8000-000000000302'`);
+  await pool.query(`insert into public_change_log(sequence,resource_type,resource_id,resource_revision,operation,changed_fields,state_checksum,occurred_at) values(12,'event','57000000-0000-4000-8000-000000000302',2,'updated',array['status'],repeat('b',64),'2026-08-22T12:01:00Z')`);
+  await pool.query(`insert into public_resource_versions(resource_type,resource_id,revision,publication_sequence,operation,championship_id,lifecycle,canonical_state,state_checksum,published_at) select resource_type,resource_id,revision,12,'updated',championship_id,lifecycle,canonical_state,state_checksum,promoted_at from public_resource_states where resource_id='57000000-0000-4000-8000-000000000302'`);
+  await pool.query('commit');
+  const second=await get(`/api/v1/events?limit=1&championship=formula-1&session_type=race&cursor=${first.pagination.next_cursor}`);
+  assert.equal(second.data.length,1);assert.equal(second.data[0].name,'Preview Race 2');assert.equal(second.data[0].revision,1);assert.equal(second.data[0].status,'scheduled');
+  const changes=await get(`/api/v1/changes?cursor=${first.pagination.sync_cursor}&include=data`);
+  assert.deepEqual(changes.data.map(change=>change.sequence),[12]);assert.equal(changes.data[0].current.status,'postponed');
+  const beforeTombstone=await get('/api/v1/events?limit=1&championship=formula-1&session_type=race');
+  await pool.query('begin');
+  await pool.query(`update public_resource_states set revision=3,lifecycle='removed',canonical_state=null,state_checksum=repeat('c',64),removed_at='2026-08-22T12:02:00Z',promoted_at='2026-08-22T12:02:00Z' where resource_id='57000000-0000-4000-8000-000000000302'`);
+  await pool.query(`insert into public_change_log(sequence,resource_type,resource_id,resource_revision,operation,changed_fields,state_checksum,occurred_at) values(13,'event','57000000-0000-4000-8000-000000000302',3,'removed','{}',repeat('c',64),'2026-08-22T12:02:00Z')`);
+  await pool.query(`insert into public_resource_versions(resource_type,resource_id,revision,publication_sequence,operation,championship_id,lifecycle,canonical_state,state_checksum,published_at) values('event','57000000-0000-4000-8000-000000000302',3,13,'removed','f1','removed',null,repeat('c',64),'2026-08-22T12:02:00Z')`);
+  await pool.query(`select setval('public_change_sequence',13)`);
+  await pool.query('commit');
+  const tombstonePage=await get(`/api/v1/events?limit=1&championship=formula-1&session_type=race&cursor=${beforeTombstone.pagination.next_cursor}`);
+  assert.equal(tombstonePage.data[0].revision,2);assert.equal(tombstonePage.data[0].status,'postponed');
+  const tombstoneChanges=await get(`/api/v1/changes?cursor=${beforeTombstone.pagination.sync_cursor}&include=data`);assert.equal(tombstoneChanges.data[0].operation,'removed');assert.equal(tombstoneChanges.data[0].current,null);
+  const current=await get('/api/v1/events?limit=10&championship=formula-1&session_type=race');assert.deepEqual(current.data.map(value=>value.name),['Preview Race 1']);
+  const expired=encodeCursor({kind:'sync',sequence:8,issuedAt:Math.floor(Date.now()/1000)},secret),retained=encodeCursor({kind:'sync',sequence:9,issuedAt:1},secret);
+  assert.equal((await app.inject(`/api/v1/changes?cursor=${expired}`)).statusCode,410);assert.equal((await app.inject(`/api/v1/changes?cursor=${retained}`)).statusCode,200);
+  assert.equal((await app.inject('/api/v1/events?limit=101')).statusCode,400);
+  assert.equal((await app.inject('/api/v1/events?cursor=forged.value')).statusCode,400);
+  assert.equal((await app.inject('/api/v1/events?championship=f1&championship_id=57000000-0000-4000-8000-000000000300')).statusCode,400);
+  assert.equal((await app.inject('/api/v1/changes?cursor='+first.pagination.next_cursor)).statusCode,400);
+  assert.equal((await app.inject('/api/v1/events/57000000-0000-4000-8000-000000000399')).statusCode,404);
+  await pool.query('set enable_seqscan=off');const plan=(await pool.query(`explain (costs off) select distinct on (resource_type,resource_id) * from public_resource_versions where resource_type='event' and publication_sequence<=12 order by resource_type,resource_id,publication_sequence desc`)).rows.map(row=>row['QUERY PLAN']).join('\n');assert.match(plan,/public_resource_versions_snapshot_idx/);
+  console.log('Lot 5.7-P-D PostgreSQL Preview API: PASS');
+  console.log('D01-D20 historical snapshot/update/tombstone/retention/security boundary: PASS');
+}finally{await app.close();await pool.end();}
