@@ -414,6 +414,41 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         self.assertIn("label=com.mse.certification=lot57pf3", runner)
         self.assertIn("validate-lot57pf3-phase2-evidence.mjs", runner)
 
+    def test_phase2_runner_preserves_certification_runtime_regressions(self):
+        runner = PHASE2_RUNNER.read_text(encoding="utf-8")
+
+        # The cursor must execute below /app so Node resolves the API image
+        # dependencies from /app/node_modules.
+        self.assertNotIn("/certification/cursor.mjs", runner)
+        self.assertEqual(runner.count("/app/f3-certification-cursor.mjs"), 3)
+
+        # Browser CORS preflights require Access-Control-Request-Method.
+        self.assertEqual(
+            runner.count("Access-Control-Request-Method: GET"),
+            2,
+        )
+
+        # Prometheus health must be established through Prometheus itself,
+        # not through BusyBox wget DNS resolution of the API service.
+        self.assertEqual(
+            runner.count("http://127.0.0.1:9090/api/v1/targets"),
+            1,
+        )
+        self.assertNotIn(
+            "wget -qO- http://api:3001/metrics",
+            runner,
+        )
+
+        # The isolated certification network exposes PostgreSQL by its
+        # container name, while the application DATABASE_URL uses "postgres".
+        self.assertIn("certification_database_url", runner)
+        self.assertEqual(runner.count('parsed.hostname!=="postgres"'), 1)
+        self.assertEqual(
+            runner.count('parsed.hostname="mse-preprod-postgres-1"'),
+            1,
+        )
+
+
     def test_phase2_evidence_requires_complete_five_state_sequence(self):
         directory, result, output = run_phase2_evidence(phase2_evidence_input())
         with directory:

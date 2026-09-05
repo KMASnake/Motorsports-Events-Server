@@ -72,12 +72,27 @@ write_override "$n_override" "$n_api" "$n_web"
 write_override "$n1_override" "$n1_api" "$n1_web"
 
 database_url(){ docker inspect "$("${compose[@]}" ps -q api)" --format '{{range .Config.Env}}{{println .}}{{end}}'|sed -n 's/^DATABASE_URL=//p'|head -n1; }
+certification_database_url(){
+  local db_url;db_url=$(database_url);[[ -n $db_url ]]||fail 'runtime DATABASE_URL is not inspectable'
+  DATABASE_URL="$db_url" node -e '
+    const value=process.env.DATABASE_URL;
+    let parsed;
+    try{
+      parsed=new URL(value);
+    }catch{
+      process.exit(1);
+    }
+    if(parsed.hostname!=="postgres")process.exit(1);
+    parsed.hostname="mse-preprod-postgres-1";
+    process.stdout.write(parsed.toString());
+  ' || fail 'certification DATABASE_URL cannot be derived safely'
+}
 recreate_cert_runner(){
-  local image=$1 db_url;db_url=$(database_url);[[ -n $db_url ]]||fail 'runtime DATABASE_URL is not inspectable'
+  local image=$1 db_url;db_url=$(certification_database_url)
   docker rm -f "$cert_runner" >/dev/null 2>&1||true
   docker run -d --name "$cert_runner" --network "$cert_network" --read-only --cap-drop ALL --security-opt no-new-privileges \
     --label com.mse.certification=lot57pf3 --label com.mse.certification.target=preproduction \
-    -e DATABASE_URL="$db_url" -v "$cursor_probe:/certification/cursor.mjs:ro" "$image" node -e 'setInterval(()=>{},2147483647)' >/dev/null
+    -e DATABASE_URL="$db_url" -v "$cursor_probe:/app/f3-certification-cursor.mjs:ro" "$image" node -e 'setInterval(()=>{},2147483647)' >/dev/null
 }
 snapshot(){
   local release=$1 output=$2
@@ -101,18 +116,53 @@ transition(){
   recreate_cert_runner "$api"
   snapshot "$runtime_release" "$workdir/$label-snapshot.json"
 }
-cursor_capture(){ docker exec -e F3_CURSOR_MODE=capture "$cert_runner" node /certification/cursor.mjs; }
-cursor_verify(){ docker exec -e F3_CURSOR_MODE=verify -e F3_CURSOR_INPUT="$1" "$cert_runner" node /certification/cursor.mjs >/dev/null; }
+cursor_capture(){ docker exec -e F3_CURSOR_MODE=capture "$cert_runner" node /app/f3-certification-cursor.mjs; }
+cursor_verify(){ docker exec -e F3_CURSOR_MODE=verify -e F3_CURSOR_INPUT="$1" "$cert_runner" node /app/f3-certification-cursor.mjs >/dev/null; }
 http_checks(){
   curl --fail --silent --show-error https://preprod.motorsports-events.fr/health >/dev/null
   curl --fail --silent --show-error https://preprod.motorsports-events.fr/health/live >/dev/null
   curl --fail --silent --show-error https://preprod.motorsports-events.fr/health/ready >/dev/null
   [[ $(curl --silent --output /dev/null --write-out '%{http_code}' https://preprod.motorsports-events.fr/metrics) == 404 ]]||fail 'public metrics exposure detected'
-  curl --fail --silent --show-error -H 'Origin: https://preprod.motorsports-events.fr' -X OPTIONS https://preprod.motorsports-events.fr/api/v1/events -D "$workdir/cors-allowed" -o /dev/null
+  curl --fail --silent --show-error \
+    -H 'Origin: https://preprod.motorsports-events.fr' \
+    -H 'Access-Control-Request-Method: GET' \
+    -X OPTIONS https://preprod.motorsports-events.fr/api/v1/events \
+    -D "$workdir/cors-allowed" -o /dev/null
   grep -qi '^access-control-allow-origin: https://preprod.motorsports-events.fr' "$workdir/cors-allowed"||fail 'allowed CORS origin missing'
-  curl --silent --show-error -H 'Origin: https://evil.example' -X OPTIONS https://preprod.motorsports-events.fr/api/v1/events -D "$workdir/cors-denied" -o /dev/null
+  curl --fail --silent --show-error \
+    -H 'Origin: https://evil.example' \
+    -H 'Access-Control-Request-Method: GET' \
+    -X OPTIONS https://preprod.motorsports-events.fr/api/v1/events \
+    -D "$workdir/cors-denied" -o /dev/null
   ! grep -qi '^access-control-allow-origin:' "$workdir/cors-denied"||fail 'foreign CORS origin granted'
-  "${compose[@]}" exec -T prometheus wget -qO- http://api:3001/metrics | grep -q '^motorsports_'||fail 'Prometheus cannot scrape API metrics'
+  "${compose[@]}" exec -T prometheus wget -qO- http://127.0.0.1:9090/api/v1/targets \
+    | node -e '
+        let input = "";
+        process.stdin.setEncoding("utf8");
+        process.stdin.on("data", chunk => input += chunk);
+        process.stdin.on("end", () => {
+          let payload;
+          try {
+            payload = JSON.parse(input);
+          } catch {
+            process.exit(1);
+          }
+
+          const targets = payload?.data?.activeTargets ?? [];
+          const target = targets.find(
+            item => item?.scrapeUrl === "http://api:3001/metrics"
+          );
+
+          if (
+            !target ||
+            target.health !== "up" ||
+            (target.lastError ?? "") !== ""
+          ) {
+            process.exit(1);
+          }
+        });
+      ' \
+    || fail 'Prometheus API target is not healthy'
 }
 db_anchor(){
   local database=${1:-} output=$2
