@@ -65,12 +65,20 @@ services:
   api:
     image: $api
     build: !reset null
+    networks:
+      - default
+      - proxy
+      - certification
   worker:
     image: $api
     build: !reset null
   web:
     image: $web
     build: !reset null
+networks:
+  certification:
+    external: true
+    name: $cert_network
 EOF
 }
 write_override "$n_override" "$n_api" "$n_web"
