@@ -442,9 +442,14 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         # The isolated certification network exposes PostgreSQL by its
         # container name, while the application DATABASE_URL uses "postgres".
         self.assertIn("certification_database_url", runner)
-        self.assertEqual(runner.count('parsed.hostname!=="postgres"'), 1)
+        self.assertIn('DATABASE_URL="$db_url" python3 -c', runner)
+        self.assertNotIn('DATABASE_URL="$db_url" node -e', runner)
         self.assertEqual(
-            runner.count('parsed.hostname="mse-preprod-postgres-1"'),
+            runner.count('if parsed.hostname != "postgres":'),
+            1,
+        )
+        self.assertEqual(
+            runner.count('host = "mse-preprod-postgres-1"'),
             1,
         )
 

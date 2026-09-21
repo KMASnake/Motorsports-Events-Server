@@ -74,17 +74,43 @@ write_override "$n1_override" "$n1_api" "$n1_web"
 database_url(){ docker inspect "$("${compose[@]}" ps -q api)" --format '{{range .Config.Env}}{{println .}}{{end}}'|sed -n 's/^DATABASE_URL=//p'|head -n1; }
 certification_database_url(){
   local db_url;db_url=$(database_url);[[ -n $db_url ]]||fail 'runtime DATABASE_URL is not inspectable'
-  DATABASE_URL="$db_url" node -e '
-    const value=process.env.DATABASE_URL;
-    let parsed;
-    try{
-      parsed=new URL(value);
-    }catch{
-      process.exit(1);
-    }
-    if(parsed.hostname!=="postgres")process.exit(1);
-    parsed.hostname="mse-preprod-postgres-1";
-    process.stdout.write(parsed.toString());
+  DATABASE_URL="$db_url" python3 -c '
+import os
+import sys
+from urllib.parse import urlsplit, urlunsplit
+
+value = os.environ.get("DATABASE_URL", "")
+try:
+    parsed = urlsplit(value)
+except Exception:
+    sys.exit(1)
+
+if parsed.hostname != "postgres":
+    sys.exit(1)
+
+host = "mse-preprod-postgres-1"
+userinfo = ""
+
+if parsed.username is not None:
+    userinfo = parsed.username
+    if parsed.password is not None:
+        userinfo += ":" + parsed.password
+    userinfo += "@"
+
+port = f":{parsed.port}" if parsed.port is not None else ""
+netloc = f"{userinfo}{host}{port}"
+
+sys.stdout.write(
+    urlunsplit(
+        (
+            parsed.scheme,
+            netloc,
+            parsed.path,
+            parsed.query,
+            parsed.fragment,
+        )
+    )
+)
   ' || fail 'certification DATABASE_URL cannot be derived safely'
 }
 recreate_cert_runner(){
