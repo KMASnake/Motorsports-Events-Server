@@ -444,6 +444,22 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         self.assertIn("certification_database_url", runner)
         self.assertIn('DATABASE_URL="$db_url" python3 -c', runner)
         self.assertNotIn('DATABASE_URL="$db_url" node -e', runner)
+
+        # The runner executes under sudo, whose PATH does not contain the
+        # maintainer NVM runtime. Every host-side Node call must therefore use
+        # the explicitly supplied and validated F3_NODE_BIN.
+        self.assertIn("node_bin=${F3_NODE_BIN:-}", runner)
+        self.assertIn("[[ -x $node_bin ]]", runner)
+        self.assertIn("readonly node_bin", runner)
+        self.assertEqual(runner.count('"$node_bin"'), 14)
+
+        # These three Node invocations intentionally execute inside the
+        # certification API container and must remain container-side.
+        self.assertEqual(runner.count('"$image" node -e'), 1)
+        self.assertEqual(
+            runner.count('"$cert_runner" node /app/f3-certification-cursor.mjs'),
+            2,
+        )
         self.assertEqual(
             runner.count('if parsed.hostname != "postgres":'),
             1,

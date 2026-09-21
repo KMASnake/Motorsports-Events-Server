@@ -4,6 +4,11 @@ set -Eeuo pipefail
 fail(){ printf 'F3 Phase 2 refused: %s\n' "$*" >&2; exit 1; }
 [[ ${1:-} == --execute ]] || fail 'explicit --execute is required after separate maintainer VPS authorization'
 [[ ${F3_PHASE2_EXECUTION_AUTHORIZED:-} == YES ]] || fail 'F3_PHASE2_EXECUTION_AUTHORIZED=YES is required'
+node_bin=${F3_NODE_BIN:-}
+[[ -n $node_bin ]] || fail 'F3_NODE_BIN is required'
+[[ -x $node_bin ]] || fail 'F3_NODE_BIN is not executable'
+"$node_bin" -e 'process.exit(typeof process.versions?.node === "string" ? 0 : 1)' >/dev/null 2>&1 || fail 'F3_NODE_BIN is not a working Node.js runtime'
+readonly node_bin
 shift
 [[ $# -eq 20 ]] || fail 'usage: --execute --baseline FILE --n-api REF --n-api-oci-layout DIR --n-web REF --n-web-oci-layout DIR --n-plus-one-api REF --n-plus-one-api-oci-layout DIR --n-plus-one-web REF --n-plus-one-web-oci-layout DIR --evidence-dir DIR'
 while [[ $# -gt 0 ]];do case "$1" in
@@ -42,9 +47,9 @@ finish(){
   trap - EXIT INT TERM
   cleanup_resources||cleanup_status=$?
   if [[ $status -eq 0 && $cleanup_status -eq 0 && $success == true ]];then
-    node -e "const fs=require('fs'),p=process.argv[1],v=JSON.parse(fs.readFileSync(p));v.cleanup_verified=true;fs.writeFileSync(p,JSON.stringify(v,null,2)+'\\n',{mode:0o600});" "$workdir/phase2-raw.json"
+    "$node_bin" -e "const fs=require('fs'),p=process.argv[1],v=JSON.parse(fs.readFileSync(p));v.cleanup_verified=true;fs.writeFileSync(p,JSON.stringify(v,null,2)+'\\n',{mode:0o600});" "$workdir/phase2-raw.json"
     mkdir -p "$evidence_dir"
-    if ! node scripts/validate-lot57pf3-phase2-evidence.mjs "$workdir/phase2-raw.json" "$evidence_dir/lot57pf3-phase2-evidence.json";then status=1;fi
+    if ! "$node_bin" scripts/validate-lot57pf3-phase2-evidence.mjs "$workdir/phase2-raw.json" "$evidence_dir/lot57pf3-phase2-evidence.json";then status=1;fi
   else
     status=1
     printf 'F3 Phase 2 cleanup failed or certification incomplete; no PASS evidence was written.\n' >&2
@@ -122,12 +127,12 @@ recreate_cert_runner(){
 }
 snapshot(){
   local release=$1 output=$2
-  node scripts/capture-lot57pf3-runtime-snapshot.mjs --n-api-image "$n_api" --n-api-oci-layout "$n_api_layout" \
+  "$node_bin" scripts/capture-lot57pf3-runtime-snapshot.mjs --n-api-image "$n_api" --n-api-oci-layout "$n_api_layout" \
     --n-web-image "$n_web" --n-web-oci-layout "$n_web_layout" \
     --n-plus-one-api-image "$n1_api" --n-plus-one-api-oci-layout "$n1_api_layout" \
     --n-plus-one-web-image "$n1_web" --n-plus-one-web-oci-layout "$n1_web_layout" \
     --runtime-release "$release" --output "$output"
-  node scripts/validate-lot57pf3-preflight.mjs "$output" "$baseline" >/dev/null
+  "$node_bin" scripts/validate-lot57pf3-preflight.mjs "$output" "$baseline" >/dev/null
 }
 assert_worker_stopped(){
   local id;id=$("${compose[@]}" ps -aq worker);[[ -n $id ]]||fail 'stopped worker container is absent'
@@ -162,7 +167,7 @@ http_checks(){
     -D "$workdir/cors-denied" -o /dev/null
   ! grep -qi '^access-control-allow-origin:' "$workdir/cors-denied"||fail 'foreign CORS origin granted'
   "${compose[@]}" exec -T prometheus wget -qO- http://127.0.0.1:9090/api/v1/targets \
-    | node -e '
+    | "$node_bin" -e '
         let input = "";
         process.stdin.setEncoding("utf8");
         process.stdin.on("data", chunk => input += chunk);
@@ -202,14 +207,14 @@ db_anchor(){
     'relationship_anchor',(select md5(coalesce(string_agg(meeting_id::text||':'||event_id::text,',' order by meeting_id,event_id),'')) from meeting_events),
     'orphan_relationships',(select count(*) from meeting_events me left join meetings m on m.id=me.meeting_id left join events e on e.id=me.event_id where m.id is null or e.id is null)
   )::text" >"$output"
-  [[ $(node -e "const v=JSON.parse(require('fs').readFileSync(process.argv[1]));process.stdout.write(String(v.orphan_relationships))" "$output") == 0 ]]||fail 'relationship integrity failed'
+  [[ $("$node_bin" -e "const v=JSON.parse(require('fs').readFileSync(process.argv[1]));process.stdout.write(String(v.orphan_relationships))" "$output") == 0 ]]||fail 'relationship integrity failed'
 }
-assert_baseline_continuity(){ node -e "const fs=require('fs'),baseline=JSON.parse(fs.readFileSync(process.argv[1])),current=JSON.parse(fs.readFileSync(process.argv[2]));for(const [field,key] of [['change_sequence','change_sequence'],['event_revision','event_revision'],['meeting_revision','meeting_revision'],['normalization_checkpoint_count','normalization_checkpoint_count']])if(Number(current[key])<Number(baseline.continuity[field]))throw Error('baseline continuity regressed: '+field);" "$baseline" "$1"||fail 'database baseline continuity prerequisite failed'; }
-compare_continuity(){ node -e "const fs=require('fs'),before=JSON.parse(fs.readFileSync(process.argv[1])),after=JSON.parse(fs.readFileSync(process.argv[2]));for(const key of ['uuid_anchor','relationship_anchor'])if(before[key]!==after[key])throw Error(key+' changed');for(const key of ['change_sequence','event_revision','meeting_revision'])if(Number(after[key])<Number(before[key]))throw Error(key+' regressed');" "$1" "$2"||fail "database continuity failed between $1 and $2"; }
-same_migration_head(){ node -e "const fs=require('fs'),a=JSON.parse(fs.readFileSync(process.argv[1])),b=JSON.parse(fs.readFileSync(process.argv[2]));if(!a.migration_head||a.migration_head!==b.migration_head)throw Error('migration head changed');" "$1" "$2"||fail "migration head mismatch between $1 and $2"; }
+assert_baseline_continuity(){ "$node_bin" -e "const fs=require('fs'),baseline=JSON.parse(fs.readFileSync(process.argv[1])),current=JSON.parse(fs.readFileSync(process.argv[2]));for(const [field,key] of [['change_sequence','change_sequence'],['event_revision','event_revision'],['meeting_revision','meeting_revision'],['normalization_checkpoint_count','normalization_checkpoint_count']])if(Number(current[key])<Number(baseline.continuity[field]))throw Error('baseline continuity regressed: '+field);" "$baseline" "$1"||fail 'database baseline continuity prerequisite failed'; }
+compare_continuity(){ "$node_bin" -e "const fs=require('fs'),before=JSON.parse(fs.readFileSync(process.argv[1])),after=JSON.parse(fs.readFileSync(process.argv[2]));for(const key of ['uuid_anchor','relationship_anchor'])if(before[key]!==after[key])throw Error(key+' changed');for(const key of ['change_sequence','event_revision','meeting_revision'])if(Number(after[key])<Number(before[key]))throw Error(key+' regressed');" "$1" "$2"||fail "database continuity failed between $1 and $2"; }
+same_migration_head(){ "$node_bin" -e "const fs=require('fs'),a=JSON.parse(fs.readFileSync(process.argv[1])),b=JSON.parse(fs.readFileSync(process.argv[2]));if(!a.migration_head||a.migration_head!==b.migration_head)throw Error('migration head changed');" "$1" "$2"||fail "migration head mismatch between $1 and $2"; }
 record_state(){
   local label=$1 runtime_release=$2 cursor_before_valid=$3 cursor_after_valid=$4
-  node -e "const fs=require('fs'),label=process.argv[1],runtime_release=process.argv[2],before=process.argv[3]==='true',after=process.argv[4]==='true',root=process.argv[5];const state={label,runtime_release,snapshot:JSON.parse(fs.readFileSync(root+'/'+label+'-snapshot.json')),database:JSON.parse(fs.readFileSync(root+'/'+label+'-db.json')),checks:{health:true,health_live:true,health_ready:true,tls:true,cors_allowed_origin:true,cors_foreign_denied:true,metrics:true},cursor_before_valid:before,cursor_after_valid:after};fs.writeFileSync(root+'/'+label+'-state.json',JSON.stringify(state,null,2)+'\\n',{mode:0o600});" "$label" "$runtime_release" "$cursor_before_valid" "$cursor_after_valid" "$workdir"
+  "$node_bin" -e "const fs=require('fs'),label=process.argv[1],runtime_release=process.argv[2],before=process.argv[3]==='true',after=process.argv[4]==='true',root=process.argv[5];const state={label,runtime_release,snapshot:JSON.parse(fs.readFileSync(root+'/'+label+'-snapshot.json')),database:JSON.parse(fs.readFileSync(root+'/'+label+'-db.json')),checks:{health:true,health_live:true,health_ready:true,tls:true,cors_allowed_origin:true,cors_foreign_denied:true,metrics:true},cursor_before_valid:before,cursor_after_valid:after};fs.writeFileSync(root+'/'+label+'-state.json',JSON.stringify(state,null,2)+'\\n',{mode:0o600});" "$label" "$runtime_release" "$cursor_before_valid" "$cursor_after_valid" "$workdir"
 }
 
 # Pre-mutation proof: exact retained N, every safety guard, DB anchors and a disposable restore.
@@ -220,7 +225,7 @@ assert_worker_stopped
 http_checks
 db_anchor "$("${compose[@]}" exec -T postgres sh -c 'printf %s "$POSTGRES_DB"')" "$workdir/n-pre-migration-db.json"
 assert_baseline_continuity "$workdir/n-pre-migration-db.json"
-cursor_before=$(cursor_capture|node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).cursor))")
+cursor_before=$(cursor_capture|"$node_bin" -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).cursor))")
 record_state n-pre-migration n true false
 backup="$workdir/pre-transition.dump"
 "${compose[@]}" exec -T postgres sh -eu -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' >"$backup"
@@ -242,7 +247,7 @@ record_state n-post-forward-migration n true false
 transition n-plus-one "$n1_override" "$n1_api" n-plus-one
 http_checks;db_anchor "$("${compose[@]}" exec -T postgres sh -c 'printf %s "$POSTGRES_DB"')" "$workdir/n-plus-one-db.json"
 compare_continuity "$workdir/n-post-forward-migration-db.json" "$workdir/n-plus-one-db.json"
-cursor_verify "$cursor_before";cursor_after=$(cursor_capture|node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).cursor))")
+cursor_verify "$cursor_before";cursor_after=$(cursor_capture|"$node_bin" -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).cursor))")
 record_state n-plus-one n_plus_1 true true
 
 # N+1 -> N rollback: application images only; never DOWN/reset/restore.
@@ -259,6 +264,6 @@ compare_continuity "$workdir/rollback-n-db.json" "$workdir/final-n-plus-one-db.j
 cursor_verify "$cursor_before";cursor_verify "$cursor_after"
 record_state final-n-plus-one n_plus_1 true true
 
-node -e "const fs=require('fs'),root=process.argv[1],baseline=JSON.parse(fs.readFileSync(process.argv[2])),names=['n-pre-migration','n-post-forward-migration','n-plus-one','rollback-n','final-n-plus-one'];const states=Object.fromEntries(names.map(name=>[name,JSON.parse(fs.readFileSync(root+'/'+name+'-state.json'))]));const raw={schema:'lot57pf3-phase2-raw-v1',sequence:names,prospective_baseline:baseline,states,backup_restore:{backup_verified:true,disposable_restore_db:true,restore_integrity_match:true},provider_calls:0,provider_credits:0,worker_started:false,cleanup_verified:false};fs.writeFileSync(root+'/phase2-raw.json',JSON.stringify(raw,null,2)+'\\n',{mode:0o600});" "$workdir" "$baseline"
+"$node_bin" -e "const fs=require('fs'),root=process.argv[1],baseline=JSON.parse(fs.readFileSync(process.argv[2])),names=['n-pre-migration','n-post-forward-migration','n-plus-one','rollback-n','final-n-plus-one'];const states=Object.fromEntries(names.map(name=>[name,JSON.parse(fs.readFileSync(root+'/'+name+'-state.json'))]));const raw={schema:'lot57pf3-phase2-raw-v1',sequence:names,prospective_baseline:baseline,states,backup_restore:{backup_verified:true,disposable_restore_db:true,restore_integrity_match:true},provider_calls:0,provider_credits:0,worker_started:false,cleanup_verified:false};fs.writeFileSync(root+'/phase2-raw.json',JSON.stringify(raw,null,2)+'\\n',{mode:0o600});" "$workdir" "$baseline"
 printf '%s\n' 'PP-T38/PP-178 Phase 2 sequence reached final N+1; final evidence remains conditional on verified cleanup and strict evidence validation.'
 success=true
