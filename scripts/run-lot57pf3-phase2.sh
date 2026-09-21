@@ -67,7 +67,7 @@ services:
     build: !reset null
     networks:
       - default
-      - proxy
+      - preprod_proxy
       - certification
   worker:
     image: $api

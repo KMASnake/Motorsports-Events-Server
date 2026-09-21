@@ -399,6 +399,8 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         self.assertNotIn("create --no-build --no-deps --force-recreate worker", runner)
         self.assertIn("name: $cert_network", runner)
         self.assertIn("      - certification", runner)
+        self.assertIn("      - preprod_proxy", runner)
+        self.assertNotIn("      - proxy", runner)
         self.assertIn("    external: true", runner)
         self.assertIn("transition n-plus-one", runner)
         self.assertIn("transition rollback-n", runner)
