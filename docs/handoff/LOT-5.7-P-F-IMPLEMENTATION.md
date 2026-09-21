@@ -1,7 +1,16 @@
 # 5.7-P-F — Implementation evidence
 
 Date: 2026-08-25  
-Status: **IMPLEMENTED LOCALLY — MAINTAINER/VPS/PROVIDER EVIDENCE REQUIRED**
+Historical status at the date above:
+**IMPLEMENTED LOCALLY — MAINTAINER/VPS/PROVIDER EVIDENCE REQUIRED**
+
+This implementation report preserves the evidence and pending items at that
+earlier stage; it does not define current authorization. The maintainer
+validated F3 on **2026-09-21**, proving **PP-178** and **PP-T38**; their pending
+VPS/release statements below are historical and superseded by the
+[F3 closure evidence](LOT-5.7-P-F3-CLOSURE.md). F2-RPV retains its separate
+validated evidence. Current state and authorization are exclusively recorded
+in PROGRESS.json. F3 closure does not close Gate F or validate Production smoke.
 
 ## Authorized scope delivered
 
@@ -79,7 +88,7 @@ PP-178 needs two explicitly selected release images for the genuine
 `N -> N+1 -> N` application rollback; local migration down/up and restart
 proof is not mislabeled as that release rollback.
 
-## Gate state
+## Historical gate state at this report's date
 
 - PP-T36: controlled deterministic substitute PASS; normative real-provider
   evidence pending authorization;

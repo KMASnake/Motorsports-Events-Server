@@ -4,8 +4,8 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-f2-rpv-maintainer-validated-gate-f-incomplete",
-    "updated_at": "2026-08-27",
+    "status": "lot-5.7-p-f3-proven-f4-in-progress-gate-f-incomplete",
+    "updated_at": "2026-09-21",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -70,7 +70,7 @@
       "vps_preproduction_validation_date": "2026-08-22",
       "vps_preproduction_validated_sha": "cb7d04795b156dc23af6c57efe2bce788569e3da",
       "authorized_gate": "5.7-P-F",
-      "authorized_technical_sub_lot": "5.7-P-F2-RPV",
+      "authorized_technical_sub_lot": "5.7-P-F4-0",
       "technical_gates": {
         "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-B": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
@@ -78,7 +78,7 @@
         "5.7-P-D": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"vps_validated":true,"vps_validation_date":"2026-08-22","vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-E": {"status":"maintainer-vps-revalidated","authorization_date":"2026-08-23","implementation_started":true,"implementation_complete":true,"integration_correction_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-25","maintainer_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","vps_revalidated":true,"vps_revalidation_date":"2026-08-25","vps_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","migration_head":"0029_lot57pe_canonical_championship_entitlements","authorization":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-AUTHORIZATION.md","implementation":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-IMPLEMENTATION.md"},
         "5.7-P-F": {
-          "status":"f2-rpv-maintainer-validated-awaiting-remaining-gate-f-audit",
+          "status":"f3-proven-f4-in-progress-gate-f-incomplete",
           "authorization_date":"2026-08-25",
           "worker_isolation_correction_authorized":true,
           "worker_isolation_correction_complete":true,
@@ -92,7 +92,50 @@
           "vps_validation_required":true,
           "real_provider_validation_required":true,
           "evidence":"docs/handoff/LOT-5.7-P-F-IMPLEMENTATION.md",
-          "authorized_subphase":"5.7-P-F2-RPV",
+          "authorized_subphase":"5.7-P-F4-0",
+          "operational_closure_f3": {
+            "status": "complete-proven",
+            "implementation_complete": true,
+            "maintainer_validated": true,
+            "maintainer_validation_date": "2026-09-21",
+            "certified_git_sha": "e70f7e18e2ae01f4af8161577aaaefc834723cdb",
+            "certified_git_tree": "e8aafaf69076b0e38b7b78f3ca0c336f2b8d3998",
+            "criteria": {"PP-178":"PROVEN","PP-T38":"PROVEN"},
+            "evidence": "docs/handoff/LOT-5.7-P-F3-CLOSURE.md",
+            "baseline_path": "docs/handoff/evidence/lot57pf3-prospective-baseline-N.json",
+            "baseline_sha256": "75dd9583fa3dc83b7c902028e7ad2b0f7abf17f1ce023ea8c151a93ebd3cfbd9",
+            "historical_identity_sha256": "208b80bfcef35c36efe5e5dcbf82d7bbba6feca1887c6286f8fc7fe18bafcf59",
+            "phase2_evidence": {
+              "versioned_in_git": false,
+              "validation_location": "/home/debian/f3-phase2-evidence-20260921-143751/lot57pf3-phase2-evidence.json",
+              "sha256": "4f7706f0d3f38eea74fcf8ffbb1dd60068d507a198d748789d8b6dd1f40cb5c1",
+              "artifact_status": "eligible-for-maintainer-validation",
+              "maintainer_validation": "PASS",
+              "provenance": "VPS Phase 2 execution; location, checksum and results supplied by maintainer; no VPS access or artifact reconstruction during F4-0"
+            },
+            "final_migration_head": "0031_real_circuit_reference_data",
+            "final_runtime_release": "N+1",
+            "provider_calls": 0,
+            "provider_credits": 0,
+            "worker_started": false
+          },
+          "preproduction_stabilization_f4": {
+            "status": "in-progress",
+            "implementation_complete": false,
+            "maintainer_validated": false,
+            "authorized_subphase": "F4-0",
+            "authorization_date": "2026-09-21",
+            "scope": "Documentation/handoff only: record certified F3 closure and preserve evidence; one local commit authorized, no push",
+            "other_f4_implementation_authorized": false,
+            "runtime_execution_authorized": false,
+            "vps_access_authorized": false,
+            "cleanup_authorized": false
+          },
+          "provider_first_f5": {
+            "status": "not-started",
+            "implementation_started": false,
+            "authorized": false
+          },
           "sources_admin_mvp_authorized":true,
           "sources_admin_mvp_authorization_date":"2026-08-26",
           "sources_admin_mvp_implementation_complete":true,
@@ -164,15 +207,15 @@
           "real_provider_validation_backup_required":true,
           "real_provider_validation_zero_credit_preflight_required":true,
           "real_provider_validation_exact_call_accounting_required":true,
-          "real_provider_execution_authorized":true,
-          "real_provider_execution_authorization_scope":"OCBlackTop F1 preproduction only; manual maintainer execution through providerAcquireOnce with an explicitly approved low --max-provider-requests budget; worker, scheduler and discovery remain stopped.",
+          "real_provider_execution_authorized":false,
+          "real_provider_execution_authorization_scope":"No new provider execution authorized for F4-0. The completed F2-RPV authorization and validation above are historical evidence, not authorization for another call.",
           "production_preview_activation_authorized":false,
           "external_client_onboarding_authorized":false
         }
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and the bounded real-provider subphase 5.7-P-F2-RPV are maintainer-validated. Gate F remains incomplete and not maintainer-validated pending a separate audit of all remaining Gate F criteria. Production Preview activation, external client onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and 5.7-P-F2-RPV retain their maintainer validations. F3 is complete/proven and maintainer-validated on 2026-09-21: PP-178 and PP-T38 are PROVEN. F4 is in progress with only F4-0 documentation/handoff authorized; F5 is not started or authorized. Gate F remains incomplete and not maintainer-validated. Production Preview activation, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -195,6 +238,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Audit the remaining 5.7-P-F criteria separately from the now maintainer-validated F2-RPV evidence. Do not close Gate F or authorize another phase without an explicit maintainer decision. Production Preview, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "task": "Review the F4-0 local documentation commit recording certified F3 closure, then explicitly authorize any next step. No push, further F4 implementation, F5, cleanup, VPS access, runtime execution or provider call is authorized by F4-0. Gate F remains incomplete; Production Preview, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   }
 }

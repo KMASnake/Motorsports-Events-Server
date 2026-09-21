@@ -4,6 +4,13 @@ This contract resolves the absence of a certifiable historical API+Web release
 without reconstructing or relabelling history. It authorizes no VPS action by
 itself.
 
+The final execution was validated by the maintainer on **2026-09-21**:
+**PP-178 PROVEN / PP-T38 PROVEN**. See the
+[F3 closure evidence](LOT-5.7-P-F3-CLOSURE.md) for the certified SHA/tree,
+checksums, external Phase 2 artifact and retention requirements. The Phase 1
+and static-design NOT PROVEN statements below describe historical stages,
+superseded by that final certification. Current state is in PROGRESS.json.
+
 ## Phase 1 — establish N prospectively
 
 A release becomes baseline N only after its exact API and Web images are
@@ -85,10 +92,13 @@ The repository artifact migrated to schema v2 preserves the historical Web OCI
 index `sha256:288a1877bfd70bbea8d195cd65a952eef90084832935623ce524cf8803021c9f`,
 runtime manifest `sha256:475dea105d6c5c9c1ee29dd00bce077590b2004c86b3b866eaa154b347705093`
 and config `sha256:d3f6f745eff9a71bd54404c4874af363ea0bdb3d5a0d69b40b6e7a4e8ee90146`.
-It is deliberately marked incomplete because the ordered historical layer and
-rootfs identities and the API chain are not present in Git. No value is
-guessed. Phase 2 fails closed until a maintainer validates and records that
-complete chain. Schema v1 artifacts are never accepted silently.
+At the initial schema-v2 migration it was deliberately marked incomplete because
+the ordered historical layer/rootfs identities and API chain were not yet in
+Git. That historical blocker was subsequently resolved: the certified baseline
+now records `runtime_identity_complete=true`; its retained checksum is in the
+closure evidence. No missing value may be guessed. Phase 2 continues to fail
+closed for an incomplete chain, and schema v1 artifacts are never accepted
+silently.
 
 ## Phase 2 — certify a genuinely distinct N+1
 
@@ -116,7 +126,9 @@ PP-178 may pass only after the complete Phase 2 succeeds. Provider calls,
 provider credits, worker starts, Production Preview and Production mutations
 remain forbidden by the F3 safety contract.
 
-PP-T38 and PP-178 remain **NOT PROVEN** after this identity-model correction.
+Historical static-design result, superseded by the final F3 certification:
+PP-T38 and PP-178 remained **NOT PROVEN** after the identity-model correction
+alone.
 
 ## Dedicated Phase 2 runner
 
@@ -163,7 +175,8 @@ zero-provider and stopped-worker invariants. Reaching the end of the shell does
 not declare PP-178 PASS; the artifact is only eligible for a separate
 maintainer validation and records `pp178_automatically_claimed_pass=false`.
 
-At HEAD `441215841fe66d0b6b8e14bd565cf3d58492f908`, the proposed N+1 Git tree is
+Historical static preparation (not the final certification record): at HEAD
+`441215841fe66d0b6b8e14bd565cf3d58492f908`, the proposed N+1 Git tree is
 `7e0dfb7abf2fdd183bf7cdd35e2d0387e26a5581`, distinct from baseline N tree
 `b98015daf2eac4b50b1939050056c979cdf0aa14`. This makes the current tree a
 legitimate static N+1 candidate. It becomes an actual N+1 only after coordinated
