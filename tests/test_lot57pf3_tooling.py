@@ -404,6 +404,8 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         self.assertNotIn("test-lot57pf3-operational-closure.sh", runner)
         self.assertIn("SAFE_RUNTIME_LEFT", runner)
         self.assertIn("disposable restore integrity", runner)
+        self.assertIn('"${compose[@]}" exec -T postgres pg_restore --list <"$backup" >/dev/null', runner)
+        self.assertNotIn('\npg_restore --list "$backup" >/dev/null', runner)
         self.assertIn("cursor_verify", runner)
         self.assertIn("n-post-forward-migration", runner)
         self.assertLess(runner.index('run --rm -T migrate'), runner.index('transition n-plus-one'))

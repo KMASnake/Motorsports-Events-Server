@@ -229,7 +229,7 @@ cursor_before=$(cursor_capture|"$node_bin" -e "let s='';process.stdin.on('data',
 record_state n-pre-migration n true false
 backup="$workdir/pre-transition.dump"
 "${compose[@]}" exec -T postgres sh -eu -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' >"$backup"
-pg_restore --list "$backup" >/dev/null
+"${compose[@]}" exec -T postgres pg_restore --list <"$backup" >/dev/null
 restore_db="f3_restore_$(od -An -N8 -tx1 /dev/urandom|tr -d ' \n')"
 "${compose[@]}" exec -T postgres sh -eu -c 'createdb -U "$POSTGRES_USER" "$1"' sh "$restore_db"
 "${compose[@]}" exec -T postgres sh -eu -c 'pg_restore --exit-on-error --no-owner -U "$POSTGRES_USER" -d "$1"' sh "$restore_db" <"$backup"
