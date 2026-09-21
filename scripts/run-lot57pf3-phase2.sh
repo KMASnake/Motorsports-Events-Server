@@ -140,7 +140,7 @@ assert_worker_stopped(){
 }
 transition(){
   local label=$1 override=$2 api=$3 runtime_release=$4
-  "${compose[@]}" -f "$override" create --no-build --no-deps --force-recreate worker >/dev/null
+  "${compose[@]}" -f "$override" create --no-build --force-recreate worker >/dev/null
   assert_worker_stopped
   "${compose[@]}" -f "$override" up -d --no-build --no-deps api web
   current_state=$label

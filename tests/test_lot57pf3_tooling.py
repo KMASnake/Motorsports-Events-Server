@@ -395,6 +395,8 @@ class Lot57Pf3ToolingTests(unittest.TestCase):
         self.assertIn("validate-lot57pf3-preflight.mjs", runner)
         self.assertIn("capture-lot57pf3-runtime-snapshot.mjs", runner)
         self.assertEqual(runner.count("up -d --no-build --no-deps api web"), 1)
+        self.assertEqual(runner.count("create --no-build --force-recreate worker"), 1)
+        self.assertNotIn("create --no-build --no-deps --force-recreate worker", runner)
         self.assertIn("transition n-plus-one", runner)
         self.assertIn("transition rollback-n", runner)
         self.assertIn("transition final-n-plus-one", runner)
