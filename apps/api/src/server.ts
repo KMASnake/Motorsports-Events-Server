@@ -95,7 +95,7 @@ const schedulerService=new PersistentSchedulerService();
 await app.register(providerSchedulerRoutes,{service:schedulerService});
 await app.register(providerAcquisitionAdminRoutes,{admin:new AcquisitionAdminService(),protection:new SourceProtectionService(),scheduler:schedulerService});
 const port = Number(process.env.API_PORT ?? 3001);
-const host = '0.0.0.0';
+const host = process.env.API_HOST ?? '0.0.0.0';
 
 try {
   await app.listen({ port, host });
