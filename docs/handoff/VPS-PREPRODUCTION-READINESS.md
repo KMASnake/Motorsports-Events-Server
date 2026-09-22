@@ -1,7 +1,7 @@
-# VPS preproduction readiness — A/B/C internal stack
+# VPS preproduction readiness — Node preproduction operations
 
-Date: 2026-08-22  
-Status: **REAL VPS VALIDATION PASS — VALIDATED 2026-08-22**
+Date: 2026-09-22
+Status: **F3 PROVEN — F4 OPERATIONS HARDENING IN PROGRESS**
 
 The maintainer completed the real VPS checklist on Debian 13.6 at deployed SHA
 `cb7d04795b156dc23af6c57efe2bce788569e3da`. The permanent preproduction stack,
@@ -18,7 +18,7 @@ EXISTING:
 - `docker-compose.yml`: PostgreSQL 17, one-shot migrator, Fastify API and Nginx Web;
 - existing API/Web Dockerfiles, named PostgreSQL volume, service healthchecks
   and Docker JSON log rotation;
-- migration runner through `0025_lot57pc_publication_state`;
+- migration runner through `0031_real_circuit_reference_data`;
 - versioned release build/install/update machinery and Caddy/TLS material;
 - historical backup/restore verification and release rollback conventions.
 
@@ -28,16 +28,17 @@ REUSABLE:
   Web root healthcheck, persistent volume and forward-compatible rollback;
 - the C backend recipe for public state, LKG, journal, kill switch and rebuild.
 
-MISSING:
+NOT RECORDED HERE:
 
-- real VPS address/user/SSH authorization;
-- actual preproduction domain/DNS and ACME email when external HTTPS is wanted;
-- real secrets stored outside Git and approved provider runtime configuration.
+- VPS address, SSH access and secrets, which must remain outside Git;
+- current host state beyond the maintainer-validated evidence referenced by
+  `PROGRESS.json` and the dedicated F3 closure document.
 
-NOT_REQUIRED_YET:
+NOT_AUTHORIZED:
 
-- Preview API, API keys, client auth, entitlements, quotas, client ACP;
-- a second reverse proxy, Kubernetes, Prometheus/Grafana expansion or 5.8 work.
+- Production Preview activation and external client onboarding;
+- provider execution during ordinary operations;
+- Lot 5.8+, Production deployment or merge to `main`.
 
 ## Architecture and services
 
@@ -77,6 +78,8 @@ recreate the intended services with the appropriate complete context.
 | migrate | — | none | must finish successfully before API |
 | API | 3001 | loopback only | `/health` includes DB check |
 | Web | 3000 | loopback only | Nginx root healthcheck |
+| Worker | none | none | stopped by default; explicit start only |
+| Prometheus | 9090 | no host publication | private scrape + persistent metrics volume |
 
 The future external path, if approved, must reuse the existing Caddy/TLS
 architecture and proxy only after real domain parameters exist. Do not expose
@@ -116,8 +119,15 @@ Le second fichier d’environnement est généré à chaque release depuis `VERS
 le HEAD Git et l’heure UTC. Il ne contient aucun secret et ne doit jamais être
 remplacé par des valeurs `unknown` lors de la construction des images API/worker.
 
-Migration head must be `0025_lot57pc_publication_state`. DOWN migrations are
+Migration head must be `0031_real_circuit_reference_data`. DOWN migrations are
 never automatic on VPS.
+
+The canonical operational scripts use the same context through
+`preprod_compose` in `scripts/lib.sh`. `scripts/update.sh` starts only
+`postgres`, the one-shot `migrate`, `api`, `web` and `prometheus`; it never
+starts `worker`. Starting the worker requires a separate, explicitly authorized
+operation. The scripts refuse an inherited `COMPOSE_FILE`, a project name other
+than `mse-preprod`, missing Compose files or a missing `.env.preprod`.
 
 ## Health, logs and restart
 
@@ -126,7 +136,7 @@ curl -fsS http://127.0.0.1:3001/health
 curl -fsS http://127.0.0.1:3000/
 docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml ps
 docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml logs --since 10m api postgres web
-docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml restart
+docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f docker-compose.preprod.yml restart api web prometheus
 ```
 
 Docker already rotates JSON logs (`10m`, five files, compressed). Logs must not
@@ -134,7 +144,12 @@ contain secrets, raw provider payloads or private corrections.
 
 ## Backup, restore and rollback
 
-Before every migration/deployment:
+Before every migration/deployment, use `./scripts/backup.sh`. It dumps the
+`postgres` service atomically, then `verify-backup.sh` restores the dump into a
+uniquely named disposable database and removes that database on exit. The
+cleanup is fail-closed.
+
+Equivalent manual backup command:
 
 ```sh
 umask 077
@@ -143,10 +158,11 @@ docker compose --env-file .env.preprod -p mse-preprod -f docker-compose.yml -f d
 gzip -t backup-*.sql.gz
 ```
 
-Restore must first be rehearsed into a disposable database with `createdb`,
-`gzip -dc | psql -v ON_ERROR_STOP=1`, then verify migration 0025, source,
-normalized identities, public state and change log. Only after explicit
-approval may a backup replace the primary database.
+`restore.sh` is deliberately verification-only: it delegates to that disposable
+restore path and cannot replace the active preproduction database, stop or
+restart API/worker services, reset a database or run a DOWN migration. Any
+future primary restore requires a separately reviewed and explicitly authorized
+procedure.
 
 Rollback means returning to the previous application/image tag while retaining
 the forward-compatible schema. Never automatically run destructive migration
@@ -183,7 +199,9 @@ VPS**, not PASS ON VPS.
 - allow 80/443 only when a real domain and TLS deployment are approved;
 - do not change the real firewall automatically from this repository recipe.
 
-TLS/DNS status: **BLOCKED UNTIL VPS CONFIGURATION**. No hostname is invented.
+TLS status: **OPERATIONAL AND PREVIOUSLY VALIDATED** for
+`preprod.motorsports-events.fr` through the existing Caddy architecture. F4-2
+does not access or revalidate the VPS and does not infer any new runtime state.
 
 ## Go / No-Go checklist
 
@@ -197,7 +215,7 @@ TLS/DNS status: **BLOCKED UNTIL VPS CONFIGURATION**. No hostname is invented.
 - [ ] secrets installed outside Git
 - [ ] persistent volumes
 - [ ] initial backup
-- [ ] migration 0025
+- [x] migration 0031
 - [ ] healthchecks green
 - [ ] restart stack PASS
 - [ ] reboot VPS PASS
@@ -209,5 +227,9 @@ TLS/DNS status: **BLOCKED UNTIL VPS CONFIGURATION**. No hostname is invented.
 - [ ] restore PASS
 - [ ] no client endpoint exposed
 
-Local portable readiness is PASS. Actual VPS Go remains pending the unchecked
-host-specific items and maintainer authorization to deploy.
+F3 operational closure is proven. F4 hardening remains in progress and this
+runbook does not authorize deployment, provider execution, Production Preview,
+external onboarding or Production.
+
+F4-0 and F4-1 are validated. F4-2 is implemented locally by this change and
+remains pending maintainer review; no runtime or VPS validation is implied.
