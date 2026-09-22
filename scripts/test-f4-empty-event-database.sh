@@ -86,6 +86,22 @@ require_local_docker() {
   endpoint="$(docker context inspect default --format '{{ .Endpoints.docker.Host }}')"
   [[ "${endpoint}" == unix://* ]] || { echo "F4-4 refuses non-local Docker endpoint: ${endpoint}" >&2; return 1; }
 }
+validate_single_local_port_binding() {
+  local phase="$1" bindings_json="$2" expected_port="$3"
+  node -e '
+    const [phase, raw, expectedPort] = process.argv.slice(1);
+    let ports;
+    try { ports=JSON.parse(raw); } catch { console.error(`F4-4 ${phase}: invalid Docker port JSON.`); process.exit(1); }
+    const keys=ports && typeof ports==="object" && !Array.isArray(ports) ? Object.keys(ports) : [];
+    const bindings=keys.length===1 && keys[0]==="5432/tcp" ? ports["5432/tcp"] : null;
+    const valid=Array.isArray(bindings) && bindings.length===1
+      && bindings[0]?.HostIp==="127.0.0.1" && bindings[0]?.HostPort===expectedPort;
+    if(!valid) {
+      console.error(`F4-4 ${phase}: expected only 127.0.0.1:${expectedPort}->5432/tcp.`);
+      process.exit(1);
+    }
+  ' "${phase}" "${bindings_json}" "${expected_port}"
+}
 
 case "${DB_NAME}" in mse_f4_empty_[0-9]*_[0-9]*) ;; *) echo "Refusing non-disposable database name: ${DB_NAME}" >&2; exit 1 ;; esac
 case "${DB_NAME}" in *preprod*|*prod*|*production*|*staging*|motorsports_events)
@@ -121,21 +137,21 @@ else
   DOCKER_CONTAINER_CREATED=true
   owned_container
   [[ "$(docker inspect --format '{{ len .Mounts }}' "${DOCKER_CONTAINER}")" == 2 ]]
-  [[ "$(docker inspect --format '{{ if index .Config.ExposedPorts "5432/tcp" }}5432/tcp{{ end }}' "${DOCKER_CONTAINER}")" == 5432/tcp ]]
-  port_bindings="$(docker inspect --format '{{ json (index .HostConfig.PortBindings "5432/tcp") }}' "${DOCKER_CONTAINER}")"
-  node -e '
-    const bindings=JSON.parse(process.argv[1]);
-    const port=process.argv[2];
-    if(!Array.isArray(bindings)||bindings.length!==1||bindings[0]?.HostIp!=="127.0.0.1"||bindings[0]?.HostPort!==port) process.exit(1);
-  ' "${port_bindings}" "${PG_PORT}"
+  configured_ports="$(docker inspect --format '{{ json .HostConfig.PortBindings }}' "${DOCKER_CONTAINER}")"
+  validate_single_local_port_binding configured "${configured_ports}" "${PG_PORT}"
   docker start "${DOCKER_CONTAINER}" >/dev/null
+  runtime_ports="$(docker inspect --format '{{ json .NetworkSettings.Ports }}' "${DOCKER_CONTAINER}")"
+  validate_single_local_port_binding runtime "${runtime_ports}" "${PG_PORT}"
   for _ in $(seq 1 60); do
     docker exec "${DOCKER_CONTAINER}" pg_isready -U mse_f4 -d "${DB_NAME}" >/dev/null 2>&1 && break
     sleep 0.5
   done
   docker exec "${DOCKER_CONTAINER}" pg_isready -U mse_f4 -d "${DB_NAME}" >/dev/null
   port_binding="$(docker port "${DOCKER_CONTAINER}" 5432/tcp)"
-  [[ "${port_binding}" == "127.0.0.1:${PG_PORT}" ]]
+  if [[ "${port_binding}" != "127.0.0.1:${PG_PORT}" ]]; then
+    echo "F4-4 docker port: expected exactly 127.0.0.1:${PG_PORT} for 5432/tcp." >&2
+    exit 1
+  fi
 fi
 
 db_psql() {

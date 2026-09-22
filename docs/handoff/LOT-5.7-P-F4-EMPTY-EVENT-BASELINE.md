@@ -81,9 +81,12 @@ que `default` et tout endpoint autre qu’un socket Unix local. Il crée un
 conteneur et un réseau `--internal` aux noms uniques, tous deux étiquetés par
 l’identifiant du run. PostgreSQL utilise un `tmpfs`, aucun volume Docker, et
 un port hôte libre est sélectionné puis publié explicitement sous la forme
-`127.0.0.1:<port>:5432/tcp`. Le harnais vérifie l’exposition du port conteneur,
-l’unique `HostConfig.PortBindings` attendu et le résultat exact de
-`docker port`; toute absence, ambiguïté ou autre adresse est refusée. Une
+`127.0.0.1:<port>:5432/tcp`. `Config.ExposedPorts` décrit l’intention de
+l’image et n’est pas une preuve portable de publication sur le conteneur créé.
+Le harnais vérifie donc l’unique `HostConfig.PortBindings` demandé avant le
+démarrage, l’unique `NetworkSettings.Ports` effectif après le démarrage, puis
+le résultat exact de `docker port`; toute absence, ambiguïté, autre port
+conteneur ou autre adresse est refusée avec un diagnostic. Une
 collision entre sélection et démarrage fait échouer `docker start`. Les migrations
 sont montées en lecture seule. Le cleanup vérifie les labels avant de supprimer
 exactement ce conteneur et ce réseau ; il n’utilise jamais Compose ni prune.
