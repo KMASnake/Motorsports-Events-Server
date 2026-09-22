@@ -84,8 +84,11 @@ un port hôte libre est sélectionné puis publié explicitement sous la forme
 `127.0.0.1:<port>:5432/tcp`. `Config.ExposedPorts` décrit l’intention de
 l’image et n’est pas une preuve portable de publication sur le conteneur créé.
 Le harnais vérifie donc l’unique `HostConfig.PortBindings` demandé avant le
-démarrage, l’unique `NetworkSettings.Ports` effectif après le démarrage, puis
-le résultat exact de `docker port`; toute absence, ambiguïté, autre port
+démarrage, attend ensuite la disponibilité réelle de PostgreSQL avec
+`pg_isready`, puis vérifie le résultat exact de `docker port`.
+`NetworkSettings.Ports` n’est pas une preuve bloquante : certains moteurs le
+laissent temporairement à `{ "5432/tcp": null }` malgré un mapping effectif.
+Toute sortie `docker port` vide ou multiligne, ambiguïté, autre port
 conteneur ou autre adresse est refusée avec un diagnostic. Une
 collision entre sélection et démarrage fait échouer `docker start`. Les migrations
 sont montées en lecture seule. Le cleanup vérifie les labels avant de supprimer

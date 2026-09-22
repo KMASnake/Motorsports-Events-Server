@@ -140,8 +140,6 @@ else
   configured_ports="$(docker inspect --format '{{ json .HostConfig.PortBindings }}' "${DOCKER_CONTAINER}")"
   validate_single_local_port_binding configured "${configured_ports}" "${PG_PORT}"
   docker start "${DOCKER_CONTAINER}" >/dev/null
-  runtime_ports="$(docker inspect --format '{{ json .NetworkSettings.Ports }}' "${DOCKER_CONTAINER}")"
-  validate_single_local_port_binding runtime "${runtime_ports}" "${PG_PORT}"
   for _ in $(seq 1 60); do
     docker exec "${DOCKER_CONTAINER}" pg_isready -U mse_f4 -d "${DB_NAME}" >/dev/null 2>&1 && break
     sleep 0.5
@@ -149,7 +147,7 @@ else
   docker exec "${DOCKER_CONTAINER}" pg_isready -U mse_f4 -d "${DB_NAME}" >/dev/null
   port_binding="$(docker port "${DOCKER_CONTAINER}" 5432/tcp)"
   if [[ "${port_binding}" != "127.0.0.1:${PG_PORT}" ]]; then
-    echo "F4-4 docker port: expected exactly 127.0.0.1:${PG_PORT} for 5432/tcp." >&2
+    echo "F4-4 docker port: expected one line exactly equal to 127.0.0.1:${PG_PORT} for 5432/tcp; got '${port_binding:-<empty>}'." >&2
     exit 1
   fi
 fi

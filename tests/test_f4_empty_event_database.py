@@ -55,7 +55,7 @@ class EmptyEventDatabaseContractTests(unittest.TestCase):
         self.assertNotIn("127.0.0.1::5432", text)
         self.assertNotIn(".Config.ExposedPorts", text)
         self.assertIn("{{ json .HostConfig.PortBindings }}", text)
-        self.assertIn("{{ json .NetworkSettings.Ports }}", text)
+        self.assertNotIn("{{ json .NetworkSettings.Ports }}", text)
         self.assertIn('keys.length===1 && keys[0]==="5432/tcp"', text)
         self.assertIn('bindings.length===1', text)
         self.assertIn('bindings[0]?.HostIp==="127.0.0.1"', text)
@@ -65,6 +65,21 @@ class EmptyEventDatabaseContractTests(unittest.TestCase):
         self.assertIn('if [[ "${port_binding}" != "127.0.0.1:${PG_PORT}" ]]', text)
         self.assertIn("owned_container", text)
         self.assertIn("owned_network", text)
+
+    def test_port_proofs_reject_unsafe_or_ambiguous_bindings(self) -> None:
+        text = SCRIPT.read_text()
+        # The pre-start proof rejects missing/extra container ports, multiple
+        # bindings, every non-loopback address and every unexpected host port.
+        self.assertIn('keys.length===1 && keys[0]==="5432/tcp"', text)
+        self.assertIn('Array.isArray(bindings) && bindings.length===1', text)
+        self.assertIn('bindings[0]?.HostIp==="127.0.0.1"', text)
+        self.assertIn('bindings[0]?.HostPort===expectedPort', text)
+        self.assertNotIn('HostIp==="0.0.0.0"', text)
+        self.assertNotIn('HostIp==="::"', text)
+        # Exact whole-output comparison rejects empty output, a wrong address
+        # or port, and multiple newline-separated docker-port bindings.
+        self.assertIn('if [[ "${port_binding}" != "127.0.0.1:${PG_PORT}" ]]', text)
+        self.assertIn("expected one line exactly equal", text)
 
     def test_docker_cleanup_cannot_target_foreign_resources(self) -> None:
         text = SCRIPT.read_text()
