@@ -78,8 +78,11 @@ jetable. Les deux chemins exécutent les mêmes assertions SQL et HTTP. Elle :
 
 Le fallback refuse `DOCKER_HOST`/`DOCKER_CONTEXT` hérités, tout contexte autre
 que `default` et tout endpoint autre qu’un socket Unix local. Il crée un
-conteneur et un réseau `--internal` aux noms uniques, tous deux étiquetés par
-l’identifiant du run. PostgreSQL utilise un `tmpfs`, aucun volume Docker, et
+conteneur et un réseau bridge dédié aux noms uniques, tous deux étiquetés par
+l’identifiant du run. Le réseau n’est pas `--internal` : sur le moteur Docker
+certifié, cette option neutralise aussi la publication loopback nécessaire à
+l’API lancée sur l’hôte. Le harnais vérifie que ce bridge n’accueille que son
+unique conteneur PostgreSQL. PostgreSQL utilise un `tmpfs`, aucun volume Docker, et
 un port hôte libre est sélectionné puis publié explicitement sous la forme
 `127.0.0.1:<port>:5432/tcp`. `Config.ExposedPorts` décrit l’intention de
 l’image et n’est pas une preuve portable de publication sur le conteneur créé.
@@ -89,7 +92,8 @@ démarrage, attend ensuite la disponibilité réelle de PostgreSQL avec
 `NetworkSettings.Ports` n’est pas une preuve bloquante : certains moteurs le
 laissent temporairement à `{ "5432/tcp": null }` malgré un mapping effectif.
 Toute sortie `docker port` vide ou multiligne, ambiguïté, autre port
-conteneur ou autre adresse est refusée avec un diagnostic. Une
+conteneur ou autre adresse est refusée avec un diagnostic. Une connexion TCP
+réelle depuis `127.0.0.1` est ensuite exigée. Une
 collision entre sélection et démarrage fait échouer `docker start`. Les migrations
 sont montées en lecture seule. Le cleanup vérifie les labels avant de supprimer
 exactement ce conteneur et ce réseau ; il n’utilise jamais Compose ni prune.
@@ -100,6 +104,13 @@ Un échec de preuve de propriété ou de cleanup conserve un statut d’échec e
 diagnostics. Si ni les binaires PostgreSQL natifs (`initdb`, `pg_ctl`,
 `createdb`, `psql`) ni un Docker local prouvable ne sont disponibles, la
 certification refuse de démarrer.
+
+Le bridge dédié permet techniquement l’egress du seul conteneur PostgreSQL,
+mais celui-ci ne contient aucun credential provider, n’exécute aucun code
+d’acquisition et ne rejoint aucun réseau applicatif. Cette surface minimale et
+temporaire évite une nouvelle chaîne de build API en conteneur. L’API de
+certification reste sur l’hôte, liée à `127.0.0.1`, Preview OFF, sans worker ni
+scheduler en exécution ; les providers bootstrap sont désactivés/inactifs.
 
 ## Matrice provider-first MVP
 

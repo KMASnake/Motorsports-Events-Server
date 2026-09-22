@@ -124,9 +124,9 @@ else
   PG_PORT="$(free_port)"
   [[ -z "$(docker container ls -a --filter "name=^/${DOCKER_CONTAINER}$" --format '{{.ID}}')" ]]
   [[ -z "$(docker network ls --filter "name=^${DOCKER_NETWORK}$" --format '{{.ID}}')" ]]
-  docker network create --internal --label "${OWNERSHIP_LABEL}=${RUN_ID}" "${DOCKER_NETWORK}" >/dev/null
+  docker network create --driver bridge --label "${OWNERSHIP_LABEL}=${RUN_ID}" "${DOCKER_NETWORK}" >/dev/null
   DOCKER_NETWORK_CREATED=true
-  [[ "$(docker network inspect --format '{{ .Internal }}' "${DOCKER_NETWORK}")" == true ]] && owned_network
+  [[ "$(docker network inspect --format '{{ .Driver }}:{{ .Internal }}' "${DOCKER_NETWORK}")" == bridge:false ]] && owned_network
   docker create --name "${DOCKER_CONTAINER}" --label "${OWNERSHIP_LABEL}=${RUN_ID}" \
     --network "${DOCKER_NETWORK}" --tmpfs /var/lib/postgresql/data:rw,noexec,nosuid,size=512m \
     --publish "127.0.0.1:${PG_PORT}:5432/tcp" --env POSTGRES_USER=mse_f4 --env POSTGRES_DB="${DB_NAME}" \
@@ -145,11 +145,30 @@ else
     sleep 0.5
   done
   docker exec "${DOCKER_CONTAINER}" pg_isready -U mse_f4 -d "${DB_NAME}" >/dev/null
+  network_members="$(docker network inspect --format '{{ json .Containers }}' "${DOCKER_NETWORK}")"
+  node -e '
+    const [raw, expectedName] = process.argv.slice(1);
+    let members;
+    try { members=JSON.parse(raw); } catch { console.error("F4-4 network: invalid membership JSON."); process.exit(1); }
+    const entries=members && typeof members==="object" && !Array.isArray(members) ? Object.values(members) : [];
+    if(entries.length!==1 || entries[0]?.Name!==expectedName) {
+      console.error(`F4-4 network: expected only owned container ${expectedName}.`);
+      process.exit(1);
+    }
+  ' "${network_members}" "${DOCKER_CONTAINER}"
   port_binding="$(docker port "${DOCKER_CONTAINER}" 5432/tcp)"
   if [[ "${port_binding}" != "127.0.0.1:${PG_PORT}" ]]; then
     echo "F4-4 docker port: expected one line exactly equal to 127.0.0.1:${PG_PORT} for 5432/tcp; got '${port_binding:-<empty>}'." >&2
     exit 1
   fi
+  node -e '
+    const net=require("node:net");
+    const socket=net.createConnection({host:"127.0.0.1",port:Number(process.argv[1])});
+    const fail=(message)=>{ console.error(message); socket.destroy(); process.exit(1); };
+    socket.setTimeout(3000,()=>fail("F4-4 PostgreSQL loopback TCP probe timed out."));
+    socket.once("error",()=>fail("F4-4 PostgreSQL loopback TCP probe failed."));
+    socket.once("connect",()=>{ socket.end(); process.exit(0); });
+  ' "${PG_PORT}"
 fi
 
 db_psql() {

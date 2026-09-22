@@ -47,7 +47,10 @@ class EmptyEventDatabaseContractTests(unittest.TestCase):
         self.assertIn("Docker fallback refuses inherited DOCKER_HOST/DOCKER_CONTEXT", text)
         self.assertIn('[[ "${context}" == default ]]', text)
         self.assertIn('[[ "${endpoint}" == unix://* ]]', text)
-        self.assertIn("docker network create --internal --label", text)
+        self.assertIn("docker network create --driver bridge --label", text)
+        self.assertNotIn("docker network create --internal", text)
+        self.assertIn("{{ .Driver }}:{{ .Internal }}", text)
+        self.assertIn("bridge:false", text)
         self.assertIn('--label "${OWNERSHIP_LABEL}=${RUN_ID}"', text)
         self.assertIn("--tmpfs /var/lib/postgresql/data", text)
         self.assertNotIn("docker volume", text)
@@ -65,6 +68,11 @@ class EmptyEventDatabaseContractTests(unittest.TestCase):
         self.assertIn('if [[ "${port_binding}" != "127.0.0.1:${PG_PORT}" ]]', text)
         self.assertIn("owned_container", text)
         self.assertIn("owned_network", text)
+        self.assertIn("{{ json .Containers }}", text)
+        self.assertIn("entries.length!==1", text)
+        self.assertIn("entries[0]?.Name!==expectedName", text)
+        self.assertIn('net.createConnection({host:"127.0.0.1",port:Number(process.argv[1])})', text)
+        self.assertIn("PostgreSQL loopback TCP probe failed", text)
 
     def test_port_proofs_reject_unsafe_or_ambiguous_bindings(self) -> None:
         text = SCRIPT.read_text()
