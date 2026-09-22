@@ -74,6 +74,7 @@ def closure_descendant(directory: Path, operation) -> Path:
     git(ROOT, "clone", "--quiet", "--shared", str(ROOT), str(repository))
     git(repository, "config", "user.name", "F4 Validator Test")
     git(repository, "config", "user.email", "f4-validator@example.invalid")
+    git(repository, "cat-file", "-e", "8553fb9c1b69790169f46a6e96ba4f02d8cf6601^{commit}")
     operation(repository)
     git(repository, "add", "-A")
     git(repository, "commit", "--quiet", "-m", "invalid closure descendant")
@@ -90,6 +91,43 @@ class F4StabilizationTests(unittest.TestCase):
     def test_missing_evidence_is_refused(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             result = run_validator("--evidence", str(Path(raw) / "missing.json"))
+        self.assertNotEqual(result.returncode, 0)
+
+    def test_shallow_checkout_is_refused_until_history_is_fetched(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repository = Path(raw) / "repository"
+            subprocess.run(
+                ["git", "clone", "--quiet", "--depth", "1", f"file://{ROOT}", str(repository)],
+                check=True,
+            )
+            (repository / ".github/workflows/validate.yml").write_bytes(
+                (ROOT / ".github/workflows/validate.yml").read_bytes()
+            )
+            self.assertNotEqual(
+                subprocess.run(
+                    ["git", "-C", str(repository), "cat-file", "-e", "8553fb9c1b69790169f46a6e96ba4f02d8cf6601^{commit}"],
+                    check=False,
+                ).returncode,
+                0,
+            )
+            refused = run_validator("--root", str(repository))
+            self.assertNotEqual(refused.returncode, 0)
+            subprocess.run(
+                ["git", "-C", str(repository), "fetch", "--quiet", "--unshallow", "origin"],
+                check=True,
+            )
+            accepted = run_validator("--root", str(repository))
+            self.assertEqual(accepted.returncode, 0, accepted.stderr)
+
+    def test_validate_job_requires_full_checkout_history(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            workflow = changed_text(
+                Path(raw),
+                ".github/workflows/validate.yml",
+                "          fetch-depth: 0",
+                "          fetch-depth: 1",
+            )
+            result = run_validator("--workflow", str(workflow))
         self.assertNotEqual(result.returncode, 0)
 
     def test_wrong_baseline_head_or_tree_is_refused(self) -> None:

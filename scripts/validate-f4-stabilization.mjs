@@ -8,6 +8,7 @@ import process from 'node:process';
 
 const EXPECTED_BASELINE_HEAD='8553fb9c1b69790169f46a6e96ba4f02d8cf6601';
 const EXPECTED_BASELINE_TREE='dc0a25485a2ef056617ec4421cd84c5bbc28d0f1';
+const LEGACY_CLOSURE_HEAD='5e047a23375fee4f6dddadf551f6d9e22253b66e';
 const EXPECTED_MIGRATION_HEAD='0031_real_circuit_reference_data';
 const F4_COMMITS=[
   '523a2cecedd38e9a9ec463fae66221069b8c53cc',
@@ -54,6 +55,7 @@ const files={
   database:path('database','apps/api/src/lib/db.ts'),
   health:path('health','apps/api/src/routes/health.ts'),
   emptyHarness:path('empty_harness','scripts/test-f4-empty-event-database.sh'),
+  workflow:path('workflow','.github/workflows/validate.yml'),
 };
 const read=file=>readFileSync(file,'utf8');
 const json=file=>JSON.parse(read(file));
@@ -126,7 +128,14 @@ for(let index=0;index<changeParts.length;){
   assert.ok(!actualChanges.has(changedPath),`chemin Git dupliqué: ${changedPath}`);
   actualChanges.set(changedPath,status);
 }
-assert.deepEqual([...actualChanges.entries()].sort(),[...ALLOWED_CLOSURE_CHANGES.entries()].sort(),'diff baseline -> clôture hors allowlist ou incomplet');
+const expectedClosureChanges=new Map(ALLOWED_CLOSURE_CHANGES);
+if(currentHead!==LEGACY_CLOSURE_HEAD)expectedClosureChanges.set('.github/workflows/validate.yml','M');
+assert.deepEqual([...actualChanges.entries()].sort(),[...expectedClosureChanges.entries()].sort(),'diff baseline -> clôture hors allowlist ou incomplet');
+
+const workflow=read(files.workflow);
+const validateJob=workflow.split('\n  validate:\n',2)[1]?.split('\n  postgres-integration:\n',1)[0];
+assert.ok(validateJob,'job validate absent du workflow legacy');
+assert.match(validateJob,/- uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 0(?:\n|$)/,'checkout complet absent du job validate');
 
 const migrationsDir=resolve(root,'infra/postgres/migrations');
 const migrationFiles=readdirSync(migrationsDir).filter(name=>/^\d{4}_.+\.up\.sql$/.test(name)).sort();
