@@ -1,5 +1,10 @@
 import pg from 'pg';
 import type { PoolClient } from 'pg';
+import {
+  classifySchemaVersions,
+  schemaCompatibilityMessage,
+  type SchemaCompatibilityCode
+} from './schemaCompatibility.js';
 
 const { Pool } = pg;
 export const pool = new Pool({
@@ -30,7 +35,40 @@ export async function databaseHealth(): Promise<boolean> {
   }
 }
 
+export type DatabaseReadiness = {
+  ready: boolean;
+  code: SchemaCompatibilityCode | 'database_unreachable' | 'schema_check_failed';
+};
+
+export async function databaseReadiness(): Promise<DatabaseReadiness> {
+  try {
+    await pool.query('select 1');
+  } catch {
+    return { ready: false, code: 'database_unreachable' };
+  }
+  try {
+    const metadata = await pool.query<{ migration_table: string | null }>(
+      "select to_regclass('public.schema_migrations')::text as migration_table"
+    );
+    if (!metadata.rows[0]?.migration_table) {
+      return { ready: false, code: 'migration_metadata_missing' };
+    }
+    const versions = await pool.query<{ version: string }>('select version from schema_migrations order by version');
+    const compatibility = classifySchemaVersions(versions.rows.map(row => row.version));
+    return { ready: compatibility.compatible, code: compatibility.code };
+  } catch {
+    return { ready: false, code: 'schema_check_failed' };
+  }
+}
+
 export async function verifyApplicationSchema(): Promise<void> {
+  const readiness = await databaseReadiness();
+  if (!readiness.ready) {
+    if (readiness.code === 'database_unreachable') throw new Error('Database is unreachable.');
+    if (readiness.code === 'schema_check_failed') throw new Error('Database schema compatibility check failed.');
+    const compatibility = classifySchemaVersions(readiness.code === 'migration_metadata_missing' ? null : []);
+    throw new Error(schemaCompatibilityMessage({ ...compatibility, code: readiness.code }));
+  }
   const result = await pool.query<{
     correction_table: string | null;
     session_types_table: string | null;
@@ -53,7 +91,6 @@ export async function verifyApplicationSchema(): Promise<void> {
     sync_restore_column: string | null;
     quota_runtime_table:string|null;
     api_clients_table:string|null;
-    applied_migrations: number;
   }>(`
     select
       to_regclass('public.event_corrections')::text as correction_table,
@@ -79,23 +116,7 @@ export async function verifyApplicationSchema(): Promise<void> {
         where table_schema='public' and table_name='provider_championships'
           and column_name='sync_state_before_championship_disable') as sync_restore_column,
       to_regclass('public.provider_quota_runtime')::text as quota_runtime_table,
-      to_regclass('public.api_clients')::text as api_clients_table,
-      (select count(*)::int from schema_migrations
-       where version in (
-         '0001_event_corrections',
-         '0002_utc_storage',
-         '0003_admin_audit_and_provider_identity',
-         '0004_sessions',
-         '0005_event_session_title',
-         '0006_admin_console_authentication',
-         '0007_provider_instances',
-         '0008_provider_championship_sources',
-         '0009_provider_discovery',
-         '0010_provider_discovery_completeness',
-         '0011_persistent_sync_scheduler',
-         '0012_scheduler_audit_fixes',
-         '0013_provider_quota_cadence'
-       )) as applied_migrations
+      to_regclass('public.api_clients')::text as api_clients_table
   `);
 
   const schema = result.rows[0];
@@ -120,8 +141,7 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.sync_runs_table ||
     !schema.sync_restore_column ||
     !schema.quota_runtime_table ||
-    (process.env.PREVIEW_API_ENABLED === 'true' && !schema.api_clients_table) ||
-    schema.applied_migrations !== 13
+    (process.env.PREVIEW_API_ENABLED === 'true' && !schema.api_clients_table)
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
   }

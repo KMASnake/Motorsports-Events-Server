@@ -122,6 +122,15 @@ remplacé par des valeurs `unknown` lors de la construction des images API/worke
 Migration head must be `0031_real_circuit_reference_data`. DOWN migrations are
 never automatic on VPS.
 
+The Node application declares that exact ordered migration chain in
+`apps/api/src/lib/schemaCompatibility.ts`. `/health/live` only proves that the
+API process is alive. `/health/ready` separately verifies PostgreSQL
+connectivity, the presence of `schema_migrations`, and exact compatibility with
+the application schema head. Missing metadata, an older head, an unknown
+version or an incomplete chain fails closed with HTTP 503. The schema guard is
+read-only: it observes and refuses; only the separately invoked `migrate`
+service applies forward migrations.
+
 The canonical operational scripts use the same context through
 `preprod_compose` in `scripts/lib.sh`. `scripts/update.sh` starts only
 `postgres`, the one-shot `migrate`, `api`, `web` and `prometheus`; it never
@@ -231,5 +240,6 @@ F3 operational closure is proven. F4 hardening remains in progress and this
 runbook does not authorize deployment, provider execution, Production Preview,
 external onboarding or Production.
 
-F4-0 and F4-1 are validated. F4-2 is implemented locally by this change and
-remains pending maintainer review; no runtime or VPS validation is implied.
+F4-0, F4-1 and F4-2 are validated. F4-3 schema compatibility is implemented
+locally by this change and remains pending maintainer review; no runtime or VPS
+validation is implied.

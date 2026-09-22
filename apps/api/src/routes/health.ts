@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { databaseHealth } from '../lib/db.js';
+import { databaseHealth, databaseReadiness } from '../lib/db.js';
 
 const service = 'motorsports-events-api';
 function runtimeMetadata() {
@@ -19,9 +19,10 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
   }));
 
   app.get('/health/ready', async (_request, reply) => {
-    const ready = await databaseHealth();
-    return reply.code(ready ? 200 : 503).send({
-      status: ready ? 'ok' : 'degraded',
+    const readiness = await databaseReadiness();
+    return reply.code(readiness.ready ? 200 : 503).send({
+      status: readiness.ready ? 'ok' : 'degraded',
+      readiness: readiness.code,
       ...runtimeMetadata(),
       timestamp: new Date().toISOString()
     });

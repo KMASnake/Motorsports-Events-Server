@@ -2,7 +2,8 @@ import Fastify from 'fastify';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const databaseHealth = vi.hoisted(() => vi.fn());
-vi.mock('../src/lib/db.js', () => ({ databaseHealth }));
+const databaseReadiness = vi.hoisted(() => vi.fn());
+vi.mock('../src/lib/db.js', () => ({ databaseHealth, databaseReadiness }));
 
 import { healthRoutes } from '../src/routes/health.js';
 
@@ -22,6 +23,7 @@ describe('health boundary', () => {
 
   beforeEach(() => {
     databaseHealth.mockReset().mockResolvedValue(true);
+    databaseReadiness.mockReset().mockResolvedValue({ ready: true, code: 'compatible' });
     process.env.APP_VERSION = 'f-test';
     process.env.GIT_SHA = 'abc123';
     process.env.BUILD_TIME = '2026-08-25T10:00:00Z';
@@ -52,10 +54,21 @@ describe('health boundary', () => {
     expect(ready.json()).toMatchObject({
       version: 'f-test', git_sha: 'abc123', build_time: '2026-08-25T10:00:00Z'
     });
-    databaseHealth.mockResolvedValue(false);
+    databaseReadiness.mockResolvedValue({ ready: false, code: 'database_unreachable' });
     const unavailable = await app.inject('/health/ready');
     expect(unavailable.statusCode).toBe(503);
     expect(unavailable.json().status).toBe('degraded');
+    expect(unavailable.json().readiness).toBe('database_unreachable');
+    expect(databaseHealth).not.toHaveBeenCalled();
+    await app.close();
+  });
+
+  it('refuses readiness when PostgreSQL is reachable but the schema is incompatible', async () => {
+    databaseReadiness.mockResolvedValue({ ready: false, code: 'schema_too_old' });
+    const app = await application();
+    const response = await app.inject('/health/ready');
+    expect(response.statusCode).toBe(503);
+    expect(response.json()).toMatchObject({ status: 'degraded', readiness: 'schema_too_old' });
     await app.close();
   });
 
