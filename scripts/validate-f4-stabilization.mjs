@@ -11,6 +11,8 @@ const EXPECTED_BASELINE_TREE='dc0a25485a2ef056617ec4421cd84c5bbc28d0f1';
 const LEGACY_CLOSURE_HEAD='5e047a23375fee4f6dddadf551f6d9e22253b66e';
 const EXPECTED_F4_5_HEAD='a455e720fe49061a818881a9385942ad6d613261';
 const EXPECTED_F4_5_TREE='f81d71f15368e08e5427f9ecb23815c3a06d4432';
+const EXPECTED_F4_6_HEAD='5776aca7d3bab642f7655a8df6975d243a5b8796';
+const EXPECTED_F4_6_TREE='16b20c5208faa6187b9402d29ed873f7fe08b69e';
 const EXPECTED_MIGRATION_HEAD='0031_real_circuit_reference_data';
 const F4_COMMITS=[
   '523a2cecedd38e9a9ec463fae66221069b8c53cc',
@@ -112,9 +114,11 @@ const evidenceFacts={
 
 assert.equal(git('rev-parse',`${EXPECTED_BASELINE_HEAD}^{tree}`),EXPECTED_BASELINE_TREE,'tree F4-4');
 assert.equal(git('rev-parse',`${EXPECTED_F4_5_HEAD}^{tree}`),EXPECTED_F4_5_TREE,'tree F4-5');
+assert.equal(git('rev-parse',`${EXPECTED_F4_6_HEAD}^{tree}`),EXPECTED_F4_6_TREE,'tree F4-6');
 const currentHead=git('rev-parse','HEAD');
 ancestor(EXPECTED_BASELINE_HEAD,currentHead);
 ancestor(EXPECTED_F4_5_HEAD,currentHead);
+ancestor(EXPECTED_F4_6_HEAD,currentHead);
 for(let index=1;index<F4_COMMITS.length;index++)ancestor(F4_COMMITS[index-1],F4_COMMITS[index]);
 const rawChanges=execFileSync('git',['-C',root,'diff','--name-status','-z','--find-renames','--find-copies','--find-copies-harder',`${EXPECTED_BASELINE_HEAD}..${currentHead}`]);
 const changeParts=rawChanges.toString('utf8').split('\0');
@@ -178,18 +182,21 @@ const progress=json(files.progress);
 const gateF=progress.current?.sub_lot_5_7_p?.technical_gates?.['5.7-P-F'];
 const f4=gateF?.preproduction_stabilization_f4;
 assert.ok(f4,'état canonique F4 absent');
-for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5'])assert.equal(f4.subphases?.[stage]?.status,'maintainer-validated',`${stage} non validé`);
+assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-gate-f-incomplete');
+assert.equal(gateF?.status,'f3-proven-f4-complete-gate-f-incomplete');
+for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.equal(f4.subphases?.[stage]?.status,'maintainer-validated',`${stage} non validé`);
 assert.equal(f4.subphases?.['F4-5']?.implementation_complete,true);
 assert.equal(f4.subphases?.['F4-5']?.maintainer_validated,true);
 assert.equal(f4.subphases?.['F4-5']?.git_head,EXPECTED_F4_5_HEAD);
 assert.equal(f4.subphases?.['F4-5']?.git_tree,EXPECTED_F4_5_TREE);
-assert.equal(f4.subphases?.['F4-6']?.status,'in-progress');
-assert.equal(f4.subphases?.['F4-6']?.implementation_complete,false);
-assert.equal(f4.subphases?.['F4-6']?.maintainer_validated,false);
-assert.equal(f4.status,'in-progress');
-assert.equal(f4.implementation_complete,false);
-assert.equal(f4.maintainer_validated,false);
-assert.equal(f4.authorized_subphase,'F4-6');
+assert.equal(f4.subphases?.['F4-6']?.implementation_complete,true);
+assert.equal(f4.subphases?.['F4-6']?.maintainer_validated,true);
+assert.equal(f4.subphases?.['F4-6']?.git_head,EXPECTED_F4_6_HEAD);
+assert.equal(f4.subphases?.['F4-6']?.git_tree,EXPECTED_F4_6_TREE);
+assert.equal(f4.status,'complete');
+assert.equal(f4.implementation_complete,true);
+assert.equal(f4.maintainer_validated,true);
+assert.equal(f4.authorized_subphase,null);
 assert.deepEqual(f4.runtime_certification,evidenceFacts,'PROGRESS contredit la preuve runtime F4-4');
 const closure=f4.f4_5_closure;
 assert.ok(closure,'clôture F4-5 absente');
@@ -203,24 +210,37 @@ for(const [name,workflow,run] of [['legacy','Validate legacy Python server',263]
   assert.equal(closure.ci[name].run_number,run);
   assert.equal(closure.ci[name].conclusion,'SUCCESS');
 }
-assert.equal(progress.current?.sub_lot_5_7_p?.authorized_technical_sub_lot,'5.7-P-F4-6');
-assert.equal(gateF.authorized_subphase,'5.7-P-F4-6');
+const finalClosure=f4.f4_6_closure;
+assert.ok(finalClosure,'clôture F4-6 absente');
+exactKeys(finalClosure,['status','git_head','git_tree','ci'],'clôture F4-6');
+assert.equal(finalClosure.status,'maintainer-validated');
+assert.equal(finalClosure.git_head,EXPECTED_F4_6_HEAD);
+assert.equal(finalClosure.git_tree,EXPECTED_F4_6_TREE);
+for(const [name,workflow,run] of [['legacy','Validate legacy Python server',264],['node','CI — Node target',533]]){
+  exactKeys(finalClosure.ci[name],['workflow','run_number','conclusion'],`CI clôture finale ${name}`);
+  assert.equal(finalClosure.ci[name].workflow,workflow);
+  assert.equal(finalClosure.ci[name].run_number,run);
+  assert.equal(finalClosure.ci[name].conclusion,'SUCCESS');
+}
+assert.equal(progress.current?.sub_lot_5_7_p?.authorized_technical_sub_lot,null);
+assert.equal(gateF.authorized_subphase,null);
 assert.equal(gateF.provider_first_f5?.status,'not-started');
 assert.equal(gateF.provider_first_f5?.implementation_started,false);
 assert.equal(gateF.provider_first_f5?.authorized,false);
 assert.equal(gateF.production_preview_activation_authorized,false);
+assert.equal(gateF.production_authorized,false);
 assert.equal(progress.current?.sub_lot_5_7_p?.full_lot_5_7_authorized,false);
 assert.equal(progress.current?.merge_authorized,false);
 
 const certification=read(files.certification),emptyDoc=read(files.emptyDoc),readiness=read(files.readiness);
-for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5'])assert.ok(certification.includes(`${stage}: **VALIDATED**`),`certification ${stage} absente`);
-for(const token of ['F4-6: **IN PROGRESS**','PENDING MAINTAINER VALIDATION','F4 global: **NOT YET MAINTAINER-VALIDATED**','F5: **NOT STARTED / NOT AUTHORIZED**',EXPECTED_F4_5_HEAD,EXPECTED_F4_5_TREE,'#263 : **SUCCESS**','#532 : **SUCCESS**'])assert.ok(certification.includes(token),`borne documentaire absente: ${token}`);
-for(const forbidden of ['F4 global: **COMPLETE','F4 global: **VALIDATED','F4-6: **VALIDATED**','F5: **STARTED','F5: **AUTHORIZED','Production: **AUTHORIZED'])assert.ok(!certification.includes(forbidden),`déclaration prématurée interdite: ${forbidden}`);
+for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.ok(certification.includes(`${stage}: **VALIDATED**`),`certification ${stage} absente`);
+for(const token of ['Statut de cette sous-phase : **MAINTAINER VALIDATED**','F4 global: **COMPLETE**','F5: **NOT STARTED / NOT AUTHORIZED**','Production: **NOT AUTHORIZED**',EXPECTED_F4_5_HEAD,EXPECTED_F4_5_TREE,EXPECTED_F4_6_HEAD,EXPECTED_F4_6_TREE,'#263 : **SUCCESS**','#532 : **SUCCESS**','#264 : **SUCCESS**','#533 : **SUCCESS**'])assert.ok(certification.includes(token),`borne documentaire absente: ${token}`);
+for(const forbidden of ['F4-6: **IN PROGRESS**','PENDING MAINTAINER VALIDATION','F4 global: **NOT YET MAINTAINER-VALIDATED**','F5: **STARTED','F5: **AUTHORIZED','Production: **AUTHORIZED'])assert.ok(!certification.includes(forbidden),`déclaration contradictoire interdite: ${forbidden}`);
 assert.ok(emptyDoc.includes('Validation runtime mainteneur : **PASS**'),'preuve F4-4 encore stale');
-assert.ok(readiness.includes('F4-0 à F4-5 : **VALIDATED**'),'runbook F4 encore stale');
-assert.ok(readiness.includes('F4-6 est **IN PROGRESS**'),'runbook F4-6 absent');
-for(const token of [EXPECTED_F4_5_HEAD,EXPECTED_F4_5_TREE,'CI legacy #263','Node\n#532 en succès','F5\nprovider-first reste non commencé et non autorisé','Production reste interdite'])assert.ok(readiness.includes(token),`runbook contradictoire ou incomplet: ${token}`);
+assert.ok(readiness.includes('F4-0 à F4-6 : **VALIDATED**'),'runbook F4 encore stale');
+assert.ok(readiness.includes('F4 est **COMPLETE**'),'runbook F4 final absent');
+for(const token of [EXPECTED_F4_5_HEAD,EXPECTED_F4_5_TREE,EXPECTED_F4_6_HEAD,EXPECTED_F4_6_TREE,'CI legacy #263','Node\n#532 en succès','CI legacy #264','Node\n#533 en succès','F5 provider-first reste non commencé et\nnon autorisé','Production reste interdite'])assert.ok(readiness.includes(token),`runbook contradictoire ou incomplet: ${token}`);
 assert.deepEqual(evidenceMarker(certification,'certification F4-5'),evidenceFacts,'certification F4-5 contredit la preuve runtime');
 assert.deepEqual(evidenceMarker(emptyDoc,'documentation F4-4'),evidenceFacts,'documentation F4-4 contredit la preuve runtime');
 
-console.log(JSON.stringify({status:'pass',baseline_git_head:evidence.baseline_git_head,baseline_git_tree:evidence.baseline_git_tree,f4_5_git_head:closure.git_head,f4_5_git_tree:closure.git_tree,current_head:currentHead,migration_head:migrations.at(-1),f4_5:'maintainer-validated',f4_6:'in-progress'}));
+console.log(JSON.stringify({status:'pass',baseline_git_head:evidence.baseline_git_head,baseline_git_tree:evidence.baseline_git_tree,f4_5_git_head:closure.git_head,f4_5_git_tree:closure.git_tree,f4_6_git_head:finalClosure.git_head,f4_6_git_tree:finalClosure.git_tree,current_head:currentHead,migration_head:migrations.at(-1),f4_5:'maintainer-validated',f4_6:'maintainer-validated',f4:'complete'}));

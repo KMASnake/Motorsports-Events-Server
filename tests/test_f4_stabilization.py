@@ -109,7 +109,8 @@ class F4StabilizationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('"status":"pass"', result.stdout)
         self.assertIn('"f4_5":"maintainer-validated"', result.stdout)
-        self.assertIn('"f4_6":"in-progress"', result.stdout)
+        self.assertIn('"f4_6":"maintainer-validated"', result.stdout)
+        self.assertIn('"f4":"complete"', result.stdout)
 
     def test_missing_evidence_is_refused(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -254,8 +255,8 @@ class F4StabilizationTests(unittest.TestCase):
             contradictory = changed_text(
                 Path(raw),
                 "docs/handoff/LOT-5.7-P-F4-STABILIZATION-CERTIFICATION.md",
-                "F4 global: **NOT YET MAINTAINER-VALIDATED**",
                 "F4 global: **COMPLETE**",
+                "F4 global: **NOT YET MAINTAINER-VALIDATED**",
             )
             self.assertNotEqual(
                 run_validator("--certification", str(contradictory)).returncode, 0
@@ -326,7 +327,26 @@ class F4StabilizationTests(unittest.TestCase):
                 )
                 self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
 
-    def test_f5_production_and_premature_f4_6_validation_are_refused(self) -> None:
+    def test_f4_6_identity_status_and_ci_are_fail_closed(self) -> None:
+        cases = (
+            lambda value: f4_state(value)["subphases"]["F4-6"].update(status="in-progress"),
+            lambda value: f4_state(value)["subphases"]["F4-6"].update(implementation_complete=False),
+            lambda value: f4_state(value)["subphases"]["F4-6"].update(maintainer_validated=False),
+            lambda value: f4_state(value)["subphases"]["F4-6"].update(git_head="0" * 40),
+            lambda value: f4_state(value)["subphases"]["F4-6"].update(git_tree="0" * 40),
+            lambda value: f4_state(value)["f4_6_closure"].update(git_head="0" * 40),
+            lambda value: f4_state(value)["f4_6_closure"].update(git_tree="0" * 40),
+            lambda value: f4_state(value)["f4_6_closure"]["ci"]["legacy"].update(run_number=263),
+            lambda value: f4_state(value)["f4_6_closure"]["ci"]["legacy"].update(conclusion="FAILURE"),
+            lambda value: f4_state(value)["f4_6_closure"]["ci"]["node"].update(run_number=532),
+            lambda value: f4_state(value)["f4_6_closure"]["ci"]["node"].update(conclusion="FAILURE"),
+        )
+        for index, mutate in enumerate(cases):
+            with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
+                target = changed_progress(Path(raw), mutate)
+                self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
+    def test_f5_production_and_incomplete_f4_are_refused(self) -> None:
         def gate(value: dict) -> dict:
             return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]
 
@@ -334,10 +354,12 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"].update(status="started", implementation_started=True),
             lambda value: gate(value)["provider_first_f5"].update(authorized=True),
             lambda value: gate(value).update(production_preview_activation_authorized=True),
+            lambda value: gate(value).update(production_authorized=True),
             lambda value: value["current"]["sub_lot_5_7_p"].update(full_lot_5_7_authorized=True),
             lambda value: value["current"].update(merge_authorized=True),
-            lambda value: f4_state(value)["subphases"]["F4-6"].update(status="maintainer-validated", implementation_complete=True, maintainer_validated=True),
-            lambda value: f4_state(value).update(status="complete", implementation_complete=True, maintainer_validated=True),
+            lambda value: f4_state(value)["subphases"]["F4-6"].update(status="in-progress", implementation_complete=False, maintainer_validated=False),
+            lambda value: f4_state(value)["subphases"]["F4-5"].update(status="in-progress"),
+            lambda value: f4_state(value).update(status="in-progress", implementation_complete=False, maintainer_validated=False),
         )
         for index, mutate in enumerate(cases):
             with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
@@ -378,12 +400,12 @@ class F4StabilizationTests(unittest.TestCase):
                 result = run_validator(f"--{option}", str(altered))
                 self.assertNotEqual(result.returncode, 0)
 
-    def test_progress_cannot_claim_f4_complete(self) -> None:
+    def test_progress_must_claim_f4_complete(self) -> None:
         progress = json.loads((ROOT / "docs/handoff/PROGRESS.json").read_text())
         f4 = f4_state(progress)
-        f4["status"] = "complete"
-        f4["implementation_complete"] = True
-        f4["maintainer_validated"] = True
+        f4["status"] = "in-progress"
+        f4["implementation_complete"] = False
+        f4["maintainer_validated"] = False
         with tempfile.TemporaryDirectory() as raw:
             target = Path(raw) / "progress.json"
             target.write_text(json.dumps(progress), encoding="utf-8")

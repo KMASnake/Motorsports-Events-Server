@@ -1,10 +1,10 @@
 # F4-6 — Gate final de certification de stabilisation
 
-Statut de cette sous-phase : **IN PROGRESS — PENDING MAINTAINER VALIDATION**.
+Statut de cette sous-phase : **MAINTAINER VALIDATED**.
 
-F4 global: **NOT YET MAINTAINER-VALIDATED**. Ce document ouvre uniquement le
-gate F4-6 ; il ne commence pas F5, n’autorise aucun déploiement et ne modifie
-aucune validation F3.
+F4 global: **COMPLETE**. Cette clôture enregistre la décision explicite du
+mainteneur après audit du commit F4-6 et de sa CI exacte ; elle ne commence pas
+F5, n’autorise aucun déploiement et ne modifie aucune validation F3.
 
 ## Identité de la baseline certifiée F4-4
 
@@ -16,6 +16,9 @@ aucune validation F3.
   `f81d71f15368e08e5427f9ecb23815c3a06d4432` ;
 - le candidat F4-6 est un descendant distinct. La baseline F4-4 et la clôture
   F4-5 ne doivent jamais être réécrites avec son identité.
+- clôture F4-6 maintainer-validated : HEAD
+  `5776aca7d3bab642f7655a8df6975d243a5b8796`, tree
+  `16b20c5208faa6187b9402d29ed873f7fe08b69e`.
 
 ## État consolidé
 
@@ -28,8 +31,8 @@ aucune validation F3.
 - F4-4: **VALIDATED** — base événementielle vide isolée et API réelle ;
 - F4-5: **VALIDATED** — consolidation validée par le mainteneur, CI legacy
   #263 et Node #532 en succès sur l’identité exacte ci-dessus ;
-- F4-6: **IN PROGRESS** — gate final statique/documentaire ; son commit et sa
-  CI doivent encore être validés explicitement par le mainteneur.
+- F4-6: **VALIDATED** — gate final statique/documentaire validé explicitement
+  par le mainteneur au commit et à la CI exacts documentés ici.
 
 ## Preuves historiques F3
 
@@ -90,14 +93,22 @@ identifiée par le HEAD/tree indiqué plus haut. Sur ce HEAD exact :
 - `Validate legacy Python server` #263 : **SUCCESS** ;
 - `CI — Node target` #532 : **SUCCESS**.
 
+La clôture F4-6 maintainer-validated est identifiée par le HEAD
+`5776aca7d3bab642f7655a8df6975d243a5b8796` et le tree
+`16b20c5208faa6187b9402d29ed873f7fe08b69e`. Sur ce commit exact :
+
+- `Validate legacy Python server` #264 : **SUCCESS** ;
+- `CI — Node target` #533 : **SUCCESS**.
+
 ## Validateur de clôture
 
 `scripts/validate-f4-stabilization.mjs` refuse notamment : preuve absente ou
 élargie, mauvaise baseline HEAD/tree, ascendance F4 rompue, migration head ou
 contrat applicatif incohérent, invariant packaging/opérations/readiness absent,
 preuve runtime non sûre, résidu non nul, appel provider, worker démarré, CI non
-SUCCESS, identité/CI F4-5 incorrecte, F5 ou Production autorisés, ou document
-déclarant prématurément F4/F4-6 validé.
+SUCCESS, identité/CI F4-5 ou F4-6 incorrecte, sous-phase F4 obligatoire non
+validée, F5 commencé/autorisé, Production autorisée ou contradiction entre les
+documents de clôture.
 
 Le validateur accepte que le candidat F4-6 soit descendant de F4-5 : il ne
 confond donc ni le candidat, ni la clôture F4-5, ni la baseline runtime F4-4.
@@ -106,13 +117,13 @@ confond donc ni le candidat, ni la clôture F4-5, ni la baseline runtime F4-4.
 
 F4-6 n’ajoute aucune fonctionnalité métier, migration ou modification Compose.
 Toutes les garanties techniques F4 sont satisfaites ; aucune nouvelle preuve
-runtime n’est nécessaire. F4 ne devient **COMPLETE** qu’après les sept
-conditions suivantes : F4-0..F4-5 validés, commit F4-6 audité, CI exacte de ce
-commit verte, aucun blocker F4 ouvert, documents/preuves cohérents, aucun
-changement fonctionnel hors périmètre et décision explicite du mainteneur.
+runtime n’est nécessaire. Les sept conditions de clôture sont satisfaites :
+F4-0..F4-5 validés, commit F4-6 audité, CI exacte de ce commit verte, aucun
+blocker F4 ouvert, documents/preuves cohérents, aucun changement fonctionnel
+hors périmètre et décision explicite du mainteneur. F4 est donc **COMPLETE**.
 
 F5: **NOT STARTED / NOT AUTHORIZED**. F5 reste le provider-first réel :
 découverte et résolution canonique, modèle de saison, acquisition et
 synchronisation, normalisation/déduplication et préparation results-ready.
 Production Preview, Production, onboarding externe et merge `main` restent
-interdits.
+interdits. Production: **NOT AUTHORIZED**.
