@@ -105,6 +105,7 @@ if INITDB="$(find_pg_binary initdb)" && PG_CTL="$(find_pg_binary pg_ctl)" \
 else
   BACKEND=docker
   require_local_docker
+  PG_PORT="$(free_port)"
   [[ -z "$(docker container ls -a --filter "name=^/${DOCKER_CONTAINER}$" --format '{{.ID}}')" ]]
   [[ -z "$(docker network ls --filter "name=^${DOCKER_NETWORK}$" --format '{{.ID}}')" ]]
   docker network create --internal --label "${OWNERSHIP_LABEL}=${RUN_ID}" "${DOCKER_NETWORK}" >/dev/null
@@ -112,7 +113,7 @@ else
   [[ "$(docker network inspect --format '{{ .Internal }}' "${DOCKER_NETWORK}")" == true ]] && owned_network
   docker create --name "${DOCKER_CONTAINER}" --label "${OWNERSHIP_LABEL}=${RUN_ID}" \
     --network "${DOCKER_NETWORK}" --tmpfs /var/lib/postgresql/data:rw,noexec,nosuid,size=512m \
-    --publish 127.0.0.1::5432 --env POSTGRES_USER=mse_f4 --env POSTGRES_DB="${DB_NAME}" \
+    --publish "127.0.0.1:${PG_PORT}:5432/tcp" --env POSTGRES_USER=mse_f4 --env POSTGRES_DB="${DB_NAME}" \
     --env POSTGRES_HOST_AUTH_METHOD=trust \
     --mount "type=bind,src=${ROOT}/infra/postgres/init,dst=/f4-init,readonly" \
     --mount "type=bind,src=${ROOT}/infra/postgres/migrations,dst=/f4-migrations,readonly" \
@@ -120,6 +121,13 @@ else
   DOCKER_CONTAINER_CREATED=true
   owned_container
   [[ "$(docker inspect --format '{{ len .Mounts }}' "${DOCKER_CONTAINER}")" == 2 ]]
+  [[ "$(docker inspect --format '{{ if index .Config.ExposedPorts "5432/tcp" }}5432/tcp{{ end }}' "${DOCKER_CONTAINER}")" == 5432/tcp ]]
+  port_bindings="$(docker inspect --format '{{ json (index .HostConfig.PortBindings "5432/tcp") }}' "${DOCKER_CONTAINER}")"
+  node -e '
+    const bindings=JSON.parse(process.argv[1]);
+    const port=process.argv[2];
+    if(!Array.isArray(bindings)||bindings.length!==1||bindings[0]?.HostIp!=="127.0.0.1"||bindings[0]?.HostPort!==port) process.exit(1);
+  ' "${port_bindings}" "${PG_PORT}"
   docker start "${DOCKER_CONTAINER}" >/dev/null
   for _ in $(seq 1 60); do
     docker exec "${DOCKER_CONTAINER}" pg_isready -U mse_f4 -d "${DB_NAME}" >/dev/null 2>&1 && break
@@ -127,8 +135,7 @@ else
   done
   docker exec "${DOCKER_CONTAINER}" pg_isready -U mse_f4 -d "${DB_NAME}" >/dev/null
   port_binding="$(docker port "${DOCKER_CONTAINER}" 5432/tcp)"
-  [[ "${port_binding}" =~ ^127\.0\.0\.1:([0-9]+)$ ]]
-  PG_PORT="${BASH_REMATCH[1]}"
+  [[ "${port_binding}" == "127.0.0.1:${PG_PORT}" ]]
 fi
 
 db_psql() {

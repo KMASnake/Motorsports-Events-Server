@@ -80,7 +80,11 @@ Le fallback refuse `DOCKER_HOST`/`DOCKER_CONTEXT` hérités, tout contexte autre
 que `default` et tout endpoint autre qu’un socket Unix local. Il crée un
 conteneur et un réseau `--internal` aux noms uniques, tous deux étiquetés par
 l’identifiant du run. PostgreSQL utilise un `tmpfs`, aucun volume Docker, et
-son port dynamique est publié exclusivement sur `127.0.0.1`. Les migrations
+un port hôte libre est sélectionné puis publié explicitement sous la forme
+`127.0.0.1:<port>:5432/tcp`. Le harnais vérifie l’exposition du port conteneur,
+l’unique `HostConfig.PortBindings` attendu et le résultat exact de
+`docker port`; toute absence, ambiguïté ou autre adresse est refusée. Une
+collision entre sélection et démarrage fait échouer `docker start`. Les migrations
 sont montées en lecture seule. Le cleanup vérifie les labels avant de supprimer
 exactement ce conteneur et ce réseau ; il n’utilise jamais Compose ni prune.
 
