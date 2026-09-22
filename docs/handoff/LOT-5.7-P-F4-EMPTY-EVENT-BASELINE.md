@@ -1,6 +1,34 @@
 # F4-4 — Base événementielle vide
 
-Statut : implémentation locale de la recette ; validation d’environnement PostgreSQL à exécuter.
+Statut : **VALIDATED**.
+
+Validation runtime mainteneur : **PASS** sur la baseline Git
+`8553fb9c1b69790169f46a6e96ba4f02d8cf6601`, tree
+`dc0a25485a2ef056617ec4421cd84c5bbc28d0f1`. Le chemin Docker isolé a atteint
+le schéma `0031_real_circuit_reference_data`, servi un calendrier vide `[]` et
+terminé avec RC 0. Le cleanup a laissé zéro conteneur, réseau ou répertoire
+temporaire F4-4 résiduel. Cette preuve est consignée sous forme sanitizée dans
+[`evidence/lot57pf4-empty-event-runtime.json`](evidence/lot57pf4-empty-event-runtime.json).
+
+<!-- F4-STABILIZATION-EVIDENCE
+{
+  "baseline_git_head": "8553fb9c1b69790169f46a6e96ba4f02d8cf6601",
+  "baseline_git_tree": "dc0a25485a2ef056617ec4421cd84c5bbc28d0f1",
+  "runtime_mode": "docker",
+  "migration_head": "0031_real_circuit_reference_data",
+  "calendar_empty": true,
+  "harness_rc": 0,
+  "cleanup": {"containers": 0, "networks": 0, "temp_dirs": 0},
+  "provider_calls": 0,
+  "worker_started": false,
+  "preprod_mutated": false,
+  "production_mutated": false,
+  "ci": {
+    "legacy": {"workflow": "Validate legacy Python server", "run_number": 261, "conclusion": "SUCCESS"},
+    "node": {"workflow": "CI — Node target", "run_number": 530, "conclusion": "SUCCESS"}
+  }
+}
+F4-STABILIZATION-EVIDENCE -->
 
 Cette étape ne clôt ni F4 ni Gate F et ne commence pas F5. F5 n’est ni commencé ni autorisé.
 
