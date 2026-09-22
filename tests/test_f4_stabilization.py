@@ -8,6 +8,12 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts/validate-f4-stabilization.mjs"
+F4_CONTRACT_FILES = (
+    ".github/workflows/validate.yml",
+    "docs/handoff/PROGRESS.json",
+    "docs/handoff/LOT-5.7-P-F4-STABILIZATION-CERTIFICATION.md",
+    "docs/handoff/VPS-PREPRODUCTION-READINESS.md",
+)
 
 
 def run_validator(*arguments: str) -> subprocess.CompletedProcess[str]:
@@ -28,6 +34,20 @@ def changed_json(directory: Path, mutate) -> Path:
     target = directory / "evidence.json"
     target.write_text(json.dumps(value), encoding="utf-8")
     return target
+
+
+def changed_progress(directory: Path, mutate) -> Path:
+    value = json.loads((ROOT / "docs/handoff/PROGRESS.json").read_text())
+    mutate(value)
+    target = directory / "progress.json"
+    target.write_text(json.dumps(value), encoding="utf-8")
+    return target
+
+
+def f4_state(value: dict) -> dict:
+    return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"][
+        "preproduction_stabilization_f4"
+    ]
 
 
 def changed_text(directory: Path, relative: str, old: str, new: str) -> Path:
@@ -75,6 +95,8 @@ def closure_descendant(directory: Path, operation) -> Path:
     git(repository, "config", "user.name", "F4 Validator Test")
     git(repository, "config", "user.email", "f4-validator@example.invalid")
     git(repository, "cat-file", "-e", "8553fb9c1b69790169f46a6e96ba4f02d8cf6601^{commit}")
+    for relative in F4_CONTRACT_FILES:
+        (repository / relative).write_bytes((ROOT / relative).read_bytes())
     operation(repository)
     git(repository, "add", "-A")
     git(repository, "commit", "--quiet", "-m", "invalid closure descendant")
@@ -86,7 +108,8 @@ class F4StabilizationTests(unittest.TestCase):
         result = run_validator()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('"status":"pass"', result.stdout)
-        self.assertIn('"f4_5":"in-progress"', result.stdout)
+        self.assertIn('"f4_5":"maintainer-validated"', result.stdout)
+        self.assertIn('"f4_6":"in-progress"', result.stdout)
 
     def test_missing_evidence_is_refused(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -100,9 +123,8 @@ class F4StabilizationTests(unittest.TestCase):
                 ["git", "clone", "--quiet", "--depth", "1", f"file://{ROOT}", str(repository)],
                 check=True,
             )
-            (repository / ".github/workflows/validate.yml").write_bytes(
-                (ROOT / ".github/workflows/validate.yml").read_bytes()
-            )
+            for relative in F4_CONTRACT_FILES:
+                (repository / relative).write_bytes((ROOT / relative).read_bytes())
             self.assertNotEqual(
                 subprocess.run(
                     ["git", "-C", str(repository), "cat-file", "-e", "8553fb9c1b69790169f46a6e96ba4f02d8cf6601^{commit}"],
@@ -277,6 +299,51 @@ class F4StabilizationTests(unittest.TestCase):
             result = run_validator("--progress", str(target))
         self.assertNotEqual(result.returncode, 0)
 
+    def test_f4_5_identity_status_and_ci_are_fail_closed(self) -> None:
+        cases = (
+            lambda value: f4_state(value)["subphases"]["F4-5"].update(status="in-progress"),
+            lambda value: f4_state(value)["subphases"]["F4-5"].update(maintainer_validated=False),
+            lambda value: f4_state(value)["subphases"]["F4-5"].update(git_head="0" * 40),
+            lambda value: f4_state(value)["subphases"]["F4-5"].update(git_tree="0" * 40),
+            lambda value: f4_state(value)["f4_5_closure"].update(git_head="0" * 40),
+            lambda value: f4_state(value)["f4_5_closure"].update(git_tree="0" * 40),
+            lambda value: f4_state(value)["f4_5_closure"]["ci"]["legacy"].update(run_number=262),
+            lambda value: f4_state(value)["f4_5_closure"]["ci"]["legacy"].update(conclusion="FAILURE"),
+            lambda value: f4_state(value)["f4_5_closure"]["ci"]["node"].update(run_number=531),
+            lambda value: f4_state(value)["f4_5_closure"]["ci"]["node"].update(conclusion="FAILURE"),
+        )
+        for index, mutate in enumerate(cases):
+            with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
+                target = changed_progress(Path(raw), mutate)
+                self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
+    def test_prior_f4_stages_are_fail_closed(self) -> None:
+        for stage in ("F4-0", "F4-1", "F4-2", "F4-3", "F4-4"):
+            with self.subTest(stage=stage), tempfile.TemporaryDirectory() as raw:
+                target = changed_progress(
+                    Path(raw),
+                    lambda value, name=stage: f4_state(value)["subphases"][name].update(status="in-progress"),
+                )
+                self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
+    def test_f5_production_and_premature_f4_6_validation_are_refused(self) -> None:
+        def gate(value: dict) -> dict:
+            return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]
+
+        cases = (
+            lambda value: gate(value)["provider_first_f5"].update(status="started", implementation_started=True),
+            lambda value: gate(value)["provider_first_f5"].update(authorized=True),
+            lambda value: gate(value).update(production_preview_activation_authorized=True),
+            lambda value: value["current"]["sub_lot_5_7_p"].update(full_lot_5_7_authorized=True),
+            lambda value: value["current"].update(merge_authorized=True),
+            lambda value: f4_state(value)["subphases"]["F4-6"].update(status="maintainer-validated", implementation_complete=True, maintainer_validated=True),
+            lambda value: f4_state(value).update(status="complete", implementation_complete=True, maintainer_validated=True),
+        )
+        for index, mutate in enumerate(cases):
+            with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
+                target = changed_progress(Path(raw), mutate)
+                self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
     def test_packaging_operation_and_schema_regressions_are_refused(self) -> None:
         cases = (
             ("archiver", "scripts/build-release-archive.py", '"ls-tree"', "git inventory removed"),
@@ -313,9 +380,7 @@ class F4StabilizationTests(unittest.TestCase):
 
     def test_progress_cannot_claim_f4_complete(self) -> None:
         progress = json.loads((ROOT / "docs/handoff/PROGRESS.json").read_text())
-        f4 = progress["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"][
-            "preproduction_stabilization_f4"
-        ]
+        f4 = f4_state(progress)
         f4["status"] = "complete"
         f4["implementation_complete"] = True
         f4["maintainer_validated"] = True

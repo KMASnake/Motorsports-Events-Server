@@ -1,17 +1,21 @@
-# F4-5 — Certification de stabilisation
+# F4-6 — Gate final de certification de stabilisation
 
-Statut de cette sous-phase : **IN PROGRESS — attente de validation mainteneur du commit F4-5**.
+Statut de cette sous-phase : **IN PROGRESS — PENDING MAINTAINER VALIDATION**.
 
-F4 global: **NOT YET MAINTAINER-VALIDATED**. Ce document ne commence ni F4-6
-ni F5, n’autorise aucun déploiement et ne modifie aucune validation F3.
+F4 global: **NOT YET MAINTAINER-VALIDATED**. Ce document ouvre uniquement le
+gate F4-6 ; il ne commence pas F5, n’autorise aucun déploiement et ne modifie
+aucune validation F3.
 
 ## Identité de la baseline certifiée F4-4
 
 - branche : `codex/lot-5-providers-sync` ;
 - HEAD : `8553fb9c1b69790169f46a6e96ba4f02d8cf6601` ;
 - tree : `dc0a25485a2ef056617ec4421cd84c5bbc28d0f1` ;
-- commit F4-5 : distinct et à certifier après création ; la baseline F4-4 ne
-  doit jamais être réécrite avec l’identité du commit documentaire F4-5.
+- clôture F4-5 maintainer-validated : HEAD
+  `a455e720fe49061a818881a9385942ad6d613261`, tree
+  `f81d71f15368e08e5427f9ecb23815c3a06d4432` ;
+- le candidat F4-6 est un descendant distinct. La baseline F4-4 et la clôture
+  F4-5 ne doivent jamais être réécrites avec son identité.
 
 ## État consolidé
 
@@ -22,8 +26,10 @@ ni F5, n’autorise aucun déploiement et ne modifie aucune validation F3.
   jetable et opérations excluant le worker ;
 - F4-3: **VALIDATED** — chaîne de migrations exacte et readiness fail-closed ;
 - F4-4: **VALIDATED** — base événementielle vide isolée et API réelle ;
-- F4-5: **IN PROGRESS** — outillage et consolidation, validation mainteneur
-  finale encore requise.
+- F4-5: **VALIDATED** — consolidation validée par le mainteneur, CI legacy
+  #263 et Node #532 en succès sur l’identité exacte ci-dessus ;
+- F4-6: **IN PROGRESS** — gate final statique/documentaire ; son commit et sa
+  CI doivent encore être validés explicitement par le mainteneur.
 
 ## Preuves historiques F3
 
@@ -68,7 +74,7 @@ Cette consolidation ne rejoue pas le harnais.
 }
 F4-STABILIZATION-EVIDENCE -->
 
-## Preuve CI de la baseline F4-4
+## Preuves CI distinctes
 
 Le mainteneur a vérifié sur GitHub, pour le SHA exact de la baseline :
 
@@ -78,21 +84,32 @@ Le mainteneur a vérifié sur GitHub, pour le SHA exact de la baseline :
 Une CI verte n’est pas à elle seule une validation mainteneur. Elle complète
 ici les preuves runtime et statiques déjà auditées.
 
+La clôture F4-5 maintainer-validated, distincte de cette baseline runtime, est
+identifiée par le HEAD/tree indiqué plus haut. Sur ce HEAD exact :
+
+- `Validate legacy Python server` #263 : **SUCCESS** ;
+- `CI — Node target` #532 : **SUCCESS**.
+
 ## Validateur de clôture
 
 `scripts/validate-f4-stabilization.mjs` refuse notamment : preuve absente ou
 élargie, mauvaise baseline HEAD/tree, ascendance F4 rompue, migration head ou
 contrat applicatif incohérent, invariant packaging/opérations/readiness absent,
 preuve runtime non sûre, résidu non nul, appel provider, worker démarré, CI non
-SUCCESS ou document déclarant prématurément F4 terminé.
+SUCCESS, identité/CI F4-5 incorrecte, F5 ou Production autorisés, ou document
+déclarant prématurément F4/F4-6 validé.
 
-Le validateur accepte que son propre commit soit descendant de la baseline :
-il ne confond donc pas le commit de clôture F4-5 avec le commit runtime F4-4.
+Le validateur accepte que le candidat F4-6 soit descendant de F4-5 : il ne
+confond donc ni le candidat, ni la clôture F4-5, ni la baseline runtime F4-4.
 
 ## Frontières
 
-F4-5 n’ajoute aucune fonctionnalité métier, migration ou modification Compose.
-F4-6 scope requires maintainer decision after F4-5.
+F4-6 n’ajoute aucune fonctionnalité métier, migration ou modification Compose.
+Toutes les garanties techniques F4 sont satisfaites ; aucune nouvelle preuve
+runtime n’est nécessaire. F4 ne devient **COMPLETE** qu’après les sept
+conditions suivantes : F4-0..F4-5 validés, commit F4-6 audité, CI exacte de ce
+commit verte, aucun blocker F4 ouvert, documents/preuves cohérents, aucun
+changement fonctionnel hors périmètre et décision explicite du mainteneur.
 
 F5: **NOT STARTED / NOT AUTHORIZED**. F5 reste le provider-first réel :
 découverte et résolution canonique, modèle de saison, acquisition et

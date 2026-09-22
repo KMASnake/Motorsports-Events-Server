@@ -1,7 +1,7 @@
 # VPS preproduction readiness — Node preproduction operations
 
 Date: 2026-09-22
-Status: **F3 PROVEN — F4-0 TO F4-4 VALIDATED — F4-5 IN PROGRESS**
+Status: **F3 PROVEN — F4-0 TO F4-5 VALIDATED — F4-6 IN PROGRESS**
 
 The maintainer completed the real VPS checklist on Debian 13.6 at deployed SHA
 `cb7d04795b156dc23af6c57efe2bce788569e3da`. The permanent preproduction stack,
@@ -240,13 +240,16 @@ F3 operational closure is proven. F4 hardening remains in progress and this
 runbook does not authorize deployment, provider execution, Production Preview,
 external onboarding or Production.
 
-F4-0 à F4-4 : **VALIDATED**. F4-4 a été certifié par le mainteneur sur une base
+F4-0 à F4-5 : **VALIDATED**. F4-4 a été certifié par le mainteneur sur une base
 PostgreSQL neuve et isolée au SHA
 `8553fb9c1b69790169f46a6e96ba4f02d8cf6601`, sans mutation préproduction ou
 Production, sans worker et sans appel provider. La preuve sanitizée est
 référencée par `LOT-5.7-P-F4-STABILIZATION-CERTIFICATION.md`.
 
-F4-5 : **IN PROGRESS**. Il consolide les preuves et l’outillage statique ; F4
-global ne devient pas maintainer-validated avant l’audit explicite du commit de
-clôture. Le scope F4-6 requires maintainer decision after F4-5. F5 provider-first
-reste non commencé et non autorisé.
+F4-5 est maintainer-validated au HEAD
+`a455e720fe49061a818881a9385942ad6d613261`, tree
+`f81d71f15368e08e5427f9ecb23815c3a06d4432`, avec les CI legacy #263 et Node
+#532 en succès. F4-6 est **IN PROGRESS** et constitue uniquement le gate final
+statique/documentaire. Il ne requiert aucun runtime. F4 global ne devient pas
+maintainer-closed avant l’audit explicite du commit F4-6 et de sa CI. F5
+provider-first reste non commencé et non autorisé ; Production reste interdite.

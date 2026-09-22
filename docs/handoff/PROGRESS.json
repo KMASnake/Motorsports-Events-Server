@@ -4,8 +4,8 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-f3-proven-f4-in-progress-gate-f-incomplete",
-    "updated_at": "2026-09-21",
+    "status": "lot-5.7-p-f3-proven-f4-6-in-progress-gate-f-incomplete",
+    "updated_at": "2026-09-22",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -70,7 +70,7 @@
       "vps_preproduction_validation_date": "2026-08-22",
       "vps_preproduction_validated_sha": "cb7d04795b156dc23af6c57efe2bce788569e3da",
       "authorized_gate": "5.7-P-F",
-      "authorized_technical_sub_lot": "5.7-P-F4-5",
+      "authorized_technical_sub_lot": "5.7-P-F4-6",
       "technical_gates": {
         "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-B": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
@@ -78,7 +78,7 @@
         "5.7-P-D": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"vps_validated":true,"vps_validation_date":"2026-08-22","vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
         "5.7-P-E": {"status":"maintainer-vps-revalidated","authorization_date":"2026-08-23","implementation_started":true,"implementation_complete":true,"integration_correction_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-25","maintainer_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","vps_revalidated":true,"vps_revalidation_date":"2026-08-25","vps_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","migration_head":"0029_lot57pe_canonical_championship_entitlements","authorization":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-AUTHORIZATION.md","implementation":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-IMPLEMENTATION.md"},
         "5.7-P-F": {
-          "status":"f3-proven-f4-in-progress-gate-f-incomplete",
+          "status":"f3-proven-f4-6-in-progress-gate-f-incomplete",
           "authorization_date":"2026-08-25",
           "worker_isolation_correction_authorized":true,
           "worker_isolation_correction_complete":true,
@@ -92,7 +92,7 @@
           "vps_validation_required":true,
           "real_provider_validation_required":true,
           "evidence":"docs/handoff/LOT-5.7-P-F-IMPLEMENTATION.md",
-          "authorized_subphase":"5.7-P-F4-5",
+          "authorized_subphase":"5.7-P-F4-6",
           "operational_closure_f3": {
             "status": "complete-proven",
             "implementation_complete": true,
@@ -123,12 +123,21 @@
             "status": "in-progress",
             "implementation_complete": false,
             "maintainer_validated": false,
-            "authorized_subphase": "F4-5",
+            "authorized_subphase": "F4-6",
             "authorization_date": "2026-09-22",
-            "scope": "Closure/certification tooling and documentation only: consolidate validated F4-0 through F4-4 evidence without runtime replay, application behavior, migration, Compose, provider-first or deployment changes.",
+            "scope": "Final static/documentary F4 gate only: record the maintainer-validated F4-5 identity and CI, preserve F3/F4 evidence and prepare explicit maintainer closure without runtime replay, application behavior, migration, Compose, provider-first or deployment changes.",
             "baseline_git_head": "8553fb9c1b69790169f46a6e96ba4f02d8cf6601",
             "baseline_git_tree": "dc0a25485a2ef056617ec4421cd84c5bbc28d0f1",
             "runtime_evidence": "docs/handoff/evidence/lot57pf4-empty-event-runtime.json",
+            "f4_5_closure": {
+              "status": "maintainer-validated",
+              "git_head": "a455e720fe49061a818881a9385942ad6d613261",
+              "git_tree": "f81d71f15368e08e5427f9ecb23815c3a06d4432",
+              "ci": {
+                "legacy": {"workflow":"Validate legacy Python server","run_number":263,"conclusion":"SUCCESS"},
+                "node": {"workflow":"CI — Node target","run_number":532,"conclusion":"SUCCESS"}
+              }
+            },
             "runtime_certification": {
               "baseline_git_head": "8553fb9c1b69790169f46a6e96ba4f02d8cf6601",
               "baseline_git_tree": "dc0a25485a2ef056617ec4421cd84c5bbc28d0f1",
@@ -161,12 +170,19 @@
                 "cleanup_verified": true
               },
               "F4-5": {
+                "status": "maintainer-validated",
+                "implementation_complete": true,
+                "maintainer_validated": true,
+                "git_head": "a455e720fe49061a818881a9385942ad6d613261",
+                "git_tree": "f81d71f15368e08e5427f9ecb23815c3a06d4432"
+              },
+              "F4-6": {
                 "status": "in-progress",
                 "implementation_complete": false,
                 "maintainer_validated": false
               }
             },
-            "f4_6_scope": "requires maintainer decision after F4-5",
+            "f4_6_scope": "Final static/documentary gate pending maintainer validation of its commit and exact CI; no runtime, functional, migration, Compose, provider-first or deployment change.",
             "runtime_execution_authorized": false,
             "vps_access_authorized": false,
             "cleanup_authorized": false
@@ -248,14 +264,14 @@
           "real_provider_validation_zero_credit_preflight_required":true,
           "real_provider_validation_exact_call_accounting_required":true,
           "real_provider_execution_authorized":false,
-          "real_provider_execution_authorization_scope":"No new provider execution authorized for F4-5. The completed F2-RPV authorization and validation above are historical evidence, not authorization for another call.",
+          "real_provider_execution_authorization_scope":"No new provider execution authorized for F4-6. The completed F2-RPV authorization and validation above are historical evidence, not authorization for another call.",
           "production_preview_activation_authorized":false,
           "external_client_onboarding_authorized":false
         }
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and 5.7-P-F2-RPV retain their maintainer validations. F3 is complete/proven and maintainer-validated on 2026-09-21: PP-178 and PP-T38 are PROVEN. F4-0 through F4-4 are maintainer-validated; F4-5 closure/certification is in progress and F4 global remains incomplete until explicit maintainer validation of its closing commit. F4-6 requires a later maintainer decision. F5 is not started or authorized. Gate F remains incomplete and not maintainer-validated. Production Preview activation, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and 5.7-P-F2-RPV retain their maintainer validations. F3 is complete/proven and maintainer-validated on 2026-09-21: PP-178 and PP-T38 are PROVEN. F4-0 through F4-5 are maintainer-validated. F4-6 is the final static/documentary gate in progress; F4 global remains incomplete until explicit maintainer validation of the F4-6 commit and its exact CI. F5 is not started or authorized. Gate F remains incomplete and not maintainer-validated. Production Preview activation, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -278,6 +294,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Review and validate the single local F4-5 stabilization closure commit. Do not push before maintainer approval. F4-6 requires a separate maintainer scope decision; F5 remains not started and unauthorized. No deployment, cleanup, VPS access, runtime execution, provider call, Production Preview activation, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main is authorized."
+    "task": "Review the local F4-6 final static/documentary gate commit, then validate its exact CI. Only an explicit later maintainer decision may declare F4 complete. F5 remains not started and unauthorized. No deployment, cleanup, VPS access, runtime execution, provider call, Production Preview activation, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main is authorized."
   }
 }
