@@ -1,6 +1,6 @@
 # ADR-0023 — Taxonomie canonique extensible
 
-Statut : candidat F5-1, en attente de validation mainteneur
+Statut : validé par le mainteneur dans F5-1
 
 Date : 2026-09-23
 

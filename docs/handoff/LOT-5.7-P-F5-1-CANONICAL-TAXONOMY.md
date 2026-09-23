@@ -1,6 +1,19 @@
 # F5-1 — Fondations de taxonomie canonique
 
-Statut : `IN_PROGRESS_PENDING_MAINTAINER_VALIDATION`
+Statut : `MAINTAINER_VALIDATED`
+
+## Validation mainteneur
+
+- audit final : `PASS` ;
+- bloqueurs P1/P2/P3 : `NONE` ;
+- commit : `3e80099d56ff85df6eebe6b84d615a89180e12e9` ;
+- tree : `34c8a030e3a5d8af2bda71421eba31cf4f7d1114` ;
+- schema head : `0032_f5_canonical_taxonomy` ;
+- Validate legacy Python server #266 : `SUCCESS` ;
+- CI — Node target #535 : `SUCCESS`.
+
+Cette validation clôt uniquement F5-1. F5 reste `IN_PROGRESS` et aucune
+sous-phase F5-2 à F5-7 n'est autorisée.
 
 ## Périmètre candidat
 

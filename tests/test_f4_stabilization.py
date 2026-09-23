@@ -10,8 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts/validate-f4-stabilization.mjs"
 F4_CONTRACT_FILES = (
     ".github/workflows/validate.yml",
+    "docs/handbook/architecture/ADR-0023-CANONICAL-TAXONOMY.md",
     "docs/handoff/PROGRESS.json",
     "docs/handoff/LOT-5.7-P-F4-STABILIZATION-CERTIFICATION.md",
+    "docs/handoff/LOT-5.7-P-F5-1-CANONICAL-TAXONOMY.md",
     "docs/handoff/VPS-PREPRODUCTION-READINESS.md",
 )
 
@@ -370,7 +372,11 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"].update(status="complete"),
             lambda value: gate(value)["provider_first_f5"].update(authorized_subphase="F5-2"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(authorized=True),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(maintainer_validated=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(status="in-progress-pending-maintainer-validation"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(maintainer_validated=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(git_head="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"]["ci"]["legacy"].update(run_number=265),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"]["ci"]["node"].update(conclusion="FAILURE"),
             lambda value: gate(value).update(production_preview_activation_authorized=True),
             lambda value: gate(value).update(production_authorized=True),
             lambda value: value["current"]["sub_lot_5_7_p"].update(full_lot_5_7_authorized=True),
@@ -383,6 +389,26 @@ class F4StabilizationTests(unittest.TestCase):
             with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
                 target = changed_progress(Path(raw), mutate)
                 self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
+    def test_f5_1_governance_documents_are_fail_closed(self) -> None:
+        cases = (
+            (
+                "docs/handoff/LOT-5.7-P-F5-1-CANONICAL-TAXONOMY.md",
+                "Statut : `MAINTAINER_VALIDATED`",
+                "Statut : `IN_PROGRESS_PENDING_MAINTAINER_VALIDATION`",
+                "--f5-doc",
+            ),
+            (
+                "docs/handbook/architecture/ADR-0023-CANONICAL-TAXONOMY.md",
+                "Statut : validé par le mainteneur dans F5-1",
+                "Statut : candidat F5-1, en attente de validation mainteneur",
+                "--taxonomy-adr",
+            ),
+        )
+        for relative, old, new, option in cases:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as raw:
+                target = changed_text(Path(raw), relative, old, new)
+                self.assertNotEqual(run_validator(option, str(target)).returncode, 0)
 
     def test_packaging_operation_and_schema_regressions_are_refused(self) -> None:
         cases = (

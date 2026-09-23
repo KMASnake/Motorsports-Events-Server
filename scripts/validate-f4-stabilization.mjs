@@ -15,6 +15,8 @@ const EXPECTED_F4_6_HEAD='5776aca7d3bab642f7655a8df6975d243a5b8796';
 const EXPECTED_F4_6_TREE='16b20c5208faa6187b9402d29ed873f7fe08b69e';
 const EXPECTED_F4_FINAL_HEAD='76e7540bf4589e1c1dda4b461a4667150537a65b';
 const EXPECTED_F4_FINAL_TREE='6867c3bd602168d117d7de42121823336edd6a68';
+const EXPECTED_F5_1_HEAD='3e80099d56ff85df6eebe6b84d615a89180e12e9';
+const EXPECTED_F5_1_TREE='34c8a030e3a5d8af2bda71421eba31cf4f7d1114';
 const EXPECTED_MIGRATION_HEAD='0031_real_circuit_reference_data';
 const F4_COMMITS=[
   '523a2cecedd38e9a9ec463fae66221069b8c53cc',
@@ -53,6 +55,8 @@ const files={
   certification:path('certification','docs/handoff/LOT-5.7-P-F4-STABILIZATION-CERTIFICATION.md'),
   emptyDoc:path('empty_doc','docs/handoff/LOT-5.7-P-F4-EMPTY-EVENT-BASELINE.md'),
   readiness:path('readiness','docs/handoff/VPS-PREPRODUCTION-READINESS.md'),
+  f5Doc:path('f5_doc','docs/handoff/LOT-5.7-P-F5-1-CANONICAL-TAXONOMY.md'),
+  taxonomyAdr:path('taxonomy_adr','docs/handbook/architecture/ADR-0023-CANONICAL-TAXONOMY.md'),
   archiver:path('archiver','scripts/build-release-archive.py'),
   releaseTests:path('release_tests','tests/test_release_workflow.py'),
   operations:path('operations','scripts/lib.sh'),
@@ -189,7 +193,7 @@ const progress=json(files.progress);
 const gateF=progress.current?.sub_lot_5_7_p?.technical_gates?.['5.7-P-F'];
 const f4=gateF?.preproduction_stabilization_f4;
 assert.ok(f4,'état canonique F4 absent');
-assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-gate-f-incomplete');
+assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-f5-1-maintainer-validated-gate-f-incomplete');
 assert.equal(gateF?.status,'f3-proven-f4-complete-gate-f-incomplete');
 for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.equal(f4.subphases?.[stage]?.status,'maintainer-validated',`${stage} non validé`);
 assert.equal(f4.subphases?.['F4-5']?.implementation_complete,true);
@@ -240,10 +244,25 @@ if(f5.status==='not-started'){
   assert.equal(f5.status,'in-progress');
   assert.equal(f5.implementation_started,true);
   assert.equal(f5.authorized,true);
-  assert.equal(f5.authorized_subphase,'F5-1');
-  assert.equal(f5.subphases?.['F5-1']?.status,'in-progress-pending-maintainer-validation');
-  assert.equal(f5.subphases?.['F5-1']?.authorized,true);
-  assert.equal(f5.subphases?.['F5-1']?.maintainer_validated,false);
+  assert.equal(f5.authorized_subphase,null);
+  const f51=f5.subphases?.['F5-1'];
+  assert.ok(f51,'état F5-1 absent');
+  exactKeys(f51,['status','authorized','implementation_complete','maintainer_audit','maintainer_validated','git_head','git_tree','migration_head','ci','blockers'],'F5-1');
+  assert.equal(f51.status,'maintainer-validated');
+  assert.equal(f51.authorized,true);
+  assert.equal(f51.implementation_complete,true);
+  assert.equal(f51.maintainer_audit,'pass');
+  assert.equal(f51.maintainer_validated,true);
+  assert.equal(f51.git_head,EXPECTED_F5_1_HEAD);
+  assert.equal(f51.git_tree,EXPECTED_F5_1_TREE);
+  assert.equal(f51.migration_head,'0032_f5_canonical_taxonomy');
+  assert.equal(f51.blockers,'NONE');
+  for(const [name,workflow,run] of [['legacy','Validate legacy Python server',266],['node','CI — Node target',535]]){
+    exactKeys(f51.ci[name],['workflow','run_number','conclusion'],`CI F5-1 ${name}`);
+    assert.equal(f51.ci[name].workflow,workflow);
+    assert.equal(f51.ci[name].run_number,run);
+    assert.equal(f51.ci[name].conclusion,'SUCCESS');
+  }
   for(const stage of ['F5-2','F5-3','F5-4','F5-5','F5-6','F5-7']){
     assert.equal(f5.subphases?.[stage]?.status,'not-started',`${stage} démarré sans autorisation`);
     assert.equal(f5.subphases?.[stage]?.authorized,false,`${stage} autorisé prématurément`);
@@ -253,6 +272,10 @@ assert.equal(gateF.production_preview_activation_authorized,false);
 assert.equal(gateF.production_authorized,false);
 assert.equal(progress.current?.sub_lot_5_7_p?.full_lot_5_7_authorized,false);
 assert.equal(progress.current?.merge_authorized,false);
+
+const f5Doc=read(files.f5Doc),taxonomyAdr=read(files.taxonomyAdr);
+for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_1_HEAD,EXPECTED_F5_1_TREE,'`0032_f5_canonical_taxonomy`','Python server #266 : `SUCCESS`','Node target #535 : `SUCCESS`','F5 reste `IN_PROGRESS`','F5-2 à F5-7 n\'est autorisée'])assert.ok(f5Doc.includes(token),`preuve documentaire F5-1 absente: ${token}`);
+assert.ok(taxonomyAdr.includes('Statut : validé par le mainteneur dans F5-1'),'ADR-0023 encore candidat ou incohérent');
 
 const certification=read(files.certification),emptyDoc=read(files.emptyDoc),readiness=read(files.readiness);
 for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.ok(certification.includes(`${stage}: **VALIDATED**`),`certification ${stage} absente`);
