@@ -3,7 +3,6 @@ import type { PoolClient } from 'pg';
 import { pool } from '../lib/db.js';
 import type { MappingConfig, NormalizedStatus, SessionType } from './deterministicNormalization.js';
 
-const sessionTypes=new Set<SessionType>(['practice','qualifying','sprint_qualifying','sprint','race','other']);
 const statuses=new Set<NormalizedStatus>(['scheduled','confirmed','postponed','cancelled','completed']);
 const unsafeKeys=new Set(['__proto__','prototype','constructor']);
 const documentKeys=['championshipIds','circuitIds','sessionTypes','statuses'] as const;
@@ -13,6 +12,12 @@ export type NormalizationMappingVersion={id:string;providerChampionshipId:string
 
 export class NormalizationMappingRepositoryError extends Error{
   constructor(readonly code:'mapping_not_found'|'active_mapping_absent'|'traversal_mapping_absent'|'ownership_mismatch'|'binding_conflict'|'malformed_mapping',message:string){super(message);}
+}
+
+function sessionTypeDictionary(value:unknown):Record<string,SessionType>{
+  const result=dictionary(value);
+  if(Object.values(result).some(target=>!/^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/.test(target)||target.length>64))throw new NormalizationMappingRepositoryError('malformed_mapping','Session type mapping target is not a canonical key.');
+  return result;
 }
 
 function dictionary(value:unknown,allowed?:ReadonlySet<string>):Record<string,string>{
@@ -32,7 +37,7 @@ export function parseNormalizationMappingDocument(value:unknown):MappingDocument
   return {
     championshipIds:dictionary(row.championshipIds),
     circuitIds:dictionary(row.circuitIds),
-    sessionTypes:dictionary(row.sessionTypes,sessionTypes) as Record<string,SessionType>,
+    sessionTypes:sessionTypeDictionary(row.sessionTypes),
     statuses:dictionary(row.statuses,statuses) as Record<string,NormalizedStatus>
   };
 }

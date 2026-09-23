@@ -26,6 +26,16 @@ def run_validator(*arguments: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def run_validator_script(script: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["node", str(script), "--root", str(ROOT), *arguments],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
 def changed_json(directory: Path, mutate) -> Path:
     value = json.loads(
         (ROOT / "docs/handoff/evidence/lot57pf4-empty-event-runtime.json").read_text()
@@ -162,12 +172,20 @@ class F4StabilizationTests(unittest.TestCase):
                 result = run_validator("--evidence", str(evidence))
                 self.assertNotEqual(result.returncode, 0)
 
-    def test_closure_diff_refuses_extra_application_migration_and_compose_files(self) -> None:
+    def test_wrong_final_f4_snapshot_identity_is_refused(self) -> None:
+        source = VALIDATOR.read_text(encoding="utf-8")
         cases = (
-            "apps/api/src/f4-invalid.ts",
-            "infra/postgres/migrations/0032_f4_invalid.up.sql",
-            "docker-compose.f4-invalid.yml",
+            "76e7540bf4589e1c1dda4b461a4667150537a65b",
+            "6867c3bd602168d117d7de42121823336edd6a68",
         )
+        for value in cases:
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as raw:
+                script = Path(raw) / "validator.mjs"
+                script.write_text(source.replace(value, "0" * 40, 1), encoding="utf-8")
+                self.assertNotEqual(run_validator_script(script).returncode, 0)
+
+    def test_post_f4_descendant_changes_do_not_expand_historical_closure_allowlist(self) -> None:
+        cases = ("apps/api/src/f5-descendant.ts", "docs/handoff/F5-DESCENDANT.md")
         for relative in cases:
             with self.subTest(relative=relative), tempfile.TemporaryDirectory() as raw:
                 def add_file(repository: Path, path=relative) -> None:
@@ -177,10 +195,9 @@ class F4StabilizationTests(unittest.TestCase):
 
                 repository = closure_descendant(Path(raw), add_file)
                 result = run_validator("--root", str(repository))
-                self.assertNotEqual(result.returncode, 0)
-                self.assertIn("allowlist", result.stderr)
+                self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_closure_diff_refuses_rename_or_copy(self) -> None:
+    def test_post_f4_descendant_rename_or_copy_does_not_rewrite_historical_snapshot(self) -> None:
         operations = (
             lambda repository: git(repository, "mv", "README.md", "README-F4-INVALID.md"),
             lambda repository: (repository / "README-F4-COPY.md").write_bytes(
@@ -191,8 +208,7 @@ class F4StabilizationTests(unittest.TestCase):
             with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
                 repository = closure_descendant(Path(raw), operation)
                 result = run_validator("--root", str(repository))
-                self.assertNotEqual(result.returncode, 0)
-                self.assertRegex(result.stderr, "rename/copy interdit|allowlist")
+                self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_unsafe_runtime_evidence_is_refused(self) -> None:
         cases = (
@@ -351,8 +367,10 @@ class F4StabilizationTests(unittest.TestCase):
             return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]
 
         cases = (
-            lambda value: gate(value)["provider_first_f5"].update(status="started", implementation_started=True),
-            lambda value: gate(value)["provider_first_f5"].update(authorized=True),
+            lambda value: gate(value)["provider_first_f5"].update(status="complete"),
+            lambda value: gate(value)["provider_first_f5"].update(authorized_subphase="F5-2"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(authorized=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(maintainer_validated=True),
             lambda value: gate(value).update(production_preview_activation_authorized=True),
             lambda value: gate(value).update(production_authorized=True),
             lambda value: value["current"]["sub_lot_5_7_p"].update(full_lot_5_7_authorized=True),

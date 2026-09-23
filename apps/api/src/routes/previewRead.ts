@@ -4,9 +4,10 @@ import {z} from 'zod';
 import {decodeCursor,encodeCursor,type PageCursor,type SyncCursor} from '../preview/cursors.js';
 import {PostgresPreviewRepository,type PreviewRepository,type ResourceRow,type ResourceType} from '../preview/repository.js';
 import type {ApiClientPrincipal} from '../preview/clientSecurity.js';
+import {canonicalTaxonomyKey} from '../lib/taxonomy.js';
 
 const uuid=z.string().uuid(),canonicalChampionshipId=z.string().trim().min(1).max(160).regex(/^[A-Za-z0-9]+(?:[._:-][A-Za-z0-9]+)*$/),instant=z.string().datetime({offset:true});
-const resourceQuery=z.object({limit:z.coerce.number().int().min(1).max(100).default(50),cursor:z.string().max(2048).optional(),championship:z.string().trim().min(1).max(120).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),championship_id:canonicalChampionshipId.optional(),from:instant.optional(),to:instant.optional(),status:z.enum(['scheduled','completed','cancelled','postponed']).optional(),session_type:z.enum(['practice','practice_1','practice_2','practice_3','qualifying','sprint_qualifying','sprint','warmup','race','test','other']).optional()}).strict().refine(value=>!(value.championship&&value.championship_id),{message:'championship and championship_id are mutually exclusive'}).refine(value=>!(value.from&&value.to&&new Date(value.from)>new Date(value.to)),{message:'from must precede to'});
+const resourceQuery=z.object({limit:z.coerce.number().int().min(1).max(100).default(50),cursor:z.string().max(2048).optional(),championship:z.string().trim().min(1).max(120).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),championship_id:canonicalChampionshipId.optional(),from:instant.optional(),to:instant.optional(),status:z.enum(['scheduled','completed','cancelled','postponed']).optional(),session_type:canonicalTaxonomyKey.optional()}).strict().refine(value=>!(value.championship&&value.championship_id),{message:'championship and championship_id are mutually exclusive'}).refine(value=>!(value.from&&value.to&&new Date(value.from)>new Date(value.to)),{message:'from must precede to'});
 const basicQuery=z.object({limit:z.coerce.number().int().min(1).max(100).default(50),cursor:z.string().max(2048).optional()}).strict();
 const changesQuery=z.object({limit:z.coerce.number().int().min(1).max(500).default(100),cursor:z.string().max(2048).optional(),include:z.enum(['data']).optional()}).strict();
 

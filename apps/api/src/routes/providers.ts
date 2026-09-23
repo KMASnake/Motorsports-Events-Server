@@ -7,6 +7,7 @@ import { ProviderMasterKeyError } from '../providers/providerSecrets.js';
 import { ProviderConfigurationService } from '../providers/providerService.js';
 import type { QuotaCadenceService } from '../providers/quotaCadenceService.js';
 import type { ProviderSourcesAdminService } from '../providers/providerSourcesAdminService.js';
+import { canonicalTaxonomyKey } from '../lib/taxonomy.js';
 
 const uuid = z.string().uuid();
 const validTimezone=(value:string)=>{try{new Intl.DateTimeFormat('fr-FR',{timeZone:value}).format();return true;}catch{return false;}};
@@ -72,7 +73,7 @@ const fail = (reply: { code(status: number): { send(value: unknown): unknown } }
 
 const championshipPatch=z.object({external_championship_id:z.string().trim().min(1).max(160),is_primary:z.boolean()}).strict();
 const sourceBody=z.object({config:z.record(z.string(),z.json())}).strict();
-const mappingBody=z.object({version_label:z.string().trim().min(1).max(128),rules_version:z.string().trim().min(1).max(128),mapping_document:z.object({championshipIds:z.record(z.string(),z.string()),circuitIds:z.record(z.string(),z.string()),sessionTypes:z.record(z.string(),z.enum(['practice','qualifying','sprint_qualifying','sprint','race','other'])),statuses:z.record(z.string(),z.enum(['scheduled','confirmed','postponed','cancelled','completed']))}).strict()}).strict();
+const mappingBody=z.object({version_label:z.string().trim().min(1).max(128),rules_version:z.string().trim().min(1).max(128),mapping_document:z.object({championshipIds:z.record(z.string(),z.string()),circuitIds:z.record(z.string(),z.string()),sessionTypes:z.record(z.string(),canonicalTaxonomyKey),statuses:z.record(z.string(),z.enum(['scheduled','confirmed','postponed','cancelled','completed']))}).strict()}).strict();
 const preflightBody=z.object({max_provider_requests:z.number().int().positive().max(100).default(1)}).strict();
 
 export async function providerRoutes(app: FastifyInstance, options: { service: ProviderConfigurationService; quota?:QuotaCadenceService;sources?:ProviderSourcesAdminService }): Promise<void> {

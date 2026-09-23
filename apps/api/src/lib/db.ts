@@ -91,6 +91,9 @@ export async function verifyApplicationSchema(): Promise<void> {
     sync_restore_column: string | null;
     quota_runtime_table:string|null;
     api_clients_table:string|null;
+    disciplines_table:string|null;
+    discipline_families_table:string|null;
+    championship_discipline_column:string|null;
   }>(`
     select
       to_regclass('public.event_corrections')::text as correction_table,
@@ -116,7 +119,11 @@ export async function verifyApplicationSchema(): Promise<void> {
         where table_schema='public' and table_name='provider_championships'
           and column_name='sync_state_before_championship_disable') as sync_restore_column,
       to_regclass('public.provider_quota_runtime')::text as quota_runtime_table,
-      to_regclass('public.api_clients')::text as api_clients_table
+      to_regclass('public.api_clients')::text as api_clients_table,
+      to_regclass('public.disciplines')::text as disciplines_table,
+      to_regclass('public.discipline_families')::text as discipline_families_table,
+      (select column_name from information_schema.columns
+        where table_schema='public' and table_name='championships' and column_name='discipline_key') as championship_discipline_column
   `);
 
   const schema = result.rows[0];
@@ -141,6 +148,9 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.sync_runs_table ||
     !schema.sync_restore_column ||
     !schema.quota_runtime_table ||
+    !schema.disciplines_table ||
+    !schema.discipline_families_table ||
+    !schema.championship_discipline_column ||
     (process.env.PREVIEW_API_ENABLED === 'true' && !schema.api_clients_table)
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');

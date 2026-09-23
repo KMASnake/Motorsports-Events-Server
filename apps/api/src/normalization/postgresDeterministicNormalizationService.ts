@@ -31,9 +31,10 @@ export class PostgresDeterministicNormalizationService{
       ?(await client.query('select meeting_id from meeting_source_links where source_entity_id=$1',[source.parent_source_entity_id])).rows[0]?.meeting_id??null
       :null;
     const candidateRows=envelope.kind==='event'&&parentSourceRequired&&!parentMeetingId?[]:envelope.kind==='event'?(await client.query(`select event.id,event.championship_id,extract(year from event.starts_at)::int season,relation.meeting_id,
-      case when event.category='race' then 'race' when event.category='sprint' then 'sprint' when event.category='qualifying' then 'qualifying' else 'other' end session_type,
+      case when type.key is not null then event.category else 'other' end session_type,
       event.starts_at,event.circuit_id,event.name,null::text round
       from events event left join meeting_events relation on relation.event_id=event.id
+      left join session_types type on type.key=event.category
       where event.normalized_uuid is not null and event.championship_id=$1 and extract(year from event.starts_at)::int=$2
         and ($3::uuid is null or relation.meeting_id=$3)
       order by event.starts_at,event.id limit 51`,[input.mapping.championshipIds[envelope.championshipSourceId]??'',envelope.season,parentSourceRequired?parentMeetingId:null])).rows

@@ -15,9 +15,9 @@ class NodeSchemaMigrationGraphTests(unittest.TestCase):
 
     def test_graph_is_linear_complete_and_has_one_head(self):
         numbers = [int(version[:4]) for version in self.versions]
-        self.assertEqual(list(range(1, 32)), numbers)
+        self.assertEqual(list(range(1, 33)), numbers)
         self.assertEqual(len(self.versions), len(set(self.versions)))
-        self.assertEqual("0031_real_circuit_reference_data", self.versions[-1])
+        self.assertEqual("0032_f5_canonical_taxonomy", self.versions[-1])
         for path, version in zip(self.up_files, self.versions, strict=True):
             sql = path.read_text(encoding="utf-8")
             self.assertIsNotNone(

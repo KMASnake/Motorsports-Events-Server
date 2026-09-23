@@ -18,6 +18,15 @@ import {
   SessionReferenceError,
   updateManualSession
 } from '../lib/sessionService.js';
+import { canonicalTaxonomyKey } from '../lib/taxonomy.js';
+import { z } from 'zod';
+
+export const sessionTypeBody = z.object({
+  key: canonicalTaxonomyKey,
+  label: z.string().trim().min(1).max(120),
+  sort_order: z.number().int().min(0).max(100000),
+  active: z.boolean().default(true)
+}).strict();
 
 const sessionSelect = `
   select s.*,s.name title,st.label type_label,e.name event_name
@@ -90,11 +99,46 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
       group by lower(btrim(title)) order by lower(min(btrim(title)))`)
   ).rows);
 
-  // Compatibilité technique avec la migration 0004 ; ce référentiel n'est
-  // pas exposé comme deuxième champ dans le workflow métier.
+  // Registre de classification réutilisé par Event ; la table sessions reste
+  // uniquement une surface de compatibilité historique (ADR-0013).
   app.get('/api/v1/admin/session-types', async () => (
     await pool.query('select key,label,sort_order,active from session_types order by sort_order,key')
   ).rows);
+  app.post('/api/v1/admin/session-types', async (request, reply) => {
+    const parsed = sessionTypeBody.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ message: 'Type de session invalide.', issues: parsed.error.issues });
+    try {
+      const created = await withTransaction(async (client) => {
+        const result = await client.query(`insert into session_types(key,label,sort_order,active)
+          values($1,$2,$3,$4) returning *`, [parsed.data.key, parsed.data.label, parsed.data.sort_order, parsed.data.active]);
+        await client.query(`insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,old_value,new_value)
+          values($1,'session_type.created','session_type',$2,$3,null,$4::jsonb)`, [actor(request), parsed.data.key, request.id, JSON.stringify(result.rows[0])]);
+        return result.rows[0];
+      });
+      markAtomicallyAudited(request);
+      return reply.code(201).send(created);
+    } catch (error: unknown) {
+      if ((error as { code?: string }).code === '23505') return reply.code(409).send({ message: 'Cette clé de type existe déjà.' });
+      throw error;
+    }
+  });
+  app.patch('/api/v1/admin/session-types/:key', async (request, reply) => {
+    const key = canonicalTaxonomyKey.safeParse((request.params as { key: string }).key);
+    const body = sessionTypeBody.omit({ key: true }).partial().strict().safeParse(request.body);
+    if (!key.success || !body.success || Object.keys(body.data).length === 0) return reply.code(400).send({ message: 'Type de session invalide.' });
+    const updated = await withTransaction(async (client) => {
+      const current = await client.query('select * from session_types where key=$1 for update', [key.data]);
+      if (!current.rowCount) return null;
+      const value = { ...current.rows[0], ...body.data } as { label: string; sort_order: number; active: boolean };
+      const result = await client.query(`update session_types set label=$2,sort_order=$3,active=$4 where key=$1 returning *`, [key.data, value.label, value.sort_order, value.active]);
+      await client.query(`insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,old_value,new_value)
+        values($1,'session_type.updated','session_type',$2,$3,$4::jsonb,$5::jsonb)`, [actor(request), key.data, request.id, JSON.stringify(current.rows[0]), JSON.stringify(result.rows[0])]);
+      return result.rows[0];
+    });
+    if (!updated) return reply.code(404).send({ message: 'Type de session introuvable.' });
+    markAtomicallyAudited(request);
+    return updated;
+  });
 
   app.get('/api/v1/admin/events/:eventId/sessions', async (request, reply) => {
     const { eventId } = request.params as { eventId: string };

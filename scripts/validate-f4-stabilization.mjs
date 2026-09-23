@@ -13,6 +13,8 @@ const EXPECTED_F4_5_HEAD='a455e720fe49061a818881a9385942ad6d613261';
 const EXPECTED_F4_5_TREE='f81d71f15368e08e5427f9ecb23815c3a06d4432';
 const EXPECTED_F4_6_HEAD='5776aca7d3bab642f7655a8df6975d243a5b8796';
 const EXPECTED_F4_6_TREE='16b20c5208faa6187b9402d29ed873f7fe08b69e';
+const EXPECTED_F4_FINAL_HEAD='76e7540bf4589e1c1dda4b461a4667150537a65b';
+const EXPECTED_F4_FINAL_TREE='6867c3bd602168d117d7de42121823336edd6a68';
 const EXPECTED_MIGRATION_HEAD='0031_real_circuit_reference_data';
 const F4_COMMITS=[
   '523a2cecedd38e9a9ec463fae66221069b8c53cc',
@@ -115,12 +117,17 @@ const evidenceFacts={
 assert.equal(git('rev-parse',`${EXPECTED_BASELINE_HEAD}^{tree}`),EXPECTED_BASELINE_TREE,'tree F4-4');
 assert.equal(git('rev-parse',`${EXPECTED_F4_5_HEAD}^{tree}`),EXPECTED_F4_5_TREE,'tree F4-5');
 assert.equal(git('rev-parse',`${EXPECTED_F4_6_HEAD}^{tree}`),EXPECTED_F4_6_TREE,'tree F4-6');
+assert.equal(git('rev-parse',`${EXPECTED_F4_FINAL_HEAD}^{tree}`),EXPECTED_F4_FINAL_TREE,'tree final F4');
 const currentHead=git('rev-parse','HEAD');
 ancestor(EXPECTED_BASELINE_HEAD,currentHead);
 ancestor(EXPECTED_F4_5_HEAD,currentHead);
 ancestor(EXPECTED_F4_6_HEAD,currentHead);
+ancestor(EXPECTED_F4_FINAL_HEAD,currentHead);
 for(let index=1;index<F4_COMMITS.length;index++)ancestor(F4_COMMITS[index-1],F4_COMMITS[index]);
-const rawChanges=execFileSync('git',['-C',root,'diff','--name-status','-z','--find-renames','--find-copies','--find-copies-harder',`${EXPECTED_BASELINE_HEAD}..${currentHead}`]);
+// L'allowlist décrit exclusivement le snapshot historique de clôture F4.
+// Un descendant F5 est autorisé, mais ses changements ne peuvent ni élargir
+// cette allowlist ni servir de preuve rétroactive pour F4.
+const rawChanges=execFileSync('git',['-C',root,'diff','--name-status','-z','--find-renames','--find-copies','--find-copies-harder',`${EXPECTED_BASELINE_HEAD}..${EXPECTED_F4_FINAL_HEAD}`]);
 const changeParts=rawChanges.toString('utf8').split('\0');
 if(changeParts.at(-1)==='')changeParts.pop();
 const actualChanges=new Map();
@@ -137,7 +144,7 @@ for(let index=0;index<changeParts.length;){
   actualChanges.set(changedPath,status);
 }
 const expectedClosureChanges=new Map(ALLOWED_CLOSURE_CHANGES);
-if(currentHead!==LEGACY_CLOSURE_HEAD)expectedClosureChanges.set('.github/workflows/validate.yml','M');
+if(EXPECTED_F4_FINAL_HEAD!==LEGACY_CLOSURE_HEAD)expectedClosureChanges.set('.github/workflows/validate.yml','M');
 assert.deepEqual([...actualChanges.entries()].sort(),[...expectedClosureChanges.entries()].sort(),'diff baseline -> clôture hors allowlist ou incomplet');
 
 const workflow=read(files.workflow);
@@ -148,7 +155,7 @@ assert.match(validateJob,/- uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth
 const migrationsDir=resolve(root,'infra/postgres/migrations');
 const migrationFiles=readdirSync(migrationsDir).filter(name=>/^\d{4}_.+\.up\.sql$/.test(name)).sort();
 const migrations=migrationFiles.map(name=>name.slice(0,-7));
-assert.equal(migrations.at(-1),EXPECTED_MIGRATION_HEAD);
+assert.equal(migrations[30],EXPECTED_MIGRATION_HEAD,'la chaîne historique F4 doit conserver 0031 à sa position certifiée');
 assert.deepEqual(migrations.map(value=>Number(value.slice(0,4))),Array.from({length:migrations.length},(_,i)=>i+1));
 const schema=read(files.schema);
 const declared=schema.split('APPLICATION_SCHEMA_MIGRATIONS = [',2)[1]?.split('] as const',1)[0]?.match(/'([0-9]{4}_[a-z0-9_]+)'/g)?.map(value=>value.slice(1,-1));
@@ -224,9 +231,24 @@ for(const [name,workflow,run] of [['legacy','Validate legacy Python server',264]
 }
 assert.equal(progress.current?.sub_lot_5_7_p?.authorized_technical_sub_lot,null);
 assert.equal(gateF.authorized_subphase,null);
-assert.equal(gateF.provider_first_f5?.status,'not-started');
-assert.equal(gateF.provider_first_f5?.implementation_started,false);
-assert.equal(gateF.provider_first_f5?.authorized,false);
+const f5=gateF.provider_first_f5;
+assert.ok(f5,'état F5 absent');
+if(f5.status==='not-started'){
+  assert.equal(f5.implementation_started,false);
+  assert.equal(f5.authorized,false);
+}else{
+  assert.equal(f5.status,'in-progress');
+  assert.equal(f5.implementation_started,true);
+  assert.equal(f5.authorized,true);
+  assert.equal(f5.authorized_subphase,'F5-1');
+  assert.equal(f5.subphases?.['F5-1']?.status,'in-progress-pending-maintainer-validation');
+  assert.equal(f5.subphases?.['F5-1']?.authorized,true);
+  assert.equal(f5.subphases?.['F5-1']?.maintainer_validated,false);
+  for(const stage of ['F5-2','F5-3','F5-4','F5-5','F5-6','F5-7']){
+    assert.equal(f5.subphases?.[stage]?.status,'not-started',`${stage} démarré sans autorisation`);
+    assert.equal(f5.subphases?.[stage]?.authorized,false,`${stage} autorisé prématurément`);
+  }
+}
 assert.equal(gateF.production_preview_activation_authorized,false);
 assert.equal(gateF.production_authorized,false);
 assert.equal(progress.current?.sub_lot_5_7_p?.full_lot_5_7_authorized,false);

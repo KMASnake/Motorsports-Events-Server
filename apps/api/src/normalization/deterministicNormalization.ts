@@ -3,7 +3,8 @@ import {createHash} from 'node:crypto';
 export const EVENT_AUTO_MATCH_SCORE=90,EVENT_REVIEW_SCORE=75,EVENT_AUTO_MATCH_MARGIN=15,MAX_MATCH_CANDIDATES=50;
 const forbiddenKeys=new Set(['__proto__','prototype','constructor']);
 
-export type SessionType='practice'|'qualifying'|'sprint_qualifying'|'sprint'|'race'|'other';
+/** Canonical data-backed key from session_types; deliberately not a closed enum. */
+export type SessionType=string;
 export type NormalizedStatus='scheduled'|'confirmed'|'postponed'|'cancelled'|'completed';
 export type Decision='linked'|'review'|'create'|'rejected';
 export type Presence='seen'|'not_observed'|'stale'|'unknown';

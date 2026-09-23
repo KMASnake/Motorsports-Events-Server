@@ -113,4 +113,10 @@ describe('Provider administration routes', () => {
     expect((await app.inject({method:'PUT',url:`/api/v1/admin/provider-championships/${providerId}/source-config`,headers,payload:{config:{api_key:sentinel},extra:true}})).statusCode).toBe(400);
     expect((await app.inject({method:'POST',url:`/api/v1/admin/provider-championships/${providerId}/normalization-mappings`,headers,payload:{version_label:'v2',rules_version:'v1',mapping_document:{}}})).statusCode).toBe(400);
   });
+
+  it('accepts an extensible canonical session type mapping key',async()=>{
+    const headers={authorization:`Bearer ${token('admin')}`};
+    const response=await app.inject({method:'POST',url:`/api/v1/admin/provider-championships/${providerId}/normalization-mappings`,headers,payload:{version_label:'v-stage',rules_version:'v1',mapping_document:{championshipIds:{f1:'f1'},circuitIds:{},sessionTypes:{Stage:'special_stage',Future:'future_session'},statuses:{Scheduled:'scheduled'}}}});
+    expect(response.statusCode).toBe(201);
+  });
 });
