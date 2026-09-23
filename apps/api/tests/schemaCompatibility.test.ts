@@ -9,13 +9,13 @@ import {
 describe('application schema compatibility', () => {
   it('accepts only the exact current migration chain', () => {
     const result = classifySchemaVersions(APPLICATION_SCHEMA_MIGRATIONS);
-    expect(APPLICATION_SCHEMA_HEAD).toBe('0032_f5_canonical_taxonomy');
+    expect(APPLICATION_SCHEMA_HEAD).toBe('0033_f5_championship_seasons');
     expect(result).toMatchObject({ compatible: true, code: 'compatible', actualHead: APPLICATION_SCHEMA_HEAD });
   });
 
   it('rejects an older schema explicitly', () => {
     const result = classifySchemaVersions(APPLICATION_SCHEMA_MIGRATIONS.slice(0, -1));
-    expect(result).toMatchObject({ compatible: false, code: 'schema_too_old', actualHead: '0031_real_circuit_reference_data' });
+    expect(result).toMatchObject({ compatible: false, code: 'schema_too_old', actualHead: '0032_f5_canonical_taxonomy' });
   });
 
   it('rejects unknown, missing and inconsistent migration state', () => {

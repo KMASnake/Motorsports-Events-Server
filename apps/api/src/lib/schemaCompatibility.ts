@@ -30,7 +30,8 @@ export const APPLICATION_SCHEMA_MIGRATIONS = [
   '0029_lot57pe_canonical_championship_entitlements',
   '0030_lot57pf_normalization_mapping_persistence',
   '0031_real_circuit_reference_data',
-  '0032_f5_canonical_taxonomy'
+  '0032_f5_canonical_taxonomy',
+  '0033_f5_championship_seasons'
 ] as const;
 
 export const APPLICATION_SCHEMA_HEAD = APPLICATION_SCHEMA_MIGRATIONS.at(-1)!;

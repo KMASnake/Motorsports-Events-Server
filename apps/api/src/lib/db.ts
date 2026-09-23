@@ -94,6 +94,8 @@ export async function verifyApplicationSchema(): Promise<void> {
     disciplines_table:string|null;
     discipline_families_table:string|null;
     championship_discipline_column:string|null;
+    championship_seasons_table:string|null;
+    meeting_championship_season_column:string|null;
   }>(`
     select
       to_regclass('public.event_corrections')::text as correction_table,
@@ -123,7 +125,10 @@ export async function verifyApplicationSchema(): Promise<void> {
       to_regclass('public.disciplines')::text as disciplines_table,
       to_regclass('public.discipline_families')::text as discipline_families_table,
       (select column_name from information_schema.columns
-        where table_schema='public' and table_name='championships' and column_name='discipline_key') as championship_discipline_column
+        where table_schema='public' and table_name='championships' and column_name='discipline_key') as championship_discipline_column,
+      to_regclass('public.championship_seasons')::text as championship_seasons_table,
+      (select column_name from information_schema.columns
+        where table_schema='public' and table_name='meetings' and column_name='championship_season_id') as meeting_championship_season_column
   `);
 
   const schema = result.rows[0];
@@ -151,6 +156,8 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.disciplines_table ||
     !schema.discipline_families_table ||
     !schema.championship_discipline_column ||
+    !schema.championship_seasons_table ||
+    !schema.meeting_championship_season_column ||
     (process.env.PREVIEW_API_ENABLED === 'true' && !schema.api_clients_table)
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');

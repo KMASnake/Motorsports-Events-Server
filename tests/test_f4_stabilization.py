@@ -370,8 +370,10 @@ class F4StabilizationTests(unittest.TestCase):
 
         cases = (
             lambda value: gate(value)["provider_first_f5"].update(status="complete"),
-            lambda value: gate(value)["provider_first_f5"].update(authorized_subphase="F5-2"),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(authorized=True),
+            lambda value: gate(value)["provider_first_f5"].update(authorized_subphase=None),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(maintainer_validated=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(migration_head="0032_f5_canonical_taxonomy"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(status="in-progress-pending-maintainer-validation"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(maintainer_validated=False),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(git_head="0" * 40),

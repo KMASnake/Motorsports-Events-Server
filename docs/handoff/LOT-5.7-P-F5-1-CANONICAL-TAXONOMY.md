@@ -12,8 +12,8 @@ Statut : `MAINTAINER_VALIDATED`
 - Validate legacy Python server #266 : `SUCCESS` ;
 - CI — Node target #535 : `SUCCESS`.
 
-Cette validation clôt uniquement F5-1. F5 reste `IN_PROGRESS` et aucune
-sous-phase F5-2 à F5-7 n'est autorisée.
+Cette validation clôt uniquement F5-1. F5 reste `IN_PROGRESS`. F5-2 a depuis
+reçu une autorisation bornée distincte ; F5-3 à F5-7 restent non autorisées.
 
 ## Périmètre candidat
 
@@ -43,7 +43,8 @@ Aucune discipline n'est déduite des catégories historiques.
 
 ## Frontières
 
-F5-2 à F5-7 restent `NOT_STARTED / NOT_AUTHORIZED`. Aucun modèle Season,
+F5-2 relève d'une autorisation et d'un handoff distincts. F5-3 à F5-7 restent
+`NOT_STARTED / NOT_AUTHORIZED`. Aucun modèle Season,
 Venue/Layout, discovery, auto-création Championship, matching provider-first,
 reconciliation multi-provider ou nouvelle publication provider-first n'est
 introduit. Production reste `NOT_AUTHORIZED`.

@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import type { PreviewClientSecurityService } from '../preview/clientSecurity.js';
 import type { PreviewRepository } from '../preview/repository.js';
 import { championshipRoutes } from './championships.js';
+import { championshipSeasonRoutes } from './championshipSeasons.js';
 import { eventRoutes } from './events.js';
 import { previewClientAdminRoutes, previewSecurityRoutes } from './previewSecurity.js';
 
@@ -18,6 +19,7 @@ export async function previewAwareResourceRoutes(
   options: PreviewAwareResourceOptions
 ): Promise<void> {
   await app.register(championshipRoutes, { includePublic: !options.previewEnabled });
+  await app.register(championshipSeasonRoutes);
   await app.register(eventRoutes, { includePublic: !options.previewEnabled });
 
   if (!options.previewEnabled) return;
