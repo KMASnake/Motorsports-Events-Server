@@ -17,6 +17,8 @@ const EXPECTED_F4_FINAL_HEAD='76e7540bf4589e1c1dda4b461a4667150537a65b';
 const EXPECTED_F4_FINAL_TREE='6867c3bd602168d117d7de42121823336edd6a68';
 const EXPECTED_F5_1_HEAD='3e80099d56ff85df6eebe6b84d615a89180e12e9';
 const EXPECTED_F5_1_TREE='34c8a030e3a5d8af2bda71421eba31cf4f7d1114';
+const EXPECTED_F5_2_HEAD='5f03705ba362f868017ed41b2c1278fb9a81ff08';
+const EXPECTED_F5_2_TREE='c3df6e27b8c0495532ccef5aa2c4c867fc9c500d';
 const EXPECTED_MIGRATION_HEAD='0031_real_circuit_reference_data';
 const F4_COMMITS=[
   '523a2cecedd38e9a9ec463fae66221069b8c53cc',
@@ -56,6 +58,7 @@ const files={
   emptyDoc:path('empty_doc','docs/handoff/LOT-5.7-P-F4-EMPTY-EVENT-BASELINE.md'),
   readiness:path('readiness','docs/handoff/VPS-PREPRODUCTION-READINESS.md'),
   f5Doc:path('f5_doc','docs/handoff/LOT-5.7-P-F5-1-CANONICAL-TAXONOMY.md'),
+  f52Doc:path('f5_2_doc','docs/handoff/LOT-5.7-P-F5-2-CHAMPIONSHIP-SEASONS.md'),
   taxonomyAdr:path('taxonomy_adr','docs/handbook/architecture/ADR-0023-CANONICAL-TAXONOMY.md'),
   archiver:path('archiver','scripts/build-release-archive.py'),
   releaseTests:path('release_tests','tests/test_release_workflow.py'),
@@ -244,7 +247,7 @@ if(f5.status==='not-started'){
   assert.equal(f5.status,'in-progress');
   assert.equal(f5.implementation_started,true);
   assert.equal(f5.authorized,true);
-  assert.equal(f5.authorized_subphase,'F5-2');
+  assert.equal(f5.authorized_subphase,null);
   const f51=f5.subphases?.['F5-1'];
   assert.ok(f51,'état F5-1 absent');
   exactKeys(f51,['status','authorized','implementation_complete','maintainer_audit','maintainer_validated','git_head','git_tree','migration_head','ci','blockers'],'F5-1');
@@ -264,12 +267,22 @@ if(f5.status==='not-started'){
     assert.equal(f51.ci[name].conclusion,'SUCCESS');
   }
   const f52=f5.subphases?.['F5-2'];
-  exactKeys(f52,['status','authorized','implementation_complete','maintainer_validated','migration_head'],'F5-2');
-  assert.equal(f52.status,'in-progress-pending-maintainer-validation');
+  exactKeys(f52,['status','authorized','implementation_complete','maintainer_audit','maintainer_validated','git_head','git_tree','migration_head','ci','blockers'],'F5-2');
+  assert.equal(f52.status,'maintainer-validated');
   assert.equal(f52.authorized,true);
   assert.equal(f52.implementation_complete,true);
-  assert.equal(f52.maintainer_validated,false);
+  assert.equal(f52.maintainer_audit,'pass');
+  assert.equal(f52.maintainer_validated,true);
+  assert.equal(f52.git_head,EXPECTED_F5_2_HEAD);
+  assert.equal(f52.git_tree,EXPECTED_F5_2_TREE);
   assert.equal(f52.migration_head,'0033_f5_championship_seasons');
+  assert.equal(f52.blockers,'NONE');
+  for(const [name,workflow,run] of [['legacy','Validate legacy Python server',268],['node','CI — Node target',537]]){
+    exactKeys(f52.ci[name],['workflow','run_number','conclusion'],`CI F5-2 ${name}`);
+    assert.equal(f52.ci[name].workflow,workflow);
+    assert.equal(f52.ci[name].run_number,run);
+    assert.equal(f52.ci[name].conclusion,'SUCCESS');
+  }
   for(const stage of ['F5-3','F5-4','F5-5','F5-6','F5-7']){
     assert.equal(f5.subphases?.[stage]?.status,'not-started',`${stage} démarré sans autorisation`);
     assert.equal(f5.subphases?.[stage]?.authorized,false,`${stage} autorisé prématurément`);
@@ -280,8 +293,9 @@ assert.equal(gateF.production_authorized,false);
 assert.equal(progress.current?.sub_lot_5_7_p?.full_lot_5_7_authorized,false);
 assert.equal(progress.current?.merge_authorized,false);
 
-const f5Doc=read(files.f5Doc),taxonomyAdr=read(files.taxonomyAdr);
+const f5Doc=read(files.f5Doc),f52Doc=read(files.f52Doc),taxonomyAdr=read(files.taxonomyAdr);
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_1_HEAD,EXPECTED_F5_1_TREE,'`0032_f5_canonical_taxonomy`','Python server #266 : `SUCCESS`','Node target #535 : `SUCCESS`','F5 reste `IN_PROGRESS`','F5-2 a depuis','F5-3 à F5-7 restent'])assert.ok(f5Doc.includes(token),`preuve documentaire F5-1 absente: ${token}`);
+for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_2_HEAD,'`0033_f5_championship_seasons`','ré-audit mainteneur final : `PASS`','bloqueurs P1 : `NONE`','bloqueurs P2 : `NONE`','bloqueurs P3 : `NONE`','Python server #268 : `SUCCESS`','Node target #537 : `SUCCESS`','F5 global reste `IN_PROGRESS`','F5-3 à F5-7 restent'])assert.ok(f52Doc.includes(token),`preuve documentaire F5-2 absente: ${token}`);
 assert.ok(taxonomyAdr.includes('Statut : validé par le mainteneur dans F5-1'),'ADR-0023 encore candidat ou incohérent');
 
 const certification=read(files.certification),emptyDoc=read(files.emptyDoc),readiness=read(files.readiness);

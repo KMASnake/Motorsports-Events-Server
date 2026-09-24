@@ -202,7 +202,7 @@
             "status": "in-progress",
             "implementation_started": true,
             "authorized": true,
-            "authorized_subphase": "F5-2",
+            "authorized_subphase": null,
             "subphases": {
               "F5-1": {
                 "status": "maintainer-validated",
@@ -220,11 +220,19 @@
                 "blockers": "NONE"
               },
               "F5-2": {
-                "status":"in-progress-pending-maintainer-validation",
-                "authorized":true,
-                "implementation_complete":true,
-                "maintainer_validated":false,
-                "migration_head":"0033_f5_championship_seasons"
+                "status": "maintainer-validated",
+                "authorized": true,
+                "implementation_complete": true,
+                "maintainer_audit": "pass",
+                "maintainer_validated": true,
+                "git_head": "5f03705ba362f868017ed41b2c1278fb9a81ff08",
+                "git_tree": "c3df6e27b8c0495532ccef5aa2c4c867fc9c500d",
+                "migration_head": "0033_f5_championship_seasons",
+                "ci": {
+                  "legacy": {"workflow":"Validate legacy Python server","run_number":268,"conclusion":"SUCCESS"},
+                  "node": {"workflow":"CI — Node target","run_number":537,"conclusion":"SUCCESS"}
+                },
+                "blockers": "NONE"
               },
               "F5-3": {"status":"not-started","authorized":false},
               "F5-4": {"status":"not-started","authorized":false},
@@ -313,7 +321,7 @@
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and 5.7-P-F2-RPV retain their maintainer validations. F3 is complete/proven and maintainer-validated on 2026-09-21: PP-178 and PP-T38 are PROVEN. F4-0 through F4-6 are maintainer-validated and F4 is complete. F5-1 is maintainer-validated at commit 3e80099d56ff85df6eebe6b84d615a89180e12e9 and tree 34c8a030e3a5d8af2bda71421eba31cf4f7d1114. F5-2 implementation is complete at schema head 0033_f5_championship_seasons and remains pending maintainer validation; F5-3 through F5-7 remain not started and unauthorized. Gate F remains incomplete and not maintainer-validated. Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and 5.7-P-F2-RPV retain their maintainer validations. F3 is complete/proven and maintainer-validated on 2026-09-21: PP-178 and PP-T38 are PROVEN. F4-0 through F4-6 are maintainer-validated and F4 is complete. F5-1 is maintainer-validated at commit 3e80099d56ff85df6eebe6b84d615a89180e12e9 and tree 34c8a030e3a5d8af2bda71421eba31cf4f7d1114. F5-2 is maintainer-validated at commit 5f03705ba362f868017ed41b2c1278fb9a81ff08, tree c3df6e27b8c0495532ccef5aa2c4c867fc9c500d and schema head 0033_f5_championship_seasons. F5 remains in progress; F5-3 through F5-7 remain not started and unauthorized. Gate F remains incomplete and not maintainer-validated. Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -336,6 +344,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Audit the bounded F5-2 ChampionshipSeason implementation and decide whether to maintainer-validate it. F5-2 remains pending maintainer validation; F5-3 through F5-7 remain not started and unauthorized. No deployment, cleanup, VPS access, runtime provider execution, provider call, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main is authorized."
+    "task": "Review the F5-2 governance consolidation. F5-2 is maintainer-validated; F5 remains in progress and F5-3 through F5-7 remain not started and unauthorized. No F5-3 implementation, deployment, cleanup, VPS access, runtime provider execution, provider call, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main is authorized."
   }
 }
