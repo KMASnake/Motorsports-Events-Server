@@ -59,6 +59,7 @@ const files={
   readiness:path('readiness','docs/handoff/VPS-PREPRODUCTION-READINESS.md'),
   f5Doc:path('f5_doc','docs/handoff/LOT-5.7-P-F5-1-CANONICAL-TAXONOMY.md'),
   f52Doc:path('f5_2_doc','docs/handoff/LOT-5.7-P-F5-2-CHAMPIONSHIP-SEASONS.md'),
+  f53Doc:path('f5_3_doc','docs/handoff/LOT-5.7-P-F5-3-CANONICAL-VENUES.md'),
   taxonomyAdr:path('taxonomy_adr','docs/handbook/architecture/ADR-0023-CANONICAL-TAXONOMY.md'),
   archiver:path('archiver','scripts/build-release-archive.py'),
   releaseTests:path('release_tests','tests/test_release_workflow.py'),
@@ -196,7 +197,7 @@ const progress=json(files.progress);
 const gateF=progress.current?.sub_lot_5_7_p?.technical_gates?.['5.7-P-F'];
 const f4=gateF?.preproduction_stabilization_f4;
 assert.ok(f4,'état canonique F4 absent');
-assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-f5-1-maintainer-validated-gate-f-incomplete');
+assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-f5-2-maintainer-validated-f5-3-pending-gate-f-incomplete');
 assert.equal(gateF?.status,'f3-proven-f4-complete-gate-f-incomplete');
 for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.equal(f4.subphases?.[stage]?.status,'maintainer-validated',`${stage} non validé`);
 assert.equal(f4.subphases?.['F4-5']?.implementation_complete,true);
@@ -247,7 +248,7 @@ if(f5.status==='not-started'){
   assert.equal(f5.status,'in-progress');
   assert.equal(f5.implementation_started,true);
   assert.equal(f5.authorized,true);
-  assert.equal(f5.authorized_subphase,null);
+  assert.equal(f5.authorized_subphase,'F5-3');
   const f51=f5.subphases?.['F5-1'];
   assert.ok(f51,'état F5-1 absent');
   exactKeys(f51,['status','authorized','implementation_complete','maintainer_audit','maintainer_validated','git_head','git_tree','migration_head','ci','blockers'],'F5-1');
@@ -283,7 +284,14 @@ if(f5.status==='not-started'){
     assert.equal(f52.ci[name].run_number,run);
     assert.equal(f52.ci[name].conclusion,'SUCCESS');
   }
-  for(const stage of ['F5-3','F5-4','F5-5','F5-6','F5-7']){
+  const f53=f5.subphases?.['F5-3'];
+  exactKeys(f53,['status','authorized','implementation_complete','maintainer_validated','migration_head'],'F5-3');
+  assert.equal(f53.status,'in-progress-pending-maintainer-validation');
+  assert.equal(f53.authorized,true);
+  assert.equal(f53.implementation_complete,true);
+  assert.equal(f53.maintainer_validated,false);
+  assert.equal(f53.migration_head,'0034_f5_canonical_venues');
+  for(const stage of ['F5-4','F5-5','F5-6','F5-7']){
     assert.equal(f5.subphases?.[stage]?.status,'not-started',`${stage} démarré sans autorisation`);
     assert.equal(f5.subphases?.[stage]?.authorized,false,`${stage} autorisé prématurément`);
   }
@@ -293,9 +301,10 @@ assert.equal(gateF.production_authorized,false);
 assert.equal(progress.current?.sub_lot_5_7_p?.full_lot_5_7_authorized,false);
 assert.equal(progress.current?.merge_authorized,false);
 
-const f5Doc=read(files.f5Doc),f52Doc=read(files.f52Doc),taxonomyAdr=read(files.taxonomyAdr);
+const f5Doc=read(files.f5Doc),f52Doc=read(files.f52Doc),f53Doc=read(files.f53Doc),taxonomyAdr=read(files.taxonomyAdr);
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_1_HEAD,EXPECTED_F5_1_TREE,'`0032_f5_canonical_taxonomy`','Python server #266 : `SUCCESS`','Node target #535 : `SUCCESS`','F5 reste `IN_PROGRESS`','F5-2 a depuis','F5-3 à F5-7 restent'])assert.ok(f5Doc.includes(token),`preuve documentaire F5-1 absente: ${token}`);
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_2_HEAD,'`0033_f5_championship_seasons`','ré-audit mainteneur final : `PASS`','bloqueurs P1 : `NONE`','bloqueurs P2 : `NONE`','bloqueurs P3 : `NONE`','Python server #268 : `SUCCESS`','Node target #537 : `SUCCESS`','F5 global reste `IN_PROGRESS`','F5-3 à F5-7 restent'])assert.ok(f52Doc.includes(token),`preuve documentaire F5-2 absente: ${token}`);
+for(const token of ['IN_PROGRESS_PENDING_MAINTAINER_VALIDATION','0034_f5_canonical_venues','aucun backfill','F5-4 à F5-7 restent','Production'])assert.ok(f53Doc.includes(token),`contrat documentaire F5-3 absent: ${token}`);
 assert.ok(taxonomyAdr.includes('Statut : validé par le mainteneur dans F5-1'),'ADR-0023 encore candidat ou incohérent');
 
 const certification=read(files.certification),emptyDoc=read(files.emptyDoc),readiness=read(files.readiness);

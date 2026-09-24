@@ -5,6 +5,7 @@ import { championshipRoutes } from './championships.js';
 import { championshipSeasonRoutes } from './championshipSeasons.js';
 import { eventRoutes } from './events.js';
 import { previewClientAdminRoutes, previewSecurityRoutes } from './previewSecurity.js';
+import { venueRoutes } from './venues.js';
 
 export interface PreviewAwareResourceOptions {
   previewEnabled: boolean;
@@ -20,6 +21,7 @@ export async function previewAwareResourceRoutes(
 ): Promise<void> {
   await app.register(championshipRoutes, { includePublic: !options.previewEnabled });
   await app.register(championshipSeasonRoutes);
+  await app.register(venueRoutes);
   await app.register(eventRoutes, { includePublic: !options.previewEnabled });
 
   if (!options.previewEnabled) return;

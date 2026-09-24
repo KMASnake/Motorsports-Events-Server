@@ -15,6 +15,7 @@ F4_CONTRACT_FILES = (
     "docs/handoff/LOT-5.7-P-F4-STABILIZATION-CERTIFICATION.md",
     "docs/handoff/LOT-5.7-P-F5-1-CANONICAL-TAXONOMY.md",
     "docs/handoff/LOT-5.7-P-F5-2-CHAMPIONSHIP-SEASONS.md",
+    "docs/handoff/LOT-5.7-P-F5-3-CANONICAL-VENUES.md",
     "docs/handoff/VPS-PREPRODUCTION-READINESS.md",
 )
 
@@ -371,15 +372,20 @@ class F4StabilizationTests(unittest.TestCase):
 
         cases = (
             lambda value: gate(value)["provider_first_f5"].update(status="complete"),
-            lambda value: gate(value)["provider_first_f5"].update(authorized_subphase="F5-3"),
+            lambda value: gate(value)["provider_first_f5"].update(authorized_subphase="F5-4"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(maintainer_validated=False),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(git_head="0" * 40),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(git_tree="0" * 40),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"]["ci"]["legacy"].update(run_number=267),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"]["ci"]["node"].update(conclusion="FAILURE"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(migration_head="0032_f5_canonical_taxonomy"),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(authorized=True),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(status="in-progress"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(maintainer_validated=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(status="not-started"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(authorized=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(implementation_complete=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(migration_head="0033_f5_championship_seasons"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(authorized=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(status="in-progress"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(status="in-progress-pending-maintainer-validation"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(maintainer_validated=False),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(git_head="0" * 40),
