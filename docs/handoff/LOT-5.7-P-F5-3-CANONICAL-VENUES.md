@@ -1,6 +1,17 @@
 # F5-3 — Canonical Venue/Layout
 
-Statut : `IN_PROGRESS_PENDING_MAINTAINER_VALIDATION`.
+Statut : `MAINTAINER_VALIDATED`.
+
+Preuve de clôture :
+
+- commit fonctionnel : `dc34c2ca192a7fa58768ab048a86036ebf63f847` ;
+- tree fonctionnel : `a170c3b54acec9fdef008d82552c080069858911` ;
+- migration : `0034_f5_canonical_venues` ;
+- ré-audit mainteneur final : `PASS` ;
+- bloqueurs P1/P2/P3 : `NONE` ;
+- violations de périmètre : `NONE` ;
+- Validate legacy Python server #270 : `SUCCESS` ;
+- CI — Node target #539 : `SUCCESS`.
 
 Ce candidat introduit la migration linéaire
 `0034_f5_canonical_venues`, fille de `0033_f5_championship_seasons` :
@@ -29,10 +40,12 @@ Meeting/Event et provenance provider restent F5-5. Les aliases et la
 réconciliation restent F5-6. Publication et API publique restent F5-7. Le cas
 WRC `location == circuit` est explicitement non résolu ici.
 
+L'UUID Event reste l'identité stable de la Session ; F5-3 ne modifie ni cette
+identité ni sa projection Meeting/Event.
+
 F5-1 et F5-2 restent `MAINTAINER_VALIDATED`. F5-4 à F5-7 restent
 `NOT_STARTED_NOT_AUTHORIZED`. F5 global reste `IN_PROGRESS` et Production
 reste `NOT_AUTHORIZED`.
 
-Ce document ne vaut pas validation mainteneur de F5-3. Aucun appel provider,
-worker, scheduler, déploiement ou mutation de préproduction/production n'est
-autorisé par ce candidat.
+Cette clôture n'autorise pas F5-4. Aucun appel provider, worker, scheduler,
+déploiement ou mutation de préproduction/production n'est autorisé.

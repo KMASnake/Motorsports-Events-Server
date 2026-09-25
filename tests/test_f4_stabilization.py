@@ -366,6 +366,19 @@ class F4StabilizationTests(unittest.TestCase):
                 target = changed_progress(Path(raw), mutate)
                 self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
 
+    def test_f5_global_not_started_regression_is_refused(self) -> None:
+        def regress_f5(value: dict) -> None:
+            f5 = value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"][
+                "provider_first_f5"
+            ]
+            f5.update(status="not-started", implementation_started=False, authorized=False)
+
+        with tempfile.TemporaryDirectory() as raw:
+            target = changed_progress(Path(raw), regress_f5)
+            result = run_validator("--progress", str(target))
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("in-progress", result.stderr)
+
     def test_f5_production_and_incomplete_f4_are_refused(self) -> None:
         def gate(value: dict) -> dict:
             return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]
@@ -379,13 +392,21 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"]["ci"]["legacy"].update(run_number=267),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"]["ci"]["node"].update(conclusion="FAILURE"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-2"].update(migration_head="0032_f5_canonical_taxonomy"),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(maintainer_validated=True),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(status="not-started"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(maintainer_validated=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(status="in-progress-pending-maintainer-validation"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(authorized=False),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(implementation_complete=False),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(migration_head="0033_f5_championship_seasons"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(git_head="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(git_tree="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"]["ci"]["legacy"].update(run_number=269),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"]["ci"]["node"].update(conclusion="FAILURE"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(status="in-progress"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(status="maintainer-validated", authorized=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(status="in-progress", authorized=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(status="in-progress", authorized=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-7"].update(status="in-progress", authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(status="in-progress-pending-maintainer-validation"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(maintainer_validated=False),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(git_head="0" * 40),
