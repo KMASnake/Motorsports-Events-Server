@@ -62,7 +62,9 @@ const files={
   f5Doc:path('f5_doc','docs/handoff/LOT-5.7-P-F5-1-CANONICAL-TAXONOMY.md'),
   f52Doc:path('f5_2_doc','docs/handoff/LOT-5.7-P-F5-2-CHAMPIONSHIP-SEASONS.md'),
   f53Doc:path('f5_3_doc','docs/handoff/LOT-5.7-P-F5-3-CANONICAL-VENUES.md'),
+  f54Doc:path('f5_4_doc','docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md'),
   taxonomyAdr:path('taxonomy_adr','docs/handbook/architecture/ADR-0023-CANONICAL-TAXONOMY.md'),
+  discoveryAdr:path('discovery_adr','docs/handbook/architecture/ADR-0026-PROVIDER-DISCOVERY-RESOLUTION.md'),
   archiver:path('archiver','scripts/build-release-archive.py'),
   releaseTests:path('release_tests','tests/test_release_workflow.py'),
   operations:path('operations','scripts/lib.sh'),
@@ -199,7 +201,7 @@ const progress=json(files.progress);
 const gateF=progress.current?.sub_lot_5_7_p?.technical_gates?.['5.7-P-F'];
 const f4=gateF?.preproduction_stabilization_f4;
 assert.ok(f4,'état canonique F4 absent');
-assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-f5-2-maintainer-validated-f5-3-pending-gate-f-incomplete');
+assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-f5-3-maintainer-validated-f5-4-pending-gate-f-incomplete');
 assert.equal(gateF?.status,'f3-proven-f4-complete-gate-f-incomplete');
 for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.equal(f4.subphases?.[stage]?.status,'maintainer-validated',`${stage} non validé`);
 assert.equal(f4.subphases?.['F4-5']?.implementation_complete,true);
@@ -299,7 +301,18 @@ assert.equal(f5.authorized_subphase,null);
     assert.equal(f53.ci[name].run_number,run);
     assert.equal(f53.ci[name].conclusion,'SUCCESS');
   }
-  for(const stage of ['F5-4','F5-5','F5-6','F5-7']){
+  const f54=f5.subphases?.['F5-4'];
+  exactKeys(f54,['status','authorized','implementation_complete','maintainer_validated','migration_head','provider_calls','worker_started','scheduler_started','evidence'],'F5-4');
+  assert.equal(f54.status,'implemented-awaiting-maintainer-validation');
+  assert.equal(f54.authorized,true);
+  assert.equal(f54.implementation_complete,true);
+  assert.equal(f54.maintainer_validated,false);
+  assert.equal(f54.migration_head,'0035_f5_provider_discovery_resolution');
+  assert.equal(f54.provider_calls,0);
+  assert.equal(f54.worker_started,false);
+  assert.equal(f54.scheduler_started,false);
+  assert.equal(f54.evidence,'docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md');
+  for(const stage of ['F5-5','F5-6','F5-7']){
     assert.equal(f5.subphases?.[stage]?.status,'not-started',`${stage} démarré sans autorisation`);
     assert.equal(f5.subphases?.[stage]?.authorized,false,`${stage} autorisé prématurément`);
   }
@@ -308,11 +321,13 @@ assert.equal(gateF.production_authorized,false);
 assert.equal(progress.current?.sub_lot_5_7_p?.full_lot_5_7_authorized,false);
 assert.equal(progress.current?.merge_authorized,false);
 
-const f5Doc=read(files.f5Doc),f52Doc=read(files.f52Doc),f53Doc=read(files.f53Doc),taxonomyAdr=read(files.taxonomyAdr);
+const f5Doc=read(files.f5Doc),f52Doc=read(files.f52Doc),f53Doc=read(files.f53Doc),f54Doc=read(files.f54Doc),taxonomyAdr=read(files.taxonomyAdr),discoveryAdr=read(files.discoveryAdr);
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_1_HEAD,EXPECTED_F5_1_TREE,'`0032_f5_canonical_taxonomy`','Python server #266 : `SUCCESS`','Node target #535 : `SUCCESS`','F5 reste `IN_PROGRESS`','F5-2 a depuis','F5-3 à F5-7 restent'])assert.ok(f5Doc.includes(token),`preuve documentaire F5-1 absente: ${token}`);
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_2_HEAD,'`0033_f5_championship_seasons`','ré-audit mainteneur final : `PASS`','bloqueurs P1 : `NONE`','bloqueurs P2 : `NONE`','bloqueurs P3 : `NONE`','Python server #268 : `SUCCESS`','Node target #537 : `SUCCESS`','F5 global reste `IN_PROGRESS`','F5-3 à F5-7 restent'])assert.ok(f52Doc.includes(token),`preuve documentaire F5-2 absente: ${token}`);
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_3_HEAD,EXPECTED_F5_3_TREE,'`0034_f5_canonical_venues`','ré-audit mainteneur final : `PASS`','Python server #270 : `SUCCESS`','Node target #539 : `SUCCESS`','aucun backfill','F5-4 à F5-7 restent','Production'])assert.ok(f53Doc.includes(token),`preuve documentaire F5-3 absente: ${token}`);
 assert.ok(taxonomyAdr.includes('Statut : validé par le mainteneur dans F5-1'),'ADR-0023 encore candidat ou incohérent');
+for(const token of ['Statut : `IMPLEMENTED_AWAITING_MAINTAINER_VALIDATION`','`0035_f5_provider_discovery_resolution`','aucun `provider_championship`','F5-5, F5-6 et F5-7 restent `NOT_STARTED_NOT_AUTHORIZED`'])assert.ok(f54Doc.includes(token),`preuve documentaire F5-4 absente: ${token}`);
+for(const token of ['Statut : candidat F5-4','Discovery et résolution ne peuvent activer','tout appel provider est interdit'])assert.ok(discoveryAdr.includes(token),`ADR F5-4 absent: ${token}`);
 
 const certification=read(files.certification),emptyDoc=read(files.emptyDoc),readiness=read(files.readiness);
 for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.ok(certification.includes(`${stage}: **VALIDATED**`),`certification ${stage} absente`);

@@ -32,7 +32,8 @@ export const APPLICATION_SCHEMA_MIGRATIONS = [
   '0031_real_circuit_reference_data',
   '0032_f5_canonical_taxonomy',
   '0033_f5_championship_seasons',
-  '0034_f5_canonical_venues'
+  '0034_f5_canonical_venues',
+  '0035_f5_provider_discovery_resolution'
 ] as const;
 
 export const APPLICATION_SCHEMA_HEAD = APPLICATION_SCHEMA_MIGRATIONS.at(-1)!;

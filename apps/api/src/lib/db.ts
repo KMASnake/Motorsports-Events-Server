@@ -96,6 +96,11 @@ export async function verifyApplicationSchema(): Promise<void> {
     championship_discipline_column:string|null;
     championship_seasons_table:string|null;
     meeting_championship_season_column:string|null;
+    provider_discovery_observations_table:string|null;
+    championship_discovery_candidates_table:string|null;
+    championship_source_links_table:string|null;
+    championship_season_source_links_table:string|null;
+    championship_discovery_decisions_table:string|null;
   }>(`
     select
       to_regclass('public.event_corrections')::text as correction_table,
@@ -128,7 +133,12 @@ export async function verifyApplicationSchema(): Promise<void> {
         where table_schema='public' and table_name='championships' and column_name='discipline_key') as championship_discipline_column,
       to_regclass('public.championship_seasons')::text as championship_seasons_table,
       (select column_name from information_schema.columns
-        where table_schema='public' and table_name='meetings' and column_name='championship_season_id') as meeting_championship_season_column
+        where table_schema='public' and table_name='meetings' and column_name='championship_season_id') as meeting_championship_season_column,
+      to_regclass('public.provider_discovery_observations')::text as provider_discovery_observations_table,
+      to_regclass('public.championship_discovery_candidates')::text as championship_discovery_candidates_table,
+      to_regclass('public.championship_source_links')::text as championship_source_links_table,
+      to_regclass('public.championship_season_source_links')::text as championship_season_source_links_table,
+      to_regclass('public.championship_discovery_decisions')::text as championship_discovery_decisions_table
   `);
 
   const schema = result.rows[0];
@@ -158,6 +168,11 @@ export async function verifyApplicationSchema(): Promise<void> {
     !schema.championship_discipline_column ||
     !schema.championship_seasons_table ||
     !schema.meeting_championship_season_column ||
+    !schema.provider_discovery_observations_table ||
+    !schema.championship_discovery_candidates_table ||
+    !schema.championship_source_links_table ||
+    !schema.championship_season_source_links_table ||
+    !schema.championship_discovery_decisions_table ||
     (process.env.PREVIEW_API_ENABLED === 'true' && !schema.api_clients_table)
   ) {
     throw new Error('Database schema is incomplete. Run the versioned migrations before starting the API.');
