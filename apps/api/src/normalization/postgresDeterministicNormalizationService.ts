@@ -1,6 +1,6 @@
 import type {PoolClient} from 'pg';
 import {withTransaction} from '../lib/db.js';
-import {normalize,stableUuid,type Correction,type MappingConfig,type MatchCandidate,type SourceEnvelope} from './deterministicNormalization.js';
+import {normalize,stableHash,stableUuid,type Correction,type MappingConfig,type MatchCandidate,type SourceEnvelope} from './deterministicNormalization.js';
 
 interface NormalizeUnitInput {sourceEntityId:string;scopeKey:string;expectedFenceGeneration:number;normalizationNow:Date;mapping:MappingConfig;traversalId?:string}
 
@@ -30,30 +30,52 @@ export class PostgresDeterministicNormalizationService{
     const parentMeetingId=parentSourceRequired
       ?(await client.query('select meeting_id from meeting_source_links where source_entity_id=$1',[source.parent_source_entity_id])).rows[0]?.meeting_id??null
       :null;
+    const parentMeeting=parentMeetingId?(await client.query('select championship_id,championship_season_id,venue_id,venue_layout_id from meetings where id=$1',[parentMeetingId])).rows[0]:null;
+    const explicitExternalSeasonId=typeof source.source_data?.external_season_id==='string'&&source.source_data.external_season_id.trim()?source.source_data.external_season_id.trim():null;
+    const seasonLink=!parentMeeting&&explicitExternalSeasonId?(await client.query(`select championship_season_id,championship_id from championship_season_source_links
+      where provider_instance_id=$1 and external_championship_id=$2 and external_season_id=$3`,[source.provider_instance_id,source.championship_source_id,explicitExternalSeasonId])).rows[0]:null;
+    const championshipSeasonId=parentMeeting?.championship_season_id??seasonLink?.championship_season_id??null;
+    const mappedCircuitId=input.mapping.circuitIds[String(source.source_data?.circuit_id??'')]??null;
+    const circuitVenue=mappedCircuitId?(await client.query('select venue_id,venue_layout_id from circuit_venue_links where circuit_id=$1',[mappedCircuitId])).rows[0]:null;
+    const venueId=circuitVenue?.venue_id??parentMeeting?.venue_id??null,venueLayoutId=circuitVenue?.venue_layout_id??parentMeeting?.venue_layout_id??null;
+    if(championshipSeasonId){
+      const identityLock=envelope.kind==='meeting'
+        ?`f5-meeting:${input.mapping.championshipIds[envelope.championshipSourceId]??''}:${championshipSeasonId}:${String(source.source_data?.round??'')}:${String(source.source_data?.name??'')}:${String(source.source_data?.starts_at??'')}`
+        :`f5-event:${parentMeetingId??'unresolved'}:${String(source.source_data?.session_type??'')}:${String(source.source_data?.starts_at??'')}`;
+      await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[identityLock]);
+    }
     const candidateRows=envelope.kind==='event'&&parentSourceRequired&&!parentMeetingId?[]:envelope.kind==='event'?(await client.query(`select event.id,event.championship_id,extract(year from event.starts_at)::int season,relation.meeting_id,
-      case when type.key is not null then event.category else 'other' end session_type,
-      event.starts_at,event.circuit_id,event.name,null::text round
-      from events event left join meeting_events relation on relation.event_id=event.id
-      left join session_types type on type.key=event.category
-      where event.normalized_uuid is not null and event.championship_id=$1 and extract(year from event.starts_at)::int=$2
+      event.session_type_key session_type,event.starts_at,event.circuit_id,event.venue_id,event.name,null::text round,meeting.championship_season_id
+      from events event join meeting_events relation on relation.event_id=event.id join meetings meeting on meeting.id=relation.meeting_id
+      where event.normalized_uuid is not null and event.championship_id=$1 and meeting.championship_season_id=$2
         and ($3::uuid is null or relation.meeting_id=$3)
-      order by event.starts_at,event.id limit 51`,[input.mapping.championshipIds[envelope.championshipSourceId]??'',envelope.season,parentSourceRequired?parentMeetingId:null])).rows
-      :(await client.query(`select id,championship_id,season,null::uuid meeting_id,'other'::text session_type,starts_at,null::text circuit_id,name,round
-        from meetings where championship_id=$1 and season=$2 order by starts_at nulls last,id limit 51`,[input.mapping.championshipIds[envelope.championshipSourceId]??'',envelope.season])).rows;
-    const candidates:MatchCandidate[]=candidateRows.map(row=>({id:String(row.id),championshipId:String(row.championship_id),season:row.season==null?null:Number(row.season),meetingId:row.meeting_id?String(row.meeting_id):null,sessionType:row.session_type,startsAt:row.starts_at?new Date(row.starts_at).toISOString():null,circuitId:row.circuit_id?String(row.circuit_id):null,name:String(row.name),round:row.round?String(row.round):null}));
+      order by event.starts_at,event.id limit 51`,[input.mapping.championshipIds[envelope.championshipSourceId]??'',championshipSeasonId,parentSourceRequired?parentMeetingId:null])).rows
+      :(await client.query(`select id,championship_id,championship_season_id,season,null::uuid meeting_id,'other'::text session_type,starts_at,null::text circuit_id,venue_id,name,round
+        from meetings where championship_id=$1 and championship_season_id=$2 order by starts_at nulls last,id limit 51`,[input.mapping.championshipIds[envelope.championshipSourceId]??'',championshipSeasonId])).rows;
+    const candidates:MatchCandidate[]=candidateRows.map(row=>({id:String(row.id),championshipId:String(row.championship_id),championshipSeasonId:row.championship_season_id?String(row.championship_season_id):null,season:row.season==null?null:Number(row.season),meetingId:row.meeting_id?String(row.meeting_id):null,sessionType:row.session_type??'other',startsAt:row.starts_at?new Date(row.starts_at).toISOString():null,circuitId:row.circuit_id?String(row.circuit_id):null,venueId:row.venue_id?String(row.venue_id):null,name:String(row.name),round:row.round?String(row.round):null}));
     const rejected=(await client.query(`select target_id from normalization_decisions where source_entity_id=$1 and decision='rejected' and target_kind=$2 and target_id is not null order by target_id`,[input.sourceEntityId,envelope.kind])).rows.map(row=>String(row.target_id));
-    let result=normalize(envelope,input.mapping,candidates,existing?String(existing):null,rejected,{parentSourceRequired,parentCanonicalResolved:parentMeetingId!=null});
+    let result=normalize(envelope,input.mapping,candidates,existing?String(existing):null,rejected,{parentSourceRequired,parentCanonicalResolved:parentMeetingId!=null,championshipSeasonId:championshipSeasonId?String(championshipSeasonId):null,venueId:venueId?String(venueId):null,venueLayoutId:venueLayoutId?String(venueLayoutId):null});
     const candidateData={normalized:result.state,resolution:result.resolution,proposed_uuid:result.proposedUuid,checksum:result.checksum};
     await client.query(`insert into normalized_candidates(id,source_entity_id,source_hash,normalization_version,resource_kind,candidate_data)
       values($1,$2,$3,$4,$5,$6::jsonb) on conflict(source_entity_id,source_hash,normalization_version,resource_kind) do nothing`,[result.candidateId,input.sourceEntityId,envelope.sourceHash,input.mapping.version,envelope.kind,JSON.stringify(candidateData)]);
-    const persisted=(await client.query(`select id,candidate_data from normalized_candidates where source_entity_id=$1 and source_hash=$2 and normalization_version=$3 and resource_kind=$4`,[input.sourceEntityId,envelope.sourceHash,input.mapping.version,envelope.kind])).rows[0];
-    const persistedData=typeof persisted?.candidate_data==='string'?JSON.parse(persisted.candidate_data) as typeof candidateData:persisted?.candidate_data as typeof candidateData|undefined;
+    let persisted=(await client.query(`select id,candidate_data,revision,resolution_state from normalized_candidates where source_entity_id=$1 and source_hash=$2 and normalization_version=$3 and resource_kind=$4 for update`,[input.sourceEntityId,envelope.sourceHash,input.mapping.version,envelope.kind])).rows[0];
+    let persistedData=typeof persisted?.candidate_data==='string'?JSON.parse(persisted.candidate_data) as typeof candidateData:persisted?.candidate_data as typeof candidateData|undefined;
     if(!persisted||!persistedData||typeof persistedData.checksum!=='string')throw new Error('normalization_replay_conflict');
-    if(persistedData.checksum!==result.checksum)result={...result,state:persistedData.normalized,resolution:persistedData.resolution,proposedUuid:persistedData.proposed_uuid,checksum:persistedData.checksum};
-    const decisionId=stableUuid('mse-normalization-decision',{candidateId:persisted.id,resolution:result.resolution});
+    if(persistedData.checksum!==result.checksum){
+      if(['PENDING','REVIEW_REQUIRED'].includes(String(persisted.resolution_state))){
+        persisted=(await client.query(`update normalized_candidates set candidate_data=$2::jsonb,revision=revision+1,resolution_state='PENDING',updated_at=now()
+          where id=$1 returning id,candidate_data,revision,resolution_state`,[persisted.id,JSON.stringify(candidateData)])).rows[0];
+        persistedData=candidateData;
+      }else result={...result,state:persistedData.normalized,resolution:persistedData.resolution,proposedUuid:persistedData.proposed_uuid,checksum:persistedData.checksum};
+    }
+    const candidateRevision=Number(persisted.revision),idempotencyKey=`deterministic:${persisted.id}:${candidateRevision}`;
+    const decisionFingerprint=stableHash({candidateId:String(persisted.id),expectedRevision:candidateRevision,decision:result.resolution.decision,reason:result.resolution.reason,targetKind:result.resolution.decision==='linked'?envelope.kind:null,targetId:result.resolution.targetId,canonical:result.state});
+    const decisionId=stableUuid('mse-normalization-decision',{candidateId:persisted.id,candidateRevision,decisionFingerprint});
     const targetKind=result.resolution.decision==='linked'?envelope.kind:null,targetId=result.resolution.decision==='linked'?result.resolution.targetId:null;
-    await client.query(`insert into normalization_decisions(id,source_entity_id,candidate_id,decision,target_kind,target_id,normalization_version,actor_id,reason)
-      values($1,$2,$3,$4,$5,$6,$7,'deterministic-normalizer',$8) on conflict do nothing`,[decisionId,input.sourceEntityId,persisted.id,result.resolution.decision,targetKind,targetId,input.mapping.version,result.resolution.reason]);
+    await client.query(`insert into normalization_decisions(id,source_entity_id,candidate_id,candidate_revision,decision,target_kind,target_id,normalization_version,actor_id,reason,idempotency_key,decision_fingerprint)
+      values($1,$2,$3,$4,$5,$6,$7,$8,'deterministic-normalizer',$9,$10,$11) on conflict(candidate_id,idempotency_key) do nothing`,[decisionId,input.sourceEntityId,persisted.id,candidateRevision,result.resolution.decision,targetKind,targetId,input.mapping.version,result.resolution.reason,idempotencyKey,decisionFingerprint]);
+    const persistedDecision=(await client.query('select decision_fingerprint from normalization_decisions where candidate_id=$1 and idempotency_key=$2',[persisted.id,idempotencyKey])).rows[0];
+    if(!persistedDecision||String(persistedDecision.decision_fingerprint)!==decisionFingerprint)throw new Error('normalization_idempotency_conflict');
     if(result.resolution.decision==='linked'&&!existing&&targetId){
       if(envelope.kind==='event'){const target=(await client.query('select normalized_uuid from events where id=$1 and normalized_uuid is not null',[targetId])).rows[0];if(!target)throw new Error('normalization_target_not_found');await client.query(`insert into event_source_links(source_entity_id,event_id,normalized_event_uuid,normalization_version) values($1,$2,$3,$4)`,[input.sourceEntityId,targetId,target.normalized_uuid,input.mapping.version]);}
       else await client.query(`insert into meeting_source_links(source_entity_id,meeting_id,normalization_version) values($1,$2,$3)`,[input.sourceEntityId,targetId,input.mapping.version]);

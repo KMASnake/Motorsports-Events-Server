@@ -4,7 +4,7 @@ export type PublicResourceType='event'|'meeting'|'championship';
 export type PublicationQuality='ready'|'review_required'|'blocked';
 export type PublicOperation='created'|'updated'|'removed'|'availability_changed';
 
-const PUBLIC_FIELDS=['resourceKind','name','sessionType','sessionLabel','status','championshipId','circuitId','season','round','startsAt','endsAt','timezone','presence'] as const;
+const PUBLIC_FIELDS=['resourceKind','name','sessionType','sessionLabel','status','championshipId','championshipSeasonId','circuitId','venueId','venueLayoutId','season','round','startsAt','endsAt','timezone','presence'] as const;
 
 export function canonicalPublicState(value:Readonly<Record<string,unknown>>):Readonly<Record<string,unknown>>{
   const state:Record<string,unknown>={};
@@ -26,7 +26,7 @@ export function changedPublicFields(before:Readonly<Record<string,unknown>>|null
 export function publicationQuality(candidate:Readonly<Record<string,unknown>>,decision:string):PublicationQuality{
   if(decision==='review')return 'review_required';
   if(decision==='rejected')return 'blocked';
-  if(!candidate.championshipId||!candidate.circuitId)return 'review_required';
+  if(!candidate.championshipId||!candidate.championshipSeasonId||(!candidate.circuitId&&!candidate.venueId))return 'review_required';
   return decision!=='create'||candidate.startsAt&&candidate.status&&!(candidate.resourceKind==='event'&&candidate.status==='confirmed')?'ready':'review_required';
 }
 

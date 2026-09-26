@@ -2,12 +2,13 @@ import {describe,expect,it,vi} from 'vitest';
 import type {PoolClient} from 'pg';
 import {PostgresPublicationService} from '../src/normalization/postgresPublicationService.js';
 
-const ready={resourceKind:'event',name:'FP1',sessionType:'practice',sessionLabel:null,status:'scheduled',championshipId:'f1',circuitId:'yas-marina',season:2026,round:null,startsAt:'2026-12-04T09:30:00.000Z',endsAt:'2026-12-04T10:30:00.000Z',timezone:'UTC',presence:'seen'};
+const ready={resourceKind:'event',name:'FP1',sessionType:'practice',sessionLabel:null,status:'scheduled',championshipId:'f1',championshipSeasonId:'57000000-0000-4000-8000-000000000090',circuitId:'yas-marina',venueId:'57000000-0000-4000-8000-000000000091',venueLayoutId:null,season:2026,round:null,startsAt:'2026-12-04T09:30:00.000Z',endsAt:'2026-12-04T10:30:00.000Z',timezone:'UTC',presence:'seen'};
 function database(parent:true|false|'none'=true){
   const query=vi.fn(async(sql:string)=>{
     if(sql.includes("publication_controls"))return {rows:[{enabled:true}]};
     if(sql.includes('from normalized_candidates candidate'))return {rows:[{id:'candidate',source_entity_id:'source-event',source_hash:'hash',normalization_version:'mapping',resource_kind:'event',decision:'create',target_id:null,source_external_id:'provider-fp1',parent_source_entity_id:parent==='none'?null:'source-meeting',source_position:'0',adapter_key:'fixture',candidate_data:{normalized:ready,proposed_uuid:'57000000-0000-4000-8000-000000000101'}}]};
     if(sql==='select meeting_id from meeting_source_links where source_entity_id=$1')return {rows:parent===true?[{meeting_id:'57000000-0000-4000-8000-000000000100'}]:[]};
+    if(sql==='select championship_id,championship_season_id from meetings where id=$1 for update')return {rows:[{championship_id:'f1',championship_season_id:ready.championshipSeasonId}]};
     if(sql==='select normalized_event_uuid from event_source_links where source_entity_id=$1')return {rows:[{normalized_event_uuid:'57000000-0000-4000-8000-000000000101'}]};
     if(sql.startsWith('select * from publication_receipts'))return {rows:[]};
     if(sql.startsWith('select * from public_resource_states'))return {rows:[]};

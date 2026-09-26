@@ -9,13 +9,13 @@ import {
 describe('application schema compatibility', () => {
   it('accepts only the exact current migration chain', () => {
     const result = classifySchemaVersions(APPLICATION_SCHEMA_MIGRATIONS);
-    expect(APPLICATION_SCHEMA_HEAD).toBe('0035_f5_provider_discovery_resolution');
+    expect(APPLICATION_SCHEMA_HEAD).toBe('0036_f5_meeting_event_canonical_resolution');
     expect(result).toMatchObject({ compatible: true, code: 'compatible', actualHead: APPLICATION_SCHEMA_HEAD });
   });
 
   it('rejects an older schema explicitly', () => {
     const result = classifySchemaVersions(APPLICATION_SCHEMA_MIGRATIONS.slice(0, -1));
-    expect(result).toMatchObject({ compatible: false, code: 'schema_too_old', actualHead: '0034_f5_canonical_venues' });
+    expect(result).toMatchObject({ compatible: false, code: 'schema_too_old', actualHead: '0035_f5_provider_discovery_resolution' });
   });
 
   it('rejects unknown, missing and inconsistent migration state', () => {

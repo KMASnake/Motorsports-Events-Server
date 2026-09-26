@@ -17,7 +17,9 @@ F4_CONTRACT_FILES = (
     "docs/handoff/LOT-5.7-P-F5-2-CHAMPIONSHIP-SEASONS.md",
     "docs/handoff/LOT-5.7-P-F5-3-CANONICAL-VENUES.md",
     "docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md",
+    "docs/handoff/LOT-5.7-P-F5-5-CANONICAL-MEETING-EVENT-RESOLUTION.md",
     "docs/handbook/architecture/ADR-0026-PROVIDER-DISCOVERY-RESOLUTION.md",
+    "docs/handbook/architecture/ADR-0027-CANONICAL-MEETING-EVENT-RESOLUTION.md",
     "docs/handoff/VPS-PREPRODUCTION-READINESS.md",
 )
 
@@ -417,7 +419,7 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(provider_calls=1),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(worker_started=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(scheduler_started=True),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(status="in-progress", authorized=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(status="maintainer-validated", maintainer_validated=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(status="in-progress", authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-7"].update(status="in-progress", authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(status="in-progress-pending-maintainer-validation"),

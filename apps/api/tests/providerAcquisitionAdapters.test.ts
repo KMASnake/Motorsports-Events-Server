@@ -42,8 +42,10 @@ describe('Lot 5.6-B provider acquisition adapters', () => {
     const config={...ocBlackTopF1Mapping,version:'ocblacktop-f1-v2',rulesVersion:'v2'};
     expect(mapSource(source('6c6c3380-e4f0-4b5d-b84d-47bf8e50c324'),config)).toMatchObject({championshipId:'f1',circuitId:'monza',sessionType:'practice',status:'scheduled'});
     expect(mapSource(source('2d8e0ba8-2e48-4914-88cf-8025661b3b47','sprint_qualifying'),config)).toMatchObject({circuitId:'silverstone',sessionType:'sprint_qualifying'});
-    expect(normalize(source('e1f7b92f-1920-4561-9a62-870cf7c5f8fe'),config,[],null).resolution).toMatchObject({decision:'review',reason:'required_identity_unknown'});
-    expect(normalize(source('unknown-provider-circuit'),config,[],null).resolution).toMatchObject({decision:'review',reason:'required_identity_unknown'});
+    expect(mapSource(source('e1f7b92f-1920-4561-9a62-870cf7c5f8fe'),config).circuitId).toBeNull();
+    expect(normalize(source('e1f7b92f-1920-4561-9a62-870cf7c5f8fe'),config,[],null).resolution).toMatchObject({decision:'review',reason:'championship_season_unresolved'});
+    expect(mapSource(source('unknown-provider-circuit'),config).circuitId).toBeNull();
+    expect(normalize(source('unknown-provider-circuit'),config,[],null).resolution).toMatchObject({decision:'review',reason:'championship_season_unresolved'});
     expect(mapSource(source('10358903-f251-4a40-8301-8966c208d860','future-format'),config).sessionType).toBe('other');
   });
 
@@ -67,7 +69,7 @@ describe('Lot 5.6-B provider acquisition adapters', () => {
     const envelope=(item:typeof result.items[number]):SourceEnvelope=>({id:item.externalId,kind:item.entityKind==='meeting'?'meeting':'event',sourceHash:'fixture',providerKey:'ocblacktop',championshipSourceId:'formula1',season:item.season,data:item.sourceData,corrections:[],lastChangedAt:'2026-08-27T00:00:00.000Z',lastObservedAt:'2026-08-27T00:00:00.000Z',observation:'present',traversalComplete:true,providerStartedAt:item.sourceData.starts_at as string,providerEndedAt:item.sourceData.ends_at as string,theoreticalEndAt:null,endEstimated:false,endProvenance:'provider',now:'2026-08-27T00:00:00.000Z'});
     expect(mapSource(envelope(meeting!),mapping)).toMatchObject({resourceKind:'meeting',name:'Abu Dhabi Grand Prix',championshipId:'f1',circuitId:'yas-marina',status:'scheduled',startsAt:'2026-12-04T09:30:00.000Z',endsAt:'2026-12-06T15:00:00.000Z'});
     expect(mapSource(envelope(events[0]!),mapping)).toMatchObject({resourceKind:'event',name:'FP1',championshipId:'f1',circuitId:'yas-marina',sessionType:'practice',status:'scheduled',startsAt:'2026-12-04T09:30:00.000Z',endsAt:'2026-12-04T10:30:00.000Z'});
-    expect(normalize(envelope(events[0]!),{...mapping,circuitIds:{}},[],null).resolution).toMatchObject({decision:'review',reason:'required_identity_unknown'});
+    expect(normalize(envelope(events[0]!),{...mapping,circuitIds:{}},[],null).resolution).toMatchObject({decision:'review',reason:'championship_season_unresolved'});
   });
 
   it.each([

@@ -5,8 +5,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 UP = ROOT / "infra/postgres/migrations/0033_f5_championship_seasons.up.sql"
 DOWN = ROOT / "infra/postgres/migrations/0033_f5_championship_seasons.down.sql"
-NORMALIZATION = ROOT / "apps/api/src/normalization/postgresDeterministicNormalizationService.ts"
-PUBLICATION = ROOT / "apps/api/src/normalization/publicationState.ts"
 RUNTIME = ROOT / "scripts/test-f5-championship-seasons.sh"
 
 
@@ -48,14 +46,13 @@ class F5ChampionshipSeasonTests(unittest.TestCase):
         self.assertIn("Refusing 0033 rollback while meetings reference championship seasons", self.down)
         self.assertIn("Refusing 0033 rollback while championship seasons contain data", self.down)
 
-    def test_matching_and_publication_contracts_remain_legacy(self):
-        normalization = NORMALIZATION.read_text(encoding="utf-8")
-        publication = PUBLICATION.read_text(encoding="utf-8")
-        self.assertIn("extract(year from event.starts_at)::int season", normalization)
-        self.assertIn("from meetings where championship_id=$1 and season=$2", normalization)
-        self.assertNotIn("championshipSeasonId", normalization)
-        self.assertNotIn("championshipSeasonId", publication)
-        self.assertIn("'season'", publication)
+    def test_migration_does_not_change_normalization_or_publication_contracts(self):
+        self.assertNotIn("normalized_candidates", self.up)
+        self.assertNotIn("normalization_decisions", self.up)
+        self.assertNotIn("event_source_links", self.up)
+        self.assertNotIn("meeting_source_links", self.up)
+        self.assertNotRegex(self.up, r"\b(update|insert into)\s+events\b")
+        self.assertNotRegex(self.up, r"\b(update|insert into)\s+meetings\b")
 
     def test_isolated_runtime_certifies_required_paths(self):
         runtime = RUNTIME.read_text(encoding="utf-8")

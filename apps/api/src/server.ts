@@ -37,6 +37,7 @@ import { PostgresNormalizationMappingRepository } from './normalization/postgres
 import { BoundedProviderOneShotRunner } from './providers/providerOneShotRunner.js';
 import { ProviderSourcesAdminService } from './providers/providerSourcesAdminService.js';
 import { championshipDiscoveryCandidateRoutes } from './routes/championshipDiscoveryCandidates.js';
+import { meetingEventResolutionCandidateRoutes } from './routes/meetingEventResolutionCandidates.js';
 
 const app = Fastify(secureFastifyOptions());
 registerSecurityHeaders(app);
@@ -96,6 +97,7 @@ const schedulerService=new PersistentSchedulerService();
 await app.register(providerSchedulerRoutes,{service:schedulerService});
 await app.register(providerAcquisitionAdminRoutes,{admin:new AcquisitionAdminService(),protection:new SourceProtectionService(),scheduler:schedulerService});
 await app.register(championshipDiscoveryCandidateRoutes);
+await app.register(meetingEventResolutionCandidateRoutes);
 const port = Number(process.env.API_PORT ?? 3001);
 const host = process.env.API_HOST ?? '0.0.0.0';
 
