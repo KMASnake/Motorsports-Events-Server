@@ -4,8 +4,8 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-f3-proven-f4-complete-f5-3-maintainer-validated-f5-4-pending-gate-f-incomplete",
-    "updated_at": "2026-09-25",
+    "status": "lot-5.7-p-f3-proven-f4-complete-f5-4-maintainer-validated-gate-f-incomplete",
+    "updated_at": "2026-09-26",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -250,11 +250,19 @@
                 "blockers": "NONE"
               },
               "F5-4": {
-                "status":"implemented-awaiting-maintainer-validation",
+                "status":"maintainer-validated",
                 "authorized":true,
                 "implementation_complete":true,
-                "maintainer_validated":false,
+                "maintainer_audit":"pass",
+                "maintainer_validated":true,
+                "git_head":"a79323c12076bda1824b9c8c7a2fc9613bf2ad33",
+                "git_tree":"4bea3e9b179cc3d438a435c1e76b0839e8874ec0",
                 "migration_head":"0035_f5_provider_discovery_resolution",
+                "ci": {
+                  "legacy":{"workflow":"Validate legacy Python server","run_number":272,"conclusion":"SUCCESS"},
+                  "node":{"workflow":"CI — Node target","run_number":541,"conclusion":"SUCCESS"}
+                },
+                "blockers":"NONE",
                 "provider_calls":0,
                 "worker_started":false,
                 "scheduler_started":false,
@@ -345,7 +353,7 @@
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and F2-RPV retain their maintainer validations. F3 is complete/proven and F4 is complete. F5-1, F5-2 and F5-3 are maintainer-validated. F5-4 is implemented and awaits maintainer validation. F5-5 through F5-7 remain not started and unauthorized. F5 remains in progress. Gate F, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and F2-RPV retain their maintainer validations. F3 is complete/proven and F4 is complete. F5-1, F5-2, F5-3 and F5-4 are maintainer-validated. F5-5 through F5-7 remain not started and unauthorized. F5 remains in progress. Gate F, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -368,6 +376,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Audit mainteneur de l'implémentation F5-4 Provider discovery resolution. F5-4 n'est pas maintainer-validated. F5-5 through F5-7 remain not started and unauthorized. No deployment, VPS access, provider execution/call, worker, scheduler, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main is authorized."
+    "task": "F5-4 Provider discovery resolution is maintainer-validated. F5-5 through F5-7 remain not started and unauthorized; no next F5 subphase is authorized. No deployment, VPS access, provider execution/call, worker, scheduler, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ or merge to main is authorized."
   }
 }

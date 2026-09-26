@@ -21,6 +21,8 @@ const EXPECTED_F5_2_HEAD='5f03705ba362f868017ed41b2c1278fb9a81ff08';
 const EXPECTED_F5_2_TREE='c3df6e27b8c0495532ccef5aa2c4c867fc9c500d';
 const EXPECTED_F5_3_HEAD='dc34c2ca192a7fa58768ab048a86036ebf63f847';
 const EXPECTED_F5_3_TREE='a170c3b54acec9fdef008d82552c080069858911';
+const EXPECTED_F5_4_HEAD='a79323c12076bda1824b9c8c7a2fc9613bf2ad33';
+const EXPECTED_F5_4_TREE='4bea3e9b179cc3d438a435c1e76b0839e8874ec0';
 const EXPECTED_MIGRATION_HEAD='0031_real_circuit_reference_data';
 const F4_COMMITS=[
   '523a2cecedd38e9a9ec463fae66221069b8c53cc',
@@ -201,7 +203,7 @@ const progress=json(files.progress);
 const gateF=progress.current?.sub_lot_5_7_p?.technical_gates?.['5.7-P-F'];
 const f4=gateF?.preproduction_stabilization_f4;
 assert.ok(f4,'état canonique F4 absent');
-assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-f5-3-maintainer-validated-f5-4-pending-gate-f-incomplete');
+assert.equal(progress.current?.status,'lot-5.7-p-f3-proven-f4-complete-f5-4-maintainer-validated-gate-f-incomplete');
 assert.equal(gateF?.status,'f3-proven-f4-complete-gate-f-incomplete');
 for(const stage of ['F4-0','F4-1','F4-2','F4-3','F4-4','F4-5','F4-6'])assert.equal(f4.subphases?.[stage]?.status,'maintainer-validated',`${stage} non validé`);
 assert.equal(f4.subphases?.['F4-5']?.implementation_complete,true);
@@ -302,12 +304,22 @@ assert.equal(f5.authorized_subphase,null);
     assert.equal(f53.ci[name].conclusion,'SUCCESS');
   }
   const f54=f5.subphases?.['F5-4'];
-  exactKeys(f54,['status','authorized','implementation_complete','maintainer_validated','migration_head','provider_calls','worker_started','scheduler_started','evidence'],'F5-4');
-  assert.equal(f54.status,'implemented-awaiting-maintainer-validation');
+  exactKeys(f54,['status','authorized','implementation_complete','maintainer_audit','maintainer_validated','git_head','git_tree','migration_head','ci','blockers','provider_calls','worker_started','scheduler_started','evidence'],'F5-4');
+  assert.equal(f54.status,'maintainer-validated');
   assert.equal(f54.authorized,true);
   assert.equal(f54.implementation_complete,true);
-  assert.equal(f54.maintainer_validated,false);
+  assert.equal(f54.maintainer_audit,'pass');
+  assert.equal(f54.maintainer_validated,true);
+  assert.equal(f54.git_head,EXPECTED_F5_4_HEAD);
+  assert.equal(f54.git_tree,EXPECTED_F5_4_TREE);
   assert.equal(f54.migration_head,'0035_f5_provider_discovery_resolution');
+  assert.equal(f54.blockers,'NONE');
+  for(const [name,workflow,run] of [['legacy','Validate legacy Python server',272],['node','CI — Node target',541]]){
+    exactKeys(f54.ci[name],['workflow','run_number','conclusion'],`CI F5-4 ${name}`);
+    assert.equal(f54.ci[name].workflow,workflow);
+    assert.equal(f54.ci[name].run_number,run);
+    assert.equal(f54.ci[name].conclusion,'SUCCESS');
+  }
   assert.equal(f54.provider_calls,0);
   assert.equal(f54.worker_started,false);
   assert.equal(f54.scheduler_started,false);
@@ -326,7 +338,7 @@ for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_1_HEAD,EXPECTE
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_2_HEAD,'`0033_f5_championship_seasons`','ré-audit mainteneur final : `PASS`','bloqueurs P1 : `NONE`','bloqueurs P2 : `NONE`','bloqueurs P3 : `NONE`','Python server #268 : `SUCCESS`','Node target #537 : `SUCCESS`','F5 global reste `IN_PROGRESS`','F5-3 à F5-7 restent'])assert.ok(f52Doc.includes(token),`preuve documentaire F5-2 absente: ${token}`);
 for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_3_HEAD,EXPECTED_F5_3_TREE,'`0034_f5_canonical_venues`','ré-audit mainteneur final : `PASS`','Python server #270 : `SUCCESS`','Node target #539 : `SUCCESS`','aucun backfill','F5-4 à F5-7 restent','Production'])assert.ok(f53Doc.includes(token),`preuve documentaire F5-3 absente: ${token}`);
 assert.ok(taxonomyAdr.includes('Statut : validé par le mainteneur dans F5-1'),'ADR-0023 encore candidat ou incohérent');
-for(const token of ['Statut : `IMPLEMENTED_AWAITING_MAINTAINER_VALIDATION`','`0035_f5_provider_discovery_resolution`','aucun `provider_championship`','F5-5, F5-6 et F5-7 restent `NOT_STARTED_NOT_AUTHORIZED`'])assert.ok(f54Doc.includes(token),`preuve documentaire F5-4 absente: ${token}`);
+for(const token of ['Statut : `MAINTAINER_VALIDATED`',EXPECTED_F5_4_HEAD,EXPECTED_F5_4_TREE,'`0035_f5_provider_discovery_resolution`','ré-audit mainteneur final : `PASS`','Python server #272 : `SUCCESS`','Node target #541 : `SUCCESS`','bloqueurs P1 : `NONE`','bloqueurs P2 : `NONE`','violations de périmètre : `NONE`','premier audit mainteneur','aucun `provider_championship`','F5-5, F5-6 et F5-7 restent `NOT_STARTED_NOT_AUTHORIZED`'])assert.ok(f54Doc.includes(token),`preuve documentaire F5-4 absente: ${token}`);
 for(const token of ['Statut : candidat F5-4','Discovery et résolution ne peuvent activer','tout appel provider est interdit'])assert.ok(discoveryAdr.includes(token),`ADR F5-4 absent: ${token}`);
 
 const certification=read(files.certification),emptyDoc=read(files.emptyDoc),readiness=read(files.readiness);
@@ -340,4 +352,4 @@ for(const token of [EXPECTED_F4_5_HEAD,EXPECTED_F4_5_TREE,EXPECTED_F4_6_HEAD,EXP
 assert.deepEqual(evidenceMarker(certification,'certification F4-5'),evidenceFacts,'certification F4-5 contredit la preuve runtime');
 assert.deepEqual(evidenceMarker(emptyDoc,'documentation F4-4'),evidenceFacts,'documentation F4-4 contredit la preuve runtime');
 
-console.log(JSON.stringify({status:'pass',baseline_git_head:evidence.baseline_git_head,baseline_git_tree:evidence.baseline_git_tree,f4_5_git_head:closure.git_head,f4_5_git_tree:closure.git_tree,f4_6_git_head:finalClosure.git_head,f4_6_git_tree:finalClosure.git_tree,current_head:currentHead,migration_head:migrations.at(-1),f4_5:'maintainer-validated',f4_6:'maintainer-validated',f4:'complete'}));
+console.log(JSON.stringify({status:'pass',baseline_git_head:evidence.baseline_git_head,baseline_git_tree:evidence.baseline_git_tree,f4_5_git_head:closure.git_head,f4_5_git_tree:closure.git_tree,f4_6_git_head:finalClosure.git_head,f4_6_git_tree:finalClosure.git_tree,current_head:currentHead,migration_head:migrations.at(-1),f4_5:'maintainer-validated',f4_6:'maintainer-validated',f4:'complete',f5_4:'maintainer-validated'}));

@@ -127,6 +127,7 @@ class F4StabilizationTests(unittest.TestCase):
         self.assertIn('"f4_5":"maintainer-validated"', result.stdout)
         self.assertIn('"f4_6":"maintainer-validated"', result.stdout)
         self.assertIn('"f4":"complete"', result.stdout)
+        self.assertIn('"f5_4":"maintainer-validated"', result.stdout)
 
     def test_missing_evidence_is_refused(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -403,10 +404,16 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"].update(git_tree="0" * 40),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"]["ci"]["legacy"].update(run_number=269),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-3"]["ci"]["node"].update(conclusion="FAILURE"),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(status="maintainer-validated", authorized=True),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(maintainer_validated=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(status="implemented-awaiting-maintainer-validation"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(maintainer_audit="fail"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(maintainer_validated=False),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(implementation_complete=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(git_head="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(git_tree="0" * 40),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(migration_head="0034_f5_canonical_venues"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"]["ci"]["legacy"].update(run_number=271),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"]["ci"]["node"].update(conclusion="FAILURE"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(blockers="P2"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(provider_calls=1),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(worker_started=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(scheduler_started=True),
@@ -433,6 +440,12 @@ class F4StabilizationTests(unittest.TestCase):
 
     def test_f5_1_governance_documents_are_fail_closed(self) -> None:
         cases = (
+            (
+                "docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md",
+                "Statut : `MAINTAINER_VALIDATED`",
+                "Statut : `IMPLEMENTED_AWAITING_MAINTAINER_VALIDATION`",
+                "--f5-4-doc",
+            ),
             (
                 "docs/handoff/LOT-5.7-P-F5-2-CHAMPIONSHIP-SEASONS.md",
                 "Statut : `MAINTAINER_VALIDATED`",
