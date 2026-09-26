@@ -1,0 +1,3 @@
+drop index provider_source_entities_refresh_scope_idx;
+alter table provider_source_entities drop column acquisition_scope;
+delete from schema_migrations where version='0020_lot56_current_refresh_scope';

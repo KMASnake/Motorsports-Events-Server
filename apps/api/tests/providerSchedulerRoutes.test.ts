@@ -1,0 +1,13 @@
+import Fastify from 'fastify';
+import { afterEach,beforeEach,describe,expect,it } from 'vitest';
+import { registerAdminAuth,signAdminToken } from '../src/lib/adminAuth.js';
+import type { PersistentSchedulerService } from '../src/providers/schedulerService.js';
+import { providerSchedulerRoutes } from '../src/routes/providerScheduler.js';
+const secret='lot-5-4-scheduler-route-secret-at-least-32-chars',id='10000000-0000-4000-8000-000000000001';
+const token=(role:'admin'|'viewer')=>signAdminToken({sub:'tester',role,exp:Math.floor(Date.now()/1000)+60},secret);
+describe('Lot 5.4 scheduler admin routes',()=>{let app:ReturnType<typeof Fastify>;
+  beforeEach(async()=>{app=Fastify({logger:false});registerAdminAuth(app,secret);const service={config:async()=>({global_worker_pool:4}),streams:async()=>[],runs:async()=>[],activate:async()=>({sync_state:'active'}),deactivate:async()=>({sync_state:'inactive'}),pause:async()=>({sync_state:'paused'}),resume:async()=>({sync_state:'active'}),reset:async()=>({phase:'current'}),syncNow:async()=>({priority_boost_until:new Date()}),setChampionshipActive:async()=>({active:false}),setConfig:async()=>({global_worker_pool:4})} as unknown as PersistentSchedulerService;await app.register(providerSchedulerRoutes,{service});});afterEach(async()=>app.close());
+  it('requires admin authorization',async()=>{expect((await app.inject({method:'GET',url:`/api/v1/admin/provider-championships/${id}/sync-streams`})).statusCode).toBe(401);expect((await app.inject({method:'GET',url:`/api/v1/admin/provider-championships/${id}/sync-streams`,headers:{authorization:`Bearer ${token('viewer')}`}})).statusCode).toBe(403);expect((await app.inject({method:'GET',url:`/api/v1/admin/provider-championships/${id}/sync-streams`,headers:{authorization:`Bearer ${token('admin')}`}})).statusCode).toBe(200);});
+  it('rejects implicit global reset',async()=>{const result=await app.inject({method:'POST',url:`/api/v1/admin/provider-championships/${id}/sync/reset`,headers:{authorization:`Bearer ${token('admin')}`},payload:{phase:'all'}});expect(result.statusCode).toBe(400);});
+  it('exposes explicit lifecycle commands',async()=>{for(const action of ['activate','pause','resume','deactivate'])expect((await app.inject({method:'POST',url:`/api/v1/admin/provider-championships/${id}/sync/${action}`,headers:{authorization:`Bearer ${token('admin')}`}})).statusCode).toBe(200);});
+});

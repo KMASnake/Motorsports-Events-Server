@@ -1,8 +1,10 @@
 import type { EventFiltersState, EventFormState, EventRow, EventView } from './eventTypes';
 import { providerSource } from './providerDisplay';
+import {eventCategoryForForm} from './eventCategories';
 
 export const emptyEventForm = (): EventFormState => ({
-  championship_id: '', circuit_id: '', name: '', category: '',
+  championship_id: '', circuit_id: '', name: '',
+  category: '',
   starts_at: '', ends_at: '', status: 'scheduled',
   published: true, description: '', session_title: ''
 });
@@ -16,7 +18,7 @@ export function eventToForm(event: EventRow): EventFormState {
     championship_id: event.championship_id,
     circuit_id: event.circuit_id ?? '',
     name: event.name,
-    category: event.category ?? '',
+    category: eventCategoryForForm(event.category),
     starts_at: localDateTimeInput(event.starts_at),
     ends_at: localDateTimeInput(event.ends_at),
     status: event.status,
@@ -24,6 +26,12 @@ export function eventToForm(event: EventRow): EventFormState {
     description: event.description ?? '',
     session_title: event.session_title ?? ''
   };
+}
+
+export function eventPresentationStatus(event: Pick<EventRow, 'status' | 'starts_at' | 'ends_at'>, reference = new Date()): EventRow['status'] {
+  if (event.status !== 'scheduled') return event.status;
+  const boundary = new Date(event.ends_at ?? event.starts_at);
+  return Number.isFinite(boundary.getTime()) && boundary <= reference ? 'completed' : 'scheduled';
 }
 
 export function slugify(value: string) {
@@ -34,7 +42,7 @@ export function slugify(value: string) {
 export function filterEvents(events: EventRow[], filters: EventFiltersState) {
   const query = filters.search.trim().toLowerCase();
   return events.filter((event) => {
-    const haystack = `${event.name} ${event.slug} ${event.championship_name} ${event.circuit_name ?? ''}`.toLowerCase();
+    const haystack = `${event.meeting_name ?? ''} ${event.name} ${event.session_title ?? ''} ${event.slug} ${event.championship_name} ${event.circuit_name ?? ''}`.toLowerCase();
     return (!query || haystack.includes(query))
       && (filters.championship === 'all' || event.championship_id === filters.championship)
       && (filters.status === 'all' || event.status === filters.status)

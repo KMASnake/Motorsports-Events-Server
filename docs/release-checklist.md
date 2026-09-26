@@ -8,6 +8,9 @@ version stable.
 - [ ] `./scripts/validate-repository.sh` réussit ;
 - [ ] la suite PostgreSQL isolée réussit ;
 - [ ] l’archive est construite uniquement par `./scripts/build-release.sh` ;
+- [ ] son contenu provient exclusivement des blobs suivis du commit identifié ;
+- [ ] aucun fichier local non suivi, `.env` ou variante `.env.*` sensible
+  n’est présent (les modèles versionnés `.env.example` restent autorisés) ;
 - [ ] le SHA-256 du ZIP est valide ;
 - [ ] l’archive réextraite réussit les mêmes tests ;
 - [ ] les jobs GitHub `validate`, `postgres-integration` et

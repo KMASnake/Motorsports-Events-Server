@@ -31,24 +31,12 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
 
       <div className="context">
         <strong>MOTORSPORTS EVENTS SERVER</strong>
-        <span>Phase 1.1 — Shell global MEDS</span>
       </div>
 
       <div className="clock">
         <MedsIcon name="clock" size={17} />
         <b>{clock}</b>
         <span>Europe/Paris</span>
-      </div>
-
-      <div className="system">
-        <i />
-        SYSTÈME
-        <b>OPÉRATIONNEL</b>
-      </div>
-
-      <div className="bell">
-        <MedsIcon name="bell" size={20} />
-        <b>3</b>
       </div>
 
       <div className="avatar" aria-hidden="true">●</div>

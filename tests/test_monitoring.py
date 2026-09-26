@@ -8,7 +8,7 @@ def test_monitoring_is_private_and_scrapes_api():
     prometheus = (ROOT / "monitoring/prometheus.yml").read_text()
     assert '"127.0.0.1:3000:3000"' in compose
     assert "9090:9090" not in compose
-    assert 'targets: ["api:8000"]' in prometheus
+    assert 'targets: ["api:3001"]' in prometheus
     assert "metrics_path: /metrics" in prometheus
     assert "rule_files:" in prometheus
     assert "/etc/prometheus/alert-rules.yml" in prometheus

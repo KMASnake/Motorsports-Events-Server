@@ -45,6 +45,8 @@ for attempt in $(seq 1 60); do
   sleep 1
 done
 
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql
+
 sql "insert into sessions(
   id,event_id,name,type,starts_at,status,published,origin,provider_key,external_id
 ) values (

@@ -1,0 +1,38 @@
+{
+  "schema": "lot57pf-pp171-evidence-v1",
+  "status": "pass",
+  "certified_at": "2026-08-31T14:58:08.432Z",
+  "git_sha": "4e37a8edeed3f22e61d9ba7e0ddda2e6d4b39b92",
+  "version": "8.1.0-alpha.2-lot.4.4",
+  "results": {
+    "schema": "lot57pf-pp171-runtime-v1",
+    "status": "pass",
+    "assertions": {
+      "real_http": true,
+      "real_postgres": true,
+      "multi_key_same_client": true,
+      "multi_client_isolation": true,
+      "rate_limit_429": true,
+      "retry_after": true,
+      "ratelimit_headers": true,
+      "daily_quota_429": true,
+      "utc_reset": true,
+      "changes_one_request": true,
+      "five_xx_compensation": true,
+      "concurrent_limit": true
+    },
+    "metrics": {
+      "client_a_allowed": 2,
+      "client_a_blocked": 1,
+      "client_b_allowed": 1,
+      "changes_rows": 3,
+      "changes_requests_charged": 1,
+      "concurrent_allowed": 5,
+      "concurrent_blocked": 7
+    },
+    "provider_calls_external": 0,
+    "provider_credits_consumed": 0,
+    "worker_started": false
+  },
+  "cleanup_verified": true
+}

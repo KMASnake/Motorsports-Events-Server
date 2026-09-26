@@ -1,0 +1,13 @@
+services:
+  caddy:
+    volumes:
+      - ${MSE_PRODUCTION_CADDYFILE:?absolute production Caddyfile path required}:/etc/caddy/Caddyfile.production:ro
+      - ${MSE_PREPROD_REPO:?absolute preprod repository path required}/infra/caddy/Caddyfile.integration:/etc/caddy/Caddyfile:ro
+      - ${MSE_PREPROD_REPO:?absolute preprod repository path required}/infra/caddy/Caddyfile.preprod:/etc/caddy/Caddyfile.preprod:ro
+    networks:
+      preprod_proxy: {}
+
+networks:
+  preprod_proxy:
+    external: true
+    name: ${PREPROD_PROXY_NETWORK:-mse-preprod-proxy}

@@ -1,5 +1,107 @@
 # Handbook Changelog
 
+## 1.39 — 2026-08-25
+
+- enregistre la revalidation mainteneur/VPS finale de 5.7-P-E au SHA
+  `74f45b7d341ca214d4569b5d9917a46bb1d38254`, migration head 0029 et Preview
+  remise OFF ;
+
+## 1.38 — 2026-08-24
+
+- rouvre la validation E après la collision de routes révélée sur VPS et
+  enregistre la correction d’assemblage en attente de revalidation ;
+- enregistre la validation mainteneur de 5.7-P-E au SHA
+  `bfe6d4818b105a08417e6c524084cae0a176690d` ;
+- formalise la frontière de sécurité client 5.7-P-E dans ADR-0022 ;
+- conserve l’activation Preview opt-in et interdit tout secret client en base,
+  logs ou audit ;
+- maintient 5.7-P-F, la visibilité Production et merge `main` non autorisés.
+
+## 1.34 — 2026-08-15
+
+- consigne l’autorisation explicite du mainteneur de conserver TheSportsDB v1 ;
+- limite strictement l’exception au segment de chemin contenant sa clé gratuite ;
+- maintient la redaction totale hors appel réseau et toutes les autres
+  protections d’ADR-0016 ;
+- ajoute ADR-0020 sans valider globalement le Lot 5.6 ni autoriser 5.6-C.
+
+## 1.33 — 2026-08-15
+
+- précise qu’une version d’API plaçant un secret dans l’URL est interdite ;
+- impose la version authentifiée par header lorsqu’elle existe ;
+- applique cette règle à TheSportsDB v2 avec `X-API-KEY`, sans exception à
+  AC-5.6-161 ;
+- maintient le Lot 5.6 non validé globalement et les Lots 5.7+ interdits.
+
+## 1.32 — 2026-08-14
+
+- formalise l'autorisation mainteneur d'implémenter le Lot 5.6 — Acquisition fournisseur durable ;
+- fixe `authorized_sub_lot = 5.6` après Concept, contrat UI, Acceptance, audit croisé, corrections et revue post-corrections ;
+- ajoute l'ADR-0019 comme décision permanente d'autorisation ;
+- précise que cette autorisation ne vaut ni validation finale de 5.6 ni fusion dans `main` ;
+- maintient les Lots 5.7 et suivants non autorisés à l'implémentation ;
+- rend historiques les anciens gates « 5.6 non autorisé » antérieurs à cette décision.
+
+## 1.31 — 2026-08-14
+
+- formalise la validation mainteneur finale du Lot 5.5 ;
+- clôt les audits P1/P2/P3 et consigne les 61 cas PostgreSQL réussis ;
+- aligne le Handbook, `PROJECT-STATUS.json`, `PROGRESS.json` et la roadmap ;
+- référence l'ADR-0018 et la preuve de validation mainteneur ;
+- maintient le Lot 5.6 non autorisé, hors conception et documentation **à l'état de la version 1.31** ; cet état est remplacé en 1.32 par l'ADR-0019.
+
+## 1.30 — 2026-08-14
+
+- corrige les deux constats finaux du ré-audit du Lot 5.5 ;
+- aligne les diagnostics sur la raison et l'échéance génériques réellement
+  décidées par le quota gate ;
+- rend le décompte post-observation indépendant des timestamps grâce à une
+  séquence PostgreSQL monotone ;
+- porte la recette PostgreSQL à 61 cas sans appel fournisseur réel ;
+- maintient le Lot 5.5 non validé par le mainteneur et le Lot 5.6 interdit à cet état historique.
+
+## 1.29 — 2026-08-14
+
+- consigne la validation explicite de la baseline sécurité pré‑5.5 ;
+- consigne la validation du Concept et de l'Acceptance 5.5 après audit croisé avec 5.4 et sécurité ;
+- autorise explicitement l'implémentation du seul Lot 5.5 via l'ADR-0017 ;
+- maintient les Lots 5.6 et suivants non autorisés jusqu'à une nouvelle validation mainteneur ;
+- aligne le Handbook permanent avec `PROJECT-STATUS.json`, `PROGRESS.json` et la roadmap.
+
+## 1.28 — 2026-08-14
+
+- corrige l’audit mainteneur pré‑5.5 : championnats publics actifs uniquement,
+  projection explicite et lectures ACP séparées ;
+- applique la CSP et les headers de sécurité au conteneur Nginx Web réel ;
+- ajoute les recettes anti-fuite, UUID, conservation de données, rollback
+  d’audit et validation Chromium sans démarrer le Lot 5.5.
+
+## 1.27 — 2026-08-14
+
+- consolide la sécurité transversale des Lots 1 à 5.4 avant le Lot 5.5 ;
+- ferme la confiance proxy, borne les corps et réponses fournisseurs, ajoute
+  headers et redaction globale ;
+- documente l’ADR-0016 et maintient le Lot 5.5 non commencé et non autorisé.
+
+## 1.26 — 2026-08-12
+
+- implémente le scheduler persistant approuvé du Lot 5.4 ;
+- ajoute curseurs, leases, fencing, reprise après crash et commandes auditées ;
+- maintient le Lot 5.5 hors périmètre jusqu'à validation mainteneur du Lot 5.4.
+- corrige l'audit 5.4 : restauration d'état, stale fail, budget commun,
+  heartbeat discovery, preuve PostgreSQL 3/2/1 et runtime périodique minimal.
+
+## 1.25 — 2026-08-12
+
+- ajoute la découverte réelle OCBlackTop et TheSportsDB sans ingestion d’événements ;
+- persiste les découvertes, divergences, absences et historiques séparément des liens validés ;
+- impose association, création locale et adoption de configuration comme actions explicites et auditées ;
+- conserve le scheduler, la synchronisation et le moteur complet de quotas hors du Lot 5.3.
+- corrige l’audit 5.3 : catalogue OCBlackTop déclaratif, complétude explicite,
+  quota inconnu bloquant, comptage des erreurs et revalidation à l’adoption.
+- complète le Lot 5.3 avec la configuration manuelle de sources indépendante
+  de la découverte, inactive par défaut et sans synchronisation d’événements.
+
 ## 1.24 — 2026-08-12
 
 - consigne la validation explicite du Lot 4.4 sur Windows et VPS ;
@@ -91,6 +193,25 @@
 - limite cette étape aux créations humaines manuelles ;
 - refuse les mutations silencieuses des Sessions fournisseur avant Corrections ;
 - applique l'audit atomique prévu par l'ADR-0012.
+
+## 1.16 — 2026-08-14
+
+- implémente le quota gate atomique PostgreSQL du Lot 5.5 ;
+- ajoute les fenêtres multiples, marge, réserve current, observations normalisées et backoffs ;
+- ajoute la recette isolée de 43 cas et son plan de rollback ;
+- maintient le Lot 5.5 en attente de validation mainteneur et interdit le démarrage du Lot 5.6 à cet état historique.
+
+## 1.36 — 2026-08-22
+
+- enregistre la validation mainteneur de C ;
+- formalise la préproduction interne A/B/C sans ouverture de D ;
+- impose loopback PostgreSQL, backup avant migration et secrets hors Git.
+
+## 1.35 — 2026-08-22
+
+- formalise l’état public durable interne du gate 5.7-P-C ;
+- impose atomicité état/révision/journal, last-known-good et tombstones ;
+- conserve toute exposition HTTP et sécurité client dans les gates suivants.
 
 ## 1.15 — 2026-08-10
 

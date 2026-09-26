@@ -32,6 +32,8 @@ for attempt in $(seq 1 60); do
   sleep 1
 done
 
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql
+
 sql "insert into sessions(id,event_id,name,type,starts_at,ends_at,status,published,description,origin,provider_key,external_id)
 values('$PROVIDER_SESSION_ID','evt-002','Provider initial','other','2026-09-01T10:00:00Z','2026-09-01T11:00:00Z','scheduled',true,null,'provider','lot43-corrections','session-1')"
 sql "create or replace function lot43_reject_correction_audit() returns trigger language plpgsql as \$\$

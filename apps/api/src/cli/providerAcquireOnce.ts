@@ -1,0 +1,10 @@
+import {verifyApplicationSchema,pool} from '../lib/db.js';
+import {BoundedProviderOneShotRunner,type OneShotTarget} from '../providers/providerOneShotRunner.js';
+import {ProviderSecretCipher} from '../providers/providerSecrets.js';
+import {ProviderConfigurationService} from '../providers/providerService.js';
+import {providerAdapterRegistry} from '../providers/registry.js';
+import {registerBuiltInAdapters} from '../providers/realAdapters.js';
+
+function args(values:string[]):OneShotTarget{const value=(name:string)=>{const index=values.indexOf(name);return index<0?null:values[index+1]??null;};const budget=Number(value('--max-provider-requests'));if(!Number.isSafeInteger(budget)||budget<=0)throw new Error('--max-provider-requests is required and must be a positive integer.');const providerInstanceId=value('--provider-instance-id'),providerChampionshipId=value('--provider-championship-id'),streamId=value('--stream-id');if(!providerInstanceId||!providerChampionshipId||!streamId)throw new Error('--provider-instance-id, --provider-championship-id and --stream-id are required.');return {providerInstanceId,providerChampionshipId,streamId,maxProviderRequests:budget,preflight:values.includes('--preflight')};}
+
+let exitCode=0;try{const target=args(process.argv.slice(2));await verifyApplicationSchema();registerBuiltInAdapters(providerAdapterRegistry);const controller=new AbortController();process.once('SIGINT',()=>controller.abort());process.once('SIGTERM',()=>controller.abort());const runner=new BoundedProviderOneShotRunner(new ProviderConfigurationService(providerAdapterRegistry,ProviderSecretCipher.fromEnvironment()));const result=await runner.run(target,controller.signal);console.log(JSON.stringify(result));if(target.preflight)console.log('PROVIDER_CALLS=0');if(!['preflight_ok','completed','budget_exhausted','busy'].includes(result.status))exitCode=1;}catch(error){console.error(JSON.stringify({status:'configuration_invalid',error:{code:'invalid_arguments',message:String((error as Error).message).slice(0,300)},PROVIDER_CALLS:0}));exitCode=1;}finally{await pool.end();process.exitCode=exitCode;}

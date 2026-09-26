@@ -7,7 +7,7 @@ import type { Championship, Circuit } from '../features/events/eventTypes';
 import { availableProviderOptions, providerLabel, providerSource } from '../features/events/providerDisplay';
 import { adminAuthorization, notifyAuthenticationRequired } from '../lib/adminAuth';
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 type References = { championships: Map<string, string>; circuits: Map<string, string> };
 
 async function call<T>(path:string,init?:RequestInit):Promise<T>{
@@ -55,7 +55,7 @@ export function CorrectionsPage(){
   const [editingId,setEditingId]=useState<string|null>(null);const [draft,setDraft]=useState('');const [error,setError]=useState('');
   const setFilter=<K extends keyof CorrectionFilters>(key:K,value:CorrectionFilters[K])=>{setFilters((current)=>({...current,[key]:value}));setPage(1)};
   const load=()=>Promise.all([
-    call<CorrectionRow[]>('/api/v1/admin/corrections'),call<Championship[]>('/api/v1/championships'),call<Circuit[]>('/api/v1/circuits')
+    call<CorrectionRow[]>('/api/v1/admin/corrections'),call<Championship[]>('/api/v1/admin/championships'),call<Circuit[]>('/api/v1/circuits')
   ]).then(([corrections,championships,circuits])=>{
     setRows(corrections);setReferences({championships:new Map(championships.map((item)=>[item.id,item.name])),circuits:new Map(circuits.map((item)=>[item.id,item.name]))});setError('');
   }).catch((reason:Error)=>setError(reason.message));

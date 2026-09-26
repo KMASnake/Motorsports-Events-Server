@@ -5,6 +5,14 @@ x-default-logging: &default-logging
     max-file: "5"
     compress: "true"
 
+x-api-build: &api-build
+  context: .
+  dockerfile: apps/api/Dockerfile
+  args:
+    APP_VERSION: ${APP_VERSION:-unknown}
+    GIT_SHA: ${GIT_SHA:-unknown}
+    BUILD_TIME: ${BUILD_TIME:-unknown}
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -25,9 +33,7 @@ services:
     logging: *default-logging
 
   api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
+    build: *api-build
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://mse:change-me@postgres:5432/motorsports_events}
       API_PORT: 3001
@@ -35,8 +41,14 @@ services:
       ADMIN_AUTH_SECRET: ${ADMIN_AUTH_SECRET:-development-only-admin-auth-secret-change-me}
       ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-development-only-session-secret-change-me}
       ADMIN_WEB_ORIGIN: ${ADMIN_WEB_ORIGIN:-http://localhost:3000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
       ADMIN_COOKIE_SECURE: ${ADMIN_COOKIE_SECURE:-false}
-      TRUST_PROXY: ${TRUST_PROXY:-false}
+      TRUST_PROXY_CIDRS: ${TRUST_PROXY_CIDRS:-}
+      PROVIDER_MASTER_KEYS: ${PROVIDER_MASTER_KEYS:-}
+      PROVIDER_ACTIVE_KEY_VERSION: ${PROVIDER_ACTIVE_KEY_VERSION:-}
+      PREVIEW_API_ENABLED: ${PREVIEW_API_ENABLED:-false}
+      PREVIEW_CURSOR_SECRET: ${PREVIEW_CURSOR_SECRET:-}
+      PREVIEW_API_KEY_PEPPER: ${PREVIEW_API_KEY_PEPPER:-}
     ports:
       - "${API_HOST_PORT:-3001}:3001"
     depends_on:
@@ -47,6 +59,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    logging: *default-logging
+
+  worker:
+    build: *api-build
+    command: ["node", "apps/api/dist/worker.js"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://mse:change-me@postgres:5432/motorsports_events}
+      NODE_ENV: development
+      PROVIDER_MASTER_KEYS: ${PROVIDER_MASTER_KEYS:-}
+      PROVIDER_ACTIVE_KEY_VERSION: ${PROVIDER_ACTIVE_KEY_VERSION:-}
+      SCHEDULER_POLL_SECONDS: ${SCHEDULER_POLL_SECONDS:-15}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    stop_grace_period: 30s
     logging: *default-logging
 
   migrate:
@@ -72,8 +100,9 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
-    environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+        APP_VERSION: ${APP_VERSION:-unknown}
+        GIT_SHA: ${GIT_SHA:-unknown}
+        BUILD_TIME: ${BUILD_TIME:-unknown}
     ports:
       - "${WEB_HOST_PORT:-3000}:3000"
     depends_on:

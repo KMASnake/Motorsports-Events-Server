@@ -5,18 +5,49 @@ import json
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def test_workspace_packages_match_version_metadata():
-    metadata = json.loads((ROOT / "VERSION.json").read_text(encoding="utf-8"))
+def test_workspace_packages_match_root_package_version():
+    root_package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
     package_files = [
-        ROOT / "package.json",
         ROOT / "apps" / "api" / "package.json",
         ROOT / "apps" / "web" / "package.json",
         ROOT / "packages" / "types" / "package.json",
     ]
 
-    assert metadata["version"] == "8.1.0-alpha.2-lot.4.3"
     assert all(
         json.loads(path.read_text(encoding="utf-8"))["version"]
-        == metadata["version"]
+        == root_package["version"]
         for path in package_files
     )
+
+
+def test_api_image_receives_release_metadata_as_build_arguments():
+    dockerfile = (ROOT / "apps" / "api" / "Dockerfile").read_text(encoding="utf-8")
+    compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+
+    for name in ("APP_VERSION", "GIT_SHA", "BUILD_TIME"):
+        assert f"ARG {name}=unknown" in dockerfile
+        assert f"{name}=${{{name}}}" in dockerfile
+        assert f"{name}: ${{{name}:-unknown}}" in compose
+
+    assert "x-api-build: &api-build" in compose
+    assert compose.count("build: *api-build") == 2
+    api_environment = compose.split("  api:\n", 1)[1].split("  worker:\n", 1)[0]
+    assert "GIT_SHA: ${GIT_SHA:-unknown}" not in api_environment.split("environment:", 1)[1]
+
+
+def test_web_image_receives_verifiable_release_metadata():
+    dockerfile = (ROOT / "apps" / "web" / "Dockerfile").read_text(encoding="utf-8")
+    compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+
+    for name in ("APP_VERSION", "GIT_SHA", "BUILD_TIME"):
+        assert f"ARG {name}=unknown" in dockerfile
+        assert f"{name}=${{{name}}}" in dockerfile
+        assert f"{name}: ${{{name}:-unknown}}" in compose
+
+
+def test_preproduction_recipe_builds_images_with_generated_release_metadata():
+    readiness = (ROOT / "docs" / "handoff" / "VPS-PREPRODUCTION-READINESS.md").read_text(encoding="utf-8")
+
+    assert "./scripts/build-release.sh" in readiness
+    assert readiness.count("--env-file .env.preprod --env-file dist/release-build.env") >= 2
+    assert "build --pull" in readiness

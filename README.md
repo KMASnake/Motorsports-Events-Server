@@ -1,55 +1,43 @@
-# Motorsports Events Server — GitHub Handover
+# Motorsports Events Server
 
-Ce dépôt constitue le package de passation complet destiné à GitHub et Codex.
+> **Règles permanentes :** [Project Handbook](PROJECT-HANDBOOK.md)  
+> **État courant et prochaine action :** [docs/handoff/PROGRESS.json](docs/handoff/PROGRESS.json)
 
-> **Source de vérité permanente :** consultez le
-> [Project Handbook](PROJECT-HANDBOOK.md) avant toute modification du dépôt.
-> Les documents de `docs/handoff/` complètent le Handbook uniquement pour le
-> périmètre et l'état d'un lot donné.
+## Navigation documentaire
 
-## État du dépôt
+Les documents actifs sont accessibles directement depuis cette page :
 
-La racine contient le **lot 4 rev.1**, qui réunit le CRUD des événements, les
-API publique/administration et la vue calendrier restaurée. Ce candidat a été
-validé par l'utilisateur le 1er août 2026 sur un environnement VPS isolé.
+- [Project Handbook](PROJECT-HANDBOOK.md) — règles permanentes et architecture normative ;
+- [État courant](docs/handoff/PROGRESS.json) — lot/gate actif, validations, autorisations, interdictions et prochaine action ;
+- [Documentation active du lot courant](docs/handoff/README.md) — contrats et preuves, avec accès direct au dossier 5.7-P-F ;
+- [Roadmap](docs/handbook/roadmap/ROADMAP.md) — trajectoire fonctionnelle uniquement ;
+- [Décisions permanentes](docs/handbook/DECISIONS.md) et [ADR](docs/handbook/architecture/) ;
+- [Archives documentaires](docs/archive/README.md) — preuves et documents clôturés.
 
-Le dernier jalon entièrement validé est :
+`PROJECT_STATUS.md`, `PROJECT-STATUS.json` et `NEXT_STEPS.md` sont uniquement des pointeurs de compatibilité. Ils ne définissent pas l'état du projet.
 
-```text
-v8.1.0-alpha.2-lot.4-rev.1
-```
+## Architecture actuelle
 
-Le rapport de validation et la passation sont conservés dans :
+Le dépôt contient temporairement deux générations du serveur :
 
-```text
-docs/handover/LOT-4-REV-1-VPS-VALIDATION.md
-docs/handover/LOT-4-REV-1-HANDOFF.md
-```
+- **cible active** : Node.js / TypeScript / PostgreSQL sous `apps/api`, `apps/web` et `infra/postgres` ;
+- **production historique** : backend Python sous `server/`, conservé en mode **LEGACY / FROZEN** jusqu’au cutover Production Node.
 
-## Prochaine action
-
-Relire puis fusionner la PR #24 dans `main`, vérifier la CI après fusion et
-choisir explicitement le prochain lot. Ne pas installer cette architecture 8.1
-sur la production historique 2.7.0 avec l'ancien script de mise à niveau.
-
-## Maquettes officielles
+L’architecture cible et le modèle d’états provider sont documentés dans :
 
 ```text
-docs/ui-reference/validated-mockups/
+docs/architecture.md
+docs/provider-state-model.md
 ```
 
-Les maquettes sont un contrat visuel. Elles ne sont pas de simples exemples.
-
-## Documentation historique
+Les règles applicables au backend historique sont documentées dans :
 
 ```text
-docs/reference/documentation-v7.0.0/
+server/LEGACY.md
+docs/cleanup/CLEANUP-06-LEGACY-OPERATIONS-AUDIT.md
 ```
 
-Elle contient les spécifications UI et d'architecture produites avant le
-développement du socle exécutable.
-
-## Démarrage local
+## Développement local Node
 
 Sous Windows :
 
@@ -57,25 +45,52 @@ Sous Windows :
 scripts\reset-dev.cmd
 ```
 
-Validation du dernier lot :
+Validation générique :
 
-```cmd
-scripts\test-lot4.cmd
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
 ```
 
-Le lot ne doit être déclaré validé qu'après :
+Les validations historiques encore maintenues restent accessibles via les commandes `npm run ...` déclarées dans `package.json`, par exemple :
 
-- build TypeScript web ;
-- build API ;
-- trois conteneurs healthy ;
-- validation API ;
-- test visuel ;
-- comparaison à la maquette ;
-- mise à jour de `PROJECT-STATUS.json` et des documents de passation.
+```bash
+npm run validate:lot4
+npm run test:lot44:final
+npm run test:lot55
+```
+
+Ne pas utiliser d’ancien wrapper `.cmd` supprimé comme source canonique : `package.json` et les scripts shell/Node qu’il référence constituent les points d’entrée maintenus.
+
+## Exploitation historique
+
+Les scripts racine `start.sh`, `stop.sh`, `restart.sh`, `backup.sh`, `restore.sh`, `upgrade.sh`, `show-keys.sh` ainsi que `install.sh` appartiennent encore à la chaîne d’exploitation/rollback historique.
+
+Ils sont **gelés** :
+
+- ne pas les étendre pour l’architecture Node ;
+- ne pas les utiliser pour piloter la préproduction Node ;
+- les conserver uniquement jusqu’au cutover Production Node et à la fin de la capacité de rollback Python.
+
+La préproduction Node utilise sa configuration Compose et son infrastructure déclarative dédiées.
+
+## Maquettes officielles
+
+```text
+docs/ui-reference/validated-mockups/
+```
+
+Les maquettes restent le contrat visuel de référence.
+
+## Documentation historique
+
+Les documents historiques sont indexés dans [docs/archive/README.md](docs/archive/README.md). Des répertoires historiques plus anciens peuvent encore subsister (`docs/handover/`, `docs/decisions/`, `docs/reference/`) pendant la transition, mais ils ne constituent aucune source de vérité active.
 
 ## Plateforme cible
 
-Console d'administration desktop :
+Console d’administration desktop :
 
 - résolution de référence : 1440 × 900 ;
 - minimum supporté : 1280 × 720 ;

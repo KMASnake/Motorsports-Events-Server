@@ -1,6 +1,7 @@
 node_modules
 dist
 coverage
+*.tsbuildinfo
 .env
 .env.local
 *.log
@@ -17,3 +18,6 @@ sanitized-snapshots/
 .env.production
 __pycache__/
 *.py[cod]
+*.key
+*.pem
+credentials*.json

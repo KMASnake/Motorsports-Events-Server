@@ -3,6 +3,8 @@ import {
   decideLocalOverride,
   decideProviderSync,
   effectiveValue,
+  assertCorrectionSafeEvent,
+  hasIncompleteProviderIdentity,
   isProviderEvent,
   providerConflict,
   shouldCreateCorrection
@@ -13,6 +15,12 @@ describe('provider correction policy',()=>{
   it('uses the override as effective value',()=>expect(effectiveValue('provider','local')).toBe('local'));
   it('detects provider changes below an override',()=>expect(providerConflict('old','new','local')).toBe(true));
   it('requires an identifiable provider source',()=>expect(isProviderEvent({origin:'mixed'})).toBe(false));
+  it('refuses a silent administrative update of inconsistent provider data',()=>{
+    expect(hasIncompleteProviderIdentity({origin:'provider'})).toBe(true);
+    expect(()=>assertCorrectionSafeEvent({origin:'provider'})).toThrow(/identité fournisseur absente/);
+    expect(()=>assertCorrectionSafeEvent({origin:'manual'})).not.toThrow();
+    expect(()=>assertCorrectionSafeEvent({origin:'provider',provider_key:'feed'})).not.toThrow();
+  });
   it('keeps the original provider value across successive local edits',()=>{
     const decision=decideLocalOverride(
       {origin:'provider',provider_key:'feed'},
