@@ -130,6 +130,7 @@ class F4StabilizationTests(unittest.TestCase):
         self.assertIn('"f4_6":"maintainer-validated"', result.stdout)
         self.assertIn('"f4":"complete"', result.stdout)
         self.assertIn('"f5_4":"maintainer-validated"', result.stdout)
+        self.assertIn('"f5_5":"maintainer-validated"', result.stdout)
 
     def test_missing_evidence_is_refused(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -384,6 +385,30 @@ class F4StabilizationTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("in-progress", result.stderr)
 
+    def test_f5_5_certification_and_future_boundaries_are_fail_closed(self) -> None:
+        def gate(value: dict) -> dict:
+            return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]
+
+        cases = (
+            lambda value: gate(value)["provider_first_f5"]["subphases"].pop("F5-5"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(status="implemented-awaiting-maintainer-validation"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(maintainer_audit="fail"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(maintainer_validated=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(git_head="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(git_tree="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(migration_head="0035_f5_provider_discovery_resolution"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["legacy"].update(run_number=273),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["node"].update(conclusion="FAILURE"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(status="in-progress", authorized=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-7"].update(status="in-progress", authorized=True),
+            lambda value: gate(value)["provider_first_f5"].update(status="complete"),
+            lambda value: gate(value).update(production_authorized=True),
+        )
+        for index, mutate in enumerate(cases):
+            with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
+                target = changed_progress(Path(raw), mutate)
+                self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
     def test_f5_production_and_incomplete_f4_are_refused(self) -> None:
         def gate(value: dict) -> dict:
             return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]
@@ -419,7 +444,14 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(provider_calls=1),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(worker_started=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-4"].update(scheduler_started=True),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(status="maintainer-validated", maintainer_validated=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(status="implemented-awaiting-maintainer-validation"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(maintainer_validated=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(git_head="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(git_tree="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(migration_head="0035_f5_provider_discovery_resolution"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].pop("git_head"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["legacy"].update(run_number=273),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["node"].update(conclusion="FAILURE"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(status="in-progress", authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-7"].update(status="in-progress", authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(status="in-progress-pending-maintainer-validation"),
