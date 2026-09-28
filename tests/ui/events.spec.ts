@@ -68,7 +68,7 @@ test.describe('Événements lot 4 rev.1', () => {
 
   test('un double-clic sur un Event existant ouvre son édition préremplie, jamais une création',async({page,request})=>{
     const rows=await (await request.get(`${apiUrl}/api/v1/admin/events`)).json();
-    const source=rows.find((event:{circuit_id:string|null;ends_at:string|null})=>event.circuit_id&&event.ends_at);
+    const source=rows.find((event:{name:string;meeting_id:string|null;circuit_id:string|null;ends_at:string|null})=>event.name==='Événement test 2'&&!event.meeting_id&&event.circuit_id&&event.ends_at);
     expect(source).toBeTruthy();
     await page.clock.setFixedTime(new Date(source.starts_at));
     await page.goto('/events');
@@ -126,9 +126,14 @@ test.describe('Événements lot 4 rev.1', () => {
   test('affiche les corrections champ par champ et le branding', async ({ page }) => {
     const workspace = await page.request.get(`${apiUrl}/api/v1/admin/events`);
     const events = await workspace.json();
-    const providerEvent = events.find((event: { origin?:string; normalized_uuid?:string|null; correction_count?:number }) => event.origin==='provider'&&event.normalized_uuid&&event.correction_count===0);
+    const providerEvent = events.find((event: { name?:string; origin?:string; normalized_uuid?:string|null; correction_count?:number; starts_at?:string; ends_at?:string|null }) => event.name==='Événement test 10'&&event.origin==='provider'&&event.normalized_uuid&&event.correction_count===0&&event.starts_at&&event.ends_at);
     expect(providerEvent).toBeTruthy();
-    const patched = await page.request.patch(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`, { data: { name: 'Événement fournisseur corrigé', starts_at: '2026-12-22T11:30:00.000Z', status: 'postponed', session_title:'Session locale' }});
+    const intervalStart=new Date(providerEvent.starts_at).getTime();
+    const intervalEnd=new Date(providerEvent.ends_at).getTime();
+    expect(intervalEnd).toBeGreaterThan(intervalStart);
+    const correctedStart=new Date(intervalStart+Math.floor((intervalEnd-intervalStart)/2)).toISOString();
+    const expectedLocalStart=await page.evaluate((iso)=>{const date=new Date(iso);return new Date(date.getTime()-date.getTimezoneOffset()*60_000).toISOString().slice(0,16)},correctedStart);
+    const patched = await page.request.patch(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`, { data: { name: 'Événement fournisseur corrigé', starts_at: correctedStart, status: 'postponed', session_title:'Session locale' }});
     expect(patched.ok()).toBeTruthy();
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
@@ -161,7 +166,7 @@ test.describe('Événements lot 4 rev.1', () => {
     const dateCorrection=providerArticle.locator('.correction-field').filter({hasText:'Début'});
     await dateCorrection.getByRole('button',{name:'Modifier local'}).click();
     await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveAttribute('type','datetime-local');
-    await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveValue('2026-12-22T11:30');
+    await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveValue(expectedLocalStart);
     await dateCorrection.getByRole('button',{name:'Annuler'}).click();
     await page.screenshot({path:'tests/ui/screenshots/corrections-list-1440x900.png'});
     await page.screenshot({path:'tests/ui/screenshots/corrections-conflict-1440x900.png'});
