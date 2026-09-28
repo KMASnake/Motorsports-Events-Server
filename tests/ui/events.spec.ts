@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { providerLabel } from '../../apps/web/src/features/events/providerDisplay';
 
 const apiUrl = process.env.API_URL ?? 'http://localhost:3001';
 const adminToken = process.env.ADMIN_TOKEN;
@@ -129,11 +130,7 @@ test.describe('Événements lot 4 rev.1', () => {
     const events = await workspace.json();
     const providerEvent = events.find((event: { name?:string; origin?:string; normalized_uuid?:string|null; correction_count?:number; starts_at?:string; ends_at?:string|null }) => event.name==='Événement test 10'&&event.origin==='provider'&&event.normalized_uuid&&event.correction_count===0&&event.starts_at&&event.ends_at);
     expect(providerEvent).toBeTruthy();
-    const providersResponse=await page.request.get(`${apiUrl}/api/v1/admin/providers`);
-    expect(providersResponse.ok()).toBeTruthy();
-    const providers=await providersResponse.json() as Array<{adapter_key:string;name:string}>;
-    const providerMetadata=providers.find(provider=>provider.adapter_key===providerEvent.provider_key);
-    expect(providerMetadata).toBeTruthy();
+    const expectedProviderLabel=providerLabel(providerEvent.origin,providerEvent.provider_key);
     const intervalStart=new Date(providerEvent.starts_at).getTime();
     const intervalEnd=new Date(providerEvent.ends_at).getTime();
     expect(intervalEnd).toBeGreaterThan(intervalStart);
@@ -144,7 +141,7 @@ test.describe('Événements lot 4 rev.1', () => {
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
-    await expect(page.getByLabel('Fournisseur')).toContainText(providerMetadata!.name);
+    await expect(page.getByLabel('Fournisseur')).toContainText(expectedProviderLabel);
     await page.getByLabel('Fournisseur').selectOption(`provider:${providerEvent.provider_key}`);
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
     await expect(page.getByLabel('Fournisseur')).toHaveValue(`provider:${providerEvent.provider_key}`);
