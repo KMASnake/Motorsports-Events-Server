@@ -1,35 +1,43 @@
 import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { CanonicalFieldOverrideService } from '../../apps/api/src/reconciliation/canonicalFieldOverrideService.js';
 
 const seed = process.argv.find((value) => value.startsWith('--seed='))?.split('=')[1] ?? 'lot-4.2';
 const id = (kind: string, index: number) => createHash('sha256')
   .update(`${seed}:${kind}:${index}`)
   .digest('hex')
   .slice(0, 16);
+const uuid = (kind: string, index: number) => {
+  const value = createHash('sha256').update(`${seed}:${kind}:${index}`).digest('hex');
+  return `${value.slice(0, 8)}-${value.slice(8, 12)}-4${value.slice(13, 16)}-a${value.slice(17, 20)}-${value.slice(20, 32)}`;
+};
 const countries = ['FR', 'GB', 'IT', 'DE', 'ES', 'US', 'JP', 'AU'];
 const providers = ['ocblacktop', 'thesportsdb', 'future-timing-feed'];
 const seedToken = id('seed', 0).slice(0, 8);
+const canonicalEventIndices = new Set([0, 3, 6, 9, 24]);
 
 type CorrectionFixture = {
   eventIndex: number;
   field: string;
   providerValue: unknown;
   overrideValue: unknown;
-  status: 'active' | 'conflict' | 'resolved' | 'ignored';
+  status: 'active' | 'conflict';
   author: string;
   daysAgo: number;
 };
 
-async function main() {
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-  try {
-    for (let index = 0; index < 12; index += 1) {
-      await pool.query(
+const overrideService = new CanonicalFieldOverrideService();
+
+export async function generateRealisticTestData(pool: pg.Pool): Promise<void> {
+  for (let index = 0; index < 12; index += 1) {
+    await pool.query(
         `insert into championships(id,slug,name,short_name,season,active)
          values($1,$2,$3,$4,2026,true) on conflict(id) do nothing`,
         [id('champ', index), `test-${seedToken}-championship-${index + 1}`, `Championnat test ${index + 1}`, `TC${index + 1}`]
-      );
-    }
+    );
+  }
     for (let index = 0; index < 40; index += 1) {
       await pool.query(
         `insert into circuits(id,name,city,country_code,timezone)
@@ -40,15 +48,26 @@ async function main() {
     for (let index = 0; index < 96; index += 1) {
       const start = new Date(Date.UTC(2026, index % 12, 2 + (index * 3) % 25, 8 + (index % 10), 0));
       const providerEvent = index % 3 === 0;
-      await pool.query(
+      const client = await pool.connect();
+      try {
+        await client.query('begin');
+        if (canonicalEventIndices.has(index)) {
+          await client.query(
+            `insert into meetings(id,championship_id,name,season,starts_at,ends_at,timezone)
+             values($1,$2,$3,2026,$4,$5,'UTC') on conflict(id) do nothing`,
+            [uuid('meeting', index), id('champ', index % 12), `Épreuve test ${index + 1}`, start, new Date(start.getTime() + (1 + index % 5) * 3_600_000)]
+          );
+        }
+        await client.query(
         `insert into events(
-           id,championship_id,circuit_id,name,slug,starts_at,ends_at,timezone,status,published,
-           origin,provider_key,external_id,description
-         ) values($1,$2,$3,$4,$5,$6,$7,'UTC',$8,$9,$10,$11,$12,$13)
+           id,championship_id,circuit_id,name,slug,category,session_type_key,starts_at,ends_at,timezone,status,published,
+           origin,provider_key,external_id,description,normalized_uuid
+         ) values($1,$2,$3,$4,$5,'other','other',$6,$7,'UTC',$8,$9,$10,$11,$12,$13,$14)
          on conflict(id) do update set
            origin=excluded.origin,
            provider_key=excluded.provider_key,
-           external_id=excluded.external_id`,
+           external_id=excluded.external_id,
+           normalized_uuid=coalesce(events.normalized_uuid,excluded.normalized_uuid)`,
         [
           id('event', index), id('champ', index % 12), id('circuit', index % 40),
           `Événement test ${index + 1}`, `event-test-${index + 1}-${id('slug', index)}`,
@@ -58,68 +77,64 @@ async function main() {
           providerEvent ? 'provider' : 'manual',
           providerEvent ? providers[(index / 3) % providers.length] : null,
           providerEvent ? `synthetic-${seed}-${index + 1}` : null,
-          `Données synthétiques déterministes (${seed}).`
+          `Données synthétiques déterministes (${seed}).`, canonicalEventIndices.has(index) ? uuid('event', index) : null
         ]
-      );
+        );
+        if (canonicalEventIndices.has(index)) {
+          await client.query(
+            `insert into meeting_events(meeting_id,event_id,position) values($1,$2,0)
+             on conflict(event_id) do update set meeting_id=excluded.meeting_id`,
+            [uuid('meeting', index), id('event', index)]
+          );
+        }
+        await client.query('commit');
+      } catch (error) {
+        await client.query('rollback');
+        throw error;
+      } finally {
+        client.release();
+      }
     }
 
     const corrections: CorrectionFixture[] = [
       { eventIndex: 0, field: 'name', providerValue: 'Grand Prix fournisseur', overrideValue: 'Grand Prix corrigé', status: 'active', author: 'administrateur', daysAgo: 0 },
-      { eventIndex: 0, field: 'circuit_id', providerValue: id('circuit', 0), overrideValue: id('circuit', 1), status: 'conflict', author: 'administrateur', daysAgo: 0 },
       { eventIndex: 3, field: 'starts_at', providerValue: '2026-04-11T09:00:00.000Z', overrideValue: '2026-04-11T10:30:00.000Z', status: 'active', author: 'planificateur', daysAgo: 1 },
       { eventIndex: 3, field: 'ends_at', providerValue: '2026-04-11T11:00:00.000Z', overrideValue: '2026-04-11T12:30:00.000Z', status: 'active', author: 'planificateur', daysAgo: 1 },
       { eventIndex: 6, field: 'status', providerValue: 'scheduled', overrideValue: 'postponed', status: 'conflict', author: 'direction-course', daysAgo: 2 },
-      { eventIndex: 9, field: 'published', providerValue: true, overrideValue: false, status: 'active', author: 'éditeur', daysAgo: 3 },
-      { eventIndex: 12, field: 'description', providerValue: 'Description fournisseur', overrideValue: 'Description locale vérifiée', status: 'active', author: 'éditeur', daysAgo: 5 },
-      { eventIndex: 15, field: 'category', providerValue: 'Race', overrideValue: 'Course principale', status: 'conflict', author: 'administrateur', daysAgo: 7 },
-      { eventIndex: 18, field: 'name', providerValue: 'Épreuve internationale', overrideValue: 'Épreuve internationale 2026', status: 'resolved', author: 'réviseur', daysAgo: 12 },
-      { eventIndex: 21, field: 'description', providerValue: null, overrideValue: 'Information en attente', status: 'ignored', author: 'réviseur', daysAgo: 20 },
-      { eventIndex: 24, field: 'name', providerValue: 'Rally fournisseur', overrideValue: 'Rally local', status: 'active', author: 'administrateur', daysAgo: 30 },
-      { eventIndex: 24, field: 'published', providerValue: false, overrideValue: true, status: 'conflict', author: 'administrateur', daysAgo: 30 }
+      { eventIndex: 24, field: 'name', providerValue: 'Rally fournisseur', overrideValue: 'Rally local', status: 'active', author: 'administrateur', daysAgo: 30 }
     ];
 
     for (const [index, correction] of corrections.entries()) {
       const eventId = id('event', correction.eventIndex);
-      const providerKey = providers[(correction.eventIndex / 3) % providers.length];
       const updatedAt = new Date(Date.now() - correction.daysAgo * 86_400_000);
-      await pool.query(
-        `insert into event_corrections(
-           id,event_id,provider_key,external_id,field_name,provider_value,override_value,
-           status,created_by,created_at,updated_at,last_provider_seen_at,conflict_detected_at
-         ) values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8,$9,$10,$10,$10,$11)
-         on conflict(event_id,field_name) do update set
-           provider_key=excluded.provider_key,
-           external_id=excluded.external_id,
-           provider_value=excluded.provider_value,
-           override_value=excluded.override_value,
-           status=excluded.status,
-           created_by=excluded.created_by,
-           created_at=excluded.created_at,
-           updated_at=excluded.updated_at,
-           last_provider_seen_at=excluded.last_provider_seen_at,
-           conflict_detected_at=excluded.conflict_detected_at`,
-        [
-          id('correction', index), eventId, providerKey,
-          `synthetic-${seed}-${correction.eventIndex + 1}`, correction.field,
-          JSON.stringify(correction.providerValue), JSON.stringify(correction.overrideValue),
-          correction.status, correction.author, updatedAt,
-          correction.status === 'conflict' ? updatedAt : null
-        ]
-      );
-      if (correction.status === 'active' || correction.status === 'conflict') {
-        await pool.query(
+      const client = await pool.connect();
+      try {
+        await client.query('begin');
+        await overrideService.setCompatibleInTransaction(client, {
+          entityKind: 'event', entityUuid: uuid('event', correction.eventIndex), canonicalRecordId: eventId,
+          fieldName: correction.field, value: correction.overrideValue,
+          providerValueAtCreation: correction.providerValue, actorId: correction.author,
+          reason: 'Deterministic acceptance fixture', legacyOperationId: `acceptance:${seed}:${index}`,
+          legacyEventCorrectionId: id('correction', index), legacyStatus: correction.status
+        });
+        await client.query(
           `update events set ${correction.field}=$2,updated_at=$3 where id=$1`,
           [eventId, correction.overrideValue, updatedAt]
         );
+        await client.query('commit');
+      } catch (error) {
+        await client.query('rollback');
+        throw error;
+      } finally {
+        client.release();
       }
     }
-    console.log(`Données synthétiques générées avec seed=${seed}: 12 championnats, 40 circuits, 96 événements, dont 32 événements fournisseur et 12 corrections.`);
-  } finally {
-    await pool.end();
-  }
+  console.log(`Données synthétiques générées avec seed=${seed}: 12 championnats, 40 circuits, 96 événements, dont 32 événements fournisseur et 5 corrections canoniques.`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  generateRealisticTestData(pool)
+    .catch((error) => { console.error(error); process.exitCode = 1; })
+    .finally(() => pool.end());
+}

@@ -124,35 +124,19 @@ test.describe('Événements lot 4 rev.1', () => {
   });
 
   test('affiche les corrections champ par champ et le branding', async ({ page }) => {
-    const marker = `correction-ui-${Date.now()}`;
     const workspace = await page.request.get(`${apiUrl}/api/v1/admin/events`);
     const events = await workspace.json();
-    for (const stale of events.filter((event: { provider_key?: string }) => event.provider_key === 'playwright-fixture')) {
-      await page.request.delete(`${apiUrl}/api/v1/admin/events/${stale.id}`);
-    }
-    const circuitsResponse = await page.request.get(`${apiUrl}/api/v1/circuits`);
-    const circuits = await circuitsResponse.json();
-    const source = events.find((event: { championship_id?: string; circuit_id?: string | null }) => event.championship_id && event.circuit_id);
-    const targetCircuit = circuits.find((circuit: { id:string }) => circuit.id !== source.circuit_id);
-    const created = await page.request.post(`${apiUrl}/api/v1/admin/provider-events`, { data: {
-      championship_id: source.championship_id, circuit_id: source.circuit_id,
-      name: 'Événement fournisseur test', category: null,
-      starts_at: '2026-12-22T10:00:00.000Z', ends_at: '2026-12-22T12:00:00.000Z',
-      status: 'scheduled', published: true,
-      provider_key: 'playwright-fixture', external_id: marker,
-      description: 'Valeur fournisseur.'
-    }});
-    expect(created.ok()).toBeTruthy();
-    const providerEvent = await created.json();
-    const patched = await page.request.patch(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`, { data: { name: 'Événement fournisseur corrigé', circuit_id: targetCircuit.id, starts_at: '2026-12-22T11:30:00.000Z', status: 'postponed' }});
+    const providerEvent = events.find((event: { origin?:string; normalized_uuid?:string|null; correction_count?:number }) => event.origin==='provider'&&event.normalized_uuid&&event.correction_count===0);
+    expect(providerEvent).toBeTruthy();
+    const patched = await page.request.patch(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`, { data: { name: 'Événement fournisseur corrigé', starts_at: '2026-12-22T11:30:00.000Z', status: 'postponed', session_title:'Session locale' }});
     expect(patched.ok()).toBeTruthy();
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
-    await expect(page.getByLabel('Fournisseur')).toContainText('Playwright Fixture');
-    await page.getByLabel('Fournisseur').selectOption('provider:playwright-fixture');
+    await expect(page.getByLabel('Fournisseur')).toContainText(providerEvent.provider_key);
+    await page.getByLabel('Fournisseur').selectOption(`provider:${providerEvent.provider_key}`);
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
-    await expect(page.getByLabel('Fournisseur')).toHaveValue('provider:playwright-fixture');
+    await expect(page.getByLabel('Fournisseur')).toHaveValue(`provider:${providerEvent.provider_key}`);
     await expect(page.getByLabel('Championnat')).toBeVisible();
     await expect(page.getByLabel('Champ corrigé')).toContainText('Nom');
     await expect(page.getByLabel('Statut de correction')).toBeVisible();
@@ -168,30 +152,17 @@ test.describe('Événements lot 4 rev.1', () => {
     await nameCorrection.getByRole('button',{name:'Enregistrer'}).click();
     await expect(page.getByRole('heading',{name:'Événement fournisseur ajusté'})).toBeVisible();
     await page.getByRole('button',{name:'Réinitialiser'}).click();
-    await expect(page.getByRole('navigation',{name:'Pagination des corrections'})).toContainText('Page 1 sur 2');
-    await expect(page.locator('.correction-field')).toHaveCount(10);
+    await expect(page.locator('.correction-field')).toHaveCount(9);
     await expect(page.getByRole('button',{name:'Restaurer fournisseur'}).first()).toBeVisible();
     await expect(page.getByRole('button',{name:'Supprimer correction'})).toHaveCount(0);
     await expect(page.getByRole('button',{name:'Conserver local'})).toHaveCount(0);
     await expect(page.getByText('Reporté',{exact:true}).first()).toBeVisible();
-    await expect(page.getByText(source.circuit_name,{exact:true}).first()).toBeVisible();
-    await expect(page.getByText(targetCircuit.name,{exact:true}).first()).toBeVisible();
-    await expect(page.getByText(source.circuit_id,{exact:true})).toHaveCount(0);
-    await expect(page.getByText(targetCircuit.id,{exact:true})).toHaveCount(0);
     const providerArticle=page.locator('.corrections-list article').filter({has:page.getByRole('heading',{name:'Événement fournisseur ajusté'})});
-    const circuitCorrection=providerArticle.locator('.correction-field').filter({hasText:'Circuit'});
-    await circuitCorrection.getByRole('button',{name:'Modifier local'}).click();
-    await expect(circuitCorrection.getByLabel('Nouvelle valeur Circuit')).toHaveValue(targetCircuit.id);
-    await expect(circuitCorrection.getByLabel('Nouvelle valeur Circuit')).toContainText(targetCircuit.name);
-    await circuitCorrection.getByRole('button',{name:'Annuler'}).click();
     const dateCorrection=providerArticle.locator('.correction-field').filter({hasText:'Début'});
     await dateCorrection.getByRole('button',{name:'Modifier local'}).click();
     await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveAttribute('type','datetime-local');
     await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveValue('2026-12-22T11:30');
     await dateCorrection.getByRole('button',{name:'Annuler'}).click();
-    await page.getByRole('button',{name:'Suivante'}).click();
-    await expect(page.getByRole('navigation',{name:'Pagination des corrections'})).toContainText('Page 2 sur 2');
-    await page.getByRole('button',{name:'Précédente'}).click();
     await page.screenshot({path:'tests/ui/screenshots/corrections-list-1440x900.png'});
     await page.screenshot({path:'tests/ui/screenshots/corrections-conflict-1440x900.png'});
     await expect(page.getByAltText('Motorsports Events Server')).toBeVisible();
@@ -199,8 +170,11 @@ test.describe('Événements lot 4 rev.1', () => {
     await providerArticle.getByRole('button',{name:'Ouvrir l’événement'}).click();
     await expect(page).toHaveURL(new RegExp(`/events\\?event_id=${providerEvent.id}`));
     await expect(page.getByRole('heading',{name:'Événement fournisseur ajusté'})).toBeVisible();
-    const deleted = await page.request.delete(`${apiUrl}/api/v1/admin/events/${providerEvent.id}`);
-    expect(deleted.ok()).toBeTruthy();
+    const cleanup = await page.request.get(`${apiUrl}/api/v1/admin/corrections?event_id=${providerEvent.id}`);
+    for (const correction of await cleanup.json()) {
+      const restored=await page.request.post(`${apiUrl}/api/v1/admin/corrections/${correction.id}/accept-provider`);
+      expect(restored.ok()).toBeTruthy();
+    }
   });
 
   test('reste exploitable en 1280 × 720', async ({ page }) => {

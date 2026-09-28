@@ -20,7 +20,9 @@ export class CanonicalFieldOverrideService{
   async setCompatibleInTransaction(client:PoolClient,input:Omit<Command,'expectedRevision'|'idempotencyKey'> & {legacyOperationId:string}){
     await this.lockEntity(client,input.entityKind,input.entityUuid);
     const current=(await client.query(`select * from canonical_field_overrides where entity_kind=$1 and entity_uuid=$2 and field_name=$3 and status='active' for update`,[input.entityKind,input.entityUuid,input.fieldName])).rows[0];
-    if(current&&reconciliationChecksum(current.override_value)===reconciliationChecksum(input.value))return {override:current,previous:current,replay:true};
+    if(current&&reconciliationChecksum(current.override_value)===reconciliationChecksum(input.value)
+      &&reconciliationChecksum(current.provider_value_at_creation)===reconciliationChecksum(input.providerValueAtCreation)
+      &&(current.legacy_status??null)===(input.legacyStatus??null))return {override:current,previous:current,replay:true};
     const expectedRevision=Number(current?.revision??0);
     const transitionOrdinal=Number((await client.query(`select count(*) count from canonical_override_mutations mutation join canonical_field_overrides override on override.id=mutation.override_id where mutation.entity_kind=$1 and mutation.entity_uuid=$2 and override.field_name=$3`,[input.entityKind,input.entityUuid,input.fieldName])).rows[0].count);
     const idempotencyKey=`legacy:${reconciliationChecksum({operation:'set',entityKind:input.entityKind,entityUuid:input.entityUuid,fieldName:input.fieldName,value:input.value,legacyOperationId:input.legacyOperationId,expectedRevision,transitionOrdinal,actorId:input.actorId,reason:input.reason})}`;

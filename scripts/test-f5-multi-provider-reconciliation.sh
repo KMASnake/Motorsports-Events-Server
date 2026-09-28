@@ -101,6 +101,8 @@ done
 
 DATABASE_URL="postgresql://mse:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/motorsports_events" \
 RUN_F5_RECONCILIATION_POSTGRES=1 npm test --workspace @mse/api -- --run tests/reconciliation.postgres.test.ts
+DATABASE_URL="postgresql://mse:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/motorsports_events" \
+RUN_F5_RECONCILIATION_POSTGRES=1 npm test --workspace @mse/api -- --run tests/acceptanceDataset.postgres.test.ts
 
 # Once F5-6 evidence exists the DOWN must refuse without deleting legacy tables.
 if "${compose[@]}" run --rm migrate sh /migrations/migrate.sh down 0037_f5_multi_provider_reconciliation >/dev/null 2>&1;then echo 'F5-6 populated DOWN accepted' >&2;exit 1;fi

@@ -64,6 +64,15 @@ suite('F5-6 PostgreSQL exact preview/apply',()=>{
     expect(Number((await pool.query('select count(*) count from canonical_field_override_history where override_id=$1',[imported.id])).rows[0].count)).toBe(3);
   });
 
+  it('F8 resolves a legacy conflict even when the override value is unchanged',async()=>{
+    const imported=(await pool.query(`select * from canonical_field_overrides where legacy_event_correction_id='legacy-conflict'`)).rows[0];
+    expect(imported.legacy_status).toBe('conflict');expect(Number(imported.revision)).toBe(1);
+    const result=await withTransaction(client=>resolveCorrection(client,'legacy-conflict','keep-override'));
+    expect(result.correction?.legacy_status).toBe('active');expect(Number(result.correction?.revision)).toBe(2);
+    const resolved=(await pool.query('select legacy_status,revision from canonical_field_overrides where id=$1',[imported.id])).rows[0];expect(resolved.legacy_status).toBe('active');expect(Number(resolved.revision)).toBe(2);
+    expect(Number((await pool.query('select count(*) count from canonical_field_override_history where override_id=$1',[imported.id])).rows[0].count)).toBe(2);
+  });
+
   it('A1-A3 persist concurrent contributions idempotently and reconcile independently of commit order',async()=>{
     const canonicalBefore=(await pool.query('select name from meetings where id=$1',[meeting])).rows[0].name;
     const revisionBefore=Number((await pool.query(`select coalesce(max(revision),0) revision from public_resource_states where resource_type='meeting' and resource_id=$1`,[meeting])).rows[0].revision);
