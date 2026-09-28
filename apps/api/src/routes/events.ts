@@ -76,7 +76,7 @@ const adminSelect = `
   select e.*,c.name championship_name,c.slug championship_slug,c.logo_url championship_logo_url,c.active championship_active,
     ci.name circuit_name,ci.city circuit_city,ci.country_code,
     me.meeting_id,m.name meeting_name,
-    (select count(*)::int from event_corrections ec where ec.event_id=e.id and ec.status in ('active','conflict')) correction_count
+    (select count(*)::int from canonical_field_overrides ec where ec.entity_kind='event' and ec.canonical_record_id=e.id and ec.status='active') correction_count
   from events e
   join championships c on c.id=e.championship_id
   left join circuits ci on ci.id=e.circuit_id

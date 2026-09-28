@@ -18,7 +18,7 @@ async function candidate(suffix:number){
     values($1,$2,$3,'meeting',$4,2026,$5::jsonb,$6,now(),now(),now())`,[source,provider,providerChampionship,`meeting-${suffix}`,JSON.stringify({name:`Meeting ${suffix}`,external_season_id:'f1-2026'}),`hash-${suffix}`]);
   const normalized={resourceKind:'meeting',name:`Meeting ${suffix}`,sessionType:'other',sessionLabel:null,status:'scheduled',championshipId:'f1',championshipSeasonId:season,circuitId:null,venueId:venue,venueLayoutId:null,season:2026,round:String(suffix),startsAt:`2026-0${Math.min(suffix,9)}-01T10:00:00.000Z`,endsAt:null,timezone:'UTC',presence:'seen'};
   await pool.query(`insert into normalized_candidates(id,source_entity_id,source_hash,normalization_version,resource_kind,candidate_data)
-    values($1,$2,$3,'f5-5-test','meeting',$4::jsonb)`,[id,source,`hash-${suffix}`,JSON.stringify({normalized,resolution:{decision:'review',reason:'ambiguous_meeting'},proposed_uuid:proposed,checksum:`checksum-${suffix}`})]);
+    values($1,$2,$3,'f5-5-test','meeting',$4::jsonb)`,[id,source,`hash-${suffix}`,JSON.stringify({normalized,resolution:{decision:'review',reason:'ambiguous_meeting'},proposed_uuid:proposed,checksum:`checksum-${suffix}`,source_revision:1})]);
   await pool.query(`insert into normalization_decisions(id,source_entity_id,candidate_id,candidate_revision,decision,target_kind,target_id,normalization_version,actor_id,reason,idempotency_key,decision_fingerprint)
     values($1,$2,$3,1,'review',null,null,'f5-5-test','deterministic-normalizer','ambiguous_meeting',$4,$5)`,[`56000000-0000-4000-8003-${String(100000000000+suffix).padStart(12,'0')}`,source,id,`review-${suffix}`,'a'.repeat(64)]);
   return {id,proposed};
@@ -31,7 +31,7 @@ async function eventCandidate(suffix:number,parent=parentSource){
     values($1,$2,$3,'event',$4,$5,2026,$6::jsonb,$7,now(),now(),now())`,[source,provider,providerChampionship,`event-${suffix}`,parent,JSON.stringify({name:`Changed Event ${suffix}`,session_type:'practice'}),`event-hash-${suffix}`]);
   const normalized={resourceKind:'event',name:`Changed Event ${suffix}`,sessionType:'practice',sessionLabel:'FP1',status:'scheduled',championshipId:'f1',championshipSeasonId:season,circuitId:null,venueId:venue,venueLayoutId:null,season:2026,round:null,startsAt:`2026-10-${String(Math.min(suffix,28)).padStart(2,'0')}T10:00:00.000Z`,endsAt:null,timezone:'UTC',presence:'seen'};
   await pool.query(`insert into normalized_candidates(id,source_entity_id,source_hash,normalization_version,resource_kind,candidate_data)
-    values($1,$2,$3,'f5-5-test','event',$4::jsonb)`,[id,source,`event-hash-${suffix}`,JSON.stringify({normalized,resolution:{decision:'review',reason:'manual_review'},proposed_uuid:proposed,checksum:`event-checksum-${suffix}`})]);
+    values($1,$2,$3,'f5-5-test','event',$4::jsonb)`,[id,source,`event-hash-${suffix}`,JSON.stringify({normalized,resolution:{decision:'review',reason:'manual_review'},proposed_uuid:proposed,checksum:`event-checksum-${suffix}`,source_revision:1})]);
   await pool.query(`insert into normalization_decisions(id,source_entity_id,candidate_id,candidate_revision,decision,target_kind,target_id,normalization_version,actor_id,reason,idempotency_key,decision_fingerprint)
     values($1,$2,$3,1,'review',null,null,'f5-5-test','deterministic-normalizer','manual_review',$4,$5)`,[`56000000-0000-4000-8007-${String(100000000000+suffix).padStart(12,'0')}`,source,id,`event-review-${suffix}`,'b'.repeat(64)]);
   return {id,proposed,source};

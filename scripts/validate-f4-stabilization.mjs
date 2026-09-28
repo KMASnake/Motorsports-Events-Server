@@ -347,10 +347,15 @@ assert.equal(f5.authorized_subphase,null);
   }
   assert.equal(f55.provider_calls,0);assert.equal(f55.worker_started,false);assert.equal(f55.scheduler_started,false);
   assert.equal(f55.evidence,'docs/handoff/LOT-5.7-P-F5-5-CANONICAL-MEETING-EVENT-RESOLUTION.md');
-  for(const stage of ['F5-6','F5-7']){
-    assert.equal(f5.subphases?.[stage]?.status,'not-started',`${stage} démarré sans autorisation`);
-    assert.equal(f5.subphases?.[stage]?.authorized,false,`${stage} autorisé prématurément`);
-  }
+  const f56=f5.subphases?.['F5-6'];
+  exactKeys(f56,['status','authorized','implementation_complete','maintainer_validated','migration_head','provider_calls','worker_started','scheduler_started','evidence'],'F5-6');
+  assert.equal(f56.status,'in-progress');
+  assert.equal(f56.authorized,true);assert.equal(f56.implementation_complete,false);assert.equal(f56.maintainer_validated,false);
+  assert.equal(f56.migration_head,'0037_f5_multi_provider_reconciliation');
+  assert.equal(f56.provider_calls,0);assert.equal(f56.worker_started,false);assert.equal(f56.scheduler_started,false);
+  assert.equal(f56.evidence,'docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md');
+  assert.equal(f5.subphases?.['F5-7']?.status,'not-started','F5-7 démarré sans autorisation');
+  assert.equal(f5.subphases?.['F5-7']?.authorized,false,'F5-7 autorisé prématurément');
 assert.equal(gateF.production_preview_activation_authorized,false);
 assert.equal(gateF.production_authorized,false);
 assert.equal(progress.current?.sub_lot_5_7_p?.full_lot_5_7_authorized,false);

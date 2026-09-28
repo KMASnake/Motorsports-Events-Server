@@ -1,12 +1,28 @@
 import type {PoolClient} from 'pg';
 import {withTransaction} from '../lib/db.js';
 import {canonicalPublicState,changedPublicFields,publicationQuality,publicStateChecksum,type PublicResourceType} from './publicationState.js';
+import {stableHash,stableUuid} from './deterministicNormalization.js';
 
 interface PublishInput{candidateId:string;expectedFenceGeneration?:number;scopeKey?:string;occurredAt:Date;failBeforeCommit?:boolean}
 interface RemoveInput{resourceType:PublicResourceType;resourceId:string;occurredAt:Date}
 const slug=(value:unknown,id:string)=>`${String(value??'event').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'event'}-${id.slice(0,8)}`;
+const sourceChecksum=(value:unknown)=>{
+  const checksum=String(value??'').toLowerCase();
+  return /^[0-9a-f]{64}$/.test(checksum)?checksum:stableHash({sourceHash:value??null});
+};
 
 export class PostgresPublicationService{
+  private async recordContribution(client:PoolClient,row:any,resourceType:'event'|'meeting',resourceId:string,canonicalRecordId:string,normalized:Readonly<Record<string,unknown>>,parentMeetingId:string|null,input:PublishInput,corrections:readonly unknown[],sourceRevision:number){
+    const structuralReferences={championshipId:normalized.championshipId??null,championshipSeasonId:normalized.championshipSeasonId??null,meetingId:parentMeetingId,venueId:normalized.venueId??null,venueLayoutId:normalized.venueLayoutId??null,sessionType:normalized.sessionType??null};
+    const contributionChecksum=stableHash({sourceHash:row.source_hash,normalizationVersion:row.normalization_version,normalized,structuralReferences,corrections});
+    const id=stableUuid(`mse-${resourceType}-source-contribution`,{sourceEntityId:row.source_entity_id,contributionChecksum});
+    const canonicalSourceChecksum=sourceChecksum(row.source_hash);
+    if(!Number.isSafeInteger(sourceRevision)||sourceRevision<1)throw new Error('source_revision_missing');
+    if(resourceType==='meeting')await client.query(`insert into meeting_source_contributions(id,source_entity_id,source_link_id,meeting_id,normalization_version,source_checksum,contribution_checksum,source_correction_provenance,normalized_values,structural_references,observed_at,received_at,source_updated_at,source_revision)
+      values($1,$2,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9::jsonb,$10,$11,$12,$13) on conflict(source_entity_id,contribution_checksum) do nothing`,[id,row.source_entity_id,resourceId,row.normalization_version,canonicalSourceChecksum,contributionChecksum,JSON.stringify(corrections),JSON.stringify(normalized),JSON.stringify(structuralReferences),row.last_observed_at,input.occurredAt,row.last_changed_at,sourceRevision]);
+    else await client.query(`insert into event_source_contributions(id,source_entity_id,source_link_id,event_uuid,event_id,meeting_id,normalization_version,source_checksum,contribution_checksum,source_correction_provenance,normalized_values,structural_references,observed_at,received_at,source_updated_at,source_revision)
+      values($1,$2,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10::jsonb,$11::jsonb,$12,$13,$14,$15) on conflict(source_entity_id,contribution_checksum) do nothing`,[id,row.source_entity_id,resourceId,canonicalRecordId,parentMeetingId,row.normalization_version,canonicalSourceChecksum,contributionChecksum,JSON.stringify(corrections),JSON.stringify(normalized),JSON.stringify(structuralReferences),row.last_observed_at,input.occurredAt,row.last_changed_at,sourceRevision]);
+  }
   publishCandidate(input:PublishInput){return withTransaction(client=>this.publishCandidateInTransaction(client,input));}
 
   async publishCandidateInTransaction(client:PoolClient,input:PublishInput){
@@ -17,7 +33,8 @@ export class PostgresPublicationService{
       if(!checkpoint||Number(checkpoint.fence_generation)!==input.expectedFenceGeneration)throw new Error('publication_checkpoint_stale');
     }
     const row=(await client.query(`select candidate.*,decision.decision,decision.target_id,source.external_id source_external_id,
-      source.parent_source_entity_id,source.source_data->>'parent_position' source_position,provider.adapter_key
+      source.parent_source_entity_id,source.source_data->>'parent_position' source_position,source.source_hash,
+      source.last_observed_at,source.last_changed_at,provider.adapter_key
       from normalized_candidates candidate join provider_source_entities source on source.id=candidate.source_entity_id
       join provider_instances provider on provider.id=source.provider_instance_id join lateral(
         select decision,target_id from normalization_decisions where candidate_id=candidate.id
@@ -71,6 +88,7 @@ export class PostgresPublicationService{
         const relation=(await client.query('select meeting_id from meeting_events where event_id=$1',[eventId])).rows[0];
         if(String(relation?.meeting_id)!==parentMeetingId)throw new Error('publication_parent_identity_conflict');
       }
+      await this.recordContribution(client,row,resourceType,resourceId,String(row.target_id??resourceId),normalized,parentMeetingId,input,Array.isArray(data.source_correction_provenance)?data.source_correction_provenance:[],Number(data.source_revision));
       const current=(await client.query('select revision from public_resource_states where resource_type=$1 and resource_id=$2',[resourceType,resourceId])).rows[0];
       return {outcome:'linked',revision:current?Number(current.revision):null,sequence:null};
     }
@@ -95,6 +113,7 @@ export class PostgresPublicationService{
       const relation=(await client.query('select meeting_id from meeting_events where event_id=$1',[resourceId])).rows[0];
       if(String(relation?.meeting_id)!==parentMeetingId)throw new Error('publication_parent_identity_conflict');
     }
+    await this.recordContribution(client,row,resourceType,resourceId,resourceType==='event'?resourceId:resourceId,normalized,parentMeetingId,input,Array.isArray(data.source_correction_provenance)?data.source_correction_provenance:[],Number(data.source_revision));
     const current=(await client.query('select * from public_resource_states where resource_type=$1 and resource_id=$2 for update',[resourceType,resourceId])).rows[0];
     if(current?.lifecycle==='removed')throw new Error('publication_tombstone_permanent');
     if(current?.state_checksum===checksum){

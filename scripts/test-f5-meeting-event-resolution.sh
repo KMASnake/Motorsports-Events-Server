@@ -10,9 +10,12 @@ trap cleanup EXIT
 for _ in $(seq 1 60);do "${compose[@]}" exec -T postgres pg_isready -U mse -d motorsports_events >/dev/null 2>&1&&break;sleep 1;done
 "${compose[@]}" run --rm migrate sh /migrations/migrate.sh up >/dev/null
 sql(){ "${compose[@]}" exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events -Atc "$1"; }
-[[ "$(sql "select version from schema_migrations order by version desc limit 1")" == 0036_f5_meeting_event_canonical_resolution ]]
+[[ "$(sql "select version from schema_migrations order by version desc limit 1")" == 0037_f5_multi_provider_reconciliation ]]
 
-# Empty DOWN and re-upgrade are reversible.
+# Empty 0037/0036 DOWN and re-upgrade are reversible; F5-5 then runs on the
+# current 0037 schema rather than silently certifying only its historical head.
+"${compose[@]}" run --rm migrate sh /migrations/migrate.sh down 0037_f5_multi_provider_reconciliation >/dev/null
+[[ "$(sql "select version from schema_migrations order by version desc limit 1")" == 0036_f5_meeting_event_canonical_resolution ]]
 "${compose[@]}" run --rm migrate sh /migrations/migrate.sh down 0036_f5_meeting_event_canonical_resolution >/dev/null
 [[ "$(sql "select version from schema_migrations order by version desc limit 1")" == 0035_f5_provider_discovery_resolution ]]
 "${compose[@]}" run --rm migrate sh /migrations/migrate.sh up >/dev/null
@@ -61,6 +64,6 @@ sql "begin;update events set championship_id='motogp' where id in('f5-event','f5
 [[ "$(sql "select count(*) from information_schema.columns where table_name='events' and column_name='championship_season_id'")" == 0 ]]
 [[ "$(sql "select count(*) from pg_trigger where tgname in('events_canonical_parent_required','meeting_events_canonical_parent_integrity','meetings_canonical_child_integrity','normalization_decisions_apply_state','normalization_decisions_immutable') and not tgisinternal")" == 5 ]]
 if "${compose[@]}" run --rm migrate sh /migrations/migrate.sh down 0036_f5_meeting_event_canonical_resolution >/dev/null 2>&1;then echo 'F5-5 populated DOWN accepted' >&2;exit 1;fi
-[[ "$(sql "select version from schema_migrations order by version desc limit 1")" == 0036_f5_meeting_event_canonical_resolution ]]
+[[ "$(sql "select version from schema_migrations order by version desc limit 1")" == 0037_f5_multi_provider_reconciliation ]]
 echo 'F5-5 Meeting/Event canonical resolution PostgreSQL certification: PASS'
 echo 'PROVIDER_CALLS=0 WORKER_STARTED=NO SCHEDULER_STARTED=NO PREPROD_ACCESSED=NO PRODUCTION_ACCESSED=NO'

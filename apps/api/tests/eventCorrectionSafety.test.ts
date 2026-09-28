@@ -43,19 +43,23 @@ describe('sécurité des corrections événement fournisseur', () => {
   });
 
   it('bloque une édition silencieuse si l’origine provider n’a aucune identité', async () => {
-    clientQuery.mockResolvedValueOnce({ rowCount: 1, rows: [{ ...base, origin: 'provider', provider_key: null, external_id: null }] });
+    const current={ ...base, normalized_uuid:null,origin: 'provider', provider_key: null, external_id: null };
+    clientQuery.mockImplementation(async(sql:string)=>String(sql).startsWith('select normalized_uuid')?{rowCount:1,rows:[{normalized_uuid:null}]}:String(sql).startsWith('select * from events')?{rowCount:1,rows:[current]}:{rowCount:1,rows:[]});
     const instance = await app();
     const response = await instance.inject({ method: 'PATCH', url: '/api/v1/admin/events/evt-002', payload: { name: 'Nom local' } });
     expect(response.statusCode).toBe(409);
     expect(response.json()).toMatchObject({ code: 'provider_identity_incomplete' });
-    expect(clientQuery).toHaveBeenCalledTimes(1);
+    expect(clientQuery).toHaveBeenCalledTimes(2);
     await instance.close();
   });
 
   it('persiste une correction avant de modifier un événement fournisseur identifié', async () => {
-    const current = { ...base, origin: 'provider', provider_key: 'fixture', external_id: 'british-gp-2026' };
+    const current = { ...base, normalized_uuid:'57000000-0000-4000-8000-000000000099',origin: 'provider', provider_key: 'fixture', external_id: 'british-gp-2026' };
     clientQuery.mockImplementation(async (sql: string) => {
       const statement = String(sql ?? '');
+      if(statement.startsWith('select normalized_uuid'))return {rowCount:1,rows:[{normalized_uuid:current.normalized_uuid}]};
+      if(statement.startsWith('select id canonical_record_id from events'))return {rowCount:1,rows:[{canonical_record_id:current.id}]};
+      if(statement.includes('select count(*) count from canonical_override_mutations'))return {rowCount:1,rows:[{count:'0'}]};
       if (statement.startsWith('select * from events')) return { rowCount: 1, rows: [current] };
       if (statement.includes('from event_corrections')) return { rowCount: 0, rows: [] };
       if (statement.startsWith('update events set')) return { rowCount: 1, rows: [{ ...current, name: 'Nom local' }] };
@@ -64,7 +68,9 @@ describe('sécurité des corrections événement fournisseur', () => {
     const instance = await app();
     const response = await instance.inject({ method: 'PATCH', url: '/api/v1/admin/events/evt-002', payload: { name: 'Nom local' } });
     expect(response.statusCode).toBe(200);
-    expect(clientQuery.mock.calls.some(([sql]) => String(sql).includes('insert into event_corrections'))).toBe(true);
+    expect(clientQuery.mock.calls.some(([sql]) => String(sql).includes('insert into canonical_field_overrides'))).toBe(true);
+    expect(clientQuery.mock.calls.some(([sql]) => String(sql).includes('insert into event_corrections'))).toBe(false);
+    expect(clientQuery.mock.calls.some(([sql,args])=>String(sql).includes('pg_advisory_xact_lock')&&(args as unknown[])[0]===`event:${current.normalized_uuid}`)).toBe(true);
     expect(clientQuery.mock.calls.find(([sql]) => String(sql).startsWith('update events set'))).toBeTruthy();
     await instance.close();
   });
@@ -123,8 +129,11 @@ describe('sécurité des corrections événement fournisseur', () => {
   });
 
   it('crée une correction contrôlée pour la catégorie d’un Event provider identifié',async()=>{
-    const current={...base,name:'Race',session_title:'Race',category:'race',origin:'provider',provider_key:'ocblacktop',external_id:'race-1'};
+    const current={...base,normalized_uuid:'57000000-0000-4000-8000-000000000098',name:'Race',session_title:'Race',category:'race',origin:'provider',provider_key:'ocblacktop',external_id:'race-1'};
     clientQuery.mockImplementation(async(sql:string,args?:unknown[])=>{
+      if(String(sql).startsWith('select normalized_uuid'))return {rowCount:1,rows:[{normalized_uuid:current.normalized_uuid}]};
+      if(String(sql).startsWith('select id canonical_record_id from events'))return {rowCount:1,rows:[{canonical_record_id:current.id}]};
+      if(String(sql).includes('select count(*) count from canonical_override_mutations'))return {rowCount:1,rows:[{count:'0'}]};
       if(String(sql).startsWith('select * from events'))return {rowCount:1,rows:[current]};
       if(String(sql).includes('from event_corrections'))return {rowCount:0,rows:[]};
       if(String(sql).startsWith('update events set'))return {rowCount:1,rows:[{...current,category:args?.[5]}]};
@@ -132,7 +141,8 @@ describe('sécurité des corrections événement fournisseur', () => {
     });
     const instance=await app(),response=await instance.inject({method:'PATCH',url:'/api/v1/admin/events/evt-002',payload:{category:'qualifying'}});
     expect(response.statusCode).toBe(200);expect(response.json()).toMatchObject({name:'Race',session_title:'Race',category:'qualifying'});
-    expect(clientQuery.mock.calls.some(([sql,args])=>String(sql).includes('insert into event_corrections')&&(args as unknown[])[4]==='category')).toBe(true);
+    expect(clientQuery.mock.calls.some(([sql,args])=>String(sql).includes('insert into canonical_field_overrides')&&(args as unknown[])[4]==='category')).toBe(true);
+    expect(clientQuery.mock.calls.some(([sql])=>String(sql).includes('insert into event_corrections'))).toBe(false);
     await instance.close();
   });
 });

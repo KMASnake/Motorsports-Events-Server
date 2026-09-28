@@ -46,9 +46,9 @@ describe('provider correction policy',()=>{
       provider_value:'old provider value',override_value:'local value',status:'active'
     })).toEqual({effectiveValue:'local value',correctionAction:'update',conflict:true});
   });
-  it('removes an override made obsolete by the provider',()=>{
+  it('keeps an active override when the provider converges to its value',()=>{
     expect(decideProviderSync('local value',{
       provider_value:'old provider value',override_value:'local value',status:'active'
-    })).toEqual({effectiveValue:'local value',correctionAction:'remove',conflict:false});
+    })).toEqual({effectiveValue:'local value',correctionAction:'none',conflict:false});
   });
 });

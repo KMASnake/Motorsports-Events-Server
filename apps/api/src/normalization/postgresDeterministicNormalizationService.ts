@@ -18,14 +18,17 @@ export class PostgresDeterministicNormalizationService{
       left join provider_source_observations observation on observation.traversal_id=coalesce($2::uuid,entity.last_traversal_id) and observation.source_entity_id=entity.id
       where entity.id=$1 for update of entity`,[input.sourceEntityId,input.traversalId??null])).rows[0];
     if(!source)throw new Error('normalization_source_not_found');
-    const correctionRows=(await client.query(`select id,field_path,override_value,status from provider_source_corrections
+    const correctionRows=(await client.query(`select id,field_path,override_value,status,revision from provider_source_corrections
       where source_entity_id=$1 order by field_path,id`,[input.sourceEntityId])).rows;
     const corrections:Correction[]=correctionRows.map(row=>({id:String(row.id),fieldPath:String(row.field_path),value:row.override_value,active:row.status==='active'}));
+    const sourceCorrectionProvenance=correctionRows.filter(row=>row.status==='active').map(row=>({id:String(row.id),revision:Number(row.revision),fieldPath:String(row.field_path)}));
+    const sourceCorrectionSetChecksum=stableHash(sourceCorrectionProvenance);
     const envelope:SourceEnvelope={id:String(source.id),kind:source.entity_kind==='meeting'?'meeting':'event',sourceHash:String(source.source_hash),providerKey:String(source.adapter_key),championshipSourceId:String(source.championship_source_id),season:source.season==null?null:Number(source.season),data:source.source_data,corrections,lastChangedAt:new Date(source.last_changed_at).toISOString(),lastObservedAt:new Date(source.last_observed_at).toISOString(),observation:source.observation_kind??undefined,traversalComplete:source.traversal_complete===true,providerStartedAt:source.provider_started_at?new Date(source.provider_started_at).toISOString():null,providerEndedAt:source.provider_ended_at?new Date(source.provider_ended_at).toISOString():null,theoreticalEndAt:source.theoretical_end_at?new Date(source.theoretical_end_at).toISOString():null,endEstimated:source.end_estimated===true,endProvenance:source.end_provenance??null,now:new Date(source.last_observed_at).toISOString()};
     envelope.now=input.normalizationNow.toISOString();
     const existing=envelope.kind==='meeting'
       ?(await client.query('select meeting_id target_id from meeting_source_links where source_entity_id=$1',[input.sourceEntityId])).rows[0]?.target_id??null
       :(await client.query('select event_id target_id from event_source_links where source_entity_id=$1',[input.sourceEntityId])).rows[0]?.target_id??null;
+    const existingMeeting=envelope.kind==='meeting'&&existing?(await client.query('select championship_season_id,venue_id,venue_layout_id from meetings where id=$1',[existing])).rows[0]:null;
     const parentSourceRequired=envelope.kind==='event'&&source.parent_source_entity_id!=null;
     const parentMeetingId=parentSourceRequired
       ?(await client.query('select meeting_id from meeting_source_links where source_entity_id=$1',[source.parent_source_entity_id])).rows[0]?.meeting_id??null
@@ -34,10 +37,10 @@ export class PostgresDeterministicNormalizationService{
     const explicitExternalSeasonId=typeof source.source_data?.external_season_id==='string'&&source.source_data.external_season_id.trim()?source.source_data.external_season_id.trim():null;
     const seasonLink=!parentMeeting&&explicitExternalSeasonId?(await client.query(`select championship_season_id,championship_id from championship_season_source_links
       where provider_instance_id=$1 and external_championship_id=$2 and external_season_id=$3`,[source.provider_instance_id,source.championship_source_id,explicitExternalSeasonId])).rows[0]:null;
-    const championshipSeasonId=parentMeeting?.championship_season_id??seasonLink?.championship_season_id??null;
+    const championshipSeasonId=parentMeeting?.championship_season_id??existingMeeting?.championship_season_id??seasonLink?.championship_season_id??null;
     const mappedCircuitId=input.mapping.circuitIds[String(source.source_data?.circuit_id??'')]??null;
     const circuitVenue=mappedCircuitId?(await client.query('select venue_id,venue_layout_id from circuit_venue_links where circuit_id=$1',[mappedCircuitId])).rows[0]:null;
-    const venueId=circuitVenue?.venue_id??parentMeeting?.venue_id??null,venueLayoutId=circuitVenue?.venue_layout_id??parentMeeting?.venue_layout_id??null;
+    const venueId=circuitVenue?.venue_id??parentMeeting?.venue_id??existingMeeting?.venue_id??null,venueLayoutId=circuitVenue?.venue_layout_id??parentMeeting?.venue_layout_id??existingMeeting?.venue_layout_id??null;
     if(championshipSeasonId){
       const identityLock=envelope.kind==='meeting'
         ?`f5-meeting:${input.mapping.championshipIds[envelope.championshipSourceId]??''}:${championshipSeasonId}:${String(source.source_data?.round??'')}:${String(source.source_data?.name??'')}:${String(source.source_data?.starts_at??'')}`
@@ -55,10 +58,11 @@ export class PostgresDeterministicNormalizationService{
     const candidates:MatchCandidate[]=candidateRows.map(row=>({id:String(row.id),championshipId:String(row.championship_id),championshipSeasonId:row.championship_season_id?String(row.championship_season_id):null,season:row.season==null?null:Number(row.season),meetingId:row.meeting_id?String(row.meeting_id):null,sessionType:row.session_type??'other',startsAt:row.starts_at?new Date(row.starts_at).toISOString():null,circuitId:row.circuit_id?String(row.circuit_id):null,venueId:row.venue_id?String(row.venue_id):null,name:String(row.name),round:row.round?String(row.round):null}));
     const rejected=(await client.query(`select target_id from normalization_decisions where source_entity_id=$1 and decision='rejected' and target_kind=$2 and target_id is not null order by target_id`,[input.sourceEntityId,envelope.kind])).rows.map(row=>String(row.target_id));
     let result=normalize(envelope,input.mapping,candidates,existing?String(existing):null,rejected,{parentSourceRequired,parentCanonicalResolved:parentMeetingId!=null,championshipSeasonId:championshipSeasonId?String(championshipSeasonId):null,venueId:venueId?String(venueId):null,venueLayoutId:venueLayoutId?String(venueLayoutId):null});
-    const candidateData={normalized:result.state,resolution:result.resolution,proposed_uuid:result.proposedUuid,checksum:result.checksum};
-    await client.query(`insert into normalized_candidates(id,source_entity_id,source_hash,normalization_version,resource_kind,candidate_data)
-      values($1,$2,$3,$4,$5,$6::jsonb) on conflict(source_entity_id,source_hash,normalization_version,resource_kind) do nothing`,[result.candidateId,input.sourceEntityId,envelope.sourceHash,input.mapping.version,envelope.kind,JSON.stringify(candidateData)]);
-    let persisted=(await client.query(`select id,candidate_data,revision,resolution_state from normalized_candidates where source_entity_id=$1 and source_hash=$2 and normalization_version=$3 and resource_kind=$4 for update`,[input.sourceEntityId,envelope.sourceHash,input.mapping.version,envelope.kind])).rows[0];
+    result={...result,candidateId:stableUuid('mse-normalized-candidate',{sourceId:input.sourceEntityId,sourceHash:envelope.sourceHash,version:input.mapping.version,sourceCorrectionSetChecksum})};
+    const candidateData={normalized:result.state,resolution:result.resolution,proposed_uuid:result.proposedUuid,checksum:result.checksum,source_revision:Number(source.source_revision),source_correction_provenance:sourceCorrectionProvenance,source_correction_set_checksum:sourceCorrectionSetChecksum};
+    await client.query(`insert into normalized_candidates(id,source_entity_id,source_hash,normalization_version,resource_kind,source_correction_set_checksum,candidate_data)
+      values($1,$2,$3,$4,$5,$6,$7::jsonb) on conflict(source_entity_id,source_hash,normalization_version,resource_kind,source_correction_set_checksum) do nothing`,[result.candidateId,input.sourceEntityId,envelope.sourceHash,input.mapping.version,envelope.kind,sourceCorrectionSetChecksum,JSON.stringify(candidateData)]);
+    let persisted=(await client.query(`select id,candidate_data,revision,resolution_state from normalized_candidates where source_entity_id=$1 and source_hash=$2 and normalization_version=$3 and resource_kind=$4 and source_correction_set_checksum=$5 for update`,[input.sourceEntityId,envelope.sourceHash,input.mapping.version,envelope.kind,sourceCorrectionSetChecksum])).rows[0];
     let persistedData=typeof persisted?.candidate_data==='string'?JSON.parse(persisted.candidate_data) as typeof candidateData:persisted?.candidate_data as typeof candidateData|undefined;
     if(!persisted||!persistedData||typeof persistedData.checksum!=='string')throw new Error('normalization_replay_conflict');
     if(persistedData.checksum!==result.checksum){

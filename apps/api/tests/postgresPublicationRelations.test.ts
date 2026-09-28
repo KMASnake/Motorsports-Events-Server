@@ -6,7 +6,7 @@ const ready={resourceKind:'event',name:'FP1',sessionType:'practice',sessionLabel
 function database(parent:true|false|'none'=true){
   const query=vi.fn(async(sql:string)=>{
     if(sql.includes("publication_controls"))return {rows:[{enabled:true}]};
-    if(sql.includes('from normalized_candidates candidate'))return {rows:[{id:'candidate',source_entity_id:'source-event',source_hash:'hash',normalization_version:'mapping',resource_kind:'event',decision:'create',target_id:null,source_external_id:'provider-fp1',parent_source_entity_id:parent==='none'?null:'source-meeting',source_position:'0',adapter_key:'fixture',candidate_data:{normalized:ready,proposed_uuid:'57000000-0000-4000-8000-000000000101'}}]};
+    if(sql.includes('from normalized_candidates candidate'))return {rows:[{id:'candidate',source_entity_id:'source-event',source_hash:'hash',normalization_version:'mapping',resource_kind:'event',decision:'create',target_id:null,source_external_id:'provider-fp1',parent_source_entity_id:parent==='none'?null:'source-meeting',source_position:'0',adapter_key:'fixture',candidate_data:{normalized:ready,proposed_uuid:'57000000-0000-4000-8000-000000000101',source_revision:1}}]};
     if(sql==='select meeting_id from meeting_source_links where source_entity_id=$1')return {rows:parent===true?[{meeting_id:'57000000-0000-4000-8000-000000000100'}]:[]};
     if(sql==='select championship_id,championship_season_id from meetings where id=$1 for update')return {rows:[{championship_id:'f1',championship_season_id:ready.championshipSeasonId}]};
     if(sql==='select normalized_event_uuid from event_source_links where source_entity_id=$1')return {rows:[{normalized_event_uuid:'57000000-0000-4000-8000-000000000101'}]};
@@ -23,7 +23,7 @@ describe('canonical meeting/event publication relation',()=>{
   it('materializes a canonical Meeting and its durable source link',async()=>{
     const query=vi.fn(async(sql:string)=>{
       if(sql.includes('publication_controls'))return {rows:[{enabled:true}]};
-      if(sql.includes('from normalized_candidates candidate'))return {rows:[{id:'meeting-candidate',source_entity_id:'source-meeting',source_hash:'hash',normalization_version:'mapping',resource_kind:'meeting',decision:'create',target_id:null,source_external_id:'provider-meeting',parent_source_entity_id:null,adapter_key:'fixture',candidate_data:{normalized:{...ready,resourceKind:'meeting',name:'Abu Dhabi Grand Prix',sessionType:'other'},proposed_uuid:'57000000-0000-4000-8000-000000000100'}}]};
+      if(sql.includes('from normalized_candidates candidate'))return {rows:[{id:'meeting-candidate',source_entity_id:'source-meeting',source_hash:'hash',normalization_version:'mapping',resource_kind:'meeting',decision:'create',target_id:null,source_external_id:'provider-meeting',parent_source_entity_id:null,adapter_key:'fixture',candidate_data:{normalized:{...ready,resourceKind:'meeting',name:'Abu Dhabi Grand Prix',sessionType:'other'},proposed_uuid:'57000000-0000-4000-8000-000000000100',source_revision:1}}]};
       if(sql==='select meeting_id from meeting_source_links where source_entity_id=$1')return {rows:[{meeting_id:'57000000-0000-4000-8000-000000000100'}]};
       if(sql.startsWith('select * from publication_receipts')||sql.startsWith('select * from public_resource_states'))return {rows:[]};
       if(sql.includes('returning sequence'))return {rows:[{sequence:1}]};

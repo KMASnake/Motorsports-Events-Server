@@ -101,6 +101,8 @@ export interface AcquiredProviderSourceItem {
   readonly parentEntityKind: ProviderSourceEntityKind | null;
   readonly season: number;
   readonly sourceData: JsonObject;
+  /** Monotone provider/source-state revision when the provider contract proves one. */
+  readonly sourceRevision?: number;
 }
 
 export interface ProviderItemAnomaly {

@@ -58,7 +58,7 @@ export function decideProviderSync(
   const next = normalizeCorrectionValue(nextProviderValue);
   if (!existing) return { effectiveValue: next, correctionAction: 'none', conflict: false };
   if (sameCorrectionValue(existing.override_value, next)) {
-    return { effectiveValue: next, correctionAction: 'remove', conflict: false };
+    return { effectiveValue: normalizeCorrectionValue(existing.override_value), correctionAction: 'none', conflict: false };
   }
   return {
     effectiveValue: normalizeCorrectionValue(existing.override_value),
