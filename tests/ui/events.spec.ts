@@ -72,7 +72,8 @@ test.describe('Événements lot 4 rev.1', () => {
     expect(source).toBeTruthy();
     await page.clock.setFixedTime(new Date(source.starts_at));
     await page.goto('/events');
-    const chip=page.locator('.events-calendar-chip').filter({hasText:source.name}).first();
+    const chip=page.locator('.events-calendar-chip').filter({has:page.getByText(source.name,{exact:true})});
+    await expect(chip).toHaveCount(1);
     await expect(chip).toBeVisible();await chip.dblclick();
     const dialog=page.getByRole('dialog');
     await expect(dialog.getByRole('heading',{name:'Modifier l’événement'})).toBeVisible();
@@ -128,6 +129,11 @@ test.describe('Événements lot 4 rev.1', () => {
     const events = await workspace.json();
     const providerEvent = events.find((event: { name?:string; origin?:string; normalized_uuid?:string|null; correction_count?:number; starts_at?:string; ends_at?:string|null }) => event.name==='Événement test 10'&&event.origin==='provider'&&event.normalized_uuid&&event.correction_count===0&&event.starts_at&&event.ends_at);
     expect(providerEvent).toBeTruthy();
+    const providersResponse=await page.request.get(`${apiUrl}/api/v1/admin/providers`);
+    expect(providersResponse.ok()).toBeTruthy();
+    const providers=await providersResponse.json() as Array<{adapter_key:string;name:string}>;
+    const providerMetadata=providers.find(provider=>provider.adapter_key===providerEvent.provider_key);
+    expect(providerMetadata).toBeTruthy();
     const intervalStart=new Date(providerEvent.starts_at).getTime();
     const intervalEnd=new Date(providerEvent.ends_at).getTime();
     expect(intervalEnd).toBeGreaterThan(intervalStart);
@@ -138,7 +144,7 @@ test.describe('Événements lot 4 rev.1', () => {
     await page.goto('/corrections');
     await expect(page.getByRole('heading',{name:'CORRECTIONS'})).toBeVisible();
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
-    await expect(page.getByLabel('Fournisseur')).toContainText(providerEvent.provider_key);
+    await expect(page.getByLabel('Fournisseur')).toContainText(providerMetadata!.name);
     await page.getByLabel('Fournisseur').selectOption(`provider:${providerEvent.provider_key}`);
     await expect(page.getByRole('heading',{name:'Événement fournisseur corrigé'})).toBeVisible();
     await expect(page.getByLabel('Fournisseur')).toHaveValue(`provider:${providerEvent.provider_key}`);
