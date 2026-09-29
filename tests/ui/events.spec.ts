@@ -128,7 +128,7 @@ test.describe('Événements lot 4 rev.1', () => {
   test('affiche les corrections champ par champ et le branding', async ({ page }) => {
     const workspace = await page.request.get(`${apiUrl}/api/v1/admin/events`);
     const events = await workspace.json();
-    const providerEvent = events.find((event: { name?:string; origin?:string; normalized_uuid?:string|null; correction_count?:number; starts_at?:string; ends_at?:string|null }) => event.name==='Événement test 10'&&event.origin==='provider'&&event.normalized_uuid&&event.correction_count===0&&event.starts_at&&event.ends_at);
+    const providerEvent = events.find((event: { name?:string; meeting_name?:string|null; origin?:string; normalized_uuid?:string|null; correction_count?:number; starts_at?:string; ends_at?:string|null }) => event.name==='Événement test 10'&&event.meeting_name&&event.origin==='provider'&&event.normalized_uuid&&event.correction_count===0&&event.starts_at&&event.ends_at);
     expect(providerEvent).toBeTruthy();
     const expectedProviderLabel=providerLabel(providerEvent.origin,providerEvent.provider_key);
     const expectedProviderSource=providerSource(undefined,providerEvent.provider_key);
@@ -162,17 +162,18 @@ test.describe('Événements lot 4 rev.1', () => {
     await expect(targetEventArticle).toHaveCount(1);
     const nameCorrection=targetEventArticle.locator('.correction-field').filter({has:page.locator('strong').filter({hasText:/^Nom/})});
     await expect(nameCorrection).toHaveCount(1);
+    const adjustedEventName='Événement fournisseur ajusté';
     await nameCorrection.getByRole('button',{name:'Modifier local'}).click();
-    await nameCorrection.getByLabel('Nouvelle valeur Nom').fill('Événement fournisseur ajusté');
+    await nameCorrection.getByLabel('Nouvelle valeur Nom').fill(adjustedEventName);
     await nameCorrection.getByRole('button',{name:'Enregistrer'}).click();
-    await expect(page.getByRole('heading',{name:'Événement fournisseur ajusté'})).toBeVisible();
+    await expect(page.getByRole('heading',{name:adjustedEventName,exact:true})).toBeVisible();
     await page.getByRole('button',{name:'Réinitialiser'}).click();
     await expect(page.locator('.correction-field')).toHaveCount(9);
     await expect(page.getByRole('button',{name:'Restaurer fournisseur'}).first()).toBeVisible();
     await expect(page.getByRole('button',{name:'Supprimer correction'})).toHaveCount(0);
     await expect(page.getByRole('button',{name:'Conserver local'})).toHaveCount(0);
     await expect(page.getByText('Reporté',{exact:true}).first()).toBeVisible();
-    const providerArticle=page.locator('.corrections-list article').filter({has:page.getByRole('heading',{name:'Événement fournisseur ajusté'})});
+    const providerArticle=page.locator('.corrections-list article').filter({has:page.getByRole('heading',{name:adjustedEventName,exact:true})});
     const dateCorrection=providerArticle.locator('.correction-field').filter({hasText:'Début'});
     await dateCorrection.getByRole('button',{name:'Modifier local'}).click();
     await expect(dateCorrection.getByLabel('Nouvelle valeur Début')).toHaveAttribute('type','datetime-local');
@@ -184,7 +185,8 @@ test.describe('Événements lot 4 rev.1', () => {
     await page.screenshot({path:'tests/ui/screenshots/branding-header-1440x900.png'});
     await providerArticle.getByRole('button',{name:'Ouvrir l’événement'}).click();
     await expect(page).toHaveURL(new RegExp(`/events\\?event_id=${providerEvent.id}`));
-    await expect(page.getByRole('heading',{name:'Événement fournisseur ajusté'})).toBeVisible();
+    await expect(page.getByRole('heading',{name:providerEvent.meeting_name,exact:true})).toBeVisible();
+    await expect(page.locator('.events-selection-bar')).toContainText(`1 sélectionné · ${adjustedEventName}`);
     const cleanup = await page.request.get(`${apiUrl}/api/v1/admin/corrections?event_id=${providerEvent.id}`);
     for (const correction of await cleanup.json()) {
       const restored=await page.request.post(`${apiUrl}/api/v1/admin/corrections/${correction.id}/accept-provider`);
