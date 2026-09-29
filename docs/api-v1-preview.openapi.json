@@ -1,21 +1,1206 @@
 {
   "openapi": "3.1.0",
-  "info": {"title": "Motorsports Events Preview Read API", "version": "1.1.0-f5.7a", "description": "Canonical additive public contract. Legacy routes and identifiers remain unchanged when Preview is disabled."},
-  "servers": [{"url": "/api/v1"}],
-  "security": [{"bearerApiKey": []}],
+  "info": {
+    "title": "Motorsports Events Preview Read API",
+    "version": "1.1.0-f5.7a",
+    "description": "Canonical additive public contract. Legacy routes and identifiers remain unchanged when Preview is disabled."
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "bearerApiKey": []
+    }
+  ],
   "paths": {
-    "/championships": {"get": {"operationId": "listChampionships", "parameters": [{"$ref": "#/components/parameters/Limit"}, {"$ref": "#/components/parameters/PageCursor"}], "responses": {"200": {"$ref": "#/components/responses/ChampionshipCollection"}, "400": {"$ref": "#/components/responses/Error"}}}},
-    "/championships/{id}": {"get": {"operationId": "getChampionship", "parameters": [{"$ref": "#/components/parameters/Id"}], "responses": {"200": {"$ref": "#/components/responses/ChampionshipResource"}, "400": {"$ref": "#/components/responses/Error"}, "404": {"$ref": "#/components/responses/Error"}}}},
-    "/events": {"get": {"operationId": "listEvents", "parameters": [{"$ref": "#/components/parameters/Limit"}, {"$ref": "#/components/parameters/PageCursor"}, {"name": "championship", "in": "query", "schema": {"type": "string", "maxLength": 120}}, {"name": "championship_id", "in": "query", "description": "Legacy canonical Championship identifier used for entitlement and compatibility filtering.", "schema": {"type": "string", "pattern": "^[A-Za-z0-9]+(?:[._:-][A-Za-z0-9]+)*$", "maxLength": 160}}, {"name": "from", "in": "query", "schema": {"type": "string", "format": "date-time"}}, {"name": "to", "in": "query", "schema": {"type": "string", "format": "date-time"}}, {"name": "status", "in": "query", "schema": {"$ref": "#/components/schemas/CanonicalEventStatus"}}, {"name": "session_type", "in": "query", "schema": {"type": "string", "maxLength": 64}}], "responses": {"200": {"$ref": "#/components/responses/EventCollection"}, "400": {"$ref": "#/components/responses/Error"}}}},
-    "/events/{id}": {"get": {"operationId": "getEvent", "parameters": [{"$ref": "#/components/parameters/Id"}], "responses": {"200": {"$ref": "#/components/responses/EventResource"}, "400": {"$ref": "#/components/responses/Error"}, "404": {"$ref": "#/components/responses/Error"}}}},
-    "/meetings": {"get": {"operationId": "listMeetings", "parameters": [{"$ref": "#/components/parameters/Limit"}, {"$ref": "#/components/parameters/PageCursor"}], "responses": {"200": {"$ref": "#/components/responses/MeetingCollection"}, "400": {"$ref": "#/components/responses/Error"}}}},
-    "/meetings/{id}": {"get": {"operationId": "getMeeting", "parameters": [{"$ref": "#/components/parameters/Id"}], "responses": {"200": {"$ref": "#/components/responses/MeetingResource"}, "400": {"$ref": "#/components/responses/Error"}, "404": {"$ref": "#/components/responses/Error"}}}},
-    "/changes": {"get": {"operationId": "listChanges", "parameters": [{"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 500, "default": 100}}, {"name": "cursor", "in": "query", "schema": {"type": "string", "maxLength": 2048}}, {"name": "include", "in": "query", "schema": {"enum": ["data"]}}], "responses": {"200": {"$ref": "#/components/responses/Collection"}, "400": {"$ref": "#/components/responses/Error"}, "410": {"description": "sync_cursor_expired", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}}, "500": {"$ref": "#/components/responses/Error"}}}}
+    "/championships": {
+      "get": {
+        "operationId": "listChampionships",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PageCursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ChampionshipCollection"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/championships/{id}": {
+      "get": {
+        "operationId": "getChampionship",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ChampionshipResource"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/championship-seasons": {
+      "get": {
+        "operationId": "listChampionshipSeasons",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PageCursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ChampionshipSeasonCollection"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/championship-seasons/{id}": {
+      "get": {
+        "operationId": "getChampionshipSeason",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ChampionshipSeasonResource"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/venues": {
+      "get": {
+        "operationId": "listVenues",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PageCursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VenueCollection"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/venues/{id}": {
+      "get": {
+        "operationId": "getVenue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VenueResource"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/venue-layouts": {
+      "get": {
+        "operationId": "listVenueLayouts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PageCursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VenueLayoutCollection"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/venue-layouts/{id}": {
+      "get": {
+        "operationId": "getVenueLayout",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VenueLayoutResource"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "operationId": "listEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PageCursor"
+          },
+          {
+            "name": "championship",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "championship_id",
+            "in": "query",
+            "description": "Legacy canonical Championship identifier used for entitlement and compatibility filtering.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]+(?:[._:-][A-Za-z0-9]+)*$",
+              "maxLength": 160
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/CanonicalEventStatus"
+            }
+          },
+          {
+            "name": "session_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EventCollection"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/events/{id}": {
+      "get": {
+        "operationId": "getEvent",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EventResource"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/meetings": {
+      "get": {
+        "operationId": "listMeetings",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/PageCursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MeetingCollection"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/meetings/{id}": {
+      "get": {
+        "operationId": "getMeeting",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MeetingResource"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/changes": {
+      "get": {
+        "operationId": "listChanges",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "data"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Collection"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "410": {
+            "description": "sync_cursor_expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
   },
   "components": {
-    "securitySchemes": {"bearerApiKey": {"type": "http", "scheme": "bearer", "description": "One-time-issued mse_live_ or mse_test_ client API key"}},
-    "parameters": {"Id": {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}, "Limit": {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 50}}, "PageCursor": {"name": "cursor", "in": "query", "schema": {"type": "string", "maxLength": 2048}}},
-    "schemas": {"CanonicalEventStatus": {"type": "string", "enum": ["scheduled", "confirmed", "postponed", "cancelled", "completed"]}, "CanonicalIdentity": {"type": "string", "format": "uuid", "description": "Stable Motorsports-Events canonical identity; never a provider identifier."}, "ChampionshipIdentity": {"type": "object", "additionalProperties": false, "required": ["id", "legacy_id"], "properties": {"id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "legacy_id": {"type": "string", "description": "Existing canonical text identity retained for backward compatibility."}}}, "Championship": {"type": "object", "additionalProperties": false, "required": ["id", "legacy_id", "revision", "name", "slug", "short_name", "official_name", "category", "discipline", "season", "logo_url", "description", "availability", "last_updated_at"], "properties": {"id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "legacy_id": {"type": "string"}, "revision": {"type": "integer", "minimum": 1}, "name": {"type": ["string", "null"]}, "slug": {"type": ["string", "null"]}, "short_name": {"type": ["string", "null"]}, "official_name": {"type": ["string", "null"]}, "category": {"type": ["string", "null"]}, "discipline": {"oneOf": [{"type": "object", "additionalProperties": false, "required": ["key", "label", "family_key"], "properties": {"key": {"type": "string"}, "label": {"type": ["string", "null"]}, "family_key": {"type": ["string", "null"]}}}, {"type": "null"}]}, "season": {"type": ["integer", "null"]}, "logo_url": {"type": ["string", "null"]}, "description": {"type": ["string", "null"]}, "availability": {"type": "string"}, "last_updated_at": {"type": "string", "format": "date-time"}}}, "ChampionshipSeason": {"type": "object", "additionalProperties": false, "required": ["id", "championship_id", "key", "label"], "properties": {"id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "championship_id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "key": {"type": "string"}, "label": {"type": "string"}}}, "Venue": {"type": "object", "additionalProperties": false, "required": ["id", "key", "name", "kind_key"], "properties": {"id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "key": {"type": "string"}, "name": {"type": "string"}, "kind_key": {"type": "string"}, "timezone": {"type": ["string", "null"]}}}, "VenueLayout": {"type": "object", "additionalProperties": false, "required": ["id", "venue_id", "key", "name"], "properties": {"id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "venue_id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "key": {"type": "string"}, "name": {"type": "string"}}}, "CanonicalMeeting": {"type": "object", "required": ["id", "championship", "championship_season_id", "venue_id", "venue_layout_id", "starts_at", "ends_at", "timezone"], "properties": {"id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "championship": {"type": "object", "required": ["id", "canonical_id"], "properties": {"id": {"type": "string"}, "canonical_id": {"$ref": "#/components/schemas/CanonicalIdentity"}}}, "championship_season_id": {"oneOf": [{"$ref": "#/components/schemas/CanonicalIdentity"}, {"type": "null"}]}, "venue_id": {"oneOf": [{"$ref": "#/components/schemas/CanonicalIdentity"}, {"type": "null"}]}, "venue_layout_id": {"oneOf": [{"$ref": "#/components/schemas/CanonicalIdentity"}, {"type": "null"}]}, "starts_at": {"type": ["string", "null"], "format": "date-time"}, "ends_at": {"type": ["string", "null"], "format": "date-time"}, "timezone": {"type": ["string", "null"]}}}, "CanonicalEvent": {"type": "object", "required": ["id", "championship", "championship_season_id", "meeting_id", "venue_id", "venue_layout_id", "session", "status", "starts_at", "ends_at", "timezone"], "properties": {"id": {"$ref": "#/components/schemas/CanonicalIdentity"}, "championship": {"type": "object", "required": ["id", "canonical_id"], "properties": {"id": {"type": "string"}, "canonical_id": {"$ref": "#/components/schemas/CanonicalIdentity"}}}, "championship_season_id": {"oneOf": [{"$ref": "#/components/schemas/CanonicalIdentity"}, {"type": "null"}]}, "meeting_id": {"oneOf": [{"$ref": "#/components/schemas/CanonicalIdentity"}, {"type": "null"}]}, "venue_id": {"oneOf": [{"$ref": "#/components/schemas/CanonicalIdentity"}, {"type": "null"}]}, "venue_layout_id": {"oneOf": [{"$ref": "#/components/schemas/CanonicalIdentity"}, {"type": "null"}]}, "session": {"type": "object", "required": ["type_key", "title"], "properties": {"type_key": {"type": "string"}, "title": {"type": ["string", "null"]}}}, "status": {"$ref": "#/components/schemas/CanonicalEventStatus"}, "starts_at": {"type": ["string", "null"], "format": "date-time"}, "ends_at": {"type": ["string", "null"], "format": "date-time"}, "timezone": {"type": ["string", "null"]}}}, "SessionType": {"type": "object", "additionalProperties": false, "required": ["key", "label", "sort_order", "active"], "properties": {"key": {"type": "string"}, "label": {"type": "string"}, "sort_order": {"type": "integer"}, "active": {"type": "boolean"}}}, "ErrorEnvelope": {"type": "object", "additionalProperties": false, "required": ["error"], "properties": {"error": {"type": "object", "additionalProperties": false, "required": ["code", "message", "request_id"], "properties": {"code": {"type": "string"}, "message": {"type": "string"}, "request_id": {"type": "string"}}}}}, "Collection": {"type": "object", "required": ["data", "pagination"], "properties": {"data": {"type": "array", "items": {"type": "object"}}, "pagination": {"type": "object", "required": ["next_cursor", "has_more"], "properties": {"next_cursor": {"type": ["string", "null"]}, "has_more": {"type": "boolean"}, "sync_cursor": {"type": "string"}}}}}},
-    "responses": {"Collection": {"description": "Bounded change cursor page", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Collection"}}}}, "ChampionshipCollection": {"description": "Bounded Championship cursor page", "content": {"application/json": {"schema": {"allOf": [{"$ref": "#/components/schemas/Collection"}, {"type": "object", "properties": {"data": {"type": "array", "items": {"$ref": "#/components/schemas/Championship"}}}}]}}}}, "MeetingCollection": {"description": "Bounded Meeting cursor page", "content": {"application/json": {"schema": {"allOf": [{"$ref": "#/components/schemas/Collection"}, {"type": "object", "properties": {"data": {"type": "array", "items": {"$ref": "#/components/schemas/CanonicalMeeting"}}}}]}}}}, "EventCollection": {"description": "Bounded Event cursor page", "content": {"application/json": {"schema": {"allOf": [{"$ref": "#/components/schemas/Collection"}, {"type": "object", "properties": {"data": {"type": "array", "items": {"$ref": "#/components/schemas/CanonicalEvent"}}}}]}}}}, "ChampionshipResource": {"description": "Canonical Championship representation", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Championship"}}}}, "MeetingResource": {"description": "Canonical Meeting representation", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CanonicalMeeting"}}}}, "EventResource": {"description": "Canonical Event representation", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CanonicalEvent"}}}}, "Error": {"description": "Safe structured error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}}}
+    "securitySchemes": {
+      "bearerApiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "One-time-issued mse_live_ or mse_test_ client API key"
+      }
+    },
+    "parameters": {
+      "Id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
+        }
+      },
+      "PageCursor": {
+        "name": "cursor",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      }
+    },
+    "schemas": {
+      "CanonicalEventStatus": {
+        "type": "string",
+        "enum": [
+          "scheduled",
+          "confirmed",
+          "postponed",
+          "cancelled",
+          "completed"
+        ]
+      },
+      "CanonicalIdentity": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Stable Motorsports-Events canonical identity; never a provider identifier."
+      },
+      "ChampionshipIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "legacy_id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "legacy_id": {
+            "type": "string",
+            "description": "Existing canonical text identity retained for backward compatibility."
+          }
+        }
+      },
+      "Championship": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "legacy_id",
+          "revision",
+          "name",
+          "slug",
+          "short_name",
+          "official_name",
+          "category",
+          "discipline",
+          "season",
+          "logo_url",
+          "description",
+          "availability",
+          "last_updated_at"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "legacy_id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "slug": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "short_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "official_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "discipline": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "key",
+                  "label",
+                  "family_key"
+                ],
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "family_key": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "season": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "logo_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "availability": {
+            "type": "string"
+          },
+          "last_updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChampionshipSeason": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "championship_id",
+          "key",
+          "label",
+          "start_year",
+          "end_year",
+          "starts_on",
+          "ends_on"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "championship_id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "start_year": {
+            "type": ["integer", "null"]
+          },
+          "end_year": {
+            "type": ["integer", "null"]
+          },
+          "starts_on": {
+            "type": ["string", "null"],
+            "format": "date"
+          },
+          "ends_on": {
+            "type": ["string", "null"],
+            "format": "date"
+          }
+        }
+      },
+      "Venue": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "key",
+          "name",
+          "kind_key",
+          "city",
+          "region",
+          "country_code",
+          "timezone",
+          "latitude",
+          "longitude"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind_key": {
+            "type": "string"
+          },
+          "city": {
+            "type": ["string", "null"]
+          },
+          "region": {
+            "type": ["string", "null"]
+          },
+          "country_code": {
+            "type": ["string", "null"]
+          },
+          "timezone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "latitude": {
+            "type": ["number", "null"]
+          },
+          "longitude": {
+            "type": ["number", "null"]
+          }
+        }
+      },
+      "VenueLayout": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "venue_id",
+          "key",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "venue_id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CanonicalMeeting": {
+        "type": "object",
+        "required": [
+          "id",
+          "championship",
+          "championship_season_id",
+          "venue_id",
+          "venue_layout_id",
+          "starts_at",
+          "ends_at",
+          "timezone"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "championship": {
+            "type": "object",
+            "required": [
+              "id",
+              "canonical_id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "canonical_id": {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              }
+            }
+          },
+          "championship_season_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "venue_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "venue_layout_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "starts_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ends_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "timezone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CanonicalEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "championship",
+          "championship_season_id",
+          "meeting_id",
+          "venue_id",
+          "venue_layout_id",
+          "session",
+          "status",
+          "starts_at",
+          "ends_at",
+          "timezone"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CanonicalIdentity"
+          },
+          "championship": {
+            "type": "object",
+            "required": [
+              "id",
+              "canonical_id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "canonical_id": {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              }
+            }
+          },
+          "championship_season_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "meeting_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "venue_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "venue_layout_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CanonicalIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "session": {
+            "type": "object",
+            "required": [
+              "type_key",
+              "title"
+            ],
+            "properties": {
+              "type_key": {
+                "type": "string"
+              },
+              "title": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/CanonicalEventStatus"
+          },
+          "starts_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ends_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "timezone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SessionType": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "label",
+          "sort_order",
+          "active"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "message",
+              "request_id"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "request_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Collection": {
+        "type": "object",
+        "required": [
+          "data",
+          "pagination"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "required": [
+              "next_cursor",
+              "has_more"
+            ],
+            "properties": {
+              "next_cursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "sync_cursor": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "Collection": {
+        "description": "Bounded change cursor page",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Collection"
+            }
+          }
+        }
+      },
+      "ChampionshipCollection": {
+        "description": "Bounded Championship cursor page",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Collection"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Championship"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ChampionshipSeasonCollection": {
+        "description": "Bounded ChampionshipSeason cursor page",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Collection"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ChampionshipSeason"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "VenueCollection": {
+        "description": "Bounded Venue cursor page",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Collection"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Venue"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "VenueLayoutCollection": {
+        "description": "Bounded VenueLayout cursor page",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Collection"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VenueLayout"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "MeetingCollection": {
+        "description": "Bounded Meeting cursor page",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Collection"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CanonicalMeeting"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "EventCollection": {
+        "description": "Bounded Event cursor page",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Collection"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CanonicalEvent"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ChampionshipResource": {
+        "description": "Canonical Championship representation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Championship"
+            }
+          }
+        }
+      },
+      "ChampionshipSeasonResource": {
+        "description": "Canonical ChampionshipSeason representation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ChampionshipSeason"
+            }
+          }
+        }
+      },
+      "VenueResource": {
+        "description": "Canonical Venue representation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Venue"
+            }
+          }
+        }
+      },
+      "VenueLayoutResource": {
+        "description": "Canonical VenueLayout representation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/VenueLayout"
+            }
+          }
+        }
+      },
+      "MeetingResource": {
+        "description": "Canonical Meeting representation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CanonicalMeeting"
+            }
+          }
+        }
+      },
+      "EventResource": {
+        "description": "Canonical Event representation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CanonicalEvent"
+            }
+          }
+        }
+      },
+      "Error": {
+        "description": "Safe structured error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        }
+      }
+    }
   }
 }

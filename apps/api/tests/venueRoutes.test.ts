@@ -27,6 +27,7 @@ describe('F5-3 Venue/Layout admin routes',()=>{
     expect((await app.inject({method:'GET',url:'/api/v1/admin/venues'})).json()).toEqual([venue]);
     expect((await app.inject({method:'GET',url:`/api/v1/admin/venues/${venueId}`})).json()).toEqual(venue);
     expect(clientQuery.mock.calls.some(([sql])=>String(sql).includes('admin_audit_log'))).toBe(true);
+    expect(clientQuery.mock.calls.some(([sql])=>String(sql).includes('publication_controls'))).toBe(true);
     await app.close();
   });
 
@@ -61,6 +62,7 @@ describe('F5-3 Venue/Layout admin routes',()=>{
     const updated=await app.inject({method:'PATCH',url:`/api/v1/admin/venue-layouts/${layoutId}`,payload:{name:'GP updated'}});
     expect(updated.json()).toMatchObject({id:layoutId,key:'grand-prix',name:'GP updated'});
     expect(clientQuery.mock.calls.some(([sql])=>/update (events|meetings|championship_seasons)/.test(String(sql)))).toBe(false);
+    expect(clientQuery.mock.calls.filter(([sql])=>String(sql).includes('publication_controls'))).toHaveLength(2);
     await app.close();
   });
 

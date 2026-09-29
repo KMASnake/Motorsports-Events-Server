@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { z } from 'zod';
 import { pool } from '../lib/db.js';
+import { CanonicalCatalogPublicationService } from '../public/canonicalCatalogPublicationService.js';
 
 export const F5_DISCOVERY_NORMALIZER_VERSION = 'f5-4-v1';
 const sensitive = /authorization|token|secret|password|cookie|api[_-]?key|ciphertext|nonce|credential/i;
@@ -96,6 +97,7 @@ function decisionFingerprint(candidateId:string,input:DecisionInput){
 }
 
 export class ChampionshipDiscoveryResolutionService{
+  constructor(readonly publication=new CanonicalCatalogPublicationService()){}
   async ingestObservation(input:ObservationInput){
     rejectSensitive(input.payload);
     const parsedPayload=discoveryPayload.safeParse(input.payload);
@@ -225,6 +227,8 @@ export class ChampionshipDiscoveryResolutionService{
       }
       if(input.season){seasonId=randomUUID();await client.query(`insert into championship_seasons(id,championship_id,key,label,start_year,end_year,starts_on,ends_on)
         values($1,$2,$3,$4,$5,$6,$7,$8)`,[seasonId,championshipId,input.season.key,input.season.label,input.season.startYear??null,input.season.endYear??null,input.season.startsOn??null,input.season.endsOn??null]);}
+      await this.publication.publishInTransaction(client,{resourceType:'championship',canonicalId:championshipId,occurredAt:new Date()});
+      if(seasonId)await this.publication.publishInTransaction(client,{resourceType:'championshipSeason',canonicalId:seasonId,occurredAt:new Date()});
     }
 
     if(championshipId){

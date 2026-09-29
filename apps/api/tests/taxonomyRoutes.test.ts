@@ -88,6 +88,7 @@ describe('F5-1 taxonomy administration routes',()=>{
       ?{rowCount:1,rows:[{id:'taxonomy-null-discipline',...payload,discipline_key:null}]}
       :{rowCount:1,rows:[]});
     const accepted=await app.inject({method:'POST',url:'/api/v1/championships',payload:{...payload,slug:'historic-series-null',discipline_key:null}});
+    expect(clientQuery.mock.calls.some(([sql])=>String(sql).includes('publication_controls'))).toBe(true);
     expect(accepted.statusCode).toBe(201);expect(accepted.json().discipline_key).toBeNull();
     await app.close();
   });

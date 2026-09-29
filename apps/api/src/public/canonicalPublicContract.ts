@@ -97,6 +97,9 @@ export function serializePublishedResource(row:ResourceRow){
     if(row.resourceId!==championshipPublicId(legacyId))throw new Error('canonical_public_championship_identity_mismatch');
     return championshipPublicSchema.parse({id:common.id,revision:common.revision,name:common.name,last_updated_at:common.last_updated_at,legacy_id:legacyId,slug:stringOrNull(state.slug),short_name:stringOrNull(state.shortName),official_name:stringOrNull(state.officialName),category:stringOrNull(state.category),discipline:state.disciplineKey?{key:state.disciplineKey,label:stringOrNull(state.disciplineLabel),family_key:stringOrNull(state.disciplineFamilyKey)}:null,season:numberOrNull(state.season),logo_url:stringOrNull(state.logoUrl),description:stringOrNull(state.description),availability:stringOrNull(state.availability)??'preview'});
   }
+  if(row.resourceType==='championshipSeason')return serializeChampionshipSeason({...state,id:row.resourceId});
+  if(row.resourceType==='venue')return serializeVenue({...state,id:row.resourceId});
+  if(row.resourceType==='venueLayout')return serializeVenueLayout({...state,id:row.resourceId});
   const legacyChampionshipId=requiredString(state.championshipId,'championship_id'),championship={id:legacyChampionshipId,canonical_id:championshipPublicId(legacyChampionshipId)};
   const venueId=uuidOrNull(state.venueId),venueLayoutId=uuidOrNull(state.venueLayoutId),legacyCircuitId=stringOrNull(state.circuitId),legacyVenue=legacyCircuitId?{id:legacyCircuitId}:null;
   if(row.resourceType==='meeting')return meetingPublicSchema.parse({...common,championship,championship_season_id:uuidOrNull(state.championshipSeasonId),season:numberOrNull(state.season),round:stringOrNull(state.round),venue_id:venueId,venue_layout_id:venueLayoutId,legacy_circuit_id:legacyCircuitId,venue:legacyVenue,data_quality:{freshness:stringOrNull(state.presence)??'unknown'},sessions:meetingSessions(state.sessions)});

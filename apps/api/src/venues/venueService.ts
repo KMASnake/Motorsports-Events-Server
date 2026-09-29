@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { FastifyRequest } from 'fastify';
 import { pool, withTransaction } from '../lib/db.js';
 import { writeAdminAudit } from '../lib/adminAudit.js';
+import { CanonicalCatalogPublicationService } from '../public/canonicalCatalogPublicationService.js';
 
 export type VenueInput = {
   key: string; name: string; kind_key: string; city: string | null; region: string | null;
@@ -20,6 +21,7 @@ const venueColumns = `id,key,name,kind_key,city,region,country_code,timezone,
   latitude::double precision as latitude,longitude::double precision as longitude,created_at,updated_at`;
 
 export class VenueService {
+  constructor(private readonly publication = new CanonicalCatalogPublicationService()) {}
   async listKinds() { return (await pool.query('select * from venue_kinds order by key')).rows; }
   async listVenues() { return (await pool.query(`select ${venueColumns} from venues order by name,key,id`)).rows; }
   async getVenue(id: string) { return (await pool.query(`select ${venueColumns} from venues where id=$1`, [id])).rows[0] ?? null; }
@@ -36,6 +38,7 @@ export class VenueService {
         [id,input.key,input.name,input.kind_key,input.city,input.region,input.country_code,input.timezone,input.latitude,input.longitude]
       )).rows[0];
       await writeAdminAudit(client,{request,resourceType:'venue',resourceId:id,oldValue:null,newValue:created});
+      await this.publication.publishInTransaction(client,{resourceType:'venue',canonicalId:id,occurredAt:new Date()});
       return created;
     });
   }
@@ -58,6 +61,7 @@ export class VenueService {
         [id,input.name,input.kind_key,input.city,input.region,input.country_code,input.timezone,input.latitude,input.longitude]
       )).rows[0];
       await writeAdminAudit(client,{request,resourceType:'venue',resourceId:id,oldValue:current,newValue:updated});
+      await this.publication.publishInTransaction(client,{resourceType:'venue',canonicalId:id,occurredAt:new Date()});
       return updated;
     });
   }
@@ -75,6 +79,7 @@ export class VenueService {
         'insert into venue_layouts(id,venue_id,key,name) values($1,$2,$3,$4) returning *',[id,venueId,input.key,input.name]
       )).rows[0];
       await writeAdminAudit(client,{request,resourceType:'venue-layout',resourceId:id,oldValue:null,newValue:created});
+      await this.publication.publishInTransaction(client,{resourceType:'venueLayout',canonicalId:id,occurredAt:new Date()});
       return created;
     });
   }
@@ -85,6 +90,7 @@ export class VenueService {
       const input=validate({key:current.key,name:current.name,...patch});
       const updated=(await client.query('update venue_layouts set name=$2,updated_at=now() where id=$1 returning *',[id,input.name])).rows[0];
       await writeAdminAudit(client,{request,resourceType:'venue-layout',resourceId:id,oldValue:current,newValue:updated});
+      await this.publication.publishInTransaction(client,{resourceType:'venueLayout',canonicalId:id,occurredAt:new Date()});
       return updated;
     });
   }

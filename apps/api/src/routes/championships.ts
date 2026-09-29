@@ -5,6 +5,8 @@ import { pool, withTransaction } from '../lib/db.js';
 import { markAtomicallyAudited, writeAdminAudit } from '../lib/adminAudit.js';
 import { uuidParam } from '../lib/routeParams.js';
 import { canonicalTaxonomyKey } from '../lib/taxonomy.js';
+import { CanonicalCatalogPublicationService } from '../public/canonicalCatalogPublicationService.js';
+import { championshipPublicId } from '../public/canonicalPublicContract.js';
 
 const nullableText = z.union([z.string().trim().max(500), z.null()]).optional();
 const nullableHttpUrl = z.union([
@@ -83,6 +85,7 @@ function dbValues(body: z.infer<typeof championshipBody>) {
 export interface ChampionshipRouteOptions { includePublic?: boolean }
 
 export async function championshipRoutes(app: FastifyInstance, options: ChampionshipRouteOptions = {}): Promise<void> {
+  const publication = new CanonicalCatalogPublicationService();
   app.get('/api/v1/admin/discipline-families', async () => (
     await pool.query('select key,label,active,created_at,updated_at from discipline_families order by label,key')
   ).rows);
@@ -135,6 +138,7 @@ export async function championshipRoutes(app: FastifyInstance, options: Champion
         const result = await client.query(`update disciplines set label=$2,family_key=$3,active=$4,updated_at=now()
           where key=$1 returning *`, [key.data, value.label, value.family_key, value.active]);
         await writeAdminAudit(client, { request, resourceType: 'discipline', resourceId: key.data, oldValue: current.rows[0], newValue: result.rows[0] });
+        for(const championship of (await client.query('select id from championships where discipline_key=$1 order by id',[key.data])).rows)await publication.publishInTransaction(client,{resourceType:'championship',canonicalId:String(championship.id),occurredAt:new Date()});
         return result.rows[0];
       });
       if (!updated) return reply.code(404).send({ message: 'Discipline introuvable.' });
@@ -204,6 +208,7 @@ export async function championshipRoutes(app: FastifyInstance, options: Champion
         [id, ...dbValues(parsed.data)]
         );
         await writeAdminAudit(client, { request, resourceType: 'championship', resourceId: id, oldValue: null, newValue: result.rows[0] });
+        await publication.publishInTransaction(client,{resourceType:'championship',canonicalId:id,occurredAt:new Date()});
         return result.rows[0];
       });
       markAtomicallyAudited(request);
@@ -234,6 +239,7 @@ export async function championshipRoutes(app: FastifyInstance, options: Champion
         [id, ...dbValues(merged)]
         );
         await writeAdminAudit(client, { request, resourceType: 'championship', resourceId: id, oldValue: current.rows[0], newValue: result.rows[0] });
+        await publication.publishInTransaction(client,{resourceType:'championship',canonicalId:id,occurredAt:new Date()});
         return result.rows[0];
       });
       if (!updated) return reply.code(404).send({ message: 'Championnat introuvable.' });
@@ -255,6 +261,7 @@ export async function championshipRoutes(app: FastifyInstance, options: Champion
         if (!current.rowCount) return null;
         const linked = await client.query('select count(*)::int as count from events where championship_id=$1', [parsed.id]);
         if (linked.rows[0].count > 0) throw new ChampionshipConflictError(`Suppression impossible : ${linked.rows[0].count} événement(s) sont encore liés à ce championnat.`);
+        await publication.removeInTransaction(client,{resourceType:'championship',resourceId:championshipPublicId(parsed.id),occurredAt:new Date()});
         await client.query('delete from championships where id=$1', [parsed.id]);
         await writeAdminAudit(client, { request, resourceType: 'championship', resourceId: parsed.id, oldValue: current.rows[0], newValue: null });
         return true;

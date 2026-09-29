@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { FastifyRequest } from 'fastify';
 import { pool, withTransaction } from '../lib/db.js';
 import { writeAdminAudit } from '../lib/adminAudit.js';
+import { CanonicalCatalogPublicationService } from '../public/canonicalCatalogPublicationService.js';
 
 export type ChampionshipSeasonInput = {
   key: string;
@@ -15,6 +16,7 @@ export type ChampionshipSeasonInput = {
 export class ChampionshipSeasonNotFoundError extends Error {}
 
 export class ChampionshipSeasonService {
+  constructor(private readonly publication = new CanonicalCatalogPublicationService()) {}
   async list(championshipId: string) {
     const championship = await pool.query('select id from championships where id=$1', [championshipId]);
     if (!championship.rowCount) throw new ChampionshipSeasonNotFoundError('Championnat introuvable.');
@@ -41,6 +43,7 @@ export class ChampionshipSeasonService {
         [id, championshipId, input.key, input.label, input.start_year, input.end_year, input.starts_on, input.ends_on]
       )).rows[0];
       await writeAdminAudit(client, { request, resourceType: 'championship-season', resourceId: id, oldValue: null, newValue: created });
+      await this.publication.publishInTransaction(client,{resourceType:'championshipSeason',canonicalId:id,occurredAt:new Date()});
       return created;
     });
   }
@@ -70,6 +73,7 @@ export class ChampionshipSeasonService {
         [id, input.label, input.start_year, input.end_year, input.starts_on, input.ends_on]
       )).rows[0];
       await writeAdminAudit(client, { request, resourceType: 'championship-season', resourceId: id, oldValue: current, newValue: updated });
+      await this.publication.publishInTransaction(client,{resourceType:'championshipSeason',canonicalId:id,occurredAt:new Date()});
       return updated;
     });
   }

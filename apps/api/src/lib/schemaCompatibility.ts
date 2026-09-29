@@ -35,7 +35,8 @@ export const APPLICATION_SCHEMA_MIGRATIONS = [
   '0034_f5_canonical_venues',
   '0035_f5_provider_discovery_resolution',
   '0036_f5_meeting_event_canonical_resolution',
-  '0037_f5_multi_provider_reconciliation'
+  '0037_f5_multi_provider_reconciliation',
+  '0038_f5_canonical_publication'
 ] as const;
 
 export const APPLICATION_SCHEMA_HEAD = APPLICATION_SCHEMA_MIGRATIONS.at(-1)!;

@@ -37,9 +37,12 @@ describe('F5-7A canonical public contract',()=>{
   });
 
   it('represents canonical Season, Venue, Layout and Session type identities without provider ids',()=>{
-    expect(serializeChampionshipSeason({id:ids.season,championship_id:'formula-1',key:'2026',label:'2026',start_year:2026,end_year:2026,starts_on:'2026-01-01',ends_on:'2026-12-31'})).toEqual({id:ids.season,championship_id:championshipPublicId('formula-1'),key:'2026',label:'2026',start_year:2026,end_year:2026,starts_on:'2026-01-01',ends_on:'2026-12-31'});
-    expect(serializeVenue({id:ids.venue,key:'monza',name:'Monza',kind_key:'circuit',city:'Monza',region:null,country_code:'IT',timezone:'Europe/Rome',latitude:45.62,longitude:9.28,provider_id:'private'})).toEqual({id:ids.venue,key:'monza',name:'Monza',kind_key:'circuit',city:'Monza',region:null,country_code:'IT',timezone:'Europe/Rome',latitude:45.62,longitude:9.28});
-    expect(serializeVenueLayout({id:ids.layout,venue_id:ids.venue,key:'grand-prix',name:'Grand Prix',external_id:'private'})).toEqual({id:ids.layout,venue_id:ids.venue,key:'grand-prix',name:'Grand Prix'});
+    const season=serializeChampionshipSeason({id:ids.season,championship_id:'formula-1',key:'2026',label:'2026',start_year:2026,end_year:2026,starts_on:'2026-01-01',ends_on:'2026-12-31'});
+    expect(season).toEqual({id:ids.season,championship_id:championshipPublicId('formula-1'),key:'2026',label:'2026',start_year:2026,end_year:2026,starts_on:'2026-01-01',ends_on:'2026-12-31'});expect(validatesOpenApiSchema('ChampionshipSeason',season)).toBe(true);
+    const venue=serializeVenue({id:ids.venue,key:'monza',name:'Monza',kind_key:'circuit',city:'Monza',region:null,country_code:'IT',timezone:'Europe/Rome',latitude:45.62,longitude:9.28,provider_id:'private'});
+    expect(venue).toEqual({id:ids.venue,key:'monza',name:'Monza',kind_key:'circuit',city:'Monza',region:null,country_code:'IT',timezone:'Europe/Rome',latitude:45.62,longitude:9.28});expect(validatesOpenApiSchema('Venue',venue)).toBe(true);
+    const layout=serializeVenueLayout({id:ids.layout,venue_id:ids.venue,key:'grand-prix',name:'Grand Prix',external_id:'private'});
+    expect(layout).toEqual({id:ids.layout,venue_id:ids.venue,key:'grand-prix',name:'Grand Prix'});expect(validatesOpenApiSchema('VenueLayout',layout)).toBe(true);
     expect(serializeSessionType({key:'race',label:'Course',sort_order:30,active:true,provider_key:'private'})).toEqual({key:'race',label:'Course',sort_order:30,active:true});
   });
 

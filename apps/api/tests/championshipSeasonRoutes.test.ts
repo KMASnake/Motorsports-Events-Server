@@ -49,6 +49,7 @@ describe('F5-2 ChampionshipSeason admin routes', () => {
     expect(response.statusCode).toBe(201);
     expect(response.json()).toMatchObject({ key: '2026/27', start_year: 2026, end_year: 2027 });
     expect(clientQuery.mock.calls.some(([sql]) => String(sql).includes('admin_audit_log'))).toBe(true);
+    expect(clientQuery.mock.calls.some(([sql]) => String(sql).includes('publication_controls'))).toBe(true);
     await app.close();
   });
 

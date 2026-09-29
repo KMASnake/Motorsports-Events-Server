@@ -1,6 +1,6 @@
 import {createHmac,timingSafeEqual} from 'node:crypto';
 
-export type PageCursor={kind:'page';resourceType:'championship'|'event'|'meeting';snapshotSequence:number;sortKey:string;resourceId:string;filterHash:string;effectiveFrom?:string;clientId?:string;issuedAt:number};
+export type PageCursor={kind:'page';resourceType:'championship'|'championshipSeason'|'venue'|'venueLayout'|'event'|'meeting';snapshotSequence:number;sortKey:string;resourceId:string;filterHash:string;effectiveFrom?:string;clientId?:string;issuedAt:number};
 export type SyncCursor={kind:'sync';sequence:number;clientId?:string;issuedAt:number};
 export type PreviewCursor=PageCursor|SyncCursor;
 
@@ -28,7 +28,7 @@ export function decodeCursor(value:string,kind:PreviewCursor['kind'],secret:stri
   if(cursor.clientId!==undefined&&!/^[0-9a-f-]{36}$/i.test(String(cursor.clientId)))throw new Error('cursor_invalid');
   if(kind==='sync'){
     if(!Number.isSafeInteger(cursor.sequence)||Number(cursor.sequence)<0)throw new Error('cursor_invalid');
-  }else if(!['event','meeting','championship'].includes(String(cursor.resourceType))||!Number.isSafeInteger(cursor.snapshotSequence)||Number(cursor.snapshotSequence)<0||typeof cursor.sortKey!=='string'||cursor.sortKey.length>256||!/^[-_A-Za-z0-9]{43}$/.test(String(cursor.filterHash))||!/^[0-9a-f-]{36}$/i.test(String(cursor.resourceId))||(cursor.effectiveFrom!==undefined&&(typeof cursor.effectiveFrom!=='string'||cursor.effectiveFrom.length>64))){
+  }else if(!['event','meeting','championship','championshipSeason','venue','venueLayout'].includes(String(cursor.resourceType))||!Number.isSafeInteger(cursor.snapshotSequence)||Number(cursor.snapshotSequence)<0||typeof cursor.sortKey!=='string'||cursor.sortKey.length>256||!/^[-_A-Za-z0-9]{43}$/.test(String(cursor.filterHash))||!/^[0-9a-f-]{36}$/i.test(String(cursor.resourceId))||(cursor.effectiveFrom!==undefined&&(typeof cursor.effectiveFrom!=='string'||cursor.effectiveFrom.length>64))){
     throw new Error('cursor_invalid');
   }
   return parsed as PreviewCursor;

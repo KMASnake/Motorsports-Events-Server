@@ -18,8 +18,16 @@ describe('5.7-P-E canonical championship entitlement SQL', () => {
     const changesSql = String(query.mock.calls[1][0]);
     expect(collectionSql).toContain('s.championship_id=any($3::text[])');
     expect(changesSql).toContain('v.championship_id=any($3::text[])');
+    expect(changesSql).toContain("v.resource_type in ('venue','venueLayout')");
     expect(`${collectionSql}\n${changesSql}`).not.toContain('uuid[]');
     expect(query.mock.calls[0][1]).toContainEqual(['f1']);
     expect(query.mock.calls[1][1]).toContainEqual(['f1']);
+  });
+
+  it('keeps global Venue catalogs authenticated without applying a false Championship scope', async () => {
+    const query = vi.fn().mockResolvedValue({ rowCount: 0, rows: [] });
+    const repository = new PostgresPreviewRepository({ query } as never);
+    await repository.list({resourceType:'venue',limit:50,snapshotSequence:1,allowedChampionshipIds:['f1']});
+    expect(String(query.mock.calls[0][0])).not.toContain('s.championship_id=any');
   });
 });

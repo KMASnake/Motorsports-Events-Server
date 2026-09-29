@@ -1,6 +1,6 @@
 import {stableHash} from './deterministicNormalization.js';
 
-export type PublicResourceType='event'|'meeting'|'championship';
+export type PublicResourceType='event'|'meeting'|'championship'|'championshipSeason'|'venue'|'venueLayout';
 export type PublicationQuality='ready'|'review_required'|'blocked';
 export type PublicOperation='created'|'updated'|'removed'|'availability_changed';
 

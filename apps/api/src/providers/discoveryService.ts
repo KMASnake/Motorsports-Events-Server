@@ -6,6 +6,7 @@ import type { JsonObject, JsonValue } from './contracts.js';
 import { ProviderConfigurationService } from './providerService.js';
 import { redactProviderData } from './providerSecrets.js';
 import { QuotaCadenceService, type QuotaWorkClass } from './quotaCadenceService.js';
+import { CanonicalCatalogPublicationService } from '../public/canonicalCatalogPublicationService.js';
 
 export type DiscoveryContext={principal:AdminPrincipal;requestId:string};
 const status=(code:number,message:string)=>Object.assign(new Error(message),{statusCode:code});
@@ -21,7 +22,7 @@ async function audit(client:PoolClient,context:DiscoveryContext,action:string,id
 async function tx<T>(operation:(client:PoolClient)=>Promise<T>){const client=await pool.connect();try{await client.query('begin');const value=await operation(client);await client.query('commit');return value;}catch(error){await client.query('rollback');throw error;}finally{client.release();}}
 
 export class ProviderDiscoveryService {
-  constructor(readonly providers:ProviderConfigurationService,readonly quota=new QuotaCadenceService()){}
+  constructor(readonly providers:ProviderConfigurationService,readonly quota=new QuotaCadenceService(),readonly publication=new CanonicalCatalogPublicationService()){}
   async config(id:string){const row=(await pool.query(`select discovery_enabled,discovery_interval_days,last_discovery_at,
     greatest(case when last_discovery_at is null then now() else last_discovery_at + make_interval(days=>discovery_interval_days) end,discovery_next_eligible_at) as next_discovery_at,
     discovery_next_eligible_at
@@ -58,6 +59,7 @@ export class ProviderDiscoveryService {
   async createAndAssociate(providerId:string,discoveryId:string,input:{name:string;season:number},context:DiscoveryContext){return tx(async client=>{const discovered=(await client.query('select * from provider_discovered_championships where id=$1 and provider_instance_id=$2 for update',[discoveryId,providerId])).rows[0];if(!discovered)return null;
     const championshipId=randomUUID();const base=input.name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'championship';const slug=`${base}-${championshipId.slice(0,8)}`;
     const championship=(await client.query(`insert into championships(id,slug,name,season,active,sync_enabled) values($1,$2,$3,$4,true,false) returning *`,[championshipId,slug,input.name,input.season])).rows[0];
+    await this.publication.publishInTransaction(client,{resourceType:'championship',canonicalId:championshipId,occurredAt:new Date()});
     const adapterKey=(await client.query('select adapter_key from provider_instances where id=$1',[discovered.provider_instance_id])).rows[0].adapter_key;const adapter=this.providers.registry.get(adapterKey)!;const linkId=randomUUID();
     const link=(await client.query(`insert into provider_championships(id,provider_instance_id,championship_id,external_championship_id,discovery_state,sync_state,is_primary,discovered_at) values($1,$2,$3,$4,'configured','inactive',false,now()) returning *`,[linkId,discovered.provider_instance_id,championshipId,discovered.external_championship_id])).rows[0];
     await client.query(`insert into provider_championship_source_configs(provider_championship_id,schema_version,config,validated_at) values($1,$2,$3::jsonb,now())`,[linkId,adapter.sourceConfigVersion,JSON.stringify(discovered.proposed_source_config)]);await client.query(`update provider_discovered_championships set provider_championship_id=$2,state='associated',source_config_diverged=false,updated_at=now() where id=$1`,[discoveryId,linkId]);await audit(client,context,'provider.discovery_championship_created',discoveryId,null,{championship,link});return {championship,link};});}
