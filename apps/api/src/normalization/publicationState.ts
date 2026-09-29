@@ -4,7 +4,7 @@ export type PublicResourceType='event'|'meeting'|'championship';
 export type PublicationQuality='ready'|'review_required'|'blocked';
 export type PublicOperation='created'|'updated'|'removed'|'availability_changed';
 
-const PUBLIC_FIELDS=['resourceKind','name','sessionType','sessionLabel','status','championshipId','championshipSeasonId','circuitId','venueId','venueLayoutId','season','round','startsAt','endsAt','timezone','presence'] as const;
+const PUBLIC_FIELDS=['resourceKind','name','sessionType','sessionLabel','status','championshipId','championshipSeasonId','meetingId','circuitId','venueId','venueLayoutId','season','round','startsAt','endsAt','timezone','presence'] as const;
 
 export function canonicalPublicState(value:Readonly<Record<string,unknown>>):Readonly<Record<string,unknown>>{
   const state:Record<string,unknown>={};

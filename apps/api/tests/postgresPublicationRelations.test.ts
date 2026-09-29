@@ -40,6 +40,8 @@ describe('canonical meeting/event publication relation',()=>{
     expect(query.mock.calls.some(([sql])=>String(sql).includes('insert into events('))).toBe(true);
     expect(query.mock.calls.some(([sql])=>String(sql).includes('insert into event_source_links'))).toBe(true);
     expect(query.mock.calls.some(([sql,args])=>String(sql).includes('insert into meeting_events')&&(args as unknown[])[0]==='57000000-0000-4000-8000-000000000100'&&(args as unknown[])[2]===0)).toBe(true);
+    const publicStateWrite=query.mock.calls.find(([sql])=>String(sql).startsWith('insert into public_resource_states'));
+    expect(JSON.parse(String((publicStateWrite?.[1] as unknown[])[4]))).toMatchObject({meetingId:'57000000-0000-4000-8000-000000000100'});
   });
   it('does not materialize an Event while its source parent is unresolved',async()=>{
     const {client,query}=database(false);

@@ -12,5 +12,6 @@ describe('Lot 5.7-P-C publication state',()=>{
   it('C14 blocks at Event granularity',()=>{expect(granularQuality({event:'review_required'})).toEqual({event:'review_required',meeting:'degraded',championship:'degraded'});});
   it('C15 permits critical Event to block Meeting only',()=>{expect(granularQuality({event:'blocked',criticalEvent:true})).toEqual({event:'blocked',meeting:'blocked',championship:'degraded'});});
   it('C30 preserves pre-1970 public values',()=>{expect(canonicalPublicState(ready).startsAt).toBe('1965-01-01T00:00:00.000Z');});
+  it('retains the canonical Event parent reference while excluding provider metadata',()=>{expect(canonicalPublicState({...ready,meetingId:'55000000-0000-4000-8000-000000000020',providerId:'private'})).toMatchObject({meetingId:'55000000-0000-4000-8000-000000000020'});expect(canonicalPublicState({...ready,meetingId:'55000000-0000-4000-8000-000000000020',providerId:'private'})).not.toHaveProperty('providerId');});
   it('C31 ignores internal property order and metadata',()=>{expect(publicStateChecksum(ready)).toBe(publicStateChecksum({...ready,provenance:{other:true}}));});
 });

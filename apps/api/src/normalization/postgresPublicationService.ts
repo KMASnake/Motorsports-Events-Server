@@ -69,7 +69,7 @@ export class PostgresPublicationService{
       if(!parent)throw new Error('publication_parent_identity_missing');
       if(String(parent.championship_id)!==String(normalized.championshipId)||String(parent.championship_season_id)!==String(normalized.championshipSeasonId))throw new Error('publication_parent_scope_mismatch');
     }
-    const state=canonicalPublicState(normalized),checksum=publicStateChecksum(state);
+    const state=canonicalPublicState({...normalized,...(resourceType==='event'?{meetingId:parentMeetingId}:{})}),checksum=publicStateChecksum(state);
     const receipt=(await client.query('select * from publication_receipts where candidate_id=$1',[input.candidateId])).rows[0];
     if(receipt)return {outcome:String(receipt.outcome),revision:Number(receipt.resource_revision),sequence:receipt.change_sequence==null?null:Number(receipt.change_sequence)};
     if(String(row.decision)==='linked'){
