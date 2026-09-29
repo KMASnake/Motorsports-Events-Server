@@ -18,6 +18,7 @@ F4_CONTRACT_FILES = (
     "docs/handoff/LOT-5.7-P-F5-3-CANONICAL-VENUES.md",
     "docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md",
     "docs/handoff/LOT-5.7-P-F5-5-CANONICAL-MEETING-EVENT-RESOLUTION.md",
+    "docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md",
     "docs/handbook/architecture/ADR-0026-PROVIDER-DISCOVERY-RESOLUTION.md",
     "docs/handbook/architecture/ADR-0027-CANONICAL-MEETING-EVENT-RESOLUTION.md",
     "docs/handoff/VPS-PREPRODUCTION-READINESS.md",
@@ -399,7 +400,6 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].update(migration_head="0035_f5_provider_discovery_resolution"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["legacy"].update(run_number=273),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["node"].update(conclusion="FAILURE"),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(status="maintainer-validated", maintainer_validated=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-7"].update(status="in-progress", authorized=True),
             lambda value: gate(value)["provider_first_f5"].update(status="complete"),
             lambda value: gate(value).update(production_authorized=True),
@@ -452,7 +452,6 @@ class F4StabilizationTests(unittest.TestCase):
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"].pop("git_head"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["legacy"].update(run_number=273),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-5"]["ci"]["node"].update(conclusion="FAILURE"),
-            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(status="maintainer-validated", maintainer_validated=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-7"].update(status="in-progress", authorized=True),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(status="in-progress-pending-maintainer-validation"),
             lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-1"].update(maintainer_validated=False),
@@ -472,8 +471,48 @@ class F4StabilizationTests(unittest.TestCase):
                 target = changed_progress(Path(raw), mutate)
                 self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
 
-    def test_f5_1_governance_documents_are_fail_closed(self) -> None:
+    def test_f5_6_certification_and_future_boundaries_are_fail_closed(self) -> None:
+        def gate(value: dict) -> dict:
+            return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]
+
         cases = (
+            lambda value: gate(value)["provider_first_f5"]["subphases"].pop("F5-6"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(status="in-progress"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(implementation_complete=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(maintainer_audit="fail"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(maintainer_validated=False),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(git_head="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(git_tree="0" * 40),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(migration_head="0036_f5_meeting_event_canonical_resolution"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"]["ci"]["legacy"].update(run_number=282),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"]["ci"]["node"].update(conclusion="FAILURE"),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"]["playwright"].update(passed=17),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(provider_calls=1),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(worker_started=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-6"].update(scheduler_started=True),
+            lambda value: gate(value)["provider_first_f5"]["subphases"]["F5-7"].update(status="maintainer-validated", authorized=True),
+            lambda value: gate(value)["provider_first_f5"].update(status="complete"),
+            lambda value: gate(value).update(production_authorized=True),
+        )
+        for index, mutate in enumerate(cases):
+            with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
+                target = changed_progress(Path(raw), mutate)
+                self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
+    def test_f5_governance_documents_are_fail_closed(self) -> None:
+        cases = (
+            (
+                "docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md",
+                "Statut : `MAINTAINER_VALIDATED`",
+                "Statut : `IN_PROGRESS`",
+                "--f5-6-doc",
+            ),
+            (
+                "docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md",
+                "Legacy Python #283 : `SUCCESS`",
+                "Legacy Python #282 : `FAILURE`",
+                "--f5-6-doc",
+            ),
             (
                 "docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md",
                 "Statut : `MAINTAINER_VALIDATED`",
