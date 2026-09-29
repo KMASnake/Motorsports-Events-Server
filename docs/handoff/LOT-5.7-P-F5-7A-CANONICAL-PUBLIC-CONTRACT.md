@@ -58,10 +58,11 @@ Le domaine public canonique des Events est exactement : `scheduled`,
 `confirmed`, `postponed`, `cancelled`, `completed`. Le filtre Preview accepte
 les cinq valeurs. `draft` reste un état administratif non publié.
 
-Les timestamps publics sont des instants ISO 8601 absolus. Conformément à
-l'ADR-0004, la projection Event/Meeting conserve `timezone="UTC"` pour
-compatibilité. Une conversion `Europe/Paris` appartient au client et ne change
-jamais l'identité ni le stockage canonique.
+Les timestamps publics sont des instants ISO 8601 absolus. La projection
+Event/Meeting conserve une timezone explicite lorsqu'elle est connue et expose
+`timezone=null` lorsqu'elle est absente ou inconnue ; elle n'invente jamais
+`UTC`. Une conversion `Europe/Paris` appartient au client et ne change jamais
+l'identité ni le stockage canonique.
 
 ## Compatibilité et sécurité
 

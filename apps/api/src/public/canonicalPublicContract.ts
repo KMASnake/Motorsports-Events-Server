@@ -35,7 +35,7 @@ const meetingSessionPublicSchema=z.object({id:uuid,type_key:z.string(),title:z.s
 
 const canonicalResourceCommon={
   id:uuid,revision:z.number().int().positive(),name:z.string().nullable(),starts_at:z.union([instant,z.null()]),
-  ends_at:nullableInstant,timezone:z.string(),last_updated_at:instant
+  ends_at:nullableInstant,timezone:z.string().nullable(),last_updated_at:instant
 };
 export const meetingPublicSchema=z.object({
   ...canonicalResourceCommon,
@@ -68,7 +68,7 @@ const stringOrNull=(value:unknown)=>typeof value==='string'?value:null;
 const numberOrNull=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)?value:null;
 const uuidOrNull=(value:unknown)=>typeof value==='string'&&uuid.safeParse(value).success?value:null;
 const requiredString=(value:unknown,name:string)=>{if(typeof value!=='string'||!value.trim())throw new Error(`canonical_public_${name}_required`);return value;};
-const timezone=(value:unknown)=>typeof value==='string'&&value.length?value:'UTC';
+const timezone=(value:unknown)=>typeof value==='string'&&value.length?value:null;
 const instantOrNull=(value:unknown)=>value==null?null:instant.parse(value);
 const meetingSessions=(value:unknown)=>Array.isArray(value)?value.map(item=>{const session=item as Record<string,unknown>;return meetingSessionPublicSchema.parse({id:session.id,type_key:session.type_key??session.sessionType,title:stringOrNull(session.title??session.name),status:session.status,starts_at:instantOrNull(session.starts_at??session.startsAt),ends_at:instantOrNull(session.ends_at??session.endsAt)});}):[];
 

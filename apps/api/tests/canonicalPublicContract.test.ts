@@ -1,4 +1,6 @@
 import {describe,expect,it} from 'vitest';
+import Ajv from 'ajv';
+import {readFileSync} from 'node:fs';
 import {
   canonicalPublicStatuses,championshipPublicId,compareCanonicalPublic,eventPublicSchema,meetingPublicSchema,
   serializeChampionshipSeason,serializePublishedResource,serializeSessionType,serializeVenue,serializeVenueLayout
@@ -9,6 +11,11 @@ const ids={season:'57000000-0000-4000-8000-000000000001',venue:'57000000-0000-40
 const promotedAt='2026-09-29T12:00:00.000Z';
 const state={resourceKind:'event',name:'Race',sessionType:'race',sessionLabel:'Grand Prix',status:'confirmed',meetingId:ids.meeting,championshipId:'formula-1',championshipSeasonId:ids.season,circuitId:'legacy-monza',venueId:ids.venue,venueLayoutId:ids.layout,season:2026,round:'8',startsAt:'2026-09-29T12:00:00.000Z',endsAt:'2026-09-29T14:00:00.000Z',timezone:'UTC',presence:'seen',providerId:'must-not-leak',externalId:'provider-event'};
 const row=(resourceType:'event'|'meeting',resourceId:string,patch:Record<string,unknown>={}):ResourceRow=>({resourceType,resourceId,revision:3,lifecycle:'active',promotedAt,sortKey:String(state.startsAt),state:{...state,...patch}});
+const openApi=JSON.parse(readFileSync(new URL('../../../docs/api-v1-preview.openapi.json',import.meta.url),'utf8'));
+function validatesOpenApiSchema(name:string,value:unknown){
+  const definitions=JSON.parse(JSON.stringify(openApi.components.schemas).replaceAll('#/components/schemas/','#/definitions/'));
+  return new Ajv({allErrors:true,strict:false}).validate({definitions,$ref:`#/definitions/${name}`},value);
+}
 
 describe('F5-7A canonical public contract',()=>{
   it('derives a stable Championship publication UUID without changing the legacy identity',()=>{
@@ -19,6 +26,14 @@ describe('F5-7A canonical public contract',()=>{
     const publicRow:ResourceRow={resourceType:'championship',resourceId:first,revision:1,lifecycle:'active',promotedAt,sortKey:'Formula 1',state:{championshipId:'formula-1',name:'Formula 1',slug:'formula-1',disciplineKey:'single_seater'}};
     expect(serializePublishedResource(publicRow)).toMatchObject({id:first,legacy_id:'formula-1',discipline:{key:'single_seater'}});
     expect(()=>serializePublishedResource({...publicRow,resourceId:ids.event})).toThrow('canonical_public_championship_identity_mismatch');
+  });
+
+  it('keeps the complete runtime Championship response conformant with its closed OpenAPI schema',()=>{
+    const legacyId='formula-1',id=championshipPublicId(legacyId);
+    const output=serializePublishedResource({resourceType:'championship',resourceId:id,revision:2,lifecycle:'active',promotedAt,sortKey:'Formula 1',state:{championshipId:legacyId,name:'Formula 1',slug:'formula-1',shortName:'F1',officialName:'FIA Formula One World Championship',category:'single-seater',disciplineKey:'single_seater',disciplineLabel:'Monoplace',disciplineFamilyKey:'circuit',season:2026,logoUrl:'https://example.invalid/f1.svg',description:'World championship',availability:'preview',providerId:'private'}});
+    expect(output).toMatchObject({id,legacy_id:legacyId,slug:'formula-1',short_name:'F1',official_name:'FIA Formula One World Championship',category:'single-seater',season:2026,logo_url:'https://example.invalid/f1.svg',description:'World championship',availability:'preview'});
+    expect(validatesOpenApiSchema('Championship',output)).toBe(true);
+    expect(JSON.stringify(output)).not.toMatch(/provider/i);
   });
 
   it('represents canonical Season, Venue, Layout and Session type identities without provider ids',()=>{
@@ -45,6 +60,15 @@ describe('F5-7A canonical public contract',()=>{
     expect(event.ends_at).toBe('2026-09-29T14:00:00.000Z');
     expect(event.timezone).toBe('UTC');
     expect(JSON.stringify(event)).not.toContain('Europe/Paris');
+  });
+
+  it('preserves explicit timezone and represents unknown or absent timezone as null',()=>{
+    expect(serializePublishedResource(row('event',ids.event,{timezone:'America/New_York'})).timezone).toBe('America/New_York');
+    expect(serializePublishedResource(row('event',ids.event,{timezone:null})).timezone).toBeNull();
+    const withoutTimezone={...state};delete (withoutTimezone as Partial<typeof state>).timezone;
+    const output=serializePublishedResource({...row('event',ids.event),state:withoutTimezone});
+    expect(output.timezone).toBeNull();
+    expect(validatesOpenApiSchema('CanonicalEvent',output)).toBe(true);
   });
 
   it('is deterministic for identical canonical input and rejects malformed canonical identities',()=>{
