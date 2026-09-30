@@ -4,13 +4,20 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 HARNESS=(ROOT/'scripts/test-f57c-deterministic-e2e.sh').read_text()
 TEST=(ROOT/'apps/api/tests/f57cEndToEnd.postgres.test.ts').read_text()
+UP=(ROOT/'infra/postgres/migrations/0039_f5_confirmed_event_status.up.sql').read_text()
+DOWN=(ROOT/'infra/postgres/migrations/0039_f5_confirmed_event_status.down.sql').read_text()
 
 class F57CStaticSafety(unittest.TestCase):
     def test_isolated_database_and_exact_schema_head(self):
         self.assertIn("test -z \"${DATABASE_URL:-}\"",HARNESS)
         self.assertIn('--publish 127.0.0.1::5432',HARNESS)
-        self.assertIn('0038_f5_canonical_publication',HARNESS)
-        self.assertNotIn('0039_',HARNESS+TEST)
+        self.assertIn('0039_f5_confirmed_event_status',HARNESS)
+        self.assertNotIn('0040_',HARNESS+TEST+UP+DOWN)
+    def test_confirmed_migration_is_minimal_and_down_is_fail_closed(self):
+        self.assertIn("status in ('draft','scheduled','confirmed','completed','cancelled','postponed')",UP)
+        self.assertIn("exists(select 1 from events where status='confirmed')",DOWN)
+        self.assertLess(DOWN.index('rollback refused'),DOWN.index('alter table events'))
+        self.assertIn('populated confirmed-status DOWN unexpectedly succeeded',HARNESS)
     def test_no_provider_or_worker_execution(self):
         for forbidden in ('providerAcquireOnce','providerOneShotRunner','docker compose','worker','scheduler'):
             self.assertNotIn(forbidden,HARNESS)

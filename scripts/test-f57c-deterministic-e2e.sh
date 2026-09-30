@@ -25,12 +25,18 @@ PORT="$(docker port "${CONTAINER}" 5432/tcp | sed -n 's/^127\.0\.0\.1:\([0-9][0-
 docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" sh -ceu '
   psql="psql -v ON_ERROR_STOP=1 -U mse -d f57c"
   $psql -c "create table if not exists schema_migrations(version text primary key,applied_at timestamptz not null default now())" >/dev/null
-  for file in /migrations/*.up.sql;do $psql -1 -f "$file" >/dev/null; test "$(basename "$file")" != 0038_f5_canonical_publication.up.sql || break; done
+  for file in /migrations/*.up.sql;do $psql -1 -f "$file" >/dev/null; test "$(basename "$file")" != 0039_f5_confirmed_event_status.up.sql || break; done
+  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0039_f5_confirmed_event_status
+  $psql -1 -f /migrations/0039_f5_confirmed_event_status.down.sql >/dev/null
   test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0038_f5_canonical_publication
+  $psql -1 -f /migrations/0039_f5_confirmed_event_status.up.sql >/dev/null
 '
 
 export DATABASE_URL="postgresql://mse:f57c-local-only@127.0.0.1:${PORT}/f57c"
 export RUN_F57C_POSTGRES=1
 npm run test --workspace @mse/api -- --run tests/f57cEndToEnd.postgres.test.ts
-test "$(docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -At -U mse -d f57c -c "select version from schema_migrations order by version desc limit 1")" = 0038_f5_canonical_publication
+if docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -v ON_ERROR_STOP=1 -U mse -d f57c -1 -f /migrations/0039_f5_confirmed_event_status.down.sql >/dev/null 2>&1;then
+  echo 'F5-7C populated confirmed-status DOWN unexpectedly succeeded' >&2;exit 1
+fi
+test "$(docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -At -U mse -d f57c -c "select version from schema_migrations order by version desc limit 1")" = 0039_f5_confirmed_event_status
 echo 'F5-7C deterministic end-to-end certification: PASS'

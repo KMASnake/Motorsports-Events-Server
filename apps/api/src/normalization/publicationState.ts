@@ -27,7 +27,7 @@ export function publicationQuality(candidate:Readonly<Record<string,unknown>>,de
   if(decision==='review')return 'review_required';
   if(decision==='rejected')return 'blocked';
   if(!candidate.championshipId||!candidate.championshipSeasonId||(!candidate.circuitId&&!candidate.venueId))return 'review_required';
-  return decision!=='create'||candidate.startsAt&&candidate.status&&!(candidate.resourceKind==='event'&&candidate.status==='confirmed')?'ready':'review_required';
+  return decision!=='create'||candidate.startsAt&&candidate.status?'ready':'review_required';
 }
 
 export function granularQuality(input:{event:PublicationQuality;criticalEvent?:boolean;meeting?:PublicationQuality}):{event:PublicationQuality;meeting:'healthy'|'degraded'|'blocked';championship:'healthy'|'degraded'}{

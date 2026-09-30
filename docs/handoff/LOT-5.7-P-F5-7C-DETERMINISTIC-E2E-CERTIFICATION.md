@@ -6,7 +6,7 @@ Le harnais `scripts/test-f57c-deterministic-e2e.sh` réutilise d'abord le
 harnais F5-6 certifié et sa base jetable pour préserver sa transition requise
 0036 → 0037 (import legacy compris). Il crée ensuite une seconde base
 PostgreSQL jetable, liée uniquement à `127.0.0.1` sur un port dynamique, et
-applique la chaîne jusqu'à `0038_f5_canonical_publication` pour le gate F5-7C.
+applique la chaîne jusqu'à `0039_f5_confirmed_event_status` pour le gate F5-7C.
 Aucun endpoint provider, worker ou scheduler n'est lancé.
 Une tentative `fetch` dans le processus de certification échoue explicitement.
 
@@ -21,6 +21,8 @@ preuve des observations immuables, de la normalisation, de la résolution
 Meeting/Event, des contributions multi-provider, de l'indépendance à l'ordre,
 des overrides et de la matérialisation effective.
 
-Cette étape ne crée aucune migration 0039, ne modifie aucune API de production
+La migration 0039 bornée aligne uniquement `events_status_check` sur le statut
+canonique `confirmed` déjà déclaré par F5-7A ; son DOWN refuse toute ligne
+`confirmed`. Cette étape ne crée aucune migration 0040, ne modifie aucune API
 et n'autorise ni F5-7D, ni provider réel, ni préproduction, ni Production, ni
 déploiement. Un PASS local reste en attente d'un audit mainteneur indépendant.
