@@ -26,17 +26,41 @@ docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" sh -ceu '
   psql="psql -v ON_ERROR_STOP=1 -U mse -d f57c"
   $psql -c "create table if not exists schema_migrations(version text primary key,applied_at timestamptz not null default now())" >/dev/null
   for file in /migrations/*.up.sql;do $psql -1 -f "$file" >/dev/null; test "$(basename "$file")" != 0039_f5_confirmed_event_status.up.sql || break; done
+  $psql -c "insert into championships(id,slug,name,season,active,sync_enabled) values (\$q\$f57c-migration\$q\$,\$q\$f57c-migration\$q\$,\$q\$F57C migration\$q\$,2026,true,false);insert into meetings(id,championship_id,name,season,timezone) values (\$q\$57c00000-0000-4000-8000-000000000040\$q\$,\$q\$f57c-migration\$q\$,\$q\$F57C migration meeting\$q\$,2026,\$q\$UTC\$q\$);insert into events(id,championship_id,name,slug,starts_at,timezone,status,published,origin,session_type_key) values (\$q\$f57c-migration-event\$q\$,\$q\$f57c-migration\$q\$,\$q\$F57C migration event\$q\$,\$q\$f57c-migration-event\$q\$,\$q\$2026-09-30T12:00:00Z\$q\$,\$q\$UTC\$q\$,\$q\$scheduled\$q\$,false,\$q\$manual\$q\$,\$q\$other\$q\$)" >/dev/null
+  $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.up.sql >/dev/null
+  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0040_f5_canonical_timezone_nullability
+  test "$($psql -Atc "select is_nullable from information_schema.columns where table_name=\$q\$meetings\$q\$ and column_name=\$q\$timezone\$q\$")" = YES
+  test "$($psql -Atc "select is_nullable from information_schema.columns where table_name=\$q\$events\$q\$ and column_name=\$q\$timezone\$q\$")" = YES
+  test "$($psql -Atc "select timezone from meetings where id=\$q\$57c00000-0000-4000-8000-000000000040\$q\$")" = UTC
+  test "$($psql -Atc "select timezone from events where id=\$q\$f57c-migration-event\$q\$")" = UTC
+  $psql -c "delete from events where id=\$q\$f57c-migration-event\$q\$;delete from meetings where id=\$q\$57c00000-0000-4000-8000-000000000040\$q\$;delete from championships where id=\$q\$f57c-migration\$q\$" >/dev/null
+  $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null
   test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0039_f5_confirmed_event_status
+  $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.up.sql >/dev/null
+  $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null
   $psql -1 -f /migrations/0039_f5_confirmed_event_status.down.sql >/dev/null
   test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0038_f5_canonical_publication
   $psql -1 -f /migrations/0039_f5_confirmed_event_status.up.sql >/dev/null
+  $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.up.sql >/dev/null
 '
 
 export DATABASE_URL="postgresql://mse:f57c-local-only@127.0.0.1:${PORT}/f57c"
 export RUN_F57C_POSTGRES=1
 npm run test --workspace @mse/api -- --run tests/f57cEndToEnd.postgres.test.ts
-if docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -v ON_ERROR_STOP=1 -U mse -d f57c -1 -f /migrations/0039_f5_confirmed_event_status.down.sql >/dev/null 2>&1;then
+if docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -v ON_ERROR_STOP=1 -U mse -d f57c -1 -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null 2>&1;then
+  echo 'F5-7C populated NULL-timezone DOWN unexpectedly succeeded' >&2;exit 1
+fi
+test "$(docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -At -U mse -d f57c -c "select version from schema_migrations order by version desc limit 1")" = 0040_f5_canonical_timezone_nullability
+if docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -v ON_ERROR_STOP=1 -U mse -d f57c -1 -c "update events set timezone='UTC' where timezone is null" -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null 2>&1;then
+  echo 'F5-7C Meeting-NULL DOWN unexpectedly succeeded' >&2;exit 1
+fi
+if docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -v ON_ERROR_STOP=1 -U mse -d f57c -1 -c "update meetings set timezone='UTC' where timezone is null" -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null 2>&1;then
+  echo 'F5-7C Event-NULL DOWN unexpectedly succeeded' >&2;exit 1
+fi
+test "$(docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -At -U mse -d f57c -c "select count(*) from meetings where timezone is null")" -gt 0
+test "$(docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -At -U mse -d f57c -c "select count(*) from events where timezone is null")" -gt 0
+if docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -v ON_ERROR_STOP=1 -U mse -d f57c -1 -c "update meetings set timezone='UTC' where timezone is null;update events set timezone='UTC' where timezone is null" -f /migrations/0040_f5_canonical_timezone_nullability.down.sql -f /migrations/0039_f5_confirmed_event_status.down.sql >/dev/null 2>&1;then
   echo 'F5-7C populated confirmed-status DOWN unexpectedly succeeded' >&2;exit 1
 fi
-test "$(docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -At -U mse -d f57c -c "select version from schema_migrations order by version desc limit 1")" = 0039_f5_confirmed_event_status
+test "$(docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -At -U mse -d f57c -c "select version from schema_migrations order by version desc limit 1")" = 0040_f5_canonical_timezone_nullability
 echo 'F5-7C deterministic end-to-end certification: PASS'
