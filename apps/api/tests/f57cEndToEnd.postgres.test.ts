@@ -11,6 +11,7 @@ import type {AcquiredProviderSourceItem,JsonObject,ProviderAdapter} from '../src
 import {PersistentSchedulerService} from '../src/providers/schedulerService.js';
 import {PreviewClientSecurityService} from '../src/preview/clientSecurity.js';
 import {PostgresPreviewRepository} from '../src/preview/repository.js';
+import {decodeCursor,type SyncCursor} from '../src/preview/cursors.js';
 import {previewSecurityRoutes} from '../src/routes/previewSecurity.js';
 
 const enabled=process.env.RUN_F57C_POSTGRES==='1',suite=enabled?describe:describe.skip;
@@ -134,8 +135,26 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     const first=await app.inject({method:'GET',url:'/api/v1/changes?limit=2&include=data',headers:{authorization:`Bearer ${key}`}});
     expect(first.statusCode).toBe(200);const page=first.json();expect(page.data).toHaveLength(2);expect(page.pagination.has_more).toBe(true);
     expect(page.data[0].sequence).toBeLessThan(page.data[1].sequence);
-    const second=await app.inject({method:'GET',url:`/api/v1/changes?limit=2&include=data&cursor=${encodeURIComponent(page.pagination.next_cursor)}`,headers:{authorization:`Bearer ${key}`}});
-    expect(second.statusCode).toBe(200);expect(second.json().data[0].sequence).toBeGreaterThan(page.data[1].sequence);
+    const firstCursor=decodeCursor(page.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
+    await pool.query('update venues set name=$2 where id=$1',[ids.venue,'F57C Venue snapshot mutation']);
+    const postBoundary=await catalog.publish({resourceType:'venue',canonicalId:ids.venue,occurredAt:new Date('2026-09-30T12:01:30Z')});
+    expect(postBoundary).toMatchObject({outcome:'updated'});
+    const postBoundarySequence=Number((await pool.query(`select max(sequence)::int sequence from public_change_log where resource_type='venue' and resource_id=$1`,[ids.venue])).rows[0].sequence);
+    expect(postBoundarySequence).toBeGreaterThan(firstCursor.snapshotSequence);
+    const originalSnapshot=[...page.data];let continuation=page.pagination.next_cursor,previous=firstCursor.sequence;
+    while(continuation){
+      const response=await app.inject({method:'GET',url:`/api/v1/changes?limit=2&include=data&cursor=${encodeURIComponent(continuation)}`,headers:{authorization:`Bearer ${key}`}});
+      expect(response.statusCode).toBe(200);const body=response.json(),decoded=decodeCursor(body.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
+      expect(decoded.snapshotSequence).toBe(firstCursor.snapshotSequence);expect(decoded.clientId).toBe(firstCursor.clientId);expect(decoded.sequence).toBeGreaterThanOrEqual(previous);
+      for(const change of body.data){expect(change.sequence).toBeGreaterThan(previous);expect(change.sequence).toBeLessThanOrEqual(firstCursor.snapshotSequence);}
+      originalSnapshot.push(...body.data);previous=decoded.sequence;continuation=body.pagination.has_more?body.pagination.next_cursor:null;
+    }
+    expect(originalSnapshot.some((change:{sequence:number})=>change.sequence===postBoundarySequence)).toBe(false);
+    expect(new Set(originalSnapshot.map((change:{sequence:number})=>change.sequence)).size).toBe(originalSnapshot.length);
+    const fresh=await app.inject({method:'GET',url:'/api/v1/changes?limit=100&include=data',headers:{authorization:`Bearer ${key}`}});
+    expect(fresh.statusCode).toBe(200);const freshBody=fresh.json(),freshCursor=decodeCursor(freshBody.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
+    expect(freshCursor.snapshotSequence).toBeGreaterThan(firstCursor.snapshotSequence);
+    expect(freshBody.data.some((change:{sequence:number})=>change.sequence===postBoundarySequence)).toBe(true);
   });
 
   it('rolls back injected publication failure, converges on retry, and exposes one tombstone',async()=>{

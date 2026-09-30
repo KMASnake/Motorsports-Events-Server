@@ -12,12 +12,13 @@ describe('5.7-P-E canonical championship entitlement SQL', () => {
       snapshotSequence: 1,
       allowedChampionshipIds: ['f1']
     });
-    await repository.changes(0, 100, false, ['f1']);
+    await repository.changes(0, 12, 100, false, ['f1']);
 
     const collectionSql = String(query.mock.calls[0][0]);
     const changesSql = String(query.mock.calls[1][0]);
     expect(collectionSql).toContain('s.championship_id=any($3::text[])');
-    expect(changesSql).toContain('v.championship_id=any($3::text[])');
+    expect(changesSql).toContain('c.sequence>$1 and c.sequence<=$2');
+    expect(changesSql).toContain('v.championship_id=any($4::text[])');
     expect(changesSql).toContain("v.resource_type in ('venue','venueLayout')");
     expect(`${collectionSql}\n${changesSql}`).not.toContain('uuid[]');
     expect(query.mock.calls[0][1]).toContainEqual(['f1']);

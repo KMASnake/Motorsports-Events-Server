@@ -60,7 +60,7 @@ class F5CanonicalPublicationTests(unittest.TestCase):
 
     def test_changes_reuses_entitlements_and_allows_only_global_catalogs(self):
         self.assertIn("v.resource_type in ('venue','venueLayout')",REPOSITORY)
-        self.assertIn('v.championship_id=any($3::text[])',REPOSITORY)
+        self.assertIn('v.championship_id=any($4::text[])',REPOSITORY)
 
     def test_postgres_harness_proves_forward_empty_down_refusal_and_reupgrade(self):
         self.assertIn('test "$version" = 0038_f5_canonical_publication&&break',HARNESS)
