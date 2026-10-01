@@ -130,12 +130,20 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     expect(event.statusCode).toBe(200);expect(event.json()).toMatchObject({id:eventId,meeting_id:meetingId,status:'confirmed',starts_at:'2026-10-01T10:00:00.000Z',ends_at:'2026-10-01T11:30:00.000Z',timezone:null,session:{type_key:'race',title:'F57C Race'}});
     expect((await pool.query('select timezone from meetings where id=$1',[meetingId])).rows[0].timezone).toBeNull();
     expect((await pool.query('select timezone from events where normalized_uuid=$1',[eventId])).rows[0].timezone).toBeNull();
-    expect((await pool.query('select timezone from meetings where id=$1',[explicitMeetingId])).rows[0].timezone).toBe('Europe/Paris');
-    expect((await pool.query('select timezone from events where normalized_uuid=$1',[explicitEventId])).rows[0].timezone).toBe('Europe/Paris');
+    const parisStartExpected='2026-10-02T10:00:00.000Z',parisEndExpected='2026-10-02T11:30:00.000Z';
+    const explicitMeetingDb=(await pool.query('select timezone from meetings where id=$1',[explicitMeetingId])).rows[0];
+    const explicitEventDb=(await pool.query('select timezone,starts_at,ends_at from events where normalized_uuid=$1',[explicitEventId])).rows[0];
+    expect(explicitMeetingDb.timezone).toBe('Europe/Paris');
+    expect(explicitEventDb.timezone).toBe('Europe/Paris');
+    expect(explicitEventDb.starts_at.toISOString()).toBe(parisStartExpected);
+    expect(explicitEventDb.ends_at.toISOString()).toBe(parisEndExpected);
     const explicitMeeting=await app.inject({method:'GET',url:`/api/v1/meetings/${explicitMeetingId}`,headers:{authorization:`Bearer ${key}`}});
     expect(explicitMeeting.statusCode).toBe(200);expect(explicitMeeting.json()).toMatchObject({id:explicitMeetingId,timezone:'Europe/Paris'});
     const explicitEvent=await app.inject({method:'GET',url:`/api/v1/events/${explicitEventId}`,headers:{authorization:`Bearer ${key}`}});
     expect(explicitEvent.statusCode).toBe(200);expect(explicitEvent.json()).toMatchObject({id:explicitEventId,meeting_id:explicitMeetingId,timezone:'Europe/Paris'});
+    expect(explicitEvent.json().starts_at).toBe(parisStartExpected);
+    expect(explicitEvent.json().ends_at).toBe(parisEndExpected);
+    console.info('F57C_PARIS_INSTANT_EVIDENCE',JSON.stringify({sourceTimezone:'Europe/Paris',dbTimezone:explicitEventDb.timezone,apiTimezone:explicitEvent.json().timezone,startExpected:parisStartExpected,startDb:explicitEventDb.starts_at.toISOString(),startApi:explicitEvent.json().starts_at,endExpected:parisEndExpected,endDb:explicitEventDb.ends_at.toISOString(),endApi:explicitEvent.json().ends_at}));
     const utcMeetingDb=(await pool.query('select timezone,starts_at,ends_at from meetings where id=$1',[utcMeetingId])).rows[0];
     const utcEventDb=(await pool.query('select timezone,starts_at,ends_at from events where normalized_uuid=$1',[utcEventId])).rows[0];
     expect(utcMeetingDb.timezone).toBe('UTC');expect(utcEventDb.timezone).toBe('UTC');
@@ -244,11 +252,14 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     }
     expect(incrementalPages).toBeGreaterThanOrEqual(3);
     expect(incrementalActual).toEqual(incrementalExpected);
+    const postBoundaryNextSyncCount=incrementalActual.filter(sequence=>sequence===postBoundarySequence).length;
+    expect(postBoundaryNextSyncCount).toBe(1);
     expect(incrementalActual).not.toContain(laterSequence);
     expect(new Set(incrementalActual).size).toBe(incrementalActual.length);
     const afterCompletion=await app.inject({method:'GET',url:`/api/v1/changes?limit=100&cursor=${encodeURIComponent(finalCheckpoint)}`,headers:{authorization:`Bearer ${key}`}});
     expect(afterCompletion.statusCode).toBe(200);
-    expect(afterCompletion.json().data.map((change:{sequence:number})=>change.sequence)).toContain(laterSequence);
+    const afterCompletionSequences:number[]=afterCompletion.json().data.map((change:{sequence:number})=>change.sequence);
+    expect(afterCompletionSequences.filter(sequence=>sequence===laterSequence)).toHaveLength(1);
     const afterCompletionCursor=decodeCursor(afterCompletion.json().pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
     expect(afterCompletionCursor).toMatchObject({role:'checkpoint',sequence:laterSequence});
     const venueList=await app.inject({method:'GET',url:'/api/v1/venues',headers:{authorization:`Bearer ${key}`}});
@@ -266,7 +277,7 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     expect(freshCursor).toMatchObject({role:'checkpoint'});
     expect(freshCursor.sequence).toBeGreaterThan(firstCursor.snapshotSequence);
     expect(freshBody.data.some((change:{sequence:number})=>change.sequence===postBoundarySequence)).toBe(true);
-    console.info('F57C_INCREMENTAL_CURSOR_EVIDENCE',JSON.stringify({completedSyncCheckpointSequence:firstCursor.snapshotSequence,laterChangeSequence:postBoundarySequence,newIncrementalLowerBound:firstCursor.snapshotSequence,newIncrementalSnapshotBoundary:incrementalCursor.snapshotSequence,expectedEligibleSequences:incrementalExpected,actualReturnedSequences:incrementalActual,pageCount:incrementalPages,postBoundarySequence:laterSequence,finalCheckpointSequence:incrementalCursor.snapshotSequence}));
+    console.info('F57C_INCREMENTAL_CURSOR_EVIDENCE',JSON.stringify({completedSyncCheckpointSequence:firstCursor.snapshotSequence,laterChangeSequence:postBoundarySequence,newIncrementalLowerBound:firstCursor.snapshotSequence,newIncrementalSnapshotBoundary:incrementalCursor.snapshotSequence,expectedEligibleSequences:incrementalExpected,actualReturnedSequences:incrementalActual,postBoundaryNextSyncCount,pageCount:incrementalPages,postBoundarySequence:laterSequence,afterCompletionSequences,finalCheckpointSequence:incrementalCursor.snapshotSequence}));
   });
 
   it('rolls back injected publication failure, converges on retry, and exposes one tombstone',async()=>{
@@ -361,7 +372,7 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     expect(retry.receipts[0]).toMatchObject({effective_checksum:success.receipts[0].effective_checksum,resource_revision:success.receipts[0].resource_revision,outcome:success.receipts[0].outcome});
     expect(retry.versions[0].publication_sequence).toBe(retry.changes[0].sequence);
     expect(retry.receipts[0].change_sequence).toBe(retry.changes[0].sequence);
-    console.info('F57C_ATOMICITY_EVIDENCE',JSON.stringify({successReferenceCaptured:true,injection:'publication_injected_failure_after_canonical_and_public_writes',partialCanonical:afterInjected.canonical.length,partialEffective:afterInjected.contribution.length,partialStates:afterInjected.state.length,partialVersions:afterInjected.versions.length,partialChanges:afterInjected.changes.length,partialReceipts:afterInjected.receipts.length,partialCheckpointAdvances:0,orphanCounts,retryEqualsReference:true}));
+    console.info('F57C_ATOMICITY_EVIDENCE',JSON.stringify({successReferenceCaptured:true,injection:'publication_injected_failure_after_canonical_and_public_writes',partialCanonical:afterInjected.canonical.length,effectiveStateApplicableToFaultScenario:false,partialEffective:'NOT_APPLICABLE',partialEffectiveReason:'Meeting fault-injection scenario does not execute reconciliation/effective-state mutation; meeting_source_contributions are source contributions, not effective reconciliation state',partialSourceContributions:afterInjected.contribution.length,partialStates:afterInjected.state.length,partialVersions:afterInjected.versions.length,partialChanges:afterInjected.changes.length,partialReceipts:afterInjected.receipts.length,partialCheckpointAdvances:0,orphanCounts,retryEqualsReference:true}));
   });
 
   it('certifies the publication graph bidirectionally across all six resource types',async()=>{
