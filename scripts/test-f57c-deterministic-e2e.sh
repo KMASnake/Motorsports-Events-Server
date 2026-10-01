@@ -47,6 +47,36 @@ docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" sh -ceu '
 export DATABASE_URL="postgresql://mse:f57c-local-only@127.0.0.1:${PORT}/f57c"
 export RUN_F57C_POSTGRES=1
 npm run test --workspace @mse/api -- --run tests/f57cEndToEnd.postgres.test.ts
+# Clone the disposable certification database after the API pool has closed.
+# This isolates the Event-only NULL DOWN proof from the other rollback tests.
+docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" createdb -U mse -T f57c f57c_event_only
+docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" sh -ceu '
+  psql="psql -v ON_ERROR_STOP=1 -U mse -d f57c_event_only"
+  $psql -c "update meetings set timezone=\$q\$UTC\$q\$ where timezone is null" >/dev/null
+  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0040_f5_canonical_timezone_nullability
+  test "$($psql -Atc "select count(*) from meetings where timezone is null")" = 0
+  event_null_count="$($psql -Atc "select count(*) from events where timezone is null")"
+  test "${event_null_count}" -ge 1
+  meetings_before="$($psql -Atc "select id,timezone from meetings order by id")"
+  events_before="$($psql -Atc "select id from events where timezone is null order by id")"
+  test "$($psql -Atc "select is_nullable from information_schema.columns where table_name=\$q\$meetings\$q\$ and column_name=\$q\$timezone\$q\$")" = YES
+  test "$($psql -Atc "select is_nullable from information_schema.columns where table_name=\$q\$events\$q\$ and column_name=\$q\$timezone\$q\$")" = YES
+  if $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null 2>&1;then
+    echo "F5-7C Event-only NULL DOWN unexpectedly succeeded" >&2;exit 1
+  fi
+  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0040_f5_canonical_timezone_nullability
+  test "$($psql -Atc "select id,timezone from meetings order by id")" = "${meetings_before}"
+  test "$($psql -Atc "select id from events where timezone is null order by id")" = "${events_before}"
+  test "$($psql -Atc "select is_nullable from information_schema.columns where table_name=\$q\$meetings\$q\$ and column_name=\$q\$timezone\$q\$")" = YES
+  test "$($psql -Atc "select is_nullable from information_schema.columns where table_name=\$q\$events\$q\$ and column_name=\$q\$timezone\$q\$")" = YES
+  $psql -c "update events set timezone=\$q\$UTC\$q\$ where timezone is null" >/dev/null
+  $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null
+  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0039_f5_confirmed_event_status
+  test "$($psql -Atc "select is_nullable from information_schema.columns where table_name=\$q\$events\$q\$ and column_name=\$q\$timezone\$q\$")" = NO
+  $psql -1 -f /migrations/0040_f5_canonical_timezone_nullability.up.sql >/dev/null
+  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0040_f5_canonical_timezone_nullability
+  echo "F57C_EVENT_ONLY_DOWN_EVIDENCE meetingNullBefore=0 eventNullBefore=${event_null_count} refused=PASS transactional=PASS eventDataUnchanged=PASS meetingDataUnchanged=PASS safeDown=PASS reupgrade=PASS"
+'
 if docker exec -e PGPASSWORD=f57c-local-only "${CONTAINER}" psql -v ON_ERROR_STOP=1 -U mse -d f57c -1 -f /migrations/0040_f5_canonical_timezone_nullability.down.sql >/dev/null 2>&1;then
   echo 'F5-7C populated NULL-timezone DOWN unexpectedly succeeded' >&2;exit 1
 fi

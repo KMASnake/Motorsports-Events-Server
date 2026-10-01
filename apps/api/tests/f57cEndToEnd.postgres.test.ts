@@ -13,6 +13,7 @@ import {PreviewClientSecurityService} from '../src/preview/clientSecurity.js';
 import {PostgresPreviewRepository} from '../src/preview/repository.js';
 import {decodeCursor,type SyncCursor} from '../src/preview/cursors.js';
 import {previewSecurityRoutes} from '../src/routes/previewSecurity.js';
+import {eventRoutes} from '../src/routes/events.js';
 
 const enabled=process.env.RUN_F57C_POSTGRES==='1',suite=enabled?describe:describe.skip;
 const ids={championship:'f57c',season:'57c00000-0000-4000-8000-000000000001',venue:'57c00000-0000-4000-8000-000000000002',layout:'57c00000-0000-4000-8000-000000000003',provider:'57c00000-0000-4000-8000-000000000004',providerChampionship:'57c00000-0000-4000-8000-000000000005',meeting:'57c00000-0000-4000-8000-000000000010',event:'57c00000-0000-4000-8000-000000000011'};
@@ -20,8 +21,8 @@ const now=new Date('2026-09-30T12:00:00.000Z'),pepper='f57c-local-certification-
 
 suite('F5-7C deterministic public pipeline certification',()=>{
   const clock={now:()=>now},catalog=new CanonicalCatalogPublicationService(),acquisition=new AcquisitionTransactionService(new PersistentSchedulerService(clock),clock),normalization=new PostgresDeterministicNormalizationService(),publication=new PostgresPublicationService(),reconciliation=new PostgresReconciliationService(),security=new PreviewClientSecurityService(pepper),repository=new PostgresPreviewRepository();
-  let app:ReturnType<typeof Fastify>|undefined,key:string,deniedKey:string;
-  let meetingSourceId='',eventSourceId='',explicitMeetingSourceId='',explicitEventSourceId='',meetingId=ids.meeting,eventId=ids.event,eventCandidateId='';
+  let app:ReturnType<typeof Fastify>|undefined,legacyApp:ReturnType<typeof Fastify>|undefined,key:string,deniedKey:string;
+  let meetingSourceId='',eventSourceId='',explicitMeetingSourceId='',explicitEventSourceId='',utcMeetingSourceId='',utcEventSourceId='',referenceSourceId='',failureSourceId='',meetingId=ids.meeting,eventId=ids.event,eventCandidateId='';
   beforeAll(async()=>{
     // Network access is forbidden for this certification process. The tested path is
     // database-backed and must never attempt to use fetch.
@@ -44,7 +45,10 @@ suite('F5-7C deterministic public pipeline certification',()=>{
       {entityKind:'meeting',externalId:'fixture-meeting',identityIsSynthetic:false,parentExternalId:null,parentEntityKind:null,season:2026,sourceData:{name:'F57C Meeting',championship_id:'fixture-championship',external_season_id:'2026',circuit_id:'fixture-circuit',starts_at:'2026-10-01T09:00:00.000Z',ends_at:'2026-10-01T12:00:00.000Z',timezone:null,status:'Scheduled',round:'1'}},
       {entityKind:'event',externalId:'fixture-event',identityIsSynthetic:false,parentExternalId:'fixture-meeting',parentEntityKind:'meeting',season:2026,sourceData:{name:'F57C Race',championship_id:'fixture-championship',circuit_id:'fixture-circuit',starts_at:'2026-10-01T10:00:00.000Z',ends_at:'2026-10-01T11:30:00.000Z',timezone:null,status:'Confirmed',session_type:'Race'}},
       {entityKind:'meeting',externalId:'fixture-meeting-explicit',identityIsSynthetic:false,parentExternalId:null,parentEntityKind:null,season:2026,sourceData:{name:'F57C Explicit Meeting',championship_id:'fixture-championship',external_season_id:'2026',circuit_id:'fixture-circuit',starts_at:'2026-10-02T09:00:00.000Z',ends_at:'2026-10-02T12:00:00.000Z',timezone:'Europe/Paris',status:'Scheduled',round:'2'}},
-      {entityKind:'event',externalId:'fixture-event-explicit',identityIsSynthetic:false,parentExternalId:'fixture-meeting-explicit',parentEntityKind:'meeting',season:2026,sourceData:{name:'F57C Explicit Race',championship_id:'fixture-championship',circuit_id:'fixture-circuit',starts_at:'2026-10-02T10:00:00.000Z',ends_at:'2026-10-02T11:30:00.000Z',timezone:'Europe/Paris',status:'Confirmed',session_type:'Race'}}
+      {entityKind:'event',externalId:'fixture-event-explicit',identityIsSynthetic:false,parentExternalId:'fixture-meeting-explicit',parentEntityKind:'meeting',season:2026,sourceData:{name:'F57C Explicit Race',championship_id:'fixture-championship',circuit_id:'fixture-circuit',starts_at:'2026-10-02T10:00:00.000Z',ends_at:'2026-10-02T11:30:00.000Z',timezone:'Europe/Paris',status:'Confirmed',session_type:'Race'}},
+      {entityKind:'meeting',externalId:'fixture-meeting-utc',identityIsSynthetic:false,parentExternalId:null,parentEntityKind:null,season:2026,sourceData:{name:'F57C UTC Meeting',championship_id:'fixture-championship',external_season_id:'2026',circuit_id:'fixture-circuit',starts_at:'2026-10-03T09:00:00.000Z',ends_at:'2026-10-03T12:00:00.000Z',timezone:'UTC',status:'Scheduled',round:'3'}},
+      {entityKind:'event',externalId:'fixture-event-utc',identityIsSynthetic:false,parentExternalId:'fixture-meeting-utc',parentEntityKind:'meeting',season:2026,sourceData:{name:'F57C UTC Race',championship_id:'fixture-championship',circuit_id:'fixture-circuit',starts_at:'2026-10-03T10:00:00.000Z',ends_at:'2026-10-03T11:30:00.000Z',timezone:'UTC',status:'Confirmed',session_type:'Race'}},
+      ...['reference','failure'].map(label=>({entityKind:'meeting' as const,externalId:`fixture-meeting-atomic-${label}`,identityIsSynthetic:false,parentExternalId:null,parentEntityKind:null,season:2026,sourceData:{name:'F57C Atomic Meeting',championship_id:'fixture-championship',external_season_id:'2026',circuit_id:'fixture-circuit',starts_at:'2026-10-04T09:00:00.000Z',ends_at:'2026-10-04T12:00:00.000Z',timezone:'UTC',status:'Scheduled',round:'4'}}))
     ];
     const adapter={key:'f57c-fixture',capabilities:{supportsChampionshipDiscovery:false,supportsSeasonDiscovery:false,supportsQuotaHeaders:false,supportsConnectionTest:false},providerConfigVersion:1,sourceConfigVersion:1,cursorVersion:1,providerForm:()=>[],championshipForm:()=>[],validateProviderConfig:()=>({}),validateSourceConfig:()=>({}),initialCursor:()=>({}),validateCursor:()=>({}),serializeCursor:cursor=>cursor,restoreCursor:()=>({}),fetchWorkUnit:async()=>({status:'complete' as const,items,itemAnomalies:[],nextCursor:{done:true},requestCount:0,complete:true,completionReason:'end_of_collection' as const}),normalize:()=>({accepted:[],rejected:[]}),confirmEmptySeason:async()=>({confirmedEmpty:false,reason:'not empty'})} satisfies ProviderAdapter<JsonObject,JsonObject,JsonObject,AcquiredProviderSourceItem>;
     const acquired=await acquisition.executeUnit({providerInstanceId:ids.provider,providerChampionshipId:ids.providerChampionship,season:2026,workClass:'current_global',safeUnitKey:'f57c',lease:{streamId:stream,runId:run,workerId:'f57c-certification',generation:1},adapter,fetchInput:{providerInstanceId:ids.provider,providerChampionshipId:ids.providerChampionship,championshipId:ids.championship,providerConfig:{},credentials:{},sourceConfig:{},phase:'current',season:2026,cursor:{},signal:new AbortController().signal}});
@@ -52,6 +56,8 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     const sources=(await pool.query(`select id,external_id from provider_source_entities where provider_championship_id=$1`,[ids.providerChampionship])).rows;
     meetingSourceId=sources.find(row=>row.external_id==='fixture-meeting').id;eventSourceId=sources.find(row=>row.external_id==='fixture-event').id;
     explicitMeetingSourceId=sources.find(row=>row.external_id==='fixture-meeting-explicit').id;explicitEventSourceId=sources.find(row=>row.external_id==='fixture-event-explicit').id;
+    utcMeetingSourceId=sources.find(row=>row.external_id==='fixture-meeting-utc').id;utcEventSourceId=sources.find(row=>row.external_id==='fixture-event-utc').id;
+    referenceSourceId=sources.find(row=>row.external_id==='fixture-meeting-atomic-reference').id;failureSourceId=sources.find(row=>row.external_id==='fixture-meeting-atomic-failure').id;
     const client=await security.createClient({name:'F57C entitled',scopes:['championships:read','meetings:read','events:read','changes:read'],championshipIds:[ids.championship],pageLimit:2,changesPageLimit:100});
     key=(await security.createKey(client.id,'test','F57C')).api_key;
     const denied=await security.createClient({name:'F57C denied',scopes:['championships:read','meetings:read','events:read','changes:read'],championshipIds:[]});
@@ -59,8 +65,11 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     app=Fastify({logger:false});
     await app.register(previewSecurityRoutes,{security,repository,cursorSecret,now:()=>now});
     await app.ready();
+    legacyApp=Fastify({logger:false});
+    await legacyApp.register(eventRoutes);
+    await legacyApp.ready();
   });
-  afterAll(async()=>{if(app)await app.close();await pool.end();});
+  afterAll(async()=>{if(app)await app.close();if(legacyApp)await legacyApp.close();await pool.end();});
 
   it('fails closed then atomically establishes canonical catalogs and replays without changes',async()=>{
     await pool.query("update publication_controls set enabled=false where control_key='promotion'");
@@ -92,6 +101,8 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     const normalizedEvent=await candidate(eventSourceId,'event');eventId=normalizedEvent.proposedUuid;eventCandidateId=normalizedEvent.candidateId;
     const explicitMeetingId=(await candidate(explicitMeetingSourceId,'meeting')).proposedUuid;
     const explicitEventId=(await candidate(explicitEventSourceId,'event')).proposedUuid;
+    const utcMeetingId=(await candidate(utcMeetingSourceId,'meeting')).proposedUuid;
+    const utcEventId=(await candidate(utcEventSourceId,'event')).proposedUuid;
     const policy='57c00000-0000-4000-8000-000000000016';
     await pool.query(`insert into reconciliation_policies(id,championship_id,championship_season_id,resource_kind,version,status,checksum,idempotency_key,request_fingerprint,actor_id,activated_at) values($1,$2,$3,'event',1,'active',$4,'f57c-policy',$4,'f57c',$5)`,[policy,ids.championship,ids.season,'e'.repeat(64),now]);
     for(const [field,klass] of [['name','DISPLAY'],['sessionLabel','DISPLAY'],['sessionType','DISPLAY'],['startsAt','SCHEDULE'],['endsAt','SCHEDULE'],['status','STATUS'],['venueId','REFERENCE'],['venueLayoutId','REFERENCE']] as const)await pool.query(`insert into reconciliation_policy_field_rules(id,policy_id,field_name,field_class,provider_priority,status_rules) values(gen_random_uuid(),$1,$2,$3,'[["f57c-fixture"]]'::jsonb,$4::jsonb)`,[policy,field,klass,JSON.stringify(field==='status'?{confirmed:['confirmed']}:{})]);
@@ -125,6 +136,29 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     expect(explicitMeeting.statusCode).toBe(200);expect(explicitMeeting.json()).toMatchObject({id:explicitMeetingId,timezone:'Europe/Paris'});
     const explicitEvent=await app.inject({method:'GET',url:`/api/v1/events/${explicitEventId}`,headers:{authorization:`Bearer ${key}`}});
     expect(explicitEvent.statusCode).toBe(200);expect(explicitEvent.json()).toMatchObject({id:explicitEventId,meeting_id:explicitMeetingId,timezone:'Europe/Paris'});
+    const utcMeetingDb=(await pool.query('select timezone,starts_at,ends_at from meetings where id=$1',[utcMeetingId])).rows[0];
+    const utcEventDb=(await pool.query('select timezone,starts_at,ends_at from events where normalized_uuid=$1',[utcEventId])).rows[0];
+    expect(utcMeetingDb.timezone).toBe('UTC');expect(utcEventDb.timezone).toBe('UTC');
+    expect(utcMeetingDb.starts_at.toISOString()).toBe('2026-10-03T09:00:00.000Z');
+    expect(utcMeetingDb.ends_at.toISOString()).toBe('2026-10-03T12:00:00.000Z');
+    expect(utcEventDb.starts_at.toISOString()).toBe('2026-10-03T10:00:00.000Z');
+    expect(utcEventDb.ends_at.toISOString()).toBe('2026-10-03T11:30:00.000Z');
+    const utcMeetingApi=await app.inject({method:'GET',url:`/api/v1/meetings/${utcMeetingId}`,headers:{authorization:`Bearer ${key}`}});
+    const utcEventApi=await app.inject({method:'GET',url:`/api/v1/events/${utcEventId}`,headers:{authorization:`Bearer ${key}`}});
+    expect(utcMeetingApi.statusCode).toBe(200);expect(utcEventApi.statusCode).toBe(200);
+    expect(utcMeetingApi.json()).toMatchObject({timezone:'UTC',starts_at:'2026-10-03T09:00:00.000Z',ends_at:'2026-10-03T12:00:00.000Z'});
+    expect(utcEventApi.json()).toMatchObject({timezone:'UTC',starts_at:'2026-10-03T10:00:00.000Z',ends_at:'2026-10-03T11:30:00.000Z'});
+    console.info('F57C_EXPLICIT_UTC_EVIDENCE',JSON.stringify({sourceTimezone:'UTC',dbTimezone:utcEventDb.timezone,apiTimezone:utcEventApi.json().timezone,startExpected:'2026-10-03T10:00:00.000Z',startDb:utcEventDb.starts_at.toISOString(),startApi:utcEventApi.json().starts_at,endExpected:'2026-10-03T11:30:00.000Z',endDb:utcEventDb.ends_at.toISOString(),endApi:utcEventApi.json().ends_at}));
+    if(!legacyApp)throw new Error('f57c_legacy_http_app_not_ready');
+    const legacyId=(await pool.query('select id from events where normalized_uuid=$1 and timezone is null',[eventId])).rows[0]?.id;
+    expect(legacyId).toBeTruthy();
+    const readSnapshot=async()=>({event:(await pool.query('select id,timezone,updated_at from events where id=$1',[legacyId])).rows[0],meeting:(await pool.query('select id,timezone,updated_at from meetings where id=$1',[meetingId])).rows[0],candidate:(await pool.query('select id,state,updated_at from normalized_candidates where id=$1',[eventCandidateId])).rows[0],state:(await pool.query("select resource_type,resource_id,revision,state_checksum,promoted_at from public_resource_states where resource_type='event' and resource_id=$1",[eventId])).rows[0],versions:(await pool.query("select revision,publication_sequence,state_checksum from public_resource_versions where resource_type='event' and resource_id=$1 order by revision",[eventId])).rows,changes:(await pool.query("select sequence,resource_revision,state_checksum from public_change_log where resource_type='event' and resource_id=$1 order by sequence",[eventId])).rows,receipts:(await pool.query('select candidate_id,resource_revision,change_sequence,outcome from publication_receipts where candidate_id=$1',[eventCandidateId])).rows});
+    const legacyBefore=await readSnapshot();
+    const legacyResponse=await legacyApp.inject({method:'GET',url:`/api/v1/events/${legacyId}`});
+    expect(legacyResponse.statusCode).toBe(200);
+    expect(legacyResponse.json().timezone).toBeNull();
+    expect(await readSnapshot()).toEqual(legacyBefore);
+    console.info('F57C_LEGACY_NULL_READ_EVIDENCE',JSON.stringify({dbBefore:legacyBefore.event.timezone,response:legacyResponse.json().timezone,dbMutation:0,publicationMutation:0}));
     const confirmed=await app.inject({method:'GET',url:'/api/v1/events?status=confirmed&from=2026-09-01T00:00:00.000Z',headers:{authorization:`Bearer ${key}`}});
     expect(confirmed.statusCode).toBe(200);expect(confirmed.json().data.map((row:{id:string})=>row.id)).toContain(eventId);
     const confirmedChanges=await app.inject({method:'GET',url:'/api/v1/changes?limit=100&include=data',headers:{authorization:`Bearer ${key}`}});
@@ -174,8 +208,8 @@ suite('F5-7C deterministic public pipeline certification',()=>{
       championshipSeason:new Set([ids.season]),
       venue:new Set([ids.venue]),
       venueLayout:new Set([ids.layout]),
-      meeting:new Set([meetingId,explicitMeetingId]),
-      event:new Set([eventId,explicitEventId])
+      meeting:new Set([meetingId,explicitMeetingId,utcMeetingId]),
+      event:new Set([eventId,explicitEventId,utcEventId])
     };
     for(const change of originalSnapshot as {resource_type:string;resource_id:string}[]){
       expect(canonicalIds[change.resource_type]?.has(change.resource_id)).toBe(true);
@@ -259,5 +293,113 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     expect(dangling.rows[0]).toEqual({season:0,layout:0,meeting:0,event:0,public:0});
     const duplicates=await pool.query(`select count(*)::int count from (select normalized_uuid from events where normalized_uuid is not null group by normalized_uuid having count(*)>1) duplicate`);
     expect(duplicates.rows[0].count).toBe(0);
+  });
+
+  it('compares an independently successful Meeting publication with a fully rolled-back fault and retry',async()=>{
+    const mapping={version:'f57c-v1',rulesVersion:'f57c-r1',championshipIds:{'fixture-championship':ids.championship},circuitIds:{'fixture-circuit':'f57c-circuit'},sessionTypes:{Race:'race' as const},statuses:{Scheduled:'scheduled' as const,Confirmed:'confirmed' as const}};
+    const reference=await normalization.normalizeUnit({sourceEntityId:referenceSourceId,scopeKey:'f57c:atomic-reference',expectedFenceGeneration:0,normalizationNow:now,mapping});
+    const failing=await normalization.normalizeUnit({sourceEntityId:failureSourceId,scopeKey:'f57c:atomic-failure',expectedFenceGeneration:0,normalizationNow:now,mapping});
+    expect(reference.resolution.decision).toBe('create');expect(failing.resolution.decision).toBe('create');
+    expect(reference.proposedUuid).not.toBe(failing.proposedUuid);
+    const sourceInputs=(await pool.query('select id,source_data from provider_source_entities where id=any($1::uuid[]) order by id',[[referenceSourceId,failureSourceId]])).rows;
+    expect(sourceInputs).toHaveLength(2);expect(sourceInputs[0].source_data).toEqual(sourceInputs[1].source_data);
+    const normalizedInputs=(await pool.query('select id,candidate_data->\'normalized\' normalized from normalized_candidates where id=any($1::uuid[]) order by id',[[reference.candidateId,failing.candidateId]])).rows;
+    expect(normalizedInputs).toHaveLength(2);
+    const normalizeSourceIdentity=(value:Record<string,any>)=>({...value,provenance:{...value.provenance,sourceEntityId:'<scenario-source>'}});
+    expect(new Set(normalizedInputs.map(row=>row.normalized.provenance.sourceEntityId))).toEqual(new Set([referenceSourceId,failureSourceId]));
+    expect(normalizeSourceIdentity(normalizedInputs[0].normalized)).toEqual(normalizeSourceIdentity(normalizedInputs[1].normalized));
+    const snapshot=async(candidate:{candidateId:string;proposedUuid:string},sourceId:string)=>{
+      const query=async(sql:string,params:unknown[]) => (await pool.query(sql,params)).rows;
+      const resource=[candidate.proposedUuid],source=[sourceId],id=[candidate.candidateId];
+      return {
+        canonical:await query('select id,championship_id,championship_season_id,name,season,round,starts_at,ends_at,timezone,venue_id,venue_layout_id from meetings where id=$1',resource),
+        relation:await query('select meeting_id,event_id,position from meeting_events where meeting_id=$1',resource),
+        sourceLink:await query('select source_entity_id,meeting_id,normalization_version from meeting_source_links where source_entity_id=$1',source),
+        contribution:await query('select source_entity_id,meeting_id,normalized_values,structural_references,source_revision from meeting_source_contributions where source_entity_id=$1',source),
+        candidate:await query('select id,state from normalized_candidates where id=$1',id),
+        state:await query("select resource_type,resource_id,revision,lifecycle,canonical_state,state_checksum,promoted_candidate_id from public_resource_states where resource_type='meeting' and resource_id=$1",resource),
+        versions:await query("select resource_type,resource_id,revision,publication_sequence,operation,lifecycle,canonical_state,state_checksum from public_resource_versions where resource_type='meeting' and resource_id=$1",resource),
+        changes:await query("select sequence,resource_type,resource_id,resource_revision,operation,state_checksum from public_change_log where resource_type='meeting' and resource_id=$1",resource),
+        receipts:await query('select candidate_id,resource_type,resource_id,effective_checksum,resource_revision,change_sequence,outcome from publication_receipts where candidate_id=$1',id),
+        checkpoints:await query('select scope_key,last_candidate_id,revision from publication_rebuild_checkpoints order by scope_key',[]),
+        controls:await query('select control_key,enabled,revision from publication_controls order by control_key',[])
+      };
+    };
+    const beforeReference=await snapshot(reference,referenceSourceId),beforeFailure=await snapshot(failing,failureSourceId);
+    for(const field of ['canonical','relation','sourceLink','contribution','state','versions','changes','receipts'] as const){expect(beforeReference[field]).toHaveLength(0);expect(beforeFailure[field]).toHaveLength(0);}
+    expect(beforeReference.candidate).toMatchObject([{id:reference.candidateId,state:'pending'}]);
+    expect(beforeFailure.candidate).toMatchObject([{id:failing.candidateId,state:'pending'}]);
+    expect(beforeFailure.checkpoints).toEqual(beforeReference.checkpoints);expect(beforeFailure.controls).toEqual(beforeReference.controls);
+    expect(await publication.publishCandidate({candidateId:reference.candidateId,occurredAt:now})).toMatchObject({outcome:'created',revision:1});
+    const success=await snapshot(reference,referenceSourceId);
+    for(const field of ['canonical','sourceLink','contribution','state','versions','changes','receipts'] as const)expect(success[field]).toHaveLength(1);
+    expect(success.relation).toHaveLength(0);expect(success.candidate).toMatchObject([{state:'promoted'}]);
+    expect(success.state[0].canonical_state).toMatchObject({name:'F57C Atomic Meeting',timezone:'UTC'});
+    expect(success.versions[0].publication_sequence).toBe(success.changes[0].sequence);
+    expect(success.receipts[0].change_sequence).toBe(success.changes[0].sequence);
+    const beforeInjected=await snapshot(failing,failureSourceId);
+    await expect(publication.publishCandidate({candidateId:failing.candidateId,occurredAt:now,failBeforeCommit:true})).rejects.toThrow('publication_injected_failure');
+    const afterInjected=await snapshot(failing,failureSourceId);
+    expect(afterInjected).toEqual(beforeInjected);
+    const orphanCounts=(await pool.query(`select
+      (select count(*)::int from public_resource_states s left join public_resource_versions v on v.resource_type=s.resource_type and v.resource_id=s.resource_id and v.revision=s.revision where v.resource_id is null) state,
+      (select count(*)::int from public_resource_versions v left join public_resource_states s on s.resource_type=v.resource_type and s.resource_id=v.resource_id where s.resource_id is null) version,
+      (select count(*)::int from public_change_log c left join public_resource_versions v on v.publication_sequence=c.sequence where v.publication_sequence is null) change,
+      (select count(*)::int from publication_receipts r left join public_resource_states s on s.resource_type=r.resource_type and s.resource_id=r.resource_id where s.resource_id is null) receipt`)).rows[0];
+    expect(orphanCounts).toEqual({state:0,version:0,change:0,receipt:0});
+    expect(await publication.publishCandidate({candidateId:failing.candidateId,occurredAt:now})).toMatchObject({outcome:'created',revision:1});
+    const retry=await snapshot(failing,failureSourceId);
+    for(const field of ['canonical','sourceLink','contribution','state','versions','changes','receipts'] as const)expect(retry[field]).toHaveLength(1);
+    expect(retry.relation).toHaveLength(0);expect(retry.candidate).toMatchObject([{state:'promoted'}]);
+    expect(retry.canonical[0]).toMatchObject({championship_id:success.canonical[0].championship_id,championship_season_id:success.canonical[0].championship_season_id,name:success.canonical[0].name,season:success.canonical[0].season,round:success.canonical[0].round,starts_at:success.canonical[0].starts_at,ends_at:success.canonical[0].ends_at,timezone:success.canonical[0].timezone,venue_id:success.canonical[0].venue_id,venue_layout_id:success.canonical[0].venue_layout_id});
+    expect(retry.state[0]).toMatchObject({revision:success.state[0].revision,lifecycle:success.state[0].lifecycle,canonical_state:success.state[0].canonical_state,state_checksum:success.state[0].state_checksum});
+    expect(retry.sourceLink[0]).toMatchObject({meeting_id:failing.proposedUuid,normalization_version:success.sourceLink[0].normalization_version});
+    expect(normalizeSourceIdentity(retry.contribution[0].normalized_values)).toEqual(normalizeSourceIdentity(success.contribution[0].normalized_values));
+    expect(retry.contribution[0]).toMatchObject({structural_references:success.contribution[0].structural_references,source_revision:success.contribution[0].source_revision});
+    expect(retry.versions[0]).toMatchObject({revision:success.versions[0].revision,operation:success.versions[0].operation,lifecycle:success.versions[0].lifecycle,canonical_state:success.versions[0].canonical_state,state_checksum:success.versions[0].state_checksum});
+    expect(retry.changes[0]).toMatchObject({resource_revision:success.changes[0].resource_revision,operation:success.changes[0].operation,state_checksum:success.changes[0].state_checksum});
+    expect(retry.receipts[0]).toMatchObject({effective_checksum:success.receipts[0].effective_checksum,resource_revision:success.receipts[0].resource_revision,outcome:success.receipts[0].outcome});
+    expect(retry.versions[0].publication_sequence).toBe(retry.changes[0].sequence);
+    expect(retry.receipts[0].change_sequence).toBe(retry.changes[0].sequence);
+    console.info('F57C_ATOMICITY_EVIDENCE',JSON.stringify({successReferenceCaptured:true,injection:'publication_injected_failure_after_canonical_and_public_writes',partialCanonical:afterInjected.canonical.length,partialEffective:afterInjected.contribution.length,partialStates:afterInjected.state.length,partialVersions:afterInjected.versions.length,partialChanges:afterInjected.changes.length,partialReceipts:afterInjected.receipts.length,partialCheckpointAdvances:0,orphanCounts,retryEqualsReference:true}));
+  });
+
+  it('certifies the publication graph bidirectionally across all six resource types',async()=>{
+    const counts=(await pool.query(`select
+      (select count(*)::int from public_resource_states s left join public_resource_versions v on v.resource_type=s.resource_type and v.resource_id=s.resource_id and v.revision=s.revision and v.state_checksum=s.state_checksum and v.lifecycle=s.lifecycle where v.resource_id is null) state_without_current_version,
+      (select count(*)::int from public_resource_versions v left join public_resource_states s on s.resource_type=v.resource_type and s.resource_id=v.resource_id where v.revision=(select max(v2.revision) from public_resource_versions v2 where v2.resource_type=v.resource_type and v2.resource_id=v.resource_id) and (s.resource_id is null or s.revision<>v.revision or s.state_checksum<>v.state_checksum or s.lifecycle<>v.lifecycle)) current_version_without_state,
+      (select count(*)::int from public_resource_versions v left join public_resource_states s on s.resource_type=v.resource_type and s.resource_id=v.resource_id where s.resource_id is null) version_without_state,
+      (select count(*)::int from public_change_log c left join public_resource_versions v on v.publication_sequence=c.sequence and v.resource_type=c.resource_type and v.resource_id=c.resource_id and v.revision=c.resource_revision and v.state_checksum=c.state_checksum where v.resource_id is null) change_without_version,
+      (select count(*)::int from public_resource_versions v left join public_change_log c on c.sequence=v.publication_sequence and c.resource_type=v.resource_type and c.resource_id=v.resource_id and c.resource_revision=v.revision and c.state_checksum=v.state_checksum where c.sequence is null) version_without_expected_change,
+      (select count(*)::int from publication_receipts r left join public_resource_states s on s.resource_type=r.resource_type and s.resource_id=r.resource_id where s.resource_id is null) receipt_without_state,
+      (select count(*)::int from publication_receipts r left join public_resource_versions v on v.resource_type=r.resource_type and v.resource_id=r.resource_id and v.revision=r.resource_revision and v.state_checksum=r.effective_checksum where v.resource_id is null) receipt_without_version,
+      (select count(*)::int from publication_receipts r left join public_change_log c on c.sequence=r.change_sequence and c.resource_type=r.resource_type and c.resource_id=r.resource_id and c.resource_revision=r.resource_revision where r.change_sequence is not null and c.sequence is null) receipt_without_change,
+      (select count(*)::int from public_resource_states s left join publication_receipts r on r.candidate_id=s.promoted_candidate_id and r.resource_type=s.resource_type and r.resource_id=s.resource_id and r.resource_revision=s.revision where s.resource_type in ('meeting','event') and s.promoted_candidate_id is not null and r.candidate_id is null) expected_publication_without_receipt,
+      (select count(*)::int from public_resource_states s where s.revision<>(select max(v.revision) from public_resource_versions v where v.resource_type=s.resource_type and v.resource_id=s.resource_id)) invalid_current_pointers,
+      (select count(*)::int from (select normalized_uuid from events where normalized_uuid is not null group by normalized_uuid having count(*)>1) d) duplicate_effective_identities,
+      (select count(*)::int from public_resource_states s where
+        (s.resource_type='championship' and not exists(select 1 from championships c where c.id=s.canonical_state->>'championshipId')) or
+        (s.resource_type='championshipSeason' and not exists(select 1 from championship_seasons c where c.id=s.resource_id)) or
+        (s.resource_type='venue' and not exists(select 1 from venues c where c.id=s.resource_id)) or
+        (s.resource_type='venueLayout' and not exists(select 1 from venue_layouts c where c.id=s.resource_id)) or
+        (s.resource_type='meeting' and not exists(select 1 from meetings c where c.id=s.resource_id)) or
+        (s.resource_type='event' and not exists(select 1 from events c where c.normalized_uuid=s.resource_id))) dangling_canonical_references,
+      (select count(*)::int from public_resource_states s where s.lifecycle='active' and (
+        (s.resource_type='championshipSeason' and not exists(select 1 from public_resource_states p where p.resource_type='championship' and p.resource_id=$1)) or
+        (s.resource_type='venueLayout' and not exists(select 1 from public_resource_states p where p.resource_type='venue' and p.resource_id=(s.canonical_state->>'venue_id')::uuid)) or
+        (s.resource_type='meeting' and (not exists(select 1 from public_resource_states p where p.resource_type='championshipSeason' and p.resource_id=(s.canonical_state->>'championshipSeasonId')::uuid) or not exists(select 1 from public_resource_states p where p.resource_type='venue' and p.resource_id=(s.canonical_state->>'venueId')::uuid))) or
+        (s.resource_type='event' and not exists(select 1 from public_resource_states p where p.resource_type='meeting' and p.resource_id=(s.canonical_state->>'meetingId')::uuid)))) dangling_public_references`,[championshipPublicId(ids.championship)])).rows[0];
+    expect(counts).toEqual({
+      state_without_current_version:0,current_version_without_state:0,version_without_state:0,
+      change_without_version:0,version_without_expected_change:0,receipt_without_state:0,
+      receipt_without_version:0,receipt_without_change:0,expected_publication_without_receipt:0,
+      invalid_current_pointers:0,duplicate_effective_identities:0,
+      dangling_canonical_references:0,dangling_public_references:0
+    });
+    const coverage=(await pool.query(`select resource_type,count(*)::int count,count(*) filter(where lifecycle='removed')::int tombstones from public_resource_states group by resource_type order by resource_type`)).rows;
+    expect(coverage.map(row=>row.resource_type)).toEqual(['championship','championshipSeason','event','meeting','venue','venueLayout']);
+    expect(coverage.find(row=>row.resource_type==='venueLayout')?.tombstones).toBe(1);
+    expect((await pool.query("select count(*)::int count from public_resource_states where resource_type='event' and canonical_state->>'status'='confirmed'")).rows[0].count).toBeGreaterThanOrEqual(1);
+    console.info('F57C_PUBLICATION_GRAPH_EVIDENCE',JSON.stringify({counts,coverage}));
   });
 });
