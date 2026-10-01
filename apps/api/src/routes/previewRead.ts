@@ -37,7 +37,7 @@ export async function previewReadRoutes(app:FastifyInstance,options:PreviewReadO
     const rows=await repository.list({resourceType:type,limit:effectiveLimit,snapshotSequence,after:cursor?{sortKey:cursor.sortKey,resourceId:cursor.resourceId}:undefined,championshipId:query.championship_id,championshipSlug:query.championship,allowedChampionshipIds:principal?[...principal.championshipIds]:undefined,from,to:query.to,status:query.status,sessionType:query.session_type});
     const hasMore=rows.length>effectiveLimit,visible=rows.slice(0,effectiveLimit),last=visible.at(-1),issuedAt=Math.floor(now().valueOf()/1000);
     const nextCursor=hasMore&&last?encodeCursor({kind:'page',resourceType:type,snapshotSequence,sortKey:last.sortKey,resourceId:last.resourceId,filterHash:fingerprint,...(from?{effectiveFrom:from}:{}),...(principal?{clientId:principal.clientId}:{}),issuedAt},options.cursorSecret):null;
-    const syncCursor=encodeCursor({kind:'sync',sequence:snapshotSequence,snapshotSequence,...(principal?{clientId:principal.clientId}:{}),issuedAt},options.cursorSecret);
+    const syncCursor=encodeCursor({kind:'sync',role:'checkpoint',sequence:snapshotSequence,...(principal?{clientId:principal.clientId}:{}),issuedAt},options.cursorSecret);
     return {data:visible.map(publicState),pagination:{next_cursor:nextCursor,has_more:hasMore,sync_cursor:syncCursor}};
   };
   const resources=[['championship','championships'],['championshipSeason','championship-seasons'],['venue','venues'],['venueLayout','venue-layouts'],['event','events'],['meeting','meetings']] as const;
@@ -45,11 +45,15 @@ export async function previewReadRoutes(app:FastifyInstance,options:PreviewReadO
   app.get('/api/v1/changes',async(request,reply)=>{const parsed=changesQuery.safeParse(request.query);if(!parsed.success)return error(reply,request,400,'invalid_request','Invalid or unsupported query parameters.');let cursor:SyncCursor|undefined;try{if(parsed.data.cursor)cursor=decodeCursor(parsed.data.cursor,'sync',options.cursorSecret) as SyncCursor;}catch{return error(reply,request,400,'invalid_sync_cursor','Invalid sync cursor.');}
     const principal=options.principal?.(request);if(principal&&cursor?.clientId!==undefined&&cursor.clientId!==principal.clientId)return error(reply,request,400,'invalid_sync_cursor','Invalid sync cursor.');
     const [oldestSequence,latestSequence]=await Promise.all([repository.oldestChangeSequence(),repository.snapshotBoundary()]);
-    cursor??={kind:'sync',sequence:0,snapshotSequence:latestSequence,issuedAt:Math.floor(now().valueOf()/1000)};
-    if(cursor.snapshotSequence>latestSequence)return error(reply,request,400,'invalid_sync_cursor','Invalid sync cursor.');
-    if(parsed.data.cursor&&oldestSequence!==null&&cursor.sequence<oldestSequence)return error(reply,request,410,'sync_cursor_expired','Sync cursor expired; perform a full resync.');
-    const limit=Math.min(parsed.data.limit,principal?.changesPageLimit??500),rows=await repository.changes(cursor.sequence,cursor.snapshotSequence,limit,parsed.data.include==='data',principal?[...principal.championshipIds]:undefined),hasMore=rows.length>limit,visible=rows.slice(0,limit),sequence=visible.at(-1)?.sequence??cursor.sequence;
-    return {data:visible.map(change=>({sequence:change.sequence,resource_type:change.resourceType,resource_id:change.resourceId,revision:change.revision,operation:change.operation,changed_fields:change.changedFields,occurred_at:change.occurredAt,...(parsed.data.include==='data'?{current:change.current?publicState(change.current):null}:{})})),pagination:{next_cursor:encodeCursor({kind:'sync',sequence,snapshotSequence:cursor.snapshotSequence,...(principal?{clientId:principal.clientId}:{}),issuedAt:Math.floor(now().valueOf()/1000)},options.cursorSecret),has_more:hasMore}};
+    if(cursor?.sequence!==undefined&&cursor.sequence>latestSequence)return error(reply,request,400,'invalid_sync_cursor','Invalid sync cursor.');
+    if(cursor?.role==='continuation'&&cursor.snapshotSequence>latestSequence)return error(reply,request,400,'invalid_sync_cursor','Invalid sync cursor.');
+    if(cursor&&oldestSequence!==null&&cursor.sequence<oldestSequence)return error(reply,request,410,'sync_cursor_expired','Sync cursor expired; perform a full resync.');
+    const lowerSequence=cursor?.sequence??0,snapshotSequence=cursor?.role==='continuation'?cursor.snapshotSequence:latestSequence;
+    const limit=Math.min(parsed.data.limit,principal?.changesPageLimit??500),rows=await repository.changes(lowerSequence,snapshotSequence,limit,parsed.data.include==='data',principal?[...principal.championshipIds]:undefined),hasMore=rows.length>limit,visible=rows.slice(0,limit),sequence=visible.at(-1)?.sequence??lowerSequence;
+    const nextCursor:SyncCursor=hasMore
+      ?{kind:'sync',role:'continuation',sequence,snapshotSequence,...(principal?{clientId:principal.clientId}:{}),issuedAt:Math.floor(now().valueOf()/1000)}
+      :{kind:'sync',role:'checkpoint',sequence:snapshotSequence,...(principal?{clientId:principal.clientId}:{}),issuedAt:Math.floor(now().valueOf()/1000)};
+    return {data:visible.map(change=>({sequence:change.sequence,resource_type:change.resourceType,resource_id:change.resourceId,revision:change.revision,operation:change.operation,changed_fields:change.changedFields,occurred_at:change.occurredAt,...(parsed.data.include==='data'?{current:change.current?publicState(change.current):null}:{})})),pagination:{next_cursor:encodeCursor(nextCursor,options.cursorSecret),has_more:hasMore}};
   });
   app.setErrorHandler((_failure,request,reply)=>{request.log.error({code:'preview_read_failed',requestId:request.id},'Preview read request failed');return error(reply,request,500,'internal_error','The service could not complete the request.');});
 }

@@ -132,29 +132,107 @@ suite('F5-7C deterministic public pipeline certification',()=>{
     expect(confirmedChange).toMatchObject({resource_type:'event',resource_id:eventId,revision:1,operation:'created',current:{id:eventId,meeting_id:meetingId,status:'confirmed',starts_at:'2026-10-01T10:00:00.000Z',ends_at:'2026-10-01T11:30:00.000Z',timezone:null}});
     const denied=await app.inject({method:'GET',url:`/api/v1/championship-seasons/${ids.season}`,headers:{authorization:`Bearer ${deniedKey}`}});
     expect(denied.statusCode).toBe(404);
+    for(const headers of [{},{authorization:'Bearer invalid'}]){
+      const unauthorized=await app.inject({method:'GET',url:'/api/v1/changes?limit=100',headers});
+      expect(unauthorized.statusCode).toBe(401);
+      expect(unauthorized.json()).not.toHaveProperty('data');
+    }
+    const deniedChanges=await app.inject({method:'GET',url:'/api/v1/changes?limit=100',headers:{authorization:`Bearer ${deniedKey}`}});
+    expect(deniedChanges.statusCode).toBe(200);
+    expect(deniedChanges.json().data.length).toBeGreaterThan(0);
+    expect(deniedChanges.json().data.every((change:{resource_type:string})=>['venue','venueLayout'].includes(change.resource_type))).toBe(true);
     const first=await app.inject({method:'GET',url:'/api/v1/changes?limit=2&include=data',headers:{authorization:`Bearer ${key}`}});
     expect(first.statusCode).toBe(200);const page=first.json();expect(page.data).toHaveLength(2);expect(page.pagination.has_more).toBe(true);
     expect(page.data[0].sequence).toBeLessThan(page.data[1].sequence);
     const firstCursor=decodeCursor(page.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
+    expect(firstCursor.role).toBe('continuation');
+    if(firstCursor.role!=='continuation')throw new Error('f57c_initial_continuation_missing');
+    const initialExpected=(await pool.query(`select c.sequence::int from public_change_log c join public_resource_versions v on v.publication_sequence=c.sequence where c.sequence>0 and c.sequence<=$1 and (v.resource_type in ('venue','venueLayout') or v.championship_id=$2) order by c.sequence`,[firstCursor.snapshotSequence,ids.championship])).rows.map(row=>row.sequence as number);
     await pool.query('update venues set name=$2 where id=$1',[ids.venue,'F57C Venue snapshot mutation']);
     const postBoundary=await catalog.publish({resourceType:'venue',canonicalId:ids.venue,occurredAt:new Date('2026-09-30T12:01:30Z')});
     expect(postBoundary).toMatchObject({outcome:'updated'});
     const postBoundarySequence=Number((await pool.query(`select max(sequence)::int sequence from public_change_log where resource_type='venue' and resource_id=$1`,[ids.venue])).rows[0].sequence);
     expect(postBoundarySequence).toBeGreaterThan(firstCursor.snapshotSequence);
-    const originalSnapshot=[...page.data];let continuation=page.pagination.next_cursor,previous=firstCursor.sequence;
+    const originalSnapshot=[...page.data];let continuation=page.pagination.next_cursor,previous=firstCursor.sequence,initialPages=1,initialCheckpoint='';
     while(continuation){
       const response=await app.inject({method:'GET',url:`/api/v1/changes?limit=2&include=data&cursor=${encodeURIComponent(continuation)}`,headers:{authorization:`Bearer ${key}`}});
       expect(response.statusCode).toBe(200);const body=response.json(),decoded=decodeCursor(body.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
-      expect(decoded.snapshotSequence).toBe(firstCursor.snapshotSequence);expect(decoded.clientId).toBe(firstCursor.clientId);expect(decoded.sequence).toBeGreaterThanOrEqual(previous);
-      for(const change of body.data){expect(change.sequence).toBeGreaterThan(previous);expect(change.sequence).toBeLessThanOrEqual(firstCursor.snapshotSequence);}
-      originalSnapshot.push(...body.data);previous=decoded.sequence;continuation=body.pagination.has_more?body.pagination.next_cursor:null;
+      initialPages++;
+      expect(decoded.clientId).toBe(firstCursor.clientId);
+      for(const change of body.data){expect(change.sequence).toBeGreaterThan(previous);expect(change.sequence).toBeLessThanOrEqual(firstCursor.snapshotSequence);previous=change.sequence;}
+      originalSnapshot.push(...body.data);
+      if(body.pagination.has_more){expect(decoded).toMatchObject({role:'continuation',sequence:previous,snapshotSequence:firstCursor.snapshotSequence});continuation=body.pagination.next_cursor;}
+      else{expect(decoded).toMatchObject({role:'checkpoint',sequence:firstCursor.snapshotSequence});initialCheckpoint=body.pagination.next_cursor;continuation=null;}
     }
+    expect(initialPages).toBeGreaterThanOrEqual(3);
+    expect(originalSnapshot.map((change:{sequence:number})=>change.sequence)).toEqual(initialExpected);
     expect(originalSnapshot.some((change:{sequence:number})=>change.sequence===postBoundarySequence)).toBe(false);
     expect(new Set(originalSnapshot.map((change:{sequence:number})=>change.sequence)).size).toBe(originalSnapshot.length);
+    expect(new Set(originalSnapshot.map((change:{resource_type:string})=>change.resource_type))).toEqual(new Set(['championship','championshipSeason','venue','venueLayout','meeting','event']));
+    const canonicalIds:Record<string,Set<string>>={
+      championship:new Set([championshipPublicId(ids.championship)]),
+      championshipSeason:new Set([ids.season]),
+      venue:new Set([ids.venue]),
+      venueLayout:new Set([ids.layout]),
+      meeting:new Set([meetingId,explicitMeetingId]),
+      event:new Set([eventId,explicitEventId])
+    };
+    for(const change of originalSnapshot as {resource_type:string;resource_id:string}[]){
+      expect(canonicalIds[change.resource_type]?.has(change.resource_id)).toBe(true);
+    }
+    for(const [index,name] of ['F57C Venue incremental 1','F57C Venue incremental 2','F57C Venue incremental 3'].entries()){
+      await pool.query('update venues set name=$2 where id=$1',[ids.venue,name]);
+      expect(await catalog.publish({resourceType:'venue',canonicalId:ids.venue,occurredAt:new Date(`2026-09-30T12:01:${31+index}Z`)})).toMatchObject({outcome:'updated'});
+    }
+    const incrementalFirst=await app.inject({method:'GET',url:`/api/v1/changes?limit=1&cursor=${encodeURIComponent(initialCheckpoint)}`,headers:{authorization:`Bearer ${key}`}});
+    expect(incrementalFirst.statusCode).toBe(200);
+    const incrementalPage=incrementalFirst.json(),incrementalCursor=decodeCursor(incrementalPage.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
+    expect(incrementalPage.pagination.has_more).toBe(true);
+    expect(incrementalCursor.role).toBe('continuation');
+    if(incrementalCursor.role!=='continuation')throw new Error('f57c_incremental_continuation_missing');
+    expect(incrementalCursor.snapshotSequence).toBeGreaterThanOrEqual(postBoundarySequence);
+    const incrementalExpected=(await pool.query(`select c.sequence::int from public_change_log c join public_resource_versions v on v.publication_sequence=c.sequence where c.sequence>$1 and c.sequence<=$2 and (v.resource_type in ('venue','venueLayout') or v.championship_id=$3) order by c.sequence`,[firstCursor.snapshotSequence,incrementalCursor.snapshotSequence,ids.championship])).rows.map(row=>row.sequence as number);
+    await pool.query('update venues set name=$2 where id=$1',[ids.venue,'F57C Venue after incremental boundary']);
+    expect(await catalog.publish({resourceType:'venue',canonicalId:ids.venue,occurredAt:new Date('2026-09-30T12:01:40Z')})).toMatchObject({outcome:'updated'});
+    const laterSequence=Number((await pool.query(`select max(sequence)::int sequence from public_change_log where resource_type='venue' and resource_id=$1`,[ids.venue])).rows[0].sequence);
+    expect(laterSequence).toBeGreaterThan(incrementalCursor.snapshotSequence);
+    const incrementalActual:number[]=incrementalPage.data.map((change:{sequence:number})=>change.sequence);
+    let incrementalPages=1,incrementalNext=incrementalPage.pagination.next_cursor,incrementalPrevious=incrementalCursor.sequence,finalCheckpoint='';
+    while(incrementalNext){
+      const response=await app.inject({method:'GET',url:`/api/v1/changes?limit=1&cursor=${encodeURIComponent(incrementalNext)}`,headers:{authorization:`Bearer ${key}`}});
+      expect(response.statusCode).toBe(200);
+      const body=response.json(),decoded=decodeCursor(body.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
+      incrementalPages++;
+      expect(decoded.clientId).toBe(incrementalCursor.clientId);
+      for(const change of body.data){expect(change.sequence).toBeGreaterThan(incrementalPrevious);expect(change.sequence).toBeLessThanOrEqual(incrementalCursor.snapshotSequence);incrementalPrevious=change.sequence;incrementalActual.push(change.sequence);}
+      if(body.pagination.has_more){expect(decoded).toMatchObject({role:'continuation',sequence:incrementalPrevious,snapshotSequence:incrementalCursor.snapshotSequence});incrementalNext=body.pagination.next_cursor;}
+      else{expect(decoded).toMatchObject({role:'checkpoint',sequence:incrementalCursor.snapshotSequence});finalCheckpoint=body.pagination.next_cursor;incrementalNext=null;}
+    }
+    expect(incrementalPages).toBeGreaterThanOrEqual(3);
+    expect(incrementalActual).toEqual(incrementalExpected);
+    expect(incrementalActual).not.toContain(laterSequence);
+    expect(new Set(incrementalActual).size).toBe(incrementalActual.length);
+    const afterCompletion=await app.inject({method:'GET',url:`/api/v1/changes?limit=100&cursor=${encodeURIComponent(finalCheckpoint)}`,headers:{authorization:`Bearer ${key}`}});
+    expect(afterCompletion.statusCode).toBe(200);
+    expect(afterCompletion.json().data.map((change:{sequence:number})=>change.sequence)).toContain(laterSequence);
+    const afterCompletionCursor=decodeCursor(afterCompletion.json().pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
+    expect(afterCompletionCursor).toMatchObject({role:'checkpoint',sequence:laterSequence});
+    const venueList=await app.inject({method:'GET',url:'/api/v1/venues',headers:{authorization:`Bearer ${key}`}});
+    expect(venueList.statusCode).toBe(200);
+    const listCheckpoint=decodeCursor(venueList.json().pagination.sync_cursor,'sync',cursorSecret) as SyncCursor;
+    expect(listCheckpoint).toMatchObject({role:'checkpoint',sequence:laterSequence});
+    await pool.query('update venues set name=$2 where id=$1',[ids.venue,'F57C Venue after list checkpoint']);
+    expect(await catalog.publish({resourceType:'venue',canonicalId:ids.venue,occurredAt:new Date('2026-09-30T12:01:41Z')})).toMatchObject({outcome:'updated'});
+    const afterList=await app.inject({method:'GET',url:`/api/v1/changes?cursor=${encodeURIComponent(venueList.json().pagination.sync_cursor)}`,headers:{authorization:`Bearer ${key}`}});
+    expect(afterList.statusCode).toBe(200);
+    expect(afterList.json().data).toHaveLength(1);
+    expect(afterList.json().data[0].sequence).toBeGreaterThan(listCheckpoint.sequence);
     const fresh=await app.inject({method:'GET',url:'/api/v1/changes?limit=100&include=data',headers:{authorization:`Bearer ${key}`}});
     expect(fresh.statusCode).toBe(200);const freshBody=fresh.json(),freshCursor=decodeCursor(freshBody.pagination.next_cursor,'sync',cursorSecret) as SyncCursor;
-    expect(freshCursor.snapshotSequence).toBeGreaterThan(firstCursor.snapshotSequence);
+    expect(freshCursor).toMatchObject({role:'checkpoint'});
+    expect(freshCursor.sequence).toBeGreaterThan(firstCursor.snapshotSequence);
     expect(freshBody.data.some((change:{sequence:number})=>change.sequence===postBoundarySequence)).toBe(true);
+    console.info('F57C_INCREMENTAL_CURSOR_EVIDENCE',JSON.stringify({completedSyncCheckpointSequence:firstCursor.snapshotSequence,laterChangeSequence:postBoundarySequence,newIncrementalLowerBound:firstCursor.snapshotSequence,newIncrementalSnapshotBoundary:incrementalCursor.snapshotSequence,expectedEligibleSequences:incrementalExpected,actualReturnedSequences:incrementalActual,pageCount:incrementalPages,postBoundarySequence:laterSequence,finalCheckpointSequence:incrementalCursor.snapshotSequence}));
   });
 
   it('rolls back injected publication failure, converges on retry, and exposes one tombstone',async()=>{
