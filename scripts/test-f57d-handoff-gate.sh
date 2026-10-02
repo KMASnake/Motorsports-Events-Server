@@ -8,6 +8,22 @@ test -z "${DATABASE_URL:-}${DOCKER_HOST:-}${DOCKER_CONTEXT:-}${PROVIDER_MASTER_K
 CONTAINER="mse-f57d0b-gate-${RANDOM}-$$"
 OWNER="${CONTAINER}"
 docker_local(){ docker --host unix:///var/run/docker.sock "$@"; }
+verify_cleanup_zero(){
+  local resource="$1" result query_rc
+  shift
+  if result="$(docker_local "$@")"; then
+    query_rc=0
+  else
+    query_rc=$?
+    printf 'DOCKER_QUERY_FAILED resource=%s query_rc=%s\n' "${resource}" "${query_rc}" >&2
+    return "${query_rc}"
+  fi
+  if test -n "${result}"; then
+    printf 'RESOURCE_COUNT_NONZERO resource=%s query_rc=%s\n' "${resource}" "${query_rc}" >&2
+    return 1
+  fi
+  printf 'CLEANUP_VERIFIED_ZERO resource=%s query_rc=%s\n' "${resource}" "${query_rc}"
+}
 cleanup(){
   local rc=$? ids
   trap - EXIT INT TERM
@@ -16,9 +32,9 @@ cleanup(){
     test "$(docker_local inspect --format '{{ index .Config.Labels "mse.f57d0b.owner" }}' "${CONTAINER}")" = "${OWNER}" || exit 1
     docker_local rm -f -v "${CONTAINER}" >/dev/null || exit 1
   fi
-  test -z "$(docker_local ps -aq --filter "label=mse.f57d0b.owner=${OWNER}")" || exit 1
-  test -z "$(docker_local volume ls -q --filter "label=mse.f57d0b.owner=${OWNER}")" || exit 1
-  test -z "$(docker_local network ls -q --filter "label=mse.f57d0b.owner=${OWNER}")" || exit 1
+  verify_cleanup_zero containers ps -aq --filter "label=mse.f57d0b.owner=${OWNER}" || exit 1
+  verify_cleanup_zero volumes volume ls -q --filter "label=mse.f57d0b.owner=${OWNER}" || exit 1
+  verify_cleanup_zero networks network ls -q --filter "label=mse.f57d0b.owner=${OWNER}" || exit 1
   echo 'F57D_GATE_CLEANUP containers=0 networks=0 volumes=0'
   exit "${rc}"
 }
