@@ -3,6 +3,7 @@ import {withTransaction} from '../lib/db.js';
 import {PostgresNormalizationMappingRepository} from './postgresNormalizationMappingRepository.js';
 import {PostgresDeterministicNormalizationService} from './postgresDeterministicNormalizationService.js';
 import {PostgresPublicationService} from './postgresPublicationService.js';
+import {PostgresReconciliationService} from '../reconciliation/postgresReconciliationService.js';
 
 export class CanonicalHandoffError extends Error{
   constructor(readonly code:'traversal_not_found'|'traversal_ineligible'|'traversal_stale'|'traversal_unbound'|'ownership_mismatch'|'stale_fence',message:string){super(message);}
@@ -13,7 +14,7 @@ export function finalCandidateClassification(decision:string,publicationOutcome?
 export function finalHandoffStatus(entities:number,review:number,ready:number,rejected:number,created:number):CanonicalHandoffResult['status']{return entities===0?'no_changes':review>0?'review_required':ready===0&&rejected>0?'rejected':created===0?'no_changes':'completed';}
 
 export class CanonicalAcquisitionPublicationService{
-  constructor(readonly mappings=new PostgresNormalizationMappingRepository(),readonly normalization=new PostgresDeterministicNormalizationService(),readonly publication=new PostgresPublicationService()){}
+  constructor(readonly mappings=new PostgresNormalizationMappingRepository(),readonly normalization=new PostgresDeterministicNormalizationService(),readonly publication=new PostgresPublicationService(),readonly reconciliation=new PostgresReconciliationService()){}
   handoffTraversal(traversalId:string,now=new Date()){return withTransaction(client=>this.handoffInTransaction(client,traversalId,now));}
   private async handoffInTransaction(client:PoolClient,traversalId:string,now:Date):Promise<CanonicalHandoffResult>{
     const traversal=(await client.query(`select traversal.*,stream.phase,stream.provider_championship_id,stream.lease_owner,stream.lease_expires_at,run.status run_status
@@ -42,8 +43,14 @@ export class CanonicalAcquisitionPublicationService{
       if(candidate.resolution.decision==='review'){review+=1;continue;}if(candidate.resolution.decision==='rejected'){rejected+=1;continue;}
       const receiptExists=Boolean((await client.query('select 1 from publication_receipts where candidate_id=$1',[candidate.candidateId])).rowCount);
       const published=await this.publication.publishCandidateInTransaction(client,{candidateId:candidate.candidateId,scopeKey:scope,expectedFenceGeneration:fence,occurredAt:now});
-      const classification=finalCandidateClassification(candidate.resolution.decision,published.outcome);if(classification==='review'){review+=1;continue;}if(classification==='ready')ready+=1;
-      if(receiptExists)unchanged+=1;else if(published.outcome==='created'||published.outcome==='updated'){created+=1;if(published.sequence!=null)highest=Math.max(highest??0,published.sequence);}else if(published.outcome==='unchanged')unchanged+=1;
+      let outcome=published.outcome,sequence:number|null=published.sequence;
+      if(published.outcome==='linked'){
+        if(!published.resourceType||!published.resourceId)throw new Error('handoff_reconciliation_identity_missing');
+        const effective=await this.reconciliation.reconcileLinkedInTransaction(client,{entityKind:published.resourceType,entityUuid:published.resourceId,evaluationAt:now.toISOString()});
+        outcome=effective.outcome==='applied'?'updated':'unchanged';sequence=effective.sequence??null;
+      }
+      const classification=finalCandidateClassification(candidate.resolution.decision,outcome);if(classification==='review'){review+=1;continue;}if(classification==='ready')ready+=1;
+      if(receiptExists)unchanged+=1;else if(outcome==='created'||outcome==='updated'){created+=1;if(sequence!=null)highest=Math.max(highest??0,sequence);}else if(outcome==='unchanged')unchanged+=1;
     }
     const status=finalHandoffStatus(entities.length,review,ready,rejected,created);
     return {traversal_id:traversalId,provider_championship_id:String(traversal.provider_championship_id),mapping_version_id:version.id,normalization_scope:scope,fence_generation:fence,entities_seen:entities.length,entities_normalized:normalized,candidates_ready:ready,candidates_review:review,publications_created:created,publications_unchanged:unchanged,highest_change_sequence:highest,status};

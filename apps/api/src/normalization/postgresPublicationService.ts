@@ -90,7 +90,7 @@ export class PostgresPublicationService{
       }
       await this.recordContribution(client,row,resourceType,resourceId,String(row.target_id??resourceId),normalized,parentMeetingId,input,Array.isArray(data.source_correction_provenance)?data.source_correction_provenance:[],Number(data.source_revision));
       const current=(await client.query('select revision from public_resource_states where resource_type=$1 and resource_id=$2',[resourceType,resourceId])).rows[0];
-      return {outcome:'linked',revision:current?Number(current.revision):null,sequence:null};
+      return {outcome:'linked',resourceType,resourceId,revision:current?Number(current.revision):null,sequence:null};
     }
     if(String(row.decision)==='create'){
       if(resourceType==='meeting'){

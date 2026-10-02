@@ -28,6 +28,22 @@ export class StaleReconciliationPreviewError extends Error{constructor(){super('
 export class PostgresReconciliationService{
   preview(input:PreviewRequest){return withTransaction(client=>this.snapshot(client,input,false));}
   apply(input:ApplyRequest){return withTransaction(client=>this.applyInTransaction(client,input));}
+  // Acquisition owns the transaction: contribution, effective canonical state
+  // and versioned publication must either all commit or all roll back.
+  async reconcileLinkedInTransaction(client:PoolClient,input:{entityKind:Kind;entityUuid:string;evaluationAt:string}){
+    await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[`${input.entityKind}:${input.entityUuid}`]);
+    const scope=input.entityKind==='meeting'
+      ?(await client.query('select championship_id,championship_season_id from meetings where id=$1',[input.entityUuid])).rows[0]
+      :(await client.query('select event.championship_id,meeting.championship_season_id from events event join meeting_events relation on relation.event_id=event.id join meetings meeting on meeting.id=relation.meeting_id where event.normalized_uuid=$1',[input.entityUuid])).rows[0];
+    if(!scope)throw new Error('canonical_entity_not_found');
+    // No implicit priority between a global and a season-specific policy.
+    // Refuse overlapping active scopes rather than invent policy precedence.
+    const policies=(await client.query(`select id from reconciliation_policies where championship_id=$1 and resource_kind=$2 and status='active' and (championship_season_id is null or championship_season_id=$3) order by id for share`,[scope.championship_id,input.entityKind,scope.championship_season_id])).rows;
+    if(policies.length!==1)throw new Error(policies.length?'handoff_reconciliation_policy_ambiguous':'handoff_reconciliation_policy_missing');
+    const request={...input,policyId:String(policies[0].id)},preview=await this.snapshot(client,request,true);
+    if(!preview.result.materializationEligible)throw new Error('handoff_reconciliation_review_required');
+    return this.applyInTransaction(client,{...request,previewChecksum:preview.previewChecksum,idempotencyKey:`handoff:${preview.previewChecksum}`,actorId:'canonical-acquisition-handoff'});
+  }
   private async snapshot(client:PoolClient,input:PreviewRequest,lock:boolean){
     await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[`${input.entityKind}:${input.entityUuid}`]);
     const canonical=input.entityKind==='meeting'?(await client.query(`select * from meetings where id=$1 ${lock?'for update':''}`,[input.entityUuid])).rows[0]:(await client.query(`select * from events where normalized_uuid=$1 ${lock?'for update':''}`,[input.entityUuid])).rows[0];
