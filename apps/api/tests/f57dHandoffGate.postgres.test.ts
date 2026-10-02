@@ -10,6 +10,7 @@ import {SourceProtectionService} from '../src/providers/sourceProtectionService.
 import {PostgresNormalizationMappingRepository} from '../src/normalization/postgresNormalizationMappingRepository.js';
 import {PostgresReconciliationService} from '../src/reconciliation/postgresReconciliationService.js';
 import {CanonicalFieldOverrideService} from '../src/reconciliation/canonicalFieldOverrideService.js';
+import {PostgresDeterministicNormalizationService} from '../src/normalization/postgresDeterministicNormalizationService.js';
 
 const enabled=process.env.RUN_F57D_HANDOFF_POSTGRES==='1',suite=enabled?describe:describe.skip;
 // These are disposable fixture identities, never the maintainer's real target IDs.
@@ -226,5 +227,42 @@ suite('F57D mandatory no-network production handoff gate',()=>{
     expect(transport).toHaveBeenCalledTimes(2);
     expect(blockedExternalFetch).not.toHaveBeenCalled();
     console.info('F57D_CASES_A_K',JSON.stringify({initial:true,identicalReplay:true,winningMeeting:true,winningEvent:true,losingMeeting:true,losingEvent:true,providerOrderIndependent:true,overridePrecedence:true,noFalseChanges:true,oneChangePerMutation:true,correctedReplay:'no_changes',atomicFailureRollback:true,simulatedRequests:2,realRequests:0}));
+  });
+  it.each([
+    {label:'A explicit identity',data:{external_season_id:'2026'},persisted:2026,expected:2026},
+    {label:'B structured numeric season',data:{season:2026},persisted:2025,expected:2026},
+    {label:'B structured string season',data:{season:' 2026 '},persisted:2025,expected:2026},
+    {label:'C persisted season',data:{},persisted:2026,expected:2026},
+    {label:'C invalid structured season',data:{season:'not-a-year'},persisted:2026,expected:2026},
+    {label:'D explicit precedence',data:{external_season_id:'2025',season:2026},persisted:2026,expected:2025},
+    {label:'E missing exact link',data:{season:2027},persisted:2026,expected:null},
+    {label:'E explicit missing link never falls back',data:{external_season_id:'2027',season:2026},persisted:2026,expected:null},
+    {label:'invalid explicit identity never falls back',data:{external_season_id:' ',season:2026},persisted:2026,expected:null},
+    {label:'no exploitable season',data:{season:false},persisted:null,expected:null},
+    {label:'F unresolved Event parent',data:{season:2026},persisted:2026,expected:2026,event:true}
+  ])('F5-7D1d $label and G identical normalization replay',async testCase=>{
+    const client=await pool.connect();
+    try{
+      await client.query('begin');
+      const season2025=randomUUID(),source=randomUUID(),parent=randomUUID(),scope=`f57d-season:${source}`;
+      const sourceLink=(await client.query('select id from championship_source_links where provider_instance_id=$1',[ids.provider])).rows[0].id;
+      await client.query("insert into championship_seasons(id,championship_id,key,label,start_year,end_year) values($1,'f1','f57d-2025','F57D 2025',2025,2025)",[season2025]);
+      await client.query("insert into championship_season_source_links(id,championship_source_link_id,provider_instance_id,external_championship_id,external_season_id,championship_id,championship_season_id,created_by) values($1,$2,$3,'formula1','2025','f1',$4,'f57d')",[randomUUID(),sourceLink,ids.provider,season2025]);
+      if('event' in testCase)await client.query("insert into provider_source_entities(id,provider_instance_id,provider_championship_id,entity_kind,external_id,season,source_data,source_hash,first_observed_at,last_observed_at,last_changed_at) values($1::uuid,$2,$3,'meeting',$1::text,2026,'{}','f57d-unresolved-parent',now(),now(),now())",[parent,ids.provider,ids.association]);
+      const data={name:`F57D Season ${source}`,circuit_id:'f57d-fixture-circuit',session_type:'race',status:'scheduled',starts_at:'2026-12-06T13:00:00Z',...testCase.data};
+      await client.query("insert into provider_source_entities(id,provider_instance_id,provider_championship_id,entity_kind,external_id,parent_source_entity_id,season,source_data,source_hash,first_observed_at,last_observed_at,last_changed_at) values($1::uuid,$2,$3,$4,$1::text,$5,$6,$7::jsonb,$1::text,now(),now(),now())",[source,ids.provider,ids.association,'event' in testCase?'event':'meeting','event' in testCase?parent:null,testCase.persisted,JSON.stringify(data)]);
+      const before=(await client.query('select (select count(*) from championship_seasons) seasons,(select count(*) from championship_season_source_links) links,(select count(*) from meetings) meetings,(select count(*) from events) events')).rows[0];
+      const normalization=new PostgresDeterministicNormalizationService(),input={sourceEntityId:source,scopeKey:scope,expectedFenceGeneration:1,normalizationNow:new Date('2026-10-02T10:00:00Z'),mapping:{version:'f57d-season',rulesVersion:'f57d-r1',championshipIds:{formula1:'f1'},circuitIds:{'f57d-fixture-circuit':'f57d'},sessionTypes:{race:'race'},statuses:{scheduled:'scheduled' as const}}};
+      const result=await normalization.normalizeUnitInTransaction(client,input);
+      expect(result.state.championshipSeasonId).toBe(testCase.expected===2025?season2025:testCase.expected===2026?ids.season:null);
+      if('event' in testCase)expect(result.resolution).toMatchObject({decision:'review',reason:'parent_identity_unresolved'});
+      else if(testCase.expected===null)expect(result.resolution).toMatchObject({decision:'review',reason:'championship_season_unresolved'});
+      else expect(result.resolution.decision).toBe('create');
+      const persisted=(await client.query('select (select count(*) from normalized_candidates where source_entity_id=$1) candidates,(select count(*) from normalization_decisions where source_entity_id=$1) decisions',[source])).rows[0];
+      expect(persisted).toEqual({candidates:'1',decisions:'1'});
+      expect(await normalization.normalizeUnitInTransaction(client,input)).toEqual(result);
+      expect((await client.query('select (select count(*) from normalized_candidates where source_entity_id=$1) candidates,(select count(*) from normalization_decisions where source_entity_id=$1) decisions',[source])).rows[0]).toEqual(persisted);
+      expect((await client.query('select (select count(*) from championship_seasons) seasons,(select count(*) from championship_season_source_links) links,(select count(*) from meetings) meetings,(select count(*) from events) events')).rows[0]).toEqual(before);
+    }finally{await client.query('rollback');client.release();}
   });
 });

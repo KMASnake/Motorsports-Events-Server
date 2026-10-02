@@ -4,6 +4,16 @@ import {normalize,stableHash,stableUuid,type Correction,type MappingConfig,type 
 
 interface NormalizeUnitInput {sourceEntityId:string;scopeKey:string;expectedFenceGeneration:number;normalizationNow:Date;mapping:MappingConfig;traversalId?:string}
 
+function externalSeasonIdentity(data:Readonly<Record<string,unknown>>,persistedSeason:unknown):string|null{
+  const explicit=data.external_season_id;
+  if(explicit!=null)return typeof explicit==='string'&&explicit.trim()?explicit.trim():null;
+  const yearIdentity=(value:unknown)=>{
+    const year=typeof value==='number'?value:typeof value==='string'&&/^\d{1,4}$/.test(value.trim())?Number(value.trim()):NaN;
+    return Number.isSafeInteger(year)&&year>=1&&year<=9999?String(year):null;
+  };
+  return yearIdentity(data.season)??yearIdentity(persistedSeason);
+}
+
 export class PostgresDeterministicNormalizationService{
   normalizeUnit(input:NormalizeUnitInput){return withTransaction(client=>this.normalizeUnitInTransaction(client,input));}
 
@@ -34,9 +44,10 @@ export class PostgresDeterministicNormalizationService{
       ?(await client.query('select meeting_id from meeting_source_links where source_entity_id=$1',[source.parent_source_entity_id])).rows[0]?.meeting_id??null
       :null;
     const parentMeeting=parentMeetingId?(await client.query('select championship_id,championship_season_id,venue_id,venue_layout_id from meetings where id=$1',[parentMeetingId])).rows[0]:null;
-    const explicitExternalSeasonId=typeof source.source_data?.external_season_id==='string'&&source.source_data.external_season_id.trim()?source.source_data.external_season_id.trim():null;
-    const seasonLink=!parentMeeting&&explicitExternalSeasonId?(await client.query(`select championship_season_id,championship_id from championship_season_source_links
-      where provider_instance_id=$1 and external_championship_id=$2 and external_season_id=$3`,[source.provider_instance_id,source.championship_source_id,explicitExternalSeasonId])).rows[0]:null;
+    const externalSeasonId=externalSeasonIdentity(source.source_data??{},source.season);
+    const seasonLinks=!parentMeeting&&externalSeasonId?(await client.query(`select championship_season_id,championship_id from championship_season_source_links
+      where provider_instance_id=$1 and external_championship_id=$2 and external_season_id=$3`,[source.provider_instance_id,source.championship_source_id,externalSeasonId])).rows:[];
+    const seasonLink=seasonLinks.length===1?seasonLinks[0]:null;
     const championshipSeasonId=parentMeeting?.championship_season_id??existingMeeting?.championship_season_id??seasonLink?.championship_season_id??null;
     const mappedCircuitId=input.mapping.circuitIds[String(source.source_data?.circuit_id??'')]??null;
     const circuitVenue=mappedCircuitId?(await client.query('select venue_id,venue_layout_id from circuit_venue_links where circuit_id=$1',[mappedCircuitId])).rows[0]:null;
