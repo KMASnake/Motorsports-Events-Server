@@ -63,9 +63,12 @@ docker_local exec "${CONTAINER}" sh -ceu '
   $psql -c "create table if not exists schema_migrations(version text primary key,applied_at timestamptz not null default now())" >/dev/null
   for file in /migrations/*.up.sql; do
     $psql -1 -f "$file" >/dev/null
-    test "$(basename "$file")" != 0040_f5_canonical_timezone_nullability.up.sql || break
+    test "$(basename "$file")" != 0041_f5_revisioned_normalization_decisions.up.sql || break
   done
-  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0040_f5_canonical_timezone_nullability
+  test "$($psql -Atc "select version from schema_migrations order by version desc limit 1")" = 0041_f5_revisioned_normalization_decisions
+  $psql -1 -f /migrations/0041_f5_revisioned_normalization_decisions.down.sql >/dev/null
+  $psql -1 -f /migrations/0041_f5_revisioned_normalization_decisions.up.sql >/dev/null
+  sh /migrations/migrate.sh up >/dev/null
 '
 cd "${ROOT}"
 DATABASE_URL="postgresql://mse:f57d0b-local-only@127.0.0.1:${PORT}/f57d0b_gate" \

@@ -10,6 +10,8 @@ import {SourceProtectionService} from '../src/providers/sourceProtectionService.
 import {PostgresNormalizationMappingRepository} from '../src/normalization/postgresNormalizationMappingRepository.js';
 import {PostgresReconciliationService} from '../src/reconciliation/postgresReconciliationService.js';
 import {CanonicalFieldOverrideService} from '../src/reconciliation/canonicalFieldOverrideService.js';
+import {MeetingEventResolutionService} from '../src/normalization/meetingEventResolutionService.js';
+import {PostgresPublicationService} from '../src/normalization/postgresPublicationService.js';
 import {PostgresDeterministicNormalizationService} from '../src/normalization/postgresDeterministicNormalizationService.js';
 
 const enabled=process.env.RUN_F57D_HANDOFF_POSTGRES==='1',suite=enabled?describe:describe.skip;
@@ -61,7 +63,7 @@ suite('F57D mandatory no-network production handoff gate',()=>{
       failureStage='quota_authorization';
       try{const result=await authorize(...args);console.info('F57D_QUOTA_GATE',JSON.stringify({allowed:result.allowed,blockingReason:result.blocking_reason}));return result;}catch(error){capture(error);throw error;}
     });
-    expect((await pool.query('select version from schema_migrations order by version desc limit 1')).rows[0].version).toBe('0040_f5_canonical_timezone_nullability');
+    expect((await pool.query('select version from schema_migrations order by version desc limit 1')).rows[0].version).toBe('0041_f5_revisioned_normalization_decisions');
     expect((await pool.query('select count(*)::int count from sync_streams where lease_owner is not null')).rows[0].count).toBe(0);
     await pool.query("insert into championships(id,slug,name,season,active,sync_enabled) values('f1','f1','F57D F1 Fixture',$1,true,false) on conflict(id) do nothing",[year]);
     expect((await pool.query("select active from championships where id='f1'")).rows[0].active).toBe(true);
@@ -264,5 +266,117 @@ suite('F57D mandatory no-network production handoff gate',()=>{
       expect((await client.query('select (select count(*) from normalized_candidates where source_entity_id=$1) candidates,(select count(*) from normalization_decisions where source_entity_id=$1) decisions',[source])).rows[0]).toEqual(persisted);
       expect((await client.query('select (select count(*) from championship_seasons) seasons,(select count(*) from championship_season_source_links) links,(select count(*) from meetings) meetings,(select count(*) from events) events')).rows[0]).toEqual(before);
     }finally{await client.query('rollback');client.release();}
+  });
+  it('reevaluates persisted-season Meeting and dependent Event without losing revision history',async()=>{
+    const client=await pool.connect();
+    try{
+      await client.query('begin');
+      const meeting=randomUUID(),event=randomUUID(),season=randomUUID(),link=randomUUID();
+      const normalization=new PostgresDeterministicNormalizationService();
+      const mapping={version:'f57d-revision',rulesVersion:'f57d-r1',championshipIds:{formula1:'f1'},circuitIds:{'revision-circuit':'f57d'},sessionTypes:{race:'race'},statuses:{scheduled:'scheduled' as const}};
+      const input=(sourceEntityId:string)=>({sourceEntityId,scopeKey:`revision:${sourceEntityId}`,expectedFenceGeneration:1,normalizationNow:new Date('2026-10-02T10:00:00Z'),mapping});
+      for(const [source,kind,parent] of [[meeting,'meeting',null],[event,'event',meeting]]){
+        await client.query(`insert into provider_source_entities(id,provider_instance_id,provider_championship_id,entity_kind,external_id,parent_source_entity_id,season,source_data,source_hash,first_observed_at,last_observed_at,last_changed_at)
+          values($1::uuid,$2,$3,$4,$1::text,$5,2028,$6::jsonb,$1::text,now(),now(),now())`,[source,ids.provider,ids.association,kind,parent,JSON.stringify({name:`Revision ${source}`,circuit_id:'revision-circuit',session_type:'race',status:'scheduled',starts_at:'2028-12-06T13:00:00Z'})]);
+      }
+      const first=await normalization.normalizeUnitInTransaction(client,input(meeting));
+      expect(first.resolution).toMatchObject({decision:'review',reason:'championship_season_unresolved'});
+      const childFirst=await normalization.normalizeUnitInTransaction(client,input(event));
+      expect(childFirst.resolution).toMatchObject({decision:'review',reason:'parent_identity_unresolved'});
+      const history=async(source:string)=>(await client.query('select * from normalization_decisions where source_entity_id=$1 order by candidate_revision,id',[source])).rows;
+      const original=await history(meeting),originalChild=await history(event);
+      expect(original).toHaveLength(1);expect(Number(original[0].candidate_revision)).toBe(1);
+      const {readFile}=await import('node:fs/promises');
+      const down=await readFile(new URL('../../../infra/postgres/migrations/0041_f5_revisioned_normalization_decisions.down.sql',import.meta.url),'utf8');
+      const up=await readFile(new URL('../../../infra/postgres/migrations/0041_f5_revisioned_normalization_decisions.up.sql',import.meta.url),'utf8');
+      // Upgrade an existing history, and exercise a compatible populated DOWN.
+      await client.query(down);
+      expect(await history(meeting)).toEqual(original);
+      expect(await history(event)).toEqual(originalChild);
+      await client.query(up);
+      expect(await history(meeting)).toEqual(original);
+      expect(await history(event)).toEqual(originalChild);
+      const sourceLink=(await client.query('select id from championship_source_links where provider_instance_id=$1',[ids.provider])).rows[0].id;
+      await client.query("insert into championship_seasons(id,championship_id,key,label,start_year,end_year) values($1,'f1','revision-2028','Revision 2028',2028,2028)",[season]);
+      await client.query("insert into championship_season_source_links(id,championship_source_link_id,provider_instance_id,external_championship_id,external_season_id,championship_id,championship_season_id,created_by) values($1,$2,$3,'formula1','2028','f1',$4,'f57d')",[link,sourceLink,ids.provider,season]);
+      // Event gains Season context but remains REVIEW while its parent is
+      // unresolved: same semantic tuple, new candidate revision.
+      await client.query('savepoint reproduce_legacy');
+      await client.query(`alter table normalization_decisions drop constraint normalization_decisions_idempotency_unique,
+        add constraint normalization_decisions_idempotency_unique unique nulls not distinct
+        (source_entity_id,candidate_id,decision,target_kind,target_id,normalization_version)`);
+      await expect(normalization.normalizeUnitInTransaction(client,input(event))).rejects.toMatchObject({code:'23505',constraint:'normalization_decisions_idempotency_unique'});
+      await client.query('rollback to savepoint reproduce_legacy');
+      const childSecond=await normalization.normalizeUnitInTransaction(client,input(event));
+      expect(childSecond.resolution).toMatchObject({decision:'review',reason:'parent_identity_unresolved'});
+      expect(childSecond.state.championshipSeasonId).toBe(season);
+      const childRevisions=await history(event);
+      expect(childRevisions.map(row=>Number(row.candidate_revision))).toEqual([1,2]);
+      expect(childRevisions.map(row=>row.decision)).toEqual(['review','review']);
+      expect(childRevisions[0]).toEqual(originalChild[0]);
+      expect(await normalization.normalizeUnitInTransaction(client,input(event))).toEqual(childSecond);
+      expect(await history(event)).toEqual(childRevisions);
+      const second=await normalization.normalizeUnitInTransaction(client,input(meeting));
+      expect(second.candidateId).toBe(first.candidateId);
+      expect(second.resolution.decision).toBe('create');
+      expect(second.state.championshipSeasonId).toBe(season);
+      const revisions=await history(meeting);
+      expect(revisions.map(row=>Number(row.candidate_revision))).toEqual([1,2]);
+      expect(revisions[0]).toEqual(original[0]);
+      expect(await normalization.normalizeUnitInTransaction(client,input(meeting))).toEqual(second);
+      expect(await history(meeting)).toEqual(revisions);
+      const publication=new PostgresPublicationService();
+      expect(await publication.publishCandidateInTransaction(client,{candidateId:second.candidateId,occurredAt:input(meeting).normalizationNow})).toMatchObject({outcome:'created'});
+      const child=await normalization.normalizeUnitInTransaction(client,input(event));
+      expect(child.resolution.decision).toBe('create');
+      expect(await publication.publishCandidateInTransaction(client,{candidateId:child.candidateId,occurredAt:input(event).normalizationNow})).toMatchObject({outcome:'created'});
+      expect((await history(event)).map(row=>Number(row.candidate_revision))).toEqual([1,2,3]);
+      const finalHistory=await history(meeting),finalChildHistory=await history(event);
+      await normalization.normalizeUnitInTransaction(client,input(meeting));
+      await normalization.normalizeUnitInTransaction(client,input(event));
+      expect(await history(meeting)).toEqual(finalHistory);
+      expect(await history(event)).toEqual(finalChildHistory);
+      // Verify rollback refuses history that cannot fit the old constraint.
+      await client.query('savepoint down_guard');
+      await expect(client.query(down)).rejects.toThrow('revisioned history must be preserved');
+      await client.query('rollback to savepoint down_guard');
+      expect(await history(meeting)).toEqual(finalHistory);
+      for(const sql of ['update normalization_decisions set reason=reason where id=$1','delete from normalization_decisions where id=$1']){
+        await client.query('savepoint immutable_guard');
+        await expect(client.query(sql,[original[0].id])).rejects.toThrow('append-only');
+        await client.query('rollback to savepoint immutable_guard');
+      }
+      expect(await history(event)).toEqual(finalChildHistory);
+    }finally{await client.query('rollback');client.release();}
+  });
+
+  it('serializes identical normalization and preserves a manual terminal decision on reevaluation',async()=>{
+    const source=randomUUID(),circuit=`revision-${source}`;
+    await pool.query(`insert into provider_source_entities(id,provider_instance_id,provider_championship_id,entity_kind,external_id,season,source_data,source_hash,first_observed_at,last_observed_at,last_changed_at)
+      values($1::uuid,$2,$3,'meeting',$1::text,2026,$4::jsonb,$1::text,now(),now(),now())`,[source,ids.provider,ids.association,JSON.stringify({name:'Concurrent Revision',circuit_id:circuit,status:'unknown',starts_at:'2026-12-06T13:00:00Z'})]);
+    const normalization=new PostgresDeterministicNormalizationService(),input={sourceEntityId:source,scopeKey:`concurrent:${source}`,expectedFenceGeneration:1,normalizationNow:new Date('2026-10-02T10:00:00Z'),mapping:{version:'revision-concurrent',rulesVersion:'f57d-r1',championshipIds:{formula1:'f1'},circuitIds:{[circuit]:circuit},sessionTypes:{},statuses:{}}};
+    const results=await Promise.all([normalization.normalizeUnit(input),normalization.normalizeUnit(input)]);
+    expect(results[1]).toEqual(results[0]);expect(results[0].resolution.decision).toBe('review');
+    const history=async()=>(await pool.query('select * from normalization_decisions where source_entity_id=$1 order by decided_at,id',[source])).rows;
+    const candidate=async()=>(await pool.query('select * from normalized_candidates where id=$1',[results[0].candidateId])).rows[0];
+    expect(await history()).toHaveLength(1);expect((await candidate()).revision).toBe('1');
+    const firstHistory=await history();
+    await pool.query("insert into circuits(id,name,country_code,timezone) values($1,'Revision Context','FR','UTC')",[circuit]);
+    await pool.query('insert into circuit_venue_links(circuit_id,venue_id,venue_layout_id) values($1,$2,$3)',[circuit,ids.venue,ids.layout]);
+    const reevaluations=await Promise.all([normalization.normalizeUnit(input),normalization.normalizeUnit(input)]);
+    expect(reevaluations[1]).toEqual(reevaluations[0]);
+    expect((await candidate()).revision).toBe('2');
+    const revisedHistory=await history();
+    expect(revisedHistory).toHaveLength(2);expect(revisedHistory[0]).toEqual(firstHistory[0]);
+    expect(revisedHistory.map(row=>Number(row.candidate_revision))).toEqual([1,2]);
+    const service=new MeetingEventResolutionService(),decision={expectedRevision:2,idempotencyKey:`manual:${source}`,action:'reject' as const,reason:'Explicit maintainer rejection'},context={actor:'maintainer',requestId:source,occurredAt:new Date()};
+    await service.decide(results[0].candidateId,decision,context);
+    const before=await candidate(),beforeHistory=await history();
+    expect(before.resolution_state).toBe('REJECTED');expect(beforeHistory).toHaveLength(3);
+    await pool.query('update circuit_venue_links set venue_layout_id=null where circuit_id=$1',[circuit]);
+    await Promise.all([normalization.normalizeUnit(input),normalization.normalizeUnit(input)]);
+    expect(await candidate()).toEqual(before);expect(await history()).toEqual(beforeHistory);
+    expect(await service.decide(results[0].candidateId,decision,context)).toMatchObject({replayed:true});
+    await expect(service.decide(results[0].candidateId,{...decision,idempotencyKey:`other:${source}`},context)).rejects.toMatchObject({statusCode:409});
   });
 });
