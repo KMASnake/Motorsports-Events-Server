@@ -1,7 +1,8 @@
 import type { Championship, Circuit, EventFormState, EventRow, SessionTitleSuggestion } from './eventTypes';
+import {isEventCategory} from './eventCategories';
 import { adminAuthorization, notifyAuthenticationRequired } from '../../lib/adminAuth';
 
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
@@ -21,7 +22,7 @@ const toIso = (value: string) => value ? new Date(value).toISOString() : null;
 export async function loadEventWorkspace() {
   const [events, championships, circuits, sessionTitles] = await Promise.all([
     request<EventRow[]>('/api/v1/admin/events'),
-    request<Championship[]>('/api/v1/championships'),
+    request<Championship[]>('/api/v1/admin/championships'),
     request<Circuit[]>('/api/v1/circuits'),
     request<SessionTitleSuggestion[]>('/api/v1/admin/session-titles')
   ]);
@@ -30,11 +31,14 @@ export async function loadEventWorkspace() {
 
 export function saveEvent(form: EventFormState, eventId?: string) {
   const payload = {
-    ...form,
+    championship_id: form.championship_id,
     circuit_id: form.circuit_id || null,
-    category: form.category || null,
+    name: form.name,
+    ...(isEventCategory(form.category)?{category:form.category}:{}),
     starts_at: toIso(form.starts_at),
     ends_at: toIso(form.ends_at),
+    status: form.status,
+    published: form.published,
     session_title: form.session_title.trim() || null,
     description: form.description || null
   };

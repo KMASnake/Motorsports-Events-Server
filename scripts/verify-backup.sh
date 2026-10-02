@@ -15,25 +15,32 @@ if [[ ! -s "${FILE}" ]]; then
 fi
 
 gzip -t "${FILE}"
+require_preprod_context
 
-POSTGRES_USER="$(python3 "${PROJECT_ROOT}/scripts/env_get.py" POSTGRES_USER --env "${ENV_FILE}" --required)"
+POSTGRES_USER="$(python3 "${PROJECT_ROOT}/scripts/env_get.py" POSTGRES_USER --env "${PREPROD_ENV_FILE}" --required)"
+POSTGRES_DB="$(python3 "${PROJECT_ROOT}/scripts/env_get.py" POSTGRES_DB --env "${PREPROD_ENV_FILE}" --required)"
 CHECK_DB="motorsports_backup_check_$(date +%Y%m%d%H%M%S)_$$"
+require_disposable_database_name "${CHECK_DB}" "${POSTGRES_DB}"
+CHECK_DB_CREATED=false
 
 cleanup() {
-  compose exec -T db dropdb \
-    -U "${POSTGRES_USER}" \
-    --if-exists "${CHECK_DB}" >/dev/null 2>&1 || true
+  if [[ "${CHECK_DB_CREATED}" == "true" ]]; then
+    preprod_compose exec -T postgres dropdb \
+      -U "${POSTGRES_USER}" \
+      --if-exists "${CHECK_DB}" >/dev/null
+  fi
 }
 trap cleanup EXIT
 
-compose exec -T db createdb -U "${POSTGRES_USER}" "${CHECK_DB}"
-gzip -dc "${FILE}" | compose exec -T db psql \
+preprod_compose exec -T postgres createdb -U "${POSTGRES_USER}" "${CHECK_DB}"
+CHECK_DB_CREATED=true
+gzip -dc "${FILE}" | preprod_compose exec -T postgres psql \
   -v ON_ERROR_STOP=1 \
   -U "${POSTGRES_USER}" \
   -d "${CHECK_DB}" \
   >/dev/null
 
-TABLES="$(compose exec -T db psql \
+TABLES="$(preprod_compose exec -T postgres psql \
   -U "${POSTGRES_USER}" \
   -d "${CHECK_DB}" \
   -Atqc "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")"
