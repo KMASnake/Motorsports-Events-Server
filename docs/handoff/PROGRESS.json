@@ -4,8 +4,8 @@
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "lot-5.7-p-f3-proven-f4-complete-f5-6-maintainer-validated-gate-f-incomplete",
-    "updated_at": "2026-09-29",
+    "status": "lot-5.7-p-f3-proven-f4-complete-f5-7d1-maintainer-validated-gate-f-incomplete",
+    "updated_at": "2026-10-04",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -307,7 +307,193 @@
                 "scheduler_started":false,
                 "evidence":"docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md"
               },
-              "F5-7": {"status":"not-started","authorized":false}
+              "F5-7": {
+                "status": "in-progress",
+                "implementation_complete": false,
+                "maintainer_validated": false,
+                "authorized_subphase": null,
+                "authorized": false,
+                "authorization_scope": "Completed D0/D1 certification only; no further execution authorized",
+                "subphases": {
+                  "F5-7D": {
+                    "status": "in-progress",
+                    "implementation_complete": false,
+                    "maintainer_validated": false,
+                    "authorized_subphase": null,
+                    "subphases": {
+                      "F5-7D0": {
+                        "status": "maintainer-validated",
+                        "implementation_complete": true,
+                        "maintainer_validated": true,
+                        "maintainer_validation_date": "2026-10-04",
+                        "evidence": "docs/handoff/LOT-5.7-P-F5-7D1-REAL-PROVIDER-CERTIFICATION.md",
+                        "git_head": "959130e5295ff753dcde10d94695d23796e92865",
+                        "git_tree": "7b5ee0cd53b9b70c91af97ced2cb594ae47e67f8"
+                      },
+                      "F5-7D1": {
+                        "status": "maintainer-validated",
+                        "implementation_complete": true,
+                        "maintainer_validated": true,
+                        "maintainer_validation_date": "2026-10-04",
+                        "evidence": "docs/handoff/LOT-5.7-P-F5-7D1-REAL-PROVIDER-CERTIFICATION.md",
+                        "git_head": "41bf9d34605567b39ab2f6f5b608107ddbecb6ab",
+                        "git_tree": "c27a8058c11876672c56e15fd3fc785cfb6e36ae",
+                        "migration_head": "0041_f5_revisioned_normalization_decisions",
+                        "maintainer_audit": "pass",
+                        "audit_recommendation": "FAVORABLE_FOR_SCOPED_MAINTAINER_CERTIFICATION",
+                        "findings": {
+                          "P1": "NONE",
+                          "P2": "NONE",
+                          "P3": "NONE"
+                        },
+                        "certification": {
+                          "evidence_classification": "maintainer-supplied-certification-and-final-cumulative-audit",
+                          "provider": "OCBlackTop",
+                          "championship": "F1",
+                          "season": 2026,
+                          "stream": "current",
+                          "provider_instance_id": "57f10000-0000-4000-8000-000000000001",
+                          "provider_championship_id": "57f10000-0000-4000-8000-000000000002",
+                          "stream_id": "57f10000-0000-4000-8000-000000000003",
+                          "mapping_version_id": "e65cde43-186d-4f9e-868d-035e2e2dca4b",
+                          "traversal_id": "cdae6918-4850-47a5-8a78-c0c85e5ae019",
+                          "acquisition": {
+                            "requests": 1,
+                            "request_budget": 1,
+                            "budget_consumed": true,
+                            "http_status": 200,
+                            "traversals": 1,
+                            "observations": 158,
+                            "received": 158,
+                            "valid": 158,
+                            "anomalies": 0,
+                            "source_meetings": 27,
+                            "source_events": 131
+                          },
+                          "migration": {
+                            "before_head": "0040_f5_canonical_timezone_nullability",
+                            "before_count": 40,
+                            "after_head": "0041_f5_revisioned_normalization_decisions",
+                            "after_count": 41,
+                            "transactional": true,
+                            "provider_invariants": [
+                              1,
+                              1,
+                              158
+                            ],
+                            "candidates": 158,
+                            "decisions": 158,
+                            "revision_1_decisions": 158,
+                            "canonical_public_counts_before_replay": 0
+                          },
+                          "replay_1": {
+                            "entities_seen": 158,
+                            "entities_normalized": 158,
+                            "candidates_ready": 134,
+                            "candidates_review": 24,
+                            "publications_created": 134,
+                            "publications_unchanged": 0,
+                            "meetings": 26,
+                            "events": 108,
+                            "meeting_events": 108,
+                            "public_changes": 134,
+                            "public_versions": 134,
+                            "public_states": 134,
+                            "revision_1_review": 158,
+                            "revision_2_create": 134,
+                            "revision_2_review": 24
+                          },
+                          "reviews": {
+                            "classification": "VALID_FAIL_CLOSED_NON_BLOCKING",
+                            "ambiguous_margin": 18,
+                            "parent_identity_unresolved": 5,
+                            "required_identity_unknown": 1,
+                            "total": 24,
+                            "canonicalized": false
+                          },
+                          "replay_2": {
+                            "entities_seen": 158,
+                            "entities_normalized": 158,
+                            "candidates_ready": 134,
+                            "candidates_review": 24,
+                            "publications_created": 0,
+                            "publications_unchanged": 134,
+                            "highest_change_sequence": null,
+                            "status": "review_required",
+                            "before_after": {
+                              "provider_invariants": [
+                                1,
+                                1,
+                                158
+                              ],
+                              "meetings": 26,
+                              "events": 108,
+                              "public_changes": 134,
+                              "public_versions": 134,
+                              "candidates": 158,
+                              "decisions": 316,
+                              "reviews": 24
+                            },
+                            "candidate_states": {
+                              "event_resolved_created_promoted": 108,
+                              "event_review_required_pending": 23,
+                              "meeting_resolved_created_promoted": 26,
+                              "meeting_review_required_pending": 1
+                            },
+                            "new_canonical_resources": 0,
+                            "new_public_changes": 0,
+                            "new_public_versions": 0,
+                            "new_normalization_decisions": 0,
+                            "real_data_idempotence": "PASS"
+                          },
+                          "automated_certification": {
+                            "f5_7d_postgres": 14,
+                            "f5_5_postgres": 13,
+                            "f5_6_postgres": 22,
+                            "f5_7c_postgres": 5,
+                            "api": 534,
+                            "web": 119,
+                            "repository": 189,
+                            "repository_skipped": 18,
+                            "migration_graph": "PASS",
+                            "schema_compatibility_0041": "PASS",
+                            "typecheck": "PASS",
+                            "lint": "PASS",
+                            "build": "PASS",
+                            "diff_check": "PASS"
+                          },
+                          "ci": {
+                            "legacy": {
+                              "workflow": "Validate legacy Python server",
+                              "run_number": 293,
+                              "conclusion": "SUCCESS"
+                            },
+                            "node": {
+                              "workflow": "CI — Node target",
+                              "run_number": 562,
+                              "conclusion": "SUCCESS"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "F5-7E": {
+                    "status": "not-started",
+                    "authorized": false,
+                    "implementation_complete": false
+                  },
+                  "F5-7F": {
+                    "status": "not-started",
+                    "authorized": false,
+                    "implementation_complete": false
+                  }
+                },
+                "do_not_retry_provider": true,
+                "provider_execution_authorized": false,
+                "offline_replay_authorized": false,
+                "real_database_access_authorized": false
+              }
             }
           },
           "sources_admin_mvp_authorized":true,
@@ -390,7 +576,7 @@
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and F2-RPV retain their maintainer validations. F3 is complete/proven and F4 is complete. F5-1 through F5-6 are maintainer-validated. F5-7 remains not started and unauthorized. F5 remains in progress. Gate F, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and F2-RPV retain their maintainer validations. F3 is complete/proven and F4 is complete. F5-1 through F5-6 are maintainer-validated. F5-7D0 and F5-7D1 are maintainer-validated and complete at their certified functional SHA. F5-7D and F5-7 remain in progress; F5-7E/F are not started and unauthorized. The real provider request budget is permanently 1/1 consumed; do not retry provider. No further offline replay or real certification DB access is authorized. F5 remains in progress. Gate F, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -413,6 +599,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "F5-6 est maintainer-validated. Attendre une autorisation mainteneur explicite avant toute action F5-7, qui reste non démarrée et non autorisée. Aucun déploiement, accès VPS, appel provider, worker, scheduler, Production Preview, Production, onboarding externe, Lot 5.7 complet, Lot 5.8+ ou merge main n'est autorisé."
+    "task": "F5-7D0 et F5-7D1 sont maintainer-validated et complets. F5-7D, F5-7 et F5 restent en cours ; F5-7E/F restent non démarrés et non autorisés. Attendre une autorisation mainteneur explicite pour toute étape suivante. Budget provider 1/1 définitivement consommé : ne jamais réessayer cette acquisition. Aucun replay offline ni accès à la DB réelle de certification n'est autorisé. Aucun déploiement, accès VPS, appel provider, worker, scheduler, Production Preview, Production, onboarding externe, Lot 5.7 complet, Lot 5.8+ ou merge main n'est autorisé."
   }
 }

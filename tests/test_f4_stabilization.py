@@ -19,6 +19,7 @@ F4_CONTRACT_FILES = (
     "docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md",
     "docs/handoff/LOT-5.7-P-F5-5-CANONICAL-MEETING-EVENT-RESOLUTION.md",
     "docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md",
+    "docs/handoff/LOT-5.7-P-F5-7D1-REAL-PROVIDER-CERTIFICATION.md",
     "docs/handbook/architecture/ADR-0026-PROVIDER-DISCOVERY-RESOLUTION.md",
     "docs/handbook/architecture/ADR-0027-CANONICAL-MEETING-EVENT-RESOLUTION.md",
     "docs/handoff/VPS-PREPRODUCTION-READINESS.md",
@@ -132,6 +133,8 @@ class F4StabilizationTests(unittest.TestCase):
         self.assertIn('"f4":"complete"', result.stdout)
         self.assertIn('"f5_4":"maintainer-validated"', result.stdout)
         self.assertIn('"f5_5":"maintainer-validated"', result.stdout)
+        self.assertIn('"f5_7d1":"maintainer-validated"', result.stdout)
+        self.assertIn('"f5_7":"in-progress"', result.stdout)
 
     def test_missing_evidence_is_refused(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -498,6 +501,47 @@ class F4StabilizationTests(unittest.TestCase):
             with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
                 target = changed_progress(Path(raw), mutate)
                 self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
+    def test_f5_7d1_scoped_certification_is_fail_closed(self) -> None:
+        def f57(value: dict) -> dict:
+            return value["current"]["sub_lot_5_7_p"]["technical_gates"]["5.7-P-F"]["provider_first_f5"]["subphases"]["F5-7"]
+
+        def d1(value: dict) -> dict:
+            return f57(value)["subphases"]["F5-7D"]["subphases"]["F5-7D1"]
+
+        cases = (
+            lambda value: f57(value).update(authorized=True),
+            lambda value: f57(value).update(do_not_retry_provider=False),
+            lambda value: f57(value).update(provider_execution_authorized=True),
+            lambda value: f57(value).update(offline_replay_authorized=True),
+            lambda value: f57(value).update(real_database_access_authorized=True),
+            lambda value: f57(value)["subphases"]["F5-7D"].update(status="complete"),
+            lambda value: f57(value)["subphases"]["F5-7E"].update(authorized=True),
+            lambda value: f57(value)["subphases"]["F5-7F"].update(implementation_complete=True),
+            lambda value: f57(value)["subphases"]["F5-7D"]["subphases"]["F5-7D0"].update(maintainer_validated=False),
+            lambda value: d1(value).update(maintainer_validated=False),
+            lambda value: d1(value).update(git_head="0" * 40),
+            lambda value: d1(value).update(git_tree="0" * 40),
+            lambda value: d1(value)["findings"].update(P2="FOUND"),
+            lambda value: d1(value)["certification"]["acquisition"].update(requests=2),
+            lambda value: d1(value)["certification"]["reviews"].update(canonicalized=True),
+            lambda value: d1(value)["certification"]["replay_2"].update(new_normalization_decisions=1),
+            lambda value: d1(value)["certification"]["ci"]["legacy"].update(conclusion="FAILURE"),
+        )
+        for index, mutate in enumerate(cases):
+            with self.subTest(case=index), tempfile.TemporaryDirectory() as raw:
+                target = changed_progress(Path(raw), mutate)
+                self.assertNotEqual(run_validator("--progress", str(target)).returncode, 0)
+
+    def test_f5_7d1_document_evidence_disagreement_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            target = changed_text(
+                Path(raw),
+                "docs/handoff/LOT-5.7-P-F5-7D1-REAL-PROVIDER-CERTIFICATION.md",
+                '"requests": 1',
+                '"requests": 2',
+            )
+            self.assertNotEqual(run_validator("--f5-7d1-doc", str(target)).returncode, 0)
 
     def test_f5_governance_documents_are_fail_closed(self) -> None:
         cases = (
