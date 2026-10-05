@@ -61,7 +61,24 @@ work inside the same transaction as its durable outcome. It never constructs a
 provider runner, loads a credential, invokes an adapter, or calls HTTP.
 A fresh process can discover work committed by a previous process.
 
-Paused, blocked, acquiring and terminal entries are not selected automatically.
+Paused, blocked, acquiring and terminal entries are not executable automatically,
+including through the ordinary runner handoff. Re-enabling promotion or restarting
+a process does not resume paused work. The authoritative gate reads durable state
+under the serialization root and related-stream locks:
+
+| Persisted state | Ordinary handoff | Offline recovery |
+| --- | --- | --- |
+| HANDOFF_PENDING | Execute | Execute |
+| HANDOFF_BACKOFF | Skip | Existing offline retry only |
+| HANDOFF_PAUSED / HANDOFF_BLOCKED / ACQUIRING | Skip | Not selected |
+| DONE / DONE_WITH_REVIEW / ABANDONED | Already terminal | Not selected |
+
+An ordinary non-executable entry returns `handoff_not_executable` with its durable
+state and performs no canonical body, checkpoint, state or audit write. Legacy
+untracked ordinary calls retain their existing compatibility behavior; they are
+not automatically backfilled or selected by recovery. No retry timer or policy
+is introduced.
+
 `resolveHandoff()` is an INTERNAL administrative primitive, with no HTTP route
 or automatic caller. It requires actor, request ID, nonempty reason and expected
 attempt count, persists its disposition and admin audit atomically:
@@ -71,7 +88,20 @@ attempt count, persists its disposition and admin audit atomically:
   acknowledging that canonical processing was deliberately discarded. This
   never claims `DONE`, publication or successful normalization.
 
+Resume accepts paused, blocked or backoff entries only; pending, acquiring and
+terminal entries are rejected. `HANDOFF_PAUSED -> HANDOFF_PENDING` and the existing
+`admin_audit_log` event `handoff.resume` commit together. The audit contains actor,
+request identity, traversal identity, old state, new state, reason and the table's
+transaction timestamp. A failed audit rolls back the transition. The locked state
+check prevents two concurrent resume requests from producing duplicate effective
+transitions or audit events, even when their expected attempt counts match.
+Resume does not execute canonical work, consume a provider request or perform
+terminal replay. A subsequent ordinary/recovery call reads the resumed state
+under lock before processing.
+
 The caller must have a separately authorized administrative/replay scope.
+Authentication and authorization of any future admin/API surface belong to its
+separate governed slice; this correction adds no endpoint or automatic caller.
 `handoffTraversal(id)` is the ordinary runner entrypoint. It and recovery share
 one terminal check under the serialization root and related-stream locks. A
 terminal ordinary call returns `already_terminal` and its durable state, without
@@ -176,6 +206,14 @@ and persist a real equal-priority schedule reconciliation conflict. A separate
 technical fault after real reconciliation/publication writes proves rollback and
 backoff remain distinct from a business review. F5-7D correction replays use the
 separate audited replay primitive; the runner continues using ordinary handoff.
+
+The paused-disposition regressions instrument the canonical body directly: ordinary
+and real runner calls skip paused/blocked work; a fresh process preserves pause;
+audit failure rolls back resume; concurrent resumes produce one effective audit;
+both ordinary/resume lock interleavings obey durable state. Ordinary backoff and
+acquiring calls cannot broaden offline recovery eligibility. Terminal guards,
+recovery/ordinary execution exclusion and real reconciliation review persistence
+remain covered. These are candidate proofs, not independent certification.
 
 D1 evidence, normalizer identity rules, migration 0041 and canonical handoff order
 are preserved. This slice supplies primitives only: P2-01/P2-02 globally and

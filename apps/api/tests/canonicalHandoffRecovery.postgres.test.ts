@@ -1,6 +1,8 @@
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {randomUUID} from 'node:crypto';
+import type {PoolClient} from 'pg';
+import * as handoffState from '../src/providers/canonicalHandoffState.js';
 import {afterAll,beforeAll,beforeEach,describe,expect,it,vi} from 'vitest';
 import {pool} from '../src/lib/db.js';
 import {AcquisitionTransactionService} from '../src/providers/acquisitionTransactionService.js';
@@ -8,7 +10,7 @@ import {PersistentSchedulerService} from '../src/providers/schedulerService.js';
 import {handoffKey,readHandoffEnvelope} from '../src/providers/canonicalHandoffState.js';
 import {BoundedProviderOneShotRunner} from '../src/providers/providerOneShotRunner.js';
 import type {ProviderConfigurationService} from '../src/providers/providerService.js';
-import {CanonicalAcquisitionPublicationService} from '../src/normalization/canonicalAcquisitionPublicationService.js';
+import {CanonicalAcquisitionPublicationService,type CanonicalHandoffResult} from '../src/normalization/canonicalAcquisitionPublicationService.js';
 import {PostgresNormalizationMappingRepository} from '../src/normalization/postgresNormalizationMappingRepository.js';
 import type {AcquiredProviderSourceItem,JsonObject,ProviderAdapter} from '../src/providers/contracts.js';
 
@@ -55,6 +57,26 @@ suite('R1-A1 durable offline handoff',()=>{
   async function counts(){return (await pool.query(`select (select count(*) from meetings where championship_id=$1)::int canonical,(select count(*) from public_resource_versions where championship_id=$1)::int versions,(select count(*) from public_resource_states where championship_id=$1)::int states,(select count(*) from normalization_decisions where source_entity_id in(select id from provider_source_entities where provider_championship_id=$2))::int decisions,(select count(*) from meeting_source_contributions where source_entity_id in(select id from provider_source_entities where provider_championship_id=$2))::int contributions,(select count(*) from public_change_log where resource_id in(select id from meetings where championship_id=$1))::int changes`,[champ,link])).rows[0];}
   const recover=(service=new CanonicalAcquisitionPublicationService(),id=stream)=>service.recoverPendingHandoff(new Date('2026-10-05T12:00:00Z'),id);
 
+  type CanonicalBody={handoffInTransaction:(client:PoolClient,id:string,now:Date)=>Promise<CanonicalHandoffResult>};
+  const bodySpy=(service:CanonicalAcquisitionPublicationService)=>vi.spyOn(service as unknown as CanonicalBody,'handoffInTransaction');
+  const resume=(service:CanonicalAcquisitionPublicationService,id:string)=>service.resolveHandoff({traversalId:id,action:'resume',actor:'r1a1-disposition-fixture',requestId:randomUUID(),expectedAttempts:1,reason:'Explicit synthetic handoff disposition'});
+  const resumeAudit=async(id:string)=>(await pool.query("select actor,action,resource_id,request_id,old_value,new_value,created_at from admin_audit_log where resource_id=$1 and action='handoff.resume' order by created_at,id",[id])).rows;
+  async function paused(){
+    const acquired=await acquire(),service=new CanonicalAcquisitionPublicationService();
+    await pool.query("update publication_controls set enabled=false where control_key='promotion'");
+    expect(await recover(service)).toMatchObject({state:'HANDOFF_PAUSED'});
+    await pool.query("update publication_controls set enabled=true where control_key='promotion'");
+    return {...acquired,service};
+  }
+  function fixtureRunner(output:Awaited<ReturnType<typeof acquire>>['output']){
+    const providers={registry:{get:vi.fn(()=>({restoreCursor:()=>({})}))},readSecretForAdapter:vi.fn(async()=> 'synthetic-fixture-only'),get:vi.fn(async()=>({config:{}}))} as unknown as ProviderConfigurationService;
+    const runner=new BoundedProviderOneShotRunner(providers);
+    vi.spyOn(runner,'preflight').mockResolvedValue({status:'preflight_ok',execution_ready:true,adapter_key:'r1-fixture',canonical_championship_id:champ,effective_mapping_uuid:mapping} as Awaited<ReturnType<typeof runner.preflight>>);
+    vi.spyOn(runner.scheduler,'acquire').mockResolvedValue({stream:{cursor:{},cursor_version:1},run_id:randomUUID(),lease_generation:1} as Awaited<ReturnType<typeof runner.scheduler.acquire>>);
+    vi.spyOn(runner.orchestrator,'executeLease').mockResolvedValue({...output,workClass:'current_global',season:2026});
+    return runner;
+  }
+
   async function reconciliationFixture(review=true){
     await acquire();expect(await recover()).toMatchObject({state:'DONE'});
     const meeting=(await pool.query('select id from meetings where championship_id=$1',[champ])).rows[0].id;
@@ -74,19 +96,84 @@ suite('R1-A1 durable offline handoff',()=>{
     return {...acquired,meeting,snapshot,evidence};
   }
 
+  it('keeps promotion-paused ordinary handoff inert after promotion is re-enabled',async()=>{
+    const {output,service,fetchWorkUnit}=await paused(),before=await entry(output.traversalId),effects=await counts(),execution=bodySpy(service);
+    expect(await service.handoffTraversal(output.traversalId)).toEqual({traversal_id:output.traversalId,status:'handoff_not_executable',handoff_state:'HANDOFF_PAUSED'});
+    expect(execution).not.toHaveBeenCalled();execution.mockRestore();expect(await entry(output.traversalId)).toEqual(before);expect(await counts()).toEqual(effects);expect(effects.versions).toBe(0);expect(await resumeAudit(output.traversalId)).toHaveLength(0);expect(await recover(service)).toBeNull();expect(fetchWorkUnit).toHaveBeenCalledTimes(1);
+  });
+  it.each(['HANDOFF_PAUSED','HANDOFF_BLOCKED'] as const)('the real runner cannot implicitly resume %s',async state=>{
+    const fixture=state==='HANDOFF_PAUSED'?await paused():await acquire({unbound:true});
+    if(state==='HANDOFF_BLOCKED')expect(await recover()).toMatchObject({state});
+    const {output,fetchWorkUnit}=fixture,before=await entry(output.traversalId),effects=await counts(),runner=fixtureRunner(output),execution=bodySpy(runner.handoff);
+    expect(await runner.run({providerInstanceId:provider,providerChampionshipId:link,streamId:stream,maxProviderRequests:1,preflight:false})).toMatchObject({provider_requests_emitted:0,handoff:{status:'handoff_not_executable',handoff_state:state}});
+    expect(execution).not.toHaveBeenCalled();expect(await entry(output.traversalId)).toEqual(before);expect(await counts()).toEqual(effects);expect(effects.versions).toBe(0);expect(await resumeAudit(output.traversalId)).toHaveLength(0);expect(fetchWorkUnit).toHaveBeenCalledTimes(1);vi.restoreAllMocks();
+  });
+  it('explicit resume commits transition and audit atomically and remains separate from replay',async()=>{
+    const {output,service,fetchWorkUnit}=await paused(),id=output.traversalId,before=await entry(id);
+    await expect(service.replayTraversal({traversalId:id,actor:'fixture',requestId:randomUUID(),reason:'Not a paused resume'})).rejects.toThrow('handoff_replay_requires_terminal_or_legacy_traversal');
+    expect(()=>service.resolveHandoff({traversalId:id,action:'resume',actor:'',requestId:randomUUID(),expectedAttempts:1,reason:'Missing actor'})).toThrow('handoff_resolution_invalid');
+    await pool.query(`create function r1a1_fail_resume_audit() returns trigger language plpgsql as $$ begin if new.resource_id='${id}' and new.action='handoff.resume' then raise exception 'synthetic audit failure'; end if; return new; end $$`);
+    await pool.query('create trigger r1a1_fail_resume_audit before insert on admin_audit_log for each row execute function r1a1_fail_resume_audit()');
+    try{await expect(resume(service,id)).rejects.toThrow('synthetic audit failure');expect(await entry(id)).toEqual(before);expect(await resumeAudit(id)).toHaveLength(0);}finally{await pool.query('drop trigger r1a1_fail_resume_audit on admin_audit_log');await pool.query('drop function r1a1_fail_resume_audit()');}
+    const execution=bodySpy(service);expect(await resume(service,id)).toEqual({state:'HANDOFF_PENDING'});expect(execution).not.toHaveBeenCalled();
+    expect(await entry(id)).toMatchObject({state:'HANDOFF_PENDING',attempts:1,error_code:null});
+    const audits=await resumeAudit(id);expect(audits).toHaveLength(1);expect(audits[0]).toMatchObject({actor:'r1a1-disposition-fixture',action:'handoff.resume',resource_id:id,old_value:before,new_value:{state:'HANDOFF_PENDING',reason:'Explicit synthetic handoff disposition'}});expect(audits[0].request_id).toBeTruthy();expect(audits[0].created_at).toBeInstanceOf(Date);
+    await expect(resume(service,id)).rejects.toThrow('handoff_resolution_conflict');expect(await resumeAudit(id)).toHaveLength(1);
+    expect(await recover(service)).toMatchObject({state:'DONE'});expect(execution).toHaveBeenCalledTimes(1);execution.mockRestore();expect(fetchWorkUnit).toHaveBeenCalledTimes(1);
+  });
+  it('a fresh process preserves pause and ordinary/recovery skips until explicit resume',async()=>{
+    const {output,service,fetchWorkUnit}=await paused(),before=await entry(output.traversalId),effects=await counts();
+    const script="globalThis.fetch=()=>{throw new Error('external transport forbidden')};const {CanonicalAcquisitionPublicationService}=await import('./dist/normalization/canonicalAcquisitionPublicationService.js');const {pool}=await import('./dist/lib/db.js');const service=new CanonicalAcquisitionPublicationService();service.handoffInTransaction=()=>{throw new Error('paused canonical body forbidden')};const recovery=await service.recoverPendingHandoff(new Date(),process.argv[1]);const ordinary=await service.handoffTraversal(process.argv[2]);console.log(JSON.stringify({recovery,ordinary}));await pool.end();";
+    const {stdout}=await promisify(execFile)(process.execPath,['--input-type=module','-e',script,stream,output.traversalId],{cwd:process.cwd()});
+    expect(JSON.parse(stdout)).toEqual({recovery:null,ordinary:{traversal_id:output.traversalId,status:'handoff_not_executable',handoff_state:'HANDOFF_PAUSED'}});expect(await entry(output.traversalId)).toEqual(before);expect(await counts()).toEqual(effects);expect(await resumeAudit(output.traversalId)).toHaveLength(0);
+    await resume(service,output.traversalId);expect(await recover(service)).toMatchObject({state:'DONE'});expect(fetchWorkUnit).toHaveBeenCalledTimes(1);
+  });
+  it('two concurrent resumes create one disposition and one audit before one canonical execution',async()=>{
+    const {output,service}=await paused(),id=output.traversalId;
+    const results=await Promise.allSettled([resume(service,id),resume(new CanonicalAcquisitionPublicationService(),id)]);
+    expect(results.filter(result=>result.status==='fulfilled')).toHaveLength(1);const rejected=results.find(result=>result.status==='rejected');expect(rejected?.status==='rejected'&&rejected.reason.message).toBe('handoff_resolution_conflict');
+    expect(await entry(id)).toMatchObject({state:'HANDOFF_PENDING',attempts:1});expect(await resumeAudit(id)).toHaveLength(1);
+    const execution=bodySpy(service);await Promise.all([recover(service),service.handoffTraversal(id)]);expect(execution).toHaveBeenCalledTimes(1);execution.mockRestore();expect(await entry(id)).toMatchObject({state:'DONE',attempts:2});expect((await counts()).changes).toBe(1);
+  });
+  it.each(['ordinary','resume'] as const)('uses locked state when %s wins the ordinary/resume race',async first=>{
+    const {output,service}=await paused(),id=output.traversalId,execution=bodySpy(service),real=handoffState.lockHandoffDomain;
+    let entered!:()=>void,release!:()=>void;const started=new Promise<void>(resolve=>{entered=resolve;}),hold=new Promise<void>(resolve=>{release=resolve;});let locks=0;
+    const lock=vi.spyOn(handoffState,'lockHandoffDomain').mockImplementation(async client=>{await real(client);if(++locks===1){entered();await hold;}});
+    const winner=first==='ordinary'?service.handoffTraversal(id):resume(service,id);await started;
+    const follower=first==='ordinary'?resume(service,id):service.handoffTraversal(id);release();
+    try{
+      const results=await Promise.all([winner,follower]);expect(await resumeAudit(id)).toHaveLength(1);
+      if(first==='ordinary'){expect(results[0]).toMatchObject({status:'handoff_not_executable',handoff_state:'HANDOFF_PAUSED'});expect(execution).not.toHaveBeenCalled();expect(await entry(id)).toMatchObject({state:'HANDOFF_PENDING',attempts:1});expect(await recover(service)).toMatchObject({state:'DONE'});}else{expect(await entry(id)).toMatchObject({state:'DONE',attempts:2});}
+      expect(execution).toHaveBeenCalledTimes(1);expect((await counts()).changes).toBe(1);
+    }finally{release();lock.mockRestore();execution.mockRestore();}
+  });
+  it('ordinary handoff does not execute blocked work or change its evidence',async()=>{
+    const {output}=await acquire({unbound:true}),service=new CanonicalAcquisitionPublicationService();expect(await recover(service)).toMatchObject({state:'HANDOFF_BLOCKED'});
+    const before=await entry(output.traversalId),execution=bodySpy(service);expect(await service.handoffTraversal(output.traversalId)).toMatchObject({status:'handoff_not_executable',handoff_state:'HANDOFF_BLOCKED'});expect(execution).not.toHaveBeenCalled();execution.mockRestore();expect(await entry(output.traversalId)).toEqual(before);expect(await recover(service)).toBeNull();
+  });
+  it('ordinary handoff cannot broaden offline technical backoff retry eligibility',async()=>{
+    const {output}=await acquire(),service=new CanonicalAcquisitionPublicationService(),fault=vi.spyOn(service.normalization,'normalizeUnitInTransaction').mockRejectedValue(new Error('synthetic technical failure'));
+    expect(await recover(service)).toMatchObject({state:'HANDOFF_BACKOFF'});fault.mockRestore();const before=await entry(output.traversalId),execution=bodySpy(service);
+    expect(await service.handoffTraversal(output.traversalId)).toMatchObject({status:'handoff_not_executable',handoff_state:'HANDOFF_BACKOFF'});expect(execution).not.toHaveBeenCalled();expect(await entry(output.traversalId)).toEqual(before);expect(await recover(service)).toMatchObject({state:'DONE'});expect(execution).toHaveBeenCalledTimes(1);execution.mockRestore();
+  });
+  it('ordinary handoff cannot execute an acquiring incomplete traversal',async()=>{
+    const {output}=await acquire({partial:true}),service=new CanonicalAcquisitionPublicationService(),before=await entry(output.traversalId),execution=bodySpy(service);
+    expect(await service.handoffTraversal(output.traversalId)).toMatchObject({status:'handoff_not_executable',handoff_state:'ACQUIRING'});expect(execution).not.toHaveBeenCalled();execution.mockRestore();expect(await entry(output.traversalId)).toEqual(before);
+  });
+
   it.each([false,true])('ordinary handoff never reexecutes a terminal traversal (normalization review=%s)',async review=>{
     const {output,fetchWorkUnit}=await acquire({review}),service=new CanonicalAcquisitionPublicationService();
     await service.handoffTraversal(output.traversalId);const before=await counts(),terminal=await entry(output.traversalId),checkpoints=(await pool.query('select * from normalization_checkpoints where scope_key like $1',[`provider-championship:${link}:%`])).rows;
-    const spy=vi.spyOn(service.normalization,'normalizeUnitInTransaction');
+    const spy=bodySpy(service);
     expect(await service.handoffTraversal(output.traversalId)).toMatchObject({status:'already_terminal',handoff_state:review?'DONE_WITH_REVIEW':'DONE'});
-    expect(spy).not.toHaveBeenCalled();spy.mockRestore();expect(await counts()).toEqual(before);expect(await entry(output.traversalId)).toEqual(terminal);expect((await pool.query('select * from normalization_checkpoints where scope_key like $1',[`provider-championship:${link}:%`])).rows).toEqual(checkpoints);expect(fetchWorkUnit).toHaveBeenCalledTimes(1);
+    expect(spy).not.toHaveBeenCalled();spy.mockRestore();await expect(resume(service,output.traversalId)).rejects.toThrow('handoff_resolution_conflict');expect(await counts()).toEqual(before);expect(await entry(output.traversalId)).toEqual(terminal);expect((await pool.query('select * from normalization_checkpoints where scope_key like $1',[`provider-championship:${link}:%`])).rows).toEqual(checkpoints);expect(fetchWorkUnit).toHaveBeenCalledTimes(1);
   });
 
   it.each(['recovery','ordinary'] as const)('executes exactly once when %s wins the recovery/ordinary race',async first=>{
     const {output}=await acquire(),service=new CanonicalAcquisitionPublicationService();
     let entered!:()=>void,release!:()=>void;const started=new Promise<void>(resolve=>{entered=resolve;}),wait=new Promise<void>(resolve=>{release=resolve;});
-    const real=service.normalization.normalizeUnitInTransaction.bind(service.normalization);let executions=0;
-    const spy=vi.spyOn(service.normalization,'normalizeUnitInTransaction').mockImplementation(async(...args)=>{executions++;if(executions===1){entered();await wait;}return real(...args);});
+    const target=service as unknown as CanonicalBody,real=target.handoffInTransaction.bind(target);let executions=0;
+    const spy=bodySpy(service).mockImplementation(async(...args)=>{executions++;if(executions===1){entered();await wait;}return real(...args);});
     const winner=first==='recovery'?recover(service):service.handoffTraversal(output.traversalId);await started;
     const follower=first==='recovery'?service.handoffTraversal(output.traversalId):recover(service);release();
     const results=await Promise.all([winner,follower]);
@@ -102,7 +189,7 @@ suite('R1-A1 durable offline handoff',()=>{
     vi.spyOn(runner.scheduler,'acquire').mockResolvedValue({stream:{cursor:{},cursor_version:1},run_id:randomUUID(),lease_generation:1} as Awaited<ReturnType<typeof runner.scheduler.acquire>>);
     // Only acquisition is simulated: runner.run invokes the real guarded handoff.
     const acquireSpy=vi.spyOn(runner.orchestrator,'executeLease').mockResolvedValue({...output,workClass:'current_global',season:2026});
-    const execution=vi.spyOn(runner.handoff.normalization,'normalizeUnitInTransaction');
+    const execution=bodySpy(runner.handoff);
     expect(await runner.run({providerInstanceId:provider,providerChampionshipId:link,streamId:stream,maxProviderRequests:1,preflight:false})).toMatchObject({status:'completed',provider_requests_emitted:0,handoff:{status:'already_terminal',handoff_state:'DONE'}});
     expect(acquireSpy).toHaveBeenCalledTimes(1);expect(execution).not.toHaveBeenCalled();expect(fetchWorkUnit).toHaveBeenCalledTimes(1);expect(await counts()).toEqual(before);
     vi.restoreAllMocks();
@@ -133,7 +220,7 @@ suite('R1-A1 durable offline handoff',()=>{
     expect(await entry(id)).toMatchObject({state:'DONE',attempts:1});
     expect(await recover()).toBeNull();expect(fetchWorkUnit).toHaveBeenCalledTimes(1);
     const before=await counts();expect(before).toMatchObject({canonical:1,versions:1,states:1,changes:1});
-    const service=new CanonicalAcquisitionPublicationService(),spy=vi.spyOn(service.normalization,'normalizeUnitInTransaction');
+    const service=new CanonicalAcquisitionPublicationService(),spy=bodySpy(service);
     expect(await service.handoffTraversal(id)).toMatchObject({status:'already_terminal',handoff_state:'DONE'});expect(spy).not.toHaveBeenCalled();spy.mockRestore();
     expect(await counts()).toEqual(before);
   });
