@@ -1,3 +1,4 @@
+import {classifyAcquisitionFailure} from './providerFailure.js';
 import {randomUUID} from 'node:crypto';
 import {pool} from '../lib/db.js';
 import {CanonicalAcquisitionPublicationService} from '../normalization/canonicalAcquisitionPublicationService.js';
@@ -18,16 +19,17 @@ export class StrictProviderRequestBudget implements ProviderRequestGate{
   private count=0;
   private stopped=false;
   constructor(readonly limit:number,private readonly delegate:ProviderRequestGate){if(!Number.isSafeInteger(limit)||limit<=0)throw new Error('max_provider_requests_invalid');}
+  get failureDomain(){return this.delegate.failureDomain;}
   get emitted(){return this.count;}
   get remaining(){return this.limit-this.count;}
   stop(){this.stopped=true;}
   async beforeRequest(){if(this.stopped)return {allowed:false,reason:'request_cancelled'};if(this.count>=this.limit)return {allowed:false,reason:'request_budget_exhausted'};this.count+=1;let decision:Awaited<ReturnType<ProviderRequestGate['beforeRequest']>>;try{decision=await this.delegate.beforeRequest();}catch(error){this.count-=1;throw error;}if(!decision.allowed){this.count-=1;return decision;}if(this.stopped){this.count-=1;if(decision.chargeId)await this.delegate.cancelAuthorization?.(decision.chargeId);return {allowed:false,reason:'request_cancelled'};}return decision;}
   afterResponse(chargeId:string,response:ProviderResponseMetadata){return this.delegate.afterResponse(chargeId,response);}
-  afterError(chargeId:string,error:{code:string;statusCode?:number}){return this.delegate.afterError(chargeId,error);}
+  afterError(chargeId:string,error:Parameters<ProviderRequestGate['afterError']>[1]){return this.delegate.afterError(chargeId,error);}
 }
 
 const requestCounter=()=>{let value=0;return {increment(){value+=1;},get value(){return value;}};};
-const safeError=(error:unknown)=>({code:String((error as {code?:string;anomaly?:{code?:string}}).code??(error as {anomaly?:{code?:string}}).anomaly?.code??'runner_failed'),message:String((error as Error).message??'runner_failed').replace(/https?:\/\/\S+/g,'[URL redacted]').slice(0,300)});
+const safeError=(error:unknown)=>({classification:classifyAcquisitionFailure(error),code:String((error as {code?:string;anomaly?:{code?:string}}).code??(error as {anomaly?:{code?:string}}).anomaly?.code??'runner_failed'),message:String((error as Error).message??'runner_failed').replace(/https?:\/\/\S+/g,'[URL redacted]').slice(0,300)});
 
 export class BoundedProviderOneShotRunner{
   constructor(
@@ -59,7 +61,7 @@ export class BoundedProviderOneShotRunner{
     return {status:configurationReady?'preflight_ok' as const:'configuration_invalid' as const,...(!configurationReady?{reason:configurationBlockers[0]}:{}),configuration_ready:configurationReady,execution_ready:executionReady,configuration_blockers:configurationBlockers,execution_blockers:executionBlockers,provider_instance_id:row.provider_instance_id,adapter_key:row.adapter_key,provider_enabled:row.provider_enabled,provider_state:row.provider_state,provider_championship_id:row.provider_championship_id,canonical_championship_id:row.championship_id,external_championship_id:row.external_championship_id,source_strategy:row.source_strategy,stream_id:row.stream_id,stream_phase:row.phase,stream_state:row.stream_state,active_mapping_uuid:row.mapping_version_id,resumable_traversal_id:resumableTraversalId,effective_mapping_uuid:effectiveMappingUuid,mapping_source:mappingSource,runtime_mapping_identity:runtimeMappingIdentity,credential_present:row.credential_present,quota_configuration:row.quota_configuration,active_lease:{owned:row.lease_owner!==null,owner:row.lease_owner,expires_at:row.lease_expires_at?.toISOString()??null},requested_max_provider_requests:target.maxProviderRequests,publication_control:{preview_api_enabled:process.env.PREVIEW_API_ENABLED==='true'},provider_requests_budget:target.maxProviderRequests,provider_requests_emitted:0,provider_requests_remaining:target.maxProviderRequests,PROVIDER_CALLS:0};
   }
 
-  private quotaGate(providerId:string,streamId:string,adapter:RegisteredProviderAdapter):ProviderRequestGate{return {beforeRequest:async()=>{const decision=await this.quota.authorize(providerId,'current',streamId);return {allowed:decision.allowed,chargeId:decision.chargeId,nextEligibleAt:decision.next_eligible_at,reason:decision.blocking_reason};},afterResponse:(chargeId,response)=>this.quota.recordOutcome(chargeId,{metadata:response,observation:adapter.observeQuota?.(response)??null,streamId}),afterError:(chargeId,error)=>this.quota.recordOutcome(chargeId,{metadata:error.statusCode?{status:error.statusCode,headers:{}}:undefined,errorCode:error.code,streamId}),cancelAuthorization:chargeId=>this.quota.markNotEmitted(chargeId)};}
+  private quotaGate(providerId:string,streamId:string,adapter:RegisteredProviderAdapter):ProviderRequestGate{return {failureDomain:'accounting',beforeRequest:async()=>{const decision=await this.quota.authorize(providerId,'current',streamId);return {allowed:decision.allowed,chargeId:decision.chargeId,nextEligibleAt:decision.next_eligible_at,reason:decision.blocking_reason};},afterResponse:(chargeId,response)=>this.quota.recordOutcome(chargeId,{metadata:response,observation:adapter.observeQuota?.(response)??null,streamId}),afterError:(chargeId,error)=>this.quota.recordOutcome(chargeId,{metadata:error.statusCode?{status:error.statusCode,headers:error.classification?.headers??{}}:undefined,errorCode:error.code,streamId}),cancelAuthorization:chargeId=>this.quota.markNotEmitted(chargeId)};}
 
   async run(target:OneShotTarget,signal?:AbortSignal){
     const report=await this.preflight(target);if(target.preflight||report.status!=='preflight_ok')return report;if(!report.execution_ready)return {...report,status:'configuration_invalid' as const,reason:'execution_not_authorized'};

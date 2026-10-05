@@ -1,3 +1,5 @@
+import { failureClassification, type ProviderFailureClassification } from './providerFailure.js';
+
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonValue[] | JsonObject;
 export type JsonObject = { readonly [key: string]: JsonValue };
@@ -32,9 +34,10 @@ export interface ProviderAdapterContext<ProviderConfig extends JsonObject> {
 }
 
 export interface ProviderRequestGate {
+  readonly failureDomain?: 'accounting' | 'callback';
   beforeRequest(): Promise<{ allowed: boolean; chargeId?: string; nextEligibleAt?: string | null; reason?: string | null }>;
   afterResponse(chargeId: string, response: ProviderResponseMetadata): Promise<void>;
-  afterError(chargeId: string, error: { code: string; statusCode?: number }): Promise<void>;
+  afterError(chargeId: string, error: { code: string; statusCode?: number; classification?: ProviderFailureClassification }): Promise<void>;
   cancelAuthorization?(chargeId: string): Promise<void>;
 }
 
@@ -139,9 +142,11 @@ export interface FetchWorkUnitResult<Raw, Cursor extends JsonObject> {
 export class ProviderAcquisitionError extends Error {
   readonly complete = false;
   readonly anomaly: ProviderBlockingAnomaly;
+  readonly classification: ProviderFailureClassification;
   constructor(code: string, message: string) {
     super(message);
     this.anomaly = { scope: 'stream', code, message };
+    this.classification = failureClassification(code, {category:'PAYLOAD_OR_SCHEMA_ERROR'});
   }
 }
 
