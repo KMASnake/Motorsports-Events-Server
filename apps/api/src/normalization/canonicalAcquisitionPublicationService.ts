@@ -11,6 +11,7 @@ export class CanonicalHandoffError extends Error{
 }
 export function canonicalNormalizationScope(providerChampionshipId:string,phase:'current'|'historical',mappingVersionId:string){return `provider-championship:${providerChampionshipId}:phase:${phase}:mapping:${mappingVersionId}`;}
 export type CanonicalHandoffResult={traversal_id:string;provider_championship_id:string;mapping_version_id:string;normalization_scope:string;fence_generation:number;entities_seen:number;entities_normalized:number;candidates_ready:number;candidates_review:number;candidates_deferred:number;publications_created:number;publications_unchanged:number;highest_change_sequence:number|null;status:'completed'|'no_changes'|'review_required'|'rejected'|'deferred'};
+export type TerminalHandoffResult={traversal_id:string;status:'already_terminal';handoff_state:HandoffStatus};
 export function finalCandidateClassification(decision:string,publicationOutcome?:string){if(decision==='review'||publicationOutcome==='review_required')return 'review';if(decision==='rejected')return 'rejected';if(['created','updated','unchanged'].includes(publicationOutcome??''))return 'ready';return 'deferred';}
 export function finalHandoffStatus(entities:number,review:number,ready:number,rejected:number,created:number):CanonicalHandoffResult['status']{return entities===0?'no_changes':review>0?'review_required':ready===0&&rejected>0?'rejected':created===0?'no_changes':'completed';}
 
@@ -30,14 +31,27 @@ export class CanonicalAcquisitionPublicationService{
       return {state};
     });
   }
-  // Direct calls are explicit offline replays. Recovery never selects terminal entries.
+  // Ordinary runner and recovery calls share the locked terminal check.
   async handoffTraversal(traversalId:string,now=new Date()){
     const outcome=await withTransaction(async client=>{
       await lockHandoffDomain(client);
-      return this.processTracked(client,traversalId,now,false);
+      return this.processTracked(client,traversalId,now,'ordinary');
     });
     if(outcome.error)throw outcome.error;
-    return outcome.result!;
+    return outcome.terminal??outcome.result!;
+  }
+
+  // Preserve the existing explicitly governed offline replay separately from runtime.
+  // No runner, route or recovery caller receives a bypass option.
+  replayTraversal(input:{traversalId:string;actor:string;requestId:string;reason:string},now=new Date()){
+    if(!input.actor.trim()||!input.requestId.trim()||!input.reason.trim()||input.reason.length>500)throw new Error('handoff_replay_authorization_invalid');
+    return withTransaction(async client=>{
+      await lockHandoffDomain(client);
+      const outcome=await this.processTracked(client,input.traversalId,now,'replay');
+      if(outcome.error)throw outcome.error;
+      await client.query(`insert into admin_audit_log(actor,action,resource_type,resource_id,request_id,new_value) values($1,'handoff.explicit_replay','canonical_handoff',$2,$3,$4::jsonb)`,[input.actor,input.traversalId,input.requestId,JSON.stringify({reason:input.reason,status:outcome.result!.status})]);
+      return outcome.result!;
+    });
   }
 
   recoverPendingHandoff(now=new Date(),streamId?:string){return withTransaction(async client=>{
@@ -47,7 +61,7 @@ export class CanonicalAcquisitionPublicationService{
       const envelope=readHandoffEnvelope(stream.historical_state);
       for(const [id,entry] of Object.entries(envelope.traversals)){
         if(entry.state==='HANDOFF_PENDING'||entry.state==='HANDOFF_BACKOFF'){
-          const outcome=await this.processTracked(client,id,now,true);
+          const outcome=await this.processTracked(client,id,now,'recovery');
           return {traversal_id:id,state:outcome.state!,result:outcome.result??null,error_code:outcome.error?String((outcome.error as {code?:string}).code??'handoff_technical_failure'):null};
         }
       }
@@ -55,15 +69,17 @@ export class CanonicalAcquisitionPublicationService{
     return null;
   });}
 
-  private async processTracked(client:PoolClient,traversalId:string,now:Date,recovery:boolean):Promise<{state?:HandoffStatus;result?:CanonicalHandoffResult;error?:unknown}>{
+  private async processTracked(client:PoolClient,traversalId:string,now:Date,mode:'ordinary'|'recovery'|'replay'):Promise<{state?:HandoffStatus;result?:CanonicalHandoffResult;terminal?:TerminalHandoffResult;error?:unknown}>{
     // Serialization root first, then all related streams in UUID order, then traversal.
     const reference=(await client.query('select stream.id,stream.provider_championship_id from sync_streams stream join provider_acquisition_traversals traversal on traversal.stream_id=stream.id where traversal.id=$1',[traversalId])).rows[0];
     if(!reference)throw new CanonicalHandoffError('traversal_not_found','Acquisition traversal not found.');
     await client.query('select id from sync_streams where provider_championship_id=$1 order by id for update',[reference.provider_championship_id]);
     const historical=(await client.query('select historical_state from sync_streams where id=$1',[reference.id])).rows[0].historical_state;
     const entry=readHandoffEnvelope(historical).traversals[traversalId];
-    if(recovery&&(!entry||terminalHandoff(entry.state)||!['HANDOFF_PENDING','HANDOFF_BACKOFF'].includes(entry.state)))return {};
-    const tracked=entry&&protectedHandoff(entry.state);
+    if(mode!=='replay'&&entry&&terminalHandoff(entry.state))return {state:entry.state,terminal:{traversal_id:traversalId,status:'already_terminal',handoff_state:entry.state}};
+    if(mode==='recovery'&&(!entry||!['HANDOFF_PENDING','HANDOFF_BACKOFF'].includes(entry.state)))return {};
+    if(mode==='replay'&&entry&&!terminalHandoff(entry.state))throw new Error('handoff_replay_requires_terminal_or_legacy_traversal');
+    const tracked=mode!=='replay'&&entry&&protectedHandoff(entry.state);
     await client.query('savepoint canonical_handoff_work');
     try{
       const result=await this.handoffInTransaction(client,traversalId,now);

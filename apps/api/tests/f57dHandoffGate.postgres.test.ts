@@ -38,6 +38,7 @@ suite('F57D mandatory no-network production handoff gate',()=>{
   const adapter=new OcBlackTopAdapter(transport);
   registry.register(adapter);
   const runner=new BoundedProviderOneShotRunner(new ProviderConfigurationService(registry,cipher));
+  const replayTraversal=(traversalId:string)=>runner.handoff.replayTraversal({traversalId,actor:'f57d-fixture',requestId:randomUUID(),reason:'Explicit governed replay of synthetic F57D correction/reconciliation evidence'});
   const policies=new Map<'meeting'|'event',string>();
   beforeAll(async()=>{
     const url=new URL(process.env.DATABASE_URL??'');
@@ -114,7 +115,7 @@ suite('F57D mandatory no-network production handoff gate',()=>{
       counts:(await pool.query('select (select count(*)::int from public_change_log) changes,(select count(*)::int from public_resource_versions) versions,(select count(*)::int from meeting_source_contributions) meetings,(select count(*)::int from event_source_contributions) events')).rows[0]
     });
     const initial=await snapshot();
-    expect(await runner.handoff.handoffTraversal(first.traversal_id)).toMatchObject({status:'no_changes'});
+    expect(await replayTraversal(first.traversal_id)).toMatchObject({status:'no_changes'});
     expect(await snapshot()).toEqual(initial);
     // A second synthetic provider uses the same injected OCBlackTop parser,
     // but a distinct policy identity. Only the disposable primary association
@@ -148,7 +149,7 @@ suite('F57D mandatory no-network production handoff gate',()=>{
     for(const source of sources)await protection.upsertCorrection({sourceEntityId:source.id,fieldPath:'name',overrideValue:source.entity_kind==='meeting'?'F57D Corrected Meeting':'F57D Corrected Race',origin:'f57d-gate',actorId:'f57d'});
     // Replay the real handoff with a new source-correction revision, not a new
     // HTTP call or a manually applied reconciliation that would hide a bypass.
-    const replay=await runner.handoff.handoffTraversal(first.traversal_id);
+    const replay=await replayTraversal(first.traversal_id);
     const reconciliation=new PostgresReconciliationService(),evidence=[];
     for(const kind of ['meeting','event'] as const){
       const canonical=(await pool.query(kind==='meeting'?"select id,name from meetings where championship_id='f1'":"select normalized_uuid id,name from events where championship_id='f1'")).rows;
@@ -172,11 +173,11 @@ suite('F57D mandatory no-network production handoff gate',()=>{
     const winning=await snapshot();
     expect(winning.counts.changes-initial.counts.changes).toBe(2);
     expect(winning.counts.versions-initial.counts.versions).toBe(2);
-    expect(await runner.handoff.handoffTraversal(first.traversal_id)).toMatchObject({status:'no_changes'});
+    expect(await replayTraversal(first.traversal_id)).toMatchObject({status:'no_changes'});
     expect(await snapshot()).toEqual(winning);
     const secondarySources=(await pool.query('select id,entity_kind from provider_source_entities where provider_championship_id=$1',[secondary.association])).rows;
     for(const source of secondarySources)await protection.upsertCorrection({sourceEntityId:source.id,fieldPath:'name',overrideValue:`F57D Losing ${source.entity_kind}`,origin:'f57d-gate',actorId:'f57d'});
-    expect(await runner.handoff.handoffTraversal(second.traversal_id)).toMatchObject({status:'no_changes'});
+    expect(await replayTraversal(second.traversal_id)).toMatchObject({status:'no_changes'});
     const losing=await snapshot();
     expect(losing.public).toEqual(winning.public);expect(losing.canonical).toEqual(winning.canonical);
     expect(losing.counts.changes).toBe(winning.counts.changes);expect(losing.counts.versions).toBe(winning.counts.versions);
@@ -186,7 +187,7 @@ suite('F57D mandatory no-network production handoff gate',()=>{
       const beforeOrder=await snapshot(),winner=`F57D ${order} Winner`;
       await correct(sources,winner);await correct(secondarySources,`F57D ${order} Loser`);
       const traversals=order==='loser-first'?[second.traversal_id,first.traversal_id]:[first.traversal_id,second.traversal_id];
-      for(const traversal of traversals)await runner.handoff.handoffTraversal(traversal);
+      for(const traversal of traversals)await replayTraversal(traversal);
       const afterOrder=await snapshot();
       expect(afterOrder.canonical).toEqual([{kind:'event',name:`${winner} event`},{kind:'meeting',name:`${winner} meeting`}]);
       expect(afterOrder.counts.changes-beforeOrder.counts.changes).toBe(2);
@@ -197,9 +198,9 @@ suite('F57D mandatory no-network production handoff gate',()=>{
       const target=(await pool.query(kind==='meeting'?"select id from meetings where championship_id='f1'":"select normalized_uuid id from events where championship_id='f1'")).rows[0].id;
       await overrides.set({entityKind:kind,entityUuid:target,fieldName:'name',value:`F57D Admin ${kind}`,expectedRevision:0,idempotencyKey:`f57d-admin-${kind}`,actorId:'f57d-admin',reason:'F57D override precedence proof'});
     }
-    await runner.handoff.handoffTraversal(first.traversal_id);
+    await replayTraversal(first.traversal_id);
     const overridden=await snapshot();
-    await correct(sources,'F57D Overridden Provider');await runner.handoff.handoffTraversal(first.traversal_id);
+    await correct(sources,'F57D Overridden Provider');await replayTraversal(first.traversal_id);
     expect((await snapshot()).canonical).toEqual([{kind:'event',name:'F57D Admin event'},{kind:'meeting',name:'F57D Admin meeting'}]);
     expect((await snapshot()).public).toEqual(overridden.public);
     expect((await snapshot()).counts.changes).toBe(overridden.counts.changes);
@@ -215,16 +216,16 @@ suite('F57D mandatory no-network production handoff gate',()=>{
     const runsBeforeFailure=(await pool.query('select count(*)::int count from reconciliation_runs')).rows[0].count;
     const reconcile=runner.handoff.reconciliation.reconcileLinkedInTransaction.bind(runner.handoff.reconciliation);
     const failure=vi.spyOn(runner.handoff.reconciliation,'reconcileLinkedInTransaction').mockImplementation(async(client,input)=>{const result=await reconcile(client,input);if(input.entityKind==='event')throw new Error('f57d_after_event_reconciliation_failure');return result;});
-    await expect(runner.handoff.handoffTraversal(first.traversal_id)).rejects.toThrow('f57d_after_event_reconciliation_failure');
+    await expect(replayTraversal(first.traversal_id)).rejects.toThrow('f57d_after_event_reconciliation_failure');
     failure.mockRestore();expect(await snapshot()).toEqual(beforeFailure);
     expect((await pool.query('select count(*)::int count from reconciliation_runs')).rows[0].count).toBe(runsBeforeFailure);
     expect((await pool.query('select * from normalization_checkpoints order by scope_key')).rows).toEqual(checkpoints);
-    await runner.handoff.handoffTraversal(first.traversal_id);
+    await replayTraversal(first.traversal_id);
     const corrected=await snapshot();
     expect(corrected.canonical).toEqual([{kind:'event',name:'F57D Atomic event'},{kind:'meeting',name:'F57D Atomic meeting'}]);
     expect(corrected.counts.changes-beforeFailure.counts.changes).toBe(2);
     expect(corrected.counts.versions-beforeFailure.counts.versions).toBe(2);
-    expect(await runner.handoff.handoffTraversal(first.traversal_id)).toMatchObject({status:'no_changes'});
+    expect(await replayTraversal(first.traversal_id)).toMatchObject({status:'no_changes'});
     expect(await snapshot()).toEqual(corrected);
     expect(transport).toHaveBeenCalledTimes(2);
     expect(blockedExternalFetch).not.toHaveBeenCalled();

@@ -72,10 +72,28 @@ attempt count, persists its disposition and admin audit atomically:
   never claims `DONE`, publication or successful normalization.
 
 The caller must have a separately authorized administrative/replay scope.
-The existing `handoffTraversal(id)` remains an explicit offline replay surface;
-calling it on terminal/historical work requires that separate scope. Recovery
-selection itself never invokes this explicit replay on terminal entries.
+`handoffTraversal(id)` is the ordinary runner entrypoint. It and recovery share
+one terminal check under the serialization root and related-stream locks. A
+terminal ordinary call returns `already_terminal` and its durable state, without
+normalization, reconciliation, publication or checkpoint writes. Recovery excludes
+terminal entries. This also protects a recovery/ordinary-runner race.
+
+The previously implicit explicit replay surface is separated as
+`replayTraversal({traversalId, actor, requestId, reason})`. It accepts terminal or
+legacy untracked traversals only, requires a separately governed caller scope,
+and writes an administrative replay audit in the canonical transaction. No runner,
+recovery caller or HTTP route invokes it. Replay preserves the original terminal
+orchestration record and never fabricates another automatic attempt.
 No legacy traversal is automatically backfilled, inferred to be done, or replayed.
+
+Normalization reviews retain normalized candidates and normalization decisions.
+Reconciliation business reviews retain `reconciliation_runs` with outcome
+`review_required`, `reconciliation_field_decisions` and `reconciliation_conflicts`.
+The existing reconciliation apply path records these and refuses ineligible
+canonical/public materialization. Its typed business outcome is counted as review
+and closes handoff as `DONE_WITH_REVIEW` in the same transaction. Arbitrary technical
+exceptions still roll back the canonical transaction's work and become backoff;
+they are not swallowed or reclassified as business reviews.
 
 ## Source replacement barrier and lock order
 
@@ -150,6 +168,14 @@ preservation and explicit audited blocked-work disposition. Existing F5-7D tests
 remain the regression proof for reconciliation rollback and immutable revisioned
 normalization decisions. Unit tests reject malformed envelopes and namespace
 injection.
+
+The P2 correction regressions additionally count actual canonical executions in
+both recovery/ordinary interleavings, test ordinary DONE/DONE_WITH_REVIEW guards,
+exercise the actual one-shot runner with acquisition-only mocks and no transport,
+and persist a real equal-priority schedule reconciliation conflict. A separate
+technical fault after real reconciliation/publication writes proves rollback and
+backoff remain distinct from a business review. F5-7D correction replays use the
+separate audited replay primitive; the runner continues using ordinary handoff.
 
 D1 evidence, normalizer identity rules, migration 0041 and canonical handoff order
 are preserved. This slice supplies primitives only: P2-01/P2-02 globally and
