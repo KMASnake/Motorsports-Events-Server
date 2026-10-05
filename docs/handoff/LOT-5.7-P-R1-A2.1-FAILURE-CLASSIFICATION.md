@@ -45,8 +45,9 @@ is not mechanically restricted to rate limits.
 `retryHint` is diagnostic, never an admission or scheduling decision. Future
 A2.2 must compute effective due time from the maximum of local backoff, valid
 provider deadline and quota constraints. This slice deliberately leaves the
-existing quota/cadence implementation and persisted outcomes unchanged; its
-old Retry-After scheduling limitations remain for A2.2.
+existing non-cancellation quota/cadence policy unchanged; its old Retry-After
+scheduling limitations remain for A2.2. The targeted caller-cancellation
+accounting exception is described below.
 
 ## Transport evidence
 
@@ -72,7 +73,7 @@ guessing is performed. A body-read failure retains received HTTP context;
 `Z_DATA_ERROR` during body reading is an encoding/payload failure. Legacy
 transport codes (`network_error`, `timeout`, `aborted`) remain compatible with
 existing quota accounting; the category supplies finer TLS/encoding evidence
-without changing the persistent counter implementation.
+without changing transport-failure accounting.
 
 ## Accounting and propagation
 
@@ -119,5 +120,47 @@ Observed implementation validation:
   were removed. No real provider, credential, certification database, preprod
   or production access, worker/scheduler process, deployment or push occurred.
 
-Self-audit: no new P1, unresolved A2.1-specific P2 or new P3 found. This is
-implementation evidence, not a maintainer certification or broader A2 closure.
+The initial self-audit missed the caller-cancellation accounting boundary.
+The independent post-implementation audit reproduced A2.1-P2-01: HTTP 200
+context forwarded with `aborted` caused a stream failure count and backoff.
+Implementation evidence is not a maintainer certification or broader A2 closure.
+
+## A2.1-P2-01 — Targeted caller-cancellation correction
+
+`QuotaCadenceService.recordOutcome` records the emitted charge exactly once,
+then commits and returns for the existing `aborted` code before any provider or
+stream health/backoff operation. This shared boundary covers one-shot and
+discovery quota gates without duplicate cancellation rules. Existing counts,
+backoffs, last error and provider health are preserved, including nonzero
+counts and preexisting backoffs; cancellation does not reset them either.
+
+Diagnostics remain `CALLER_ABORTED`, with received HTTP status/context in the
+classified exception. The existing `provider_request_charges.outcome` stores
+`aborted` as a local control-flow diagnostic with `emitted=true`, not a provider
+health failure. Quota consumption is retained. No diagnostic is written to
+`sync_streams.last_error_code`, and no retry record or counter is introduced.
+
+The exception applies only to caller cancellation. Timeout, network failure,
+HTTP 429/503, successful-response data errors and internal callback failures
+retain their existing handling. HTTP/TLS classification, Retry-After parsing
+and scheduling, scheduler selection, acquisition outcomes and A1 semantics
+are unchanged. A2.1 remains a candidate requiring independent re-audit.
+
+PostgreSQL regression cases exercise the actual one-shot quota bridge for
+cancellation during a received HTTP 200 body, cancellation before response,
+preservation of prior health state, truthful/idempotent charges, timeout,
+429/503 with Retry-After, invalid JSON/content type and network failure. The
+existing callback-after-commit and concurrent charge-id outcome cases remain.
+
+Observed correction validation: 9 added PostgreSQL cases passed first, then all
+11 accounting cases passed. The three-version audit comparison reproduced the
+original candidate's count/backoff mutation and showed the corrected candidate
+matching A1 neutrality while preserving HTTP 200 / CALLER_ABORTED diagnostics.
+API tests passed (599, with 100 PostgreSQL skips covered as applicable by the
+dedicated harnesses); A1 (31), quota/cadence (64), acquisition/scheduler and the
+existing normalization/publication PostgreSQL regressions passed. Repository
+validation (193 tests, 18 skips), typecheck, lint, API build and governance
+validation passed. Local disposable database resources were removed. No real
+provider/credential/database access, worker/scheduler process, deployment or
+push was required. A2.1-P2-01 is addressed by this targeted implementation;
+independent re-audit and maintainer certification are still separate steps.
