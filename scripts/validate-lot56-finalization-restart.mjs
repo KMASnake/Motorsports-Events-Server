@@ -1,3 +1,4 @@
+import {disposeFixtureHandoff} from './test-support/dispose-acquisition-fixture-handoff.mjs';
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {pool} from '../apps/api/dist/lib/db.js';
@@ -13,7 +14,7 @@ const service=new DurableAcquisitionOrchestrator({now:()=>new Date(now)});
 const gate={beforeRequest:async()=>({allowed:true}),afterResponse:async()=>{},afterError:async()=>{}};
 const fetchInput=season=>({providerInstanceId:provider,providerConfig:{},credentials:{},requestGate:gate,providerChampionshipId:link,championshipId:'f1',sourceConfig:{},phase:'current',season,cursor:{},signal:new AbortController().signal});
 const item=(externalId,season,start,end)=>({entityKind:'event',externalId,identityIsSynthetic:false,parentExternalId:null,parentEntityKind:null,season,sourceData:{status:'scheduled',type:'race',starts_at:start,ends_at:end}});
-const lease=async worker=>{const generation=Number((await pool.query('select lease_generation from sync_streams where id=$1',[stream])).rows[0].lease_generation)+1,runId=randomUUID(),expires=new Date(now.getTime()+600000);await pool.query(`update sync_streams set state='running',lease_owner=$2,lease_acquired_at=$3,lease_expires_at=$4,lease_generation=$5 where id=$1`,[stream,worker,now,expires,generation]);await pool.query(`insert into sync_runs(id,stream_id,worker_id,lease_generation,work_class,cursor_before,status,request_id) values($1,$2,$3,$4,'current','{}','running',$5)`,[runId,stream,worker,generation,randomUUID()]);return {streamId:stream,runId,workerId:worker,generation};};
+const lease=async worker=>{await disposeFixtureHandoff(link);const generation=Number((await pool.query('select lease_generation from sync_streams where id=$1',[stream])).rows[0].lease_generation)+1,runId=randomUUID(),expires=new Date(now.getTime()+600000);await pool.query(`update sync_streams set state='running',lease_owner=$2,lease_acquired_at=$3,lease_expires_at=$4,lease_generation=$5 where id=$1`,[stream,worker,now,expires,generation]);await pool.query(`insert into sync_runs(id,stream_id,worker_id,lease_generation,work_class,cursor_before,status,request_id) values($1,$2,$3,$4,'current','{}','running',$5)`,[runId,stream,worker,generation,randomUUID()]);return {streamId:stream,runId,workerId:worker,generation};};
 const execute=async(season,items,worker,dispatchCounter)=>service.executeLease({providerInstanceId:provider,providerChampionshipId:link,season,dispatchCounter,lease:await lease(worker),adapter:{fetchWorkUnit:async input=>{await input.requestGate.beforeRequest();return {status:'complete',items,itemAnomalies:[],nextCursor:{},requestCount:1,complete:true,completionReason:'end_of_collection'};}},fetchInput:fetchInput(season)});
 
 try{

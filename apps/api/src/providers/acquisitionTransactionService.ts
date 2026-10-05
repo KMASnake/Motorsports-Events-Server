@@ -1,3 +1,4 @@
+import {assertNoPendingHandoff,lockHandoffDomain,writeHandoffState} from './canonicalHandoffState.js';
 import { createHash, randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { pool } from '../lib/db.js';
@@ -35,6 +36,7 @@ export class AcquisitionTransactionService{
   }){
     const traversalId=input.traversalId??randomUUID();
     const client=await pool.connect();try{await client.query('begin');
+      await lockHandoffDomain(client);await assertNoPendingHandoff(client,input.providerChampionshipId);
       if(input.traversalId){
         const resumed=(await client.query(`update provider_acquisition_traversals traversal set run_id=$2,lease_generation=$7,status='running',finished_at=null from sync_streams stream,sync_runs run where traversal.id=$1 and traversal.stream_id=$3 and traversal.work_class=$4 and traversal.season=$5 and traversal.safe_unit_key=$6 and traversal.status in('running','partial') and traversal.complete=false and stream.id=traversal.stream_id and stream.lease_owner=$8 and stream.lease_generation=$7 and stream.lease_expires_at>$9 and run.id=$2 and run.stream_id=stream.id and run.worker_id=$8 and run.lease_generation=$7 and run.status='running' returning traversal.id`,[traversalId,input.lease.runId,input.lease.streamId,input.workClass,input.season,input.safeUnitKey,input.lease.generation,input.lease.workerId,this.clock.now()])).rowCount;
         if(!resumed)throw staleWorker();
@@ -43,6 +45,7 @@ export class AcquisitionTransactionService{
         if(!created)throw staleWorker();
       }
       if(input.mappingVersionId){const bound=await client.query(`insert into provider_acquisition_traversal_mappings(traversal_id,provider_championship_id,mapping_version_id) select traversal.id,stream.provider_championship_id,version.id from provider_acquisition_traversals traversal join sync_streams stream on stream.id=traversal.stream_id join normalization_mapping_versions version on version.id=$2 and version.provider_championship_id=stream.provider_championship_id join provider_championship_active_normalization_mappings active on active.provider_championship_id=stream.provider_championship_id and active.mapping_version_id=version.id where traversal.id=$1 on conflict(traversal_id) do nothing returning traversal_id`,[traversalId,input.mappingVersionId]);const existing=(await client.query('select mapping_version_id from provider_acquisition_traversal_mappings where traversal_id=$1',[traversalId])).rows[0];if(!bound.rowCount&&String(existing?.mapping_version_id)!==input.mappingVersionId)throw new Error('traversal_mapping_binding_failed');}
+      await writeHandoffState(client,input.lease.streamId,traversalId,'ACQUIRING',this.clock.now());
       await client.query('commit');
     }catch(error){await client.query('rollback');throw error;}finally{client.release();}
     let result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>;
@@ -88,6 +91,7 @@ export class AcquisitionTransactionService{
     if(complete){
       await client.query(`insert into provider_source_observations(traversal_id,source_entity_id,observation_kind,observed_at) select $1,entity.id,'not_observed',$4 from provider_source_entities entity where entity.provider_championship_id=$2 and entity.season=$3 and not exists(select 1 from provider_source_observations observed where observed.traversal_id=$1 and observed.source_entity_id=entity.id and observed.observation_kind='present') on conflict(traversal_id,source_entity_id) do nothing`,[input.traversalId,input.providerChampionshipId,input.season,now]);
     }
+    if(complete)await writeHandoffState(client,input.lease.streamId,input.traversalId,'HANDOFF_PENDING',now);
     await input.afterPersist?.(client,input.result,{traversalId:input.traversalId,receivedItems:Number(totals.received_items),validItems:Number(totals.valid_items),complete});
   }
 

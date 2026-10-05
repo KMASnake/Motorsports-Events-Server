@@ -1,3 +1,5 @@
+import {SourceProtectionService} from '../apps/api/dist/providers/sourceProtectionService.js';
+import {disposeFixtureHandoff} from './test-support/dispose-acquisition-fixture-handoff.mjs';
 import assert from 'node:assert/strict';
 import { pool } from '../apps/api/dist/lib/db.js';
 import { AcquisitionTransactionService } from '../apps/api/dist/providers/acquisitionTransactionService.js';
@@ -19,6 +21,7 @@ const adapter=(value)=>({fetchWorkUnit:async()=>{if(value instanceof Error)throw
 const fetchInput={providerInstanceId:providerId,providerConfig:{},credentials:{},providerChampionshipId:linkId,championshipId:'f1',sourceConfig:{},phase:'current',season:2026,cursor:cursor(1),signal:new AbortController().signal};
 
 async function lease(){
+  await disposeFixtureHandoff(linkId);
   await pool.query("update sync_streams set state='ready',lease_owner=null,lease_acquired_at=null,lease_expires_at=null,next_eligible_at=null where id=$1",[streamId]);
   const acquired=await scheduler.acquire(worker);assert(acquired&&acquired.stream.id===streamId);
   return {streamId,runId:acquired.run_id,workerId:worker,generation:acquired.lease_generation};
@@ -170,14 +173,18 @@ try{
   assert.equal((await scalar("select parent_source_entity_id from provider_source_entities where external_id='cross-scope-child'")).parent_source_entity_id,null);
   console.log('Références parent durables, typées, même périmètre et rejeu idempotent : OK');
 
-  await pool.query(`insert into event_corrections(id,event_id,provider_key,field_name,provider_value,override_value,status,created_by) values('lot56-c-override','evt-002','fixture','name','"Provider"','"Local"','active','maintainer') on conflict(event_id,field_name) do update set override_value='"Local"',status='active'`);
-  await pool.query("update events set provider_key='lot56-c-fixture',external_id='override-safe' where id='evt-002'");
+  // 0037 makes legacy event_corrections read-only. Exercise the current
+  // source correction contract instead of writing an obsolete fixture table.
+  await execute(result([item('override-safe',{name:'Provider'})],10));
+  const protectedSource=(await scalar("select id from provider_source_entities where external_id='override-safe'")).id;
+  const protection=new SourceProtectionService();
+  const correction=await protection.upsertCorrection({sourceEntityId:protectedSource,fieldPath:'name',overrideValue:'Local',origin:'administrator',actorId:'maintainer',reason:'Synthetic source override proof'});
   await Promise.all([
     execute(result([item('override-safe',{name:'Provider changed'})],11)),
-    pool.query(`update event_corrections set override_value='"Local"'::jsonb,updated_at=now() where id='lot56-c-override'`)
+    protection.upsertCorrection({sourceEntityId:protectedSource,fieldPath:'name',overrideValue:'Local',origin:'administrator',actorId:'maintainer',reason:'Concurrent synthetic source override proof'})
   ]);
-  assert.equal((await scalar("select override_value from event_corrections where id='lot56-c-override'")).override_value,'Local');
-  assert.equal((await scalar("select manual_override_active from provider_source_changes where source_entity_id=(select id from provider_source_entities where external_id='override-safe') order by id desc limit 1")).manual_override_active,true);
+  assert.equal((await scalar('select override_value from provider_source_corrections where id=$1',[correction.id])).override_value,'Local');
+  assert.equal((await scalar("select manual_override_active from provider_source_changes where source_entity_id=$1 order by id desc limit 1",[protectedSource])).manual_override_active,true);
   console.log('Override actif préservé pendant mise à jour source : OK');
 
   const secret='LOT56_C_CANARY_SECRET';

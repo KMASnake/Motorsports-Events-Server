@@ -1,3 +1,4 @@
+import {disposeFixtureHandoff} from './test-support/dispose-acquisition-fixture-handoff.mjs';
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {pool} from '../apps/api/dist/lib/db.js';
@@ -17,7 +18,7 @@ const fetchInput={providerInstanceId:provider,providerConfig:{},credentials:{},r
 const item=name=>({entityKind:'event',externalId:'protected-event',identityIsSynthetic:false,parentExternalId:null,parentEntityKind:null,season:1969,sourceData:{name,status:'scheduled',starts_at:'1969-07-20T20:17:00Z'}});
 const result=(items,page,complete=true)=>({status:'complete',items,itemAnomalies:[],nextCursor:{page},requestCount:1,complete,completionReason:complete?'end_of_collection':null});
 const adapter=value=>({fetchWorkUnit:async input=>{await input.requestGate.beforeRequest();return value;}});
-const lease=async worker=>{const generation=Number((await pool.query('select lease_generation from sync_streams where id=$1',[stream])).rows[0].lease_generation)+1,runId=randomUUID();await pool.query(`update sync_streams set state='running',lease_owner=$2,lease_acquired_at=$3,lease_expires_at=$4,lease_generation=$5 where id=$1`,[stream,worker,clock.now(),new Date(clock.now().getTime()+600000),generation]);await pool.query(`insert into sync_runs(id,stream_id,worker_id,lease_generation,work_class,cursor_before,status,request_id) values($1,$2,$3,$4,'current','{}','running',$5)`,[runId,stream,worker,generation,randomUUID()]);return {streamId:stream,runId,workerId:worker,generation};};
+const lease=async worker=>{await disposeFixtureHandoff(link);const generation=Number((await pool.query('select lease_generation from sync_streams where id=$1',[stream])).rows[0].lease_generation)+1,runId=randomUUID();await pool.query(`update sync_streams set state='running',lease_owner=$2,lease_acquired_at=$3,lease_expires_at=$4,lease_generation=$5 where id=$1`,[stream,worker,clock.now(),new Date(clock.now().getTime()+600000),generation]);await pool.query(`insert into sync_runs(id,stream_id,worker_id,lease_generation,work_class,cursor_before,status,request_id) values($1,$2,$3,$4,'current','{}','running',$5)`,[runId,stream,worker,generation,randomUUID()]);return {streamId:stream,runId,workerId:worker,generation};};
 const execute=async(value,label,beforeCommit)=>acquisition.executeUnit({providerInstanceId:provider,providerChampionshipId:link,season:1969,workClass:'current_global',safeUnitKey:label,lease:await lease(label),adapter:adapter(value),fetchInput,beforeCommit});
 const scalar=async(sql,params=[])=>(await pool.query(sql,params)).rows[0];
 
