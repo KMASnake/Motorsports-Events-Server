@@ -71,6 +71,7 @@ const files={
   f54Doc:path('f5_4_doc','docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md'),
   f55Doc:path('f5_5_doc','docs/handoff/LOT-5.7-P-F5-5-CANONICAL-MEETING-EVENT-RESOLUTION.md'),
   f56Doc:path('f5_6_doc','docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md'),
+  r0Doc:path('r0_doc','docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md'),
   f57d1Doc:path('f5_7d1_doc','docs/handoff/LOT-5.7-P-F5-7D1-REAL-PROVIDER-CERTIFICATION.md'),
   taxonomyAdr:path('taxonomy_adr','docs/handbook/architecture/ADR-0023-CANONICAL-TAXONOMY.md'),
   discoveryAdr:path('discovery_adr','docs/handbook/architecture/ADR-0026-PROVIDER-DISCOVERY-RESOLUTION.md'),
@@ -368,7 +369,7 @@ assert.equal(f5.authorized_subphase,null);
   assert.equal(f56.evidence,'docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md');
 // Certification bornée D0/D1 : aucune autorisation d'exécution future.
 const f57=f5.subphases?.['F5-7'];
-exactKeys(f57,['status','implementation_complete','maintainer_validated','authorized_subphase','authorized','authorization_scope','subphases','do_not_retry_provider','provider_execution_authorized','offline_replay_authorized','real_database_access_authorized'],'F5-7');
+exactKeys(f57,['status','implementation_complete','maintainer_validated','authorized_subphase','authorized','authorization_scope','subphases','do_not_retry_provider','provider_execution_authorized','offline_replay_authorized','real_database_access_authorized','r0_governance'],'F5-7');
 const incomplete=value=>{
   assert.equal(value.status,'in-progress');
   assert.equal(value.implementation_complete,false);
@@ -380,13 +381,13 @@ assert.equal(f57.authorized,false);
 assert.equal(f57.authorization_scope,'Completed D0/D1 certification only; no further execution authorized');
 assert.equal(f57.do_not_retry_provider,true);
 for(const flag of ['provider_execution_authorized','offline_replay_authorized','real_database_access_authorized'])assert.equal(f57[flag],false);
-exactKeys(f57.subphases,['F5-7D','F5-7E','F5-7F'],'sous-phases F5-7');
+exactKeys(f57.subphases,['F5-7A','F5-7B','F5-7C','F5-7D','F5-7E','F5-7F'],'sous-phases F5-7');
 const f57d=f57.subphases['F5-7D'];
 exactKeys(f57d,['status','implementation_complete','maintainer_validated','authorized_subphase','subphases'],'F5-7D');
 incomplete(f57d);
-exactKeys(f57d.subphases,['F5-7D0','F5-7D1'],'tranches F5-7D');
+exactKeys(f57d.subphases,['F5-7D0','F5-7D1','F5-7D2'],'tranches F5-7D');
 for(const stage of ['F5-7E','F5-7F']){
-  assert.deepEqual(f57.subphases[stage],{status:'not-started',authorized:false,implementation_complete:false});
+  assert.deepEqual(f57.subphases[stage],{status:'not-started',authorized:false,implementation_complete:false,maintainer_validated:false,contract:`docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#${stage.toLowerCase()}`});
 }
 const f57d0=f57d.subphases['F5-7D0'],f57d1=f57d.subphases['F5-7D1'];
 const sliceKeys=['status','implementation_complete','maintainer_validated','maintainer_validation_date','evidence','git_head','git_tree'];
@@ -421,6 +422,231 @@ assert.equal(d1Proof.replay_2.publications_created,0);assert.equal(d1Proof.repla
 for(const count of ['new_canonical_resources','new_public_changes','new_public_versions','new_normalization_decisions'])assert.equal(d1Proof.replay_2[count],0);
 assert.deepEqual(d1Proof.replay_2.before_after,{provider_invariants:[1,1,158],meetings:26,events:108,public_changes:134,public_versions:134,candidates:158,decisions:316,reviews:24});
 assert.deepEqual(d1Proof.ci,{legacy:{workflow:'Validate legacy Python server',run_number:293,conclusion:'SUCCESS'},node:{workflow:'CI — Node target',run_number:562,conclusion:'SUCCESS'}});
+
+// R0 définit les conditions futures et conserve toute exécution interdite.
+const expectedR0={
+  "status": "complete",
+  "governance_only": true,
+  "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md",
+  "base_head": "6ef82caaa5228ceee8badd27e0b10aa200bacf82",
+  "base_tree": "c2b5ffd68c2125d045aafaa2d561a95358f07a11",
+  "definition_date": "2026-10-05",
+  "implementation_authorized": false,
+  "execution_authorized": false,
+  "target_mvp_championships": [
+    "F1",
+    "Formula E",
+    "MotoGP",
+    "Moto2",
+    "Moto3",
+    "WRC",
+    "WSBK",
+    "WSSP"
+  ],
+  "certified_real_championships": [
+    "F1"
+  ],
+  "post_d1_audit": {
+    "conclusion": "PASS",
+    "P1": [],
+    "P2_open": [
+      "P2-01",
+      "P2-02",
+      "P2-03",
+      "P2-04",
+      "P2-05",
+      "P2-06"
+    ],
+    "P3_resolved": [
+      "P3-01"
+    ],
+    "P3_open": [
+      "P3-02",
+      "P3-03"
+    ]
+  },
+  "certified_governance_ci": {
+    "git_head": "6ef82caaa5228ceee8badd27e0b10aa200bacf82",
+    "provenance": "Maintainer supplied; no external access in R0",
+    "legacy": {
+      "run_number": 294,
+      "conclusion": "SUCCESS"
+    },
+    "node": {
+      "run_number": 563,
+      "conclusion": "SUCCESS"
+    }
+  }
+};
+assert.deepEqual(f57.r0_governance,expectedR0,'R0: état, couverture ou autorisations incohérents');
+for(const stage of ['F5-7A','F5-7B','F5-7C'])assert.deepEqual(f57.subphases[stage],{status:'complete',implementation_complete:true,maintainer_validated:true,certification_provenance:'Certified current state supplied by maintainer in R0 authorization; no runtime recertification'});
+assert.deepEqual(f57d.subphases['F5-7D2'],{status:'not-started',authorized:false,implementation_complete:false,maintainer_validated:false,contract:'docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#f5-7d2',request_budget_authorized:null});
+const expectedR0Contract={
+  "schema": "post-d1-r0-v1",
+  "definition_only": true,
+  "d1_request_budget": "1/1 CONSUMED",
+  "do_not_retry_d1_provider_request": true,
+  "lot_5_dependencies": [
+    "5.8",
+    "5.9",
+    "5.10"
+  ],
+  "requirements": {
+    "d2_entry": [
+      "periodic_acquisition_path_certified",
+      "durable_acquisition_handoff_recovery",
+      "transient_retry_backoff",
+      "permanent_fail_closed_no_retry",
+      "quota_and_request_budget_enforcement",
+      "leases_fencing_duplicate_protection",
+      "crash_restart_certified",
+      "disabled_provider_championship_stream",
+      "review_without_reacquisition_loop",
+      "operational_review_handling",
+      "acquisition_publication_observability",
+      "explicit_maintainer_authorization",
+      "new_separate_provider_budget"
+    ],
+    "d2_evidence": [
+      "bounded_targets_and_cycles",
+      "identical_replay_idempotence",
+      "genuine_changes_or_approved_equivalent",
+      "effective_changes_only",
+      "publication_revisions_changes",
+      "review_queue",
+      "quotas",
+      "retry_recovery",
+      "acquisition_handoff_crash",
+      "restart",
+      "no_duplicate_publication",
+      "no_unsafe_canonical_creation",
+      "multi_provider_order_if_in_scope",
+      "positive_championship_evidence_matrix"
+    ],
+    "e_entry": [
+      "d2_certified",
+      "operational_prerequisites_certified",
+      "explicit_persistent_preprod_authorization",
+      "then_current_schema_compatible",
+      "reproducible_provider_season_mapping_policy",
+      "preprod_secrets_and_budgets",
+      "operational_reviews",
+      "monitoring_available"
+    ],
+    "e_evidence": [
+      "persistent_database",
+      "actual_schema_safe_migration",
+      "backup_before_migration",
+      "restore_verification",
+      "persistent_configuration_secrets",
+      "scheduler_initially_disabled",
+      "bounded_manual_preflight",
+      "explicit_scheduler_activation",
+      "multiple_scheduled_cycles",
+      "restart_persistence",
+      "crash_recovery",
+      "pipeline_lag",
+      "review_queue",
+      "public_api_staging_consumers",
+      "monitoring_logs_alerts",
+      "backup_restore",
+      "fail_closed_rollback_forward_fix",
+      "production_untouched"
+    ],
+    "f_mybb": [
+      "real_plugin_code",
+      "canonical_uuid",
+      "current_authentication",
+      "full_bootstrap",
+      "pagination",
+      "persistent_checkpoint",
+      "changes_sync",
+      "revision_deduplication",
+      "cursor_410_full_recovery",
+      "tombstones",
+      "cancellations",
+      "rescheduling",
+      "europe_paris_dst",
+      "outage",
+      "last_known_good",
+      "bounded_retries",
+      "credential_rotation",
+      "compatibility_versioning"
+    ],
+    "f_mobile": [
+      "stable_api_version",
+      "bootstrap",
+      "incremental_sync",
+      "checkpoint_semantics",
+      "cursor_expiration_recovery",
+      "revisions",
+      "tombstones",
+      "local_cache",
+      "auth_provisioning",
+      "revocation",
+      "quotas_rate_limits",
+      "compatibility_deprecation"
+    ],
+    "f57_exit": [
+      "a_b_c_complete",
+      "d0_complete",
+      "d1_complete",
+      "d2_complete",
+      "e_complete",
+      "f_complete",
+      "no_open_p1_p2_in_scope",
+      "required_ci_exact_sha",
+      "all_budgets_accounted",
+      "no_unauthorized_provider_execution",
+      "no_unauthorized_environment_activation",
+      "recorded_maintainer_acceptance"
+    ],
+    "f5_exit": [
+      "f5_1_to_f5_7_complete",
+      "applicable_5_8_accepted",
+      "applicable_5_9_accepted",
+      "5_10_final_acceptance_complete",
+      "declared_mvp_configuration_reviews",
+      "consumer_contract_certified",
+      "backup_restore_migration_rollback_forward_fix",
+      "security_monitoring_accepted",
+      "final_ci_exact_sha",
+      "final_maintainer_acceptance"
+    ]
+  },
+  "authorization_points": {
+    "FIRST_REPEATED_REAL_PROVIDER_AUTHORIZATION": "F5-7D2: separate maintainer authorization and NEW budget",
+    "FIRST_PERSISTENT_PREPROD_SCHEDULER_AUTHORIZATION": "F5-7E: isolated operational certification PASS and explicit maintainer authorization",
+    "FIRST_MYBB_STAGING_AUTHORIZATION": "F5-7F: explicit maintainer authorization and dedicated staging credentials",
+    "FIRST_MOBILE_DEVELOPMENT_AUTHORIZATION": "F5-7F: explicit maintainer authorization after backend sync/auth/version contract freeze",
+    "FIRST_PRODUCTION_DB_AUTHORIZATION": "Final acceptance/go-live gate and explicit bounded maintainer authorization",
+    "FIRST_PRODUCTION_PROVIDER_CONFIGURATION_AUTHORIZATION": "Separate bounded step after DB/schema/secrets validation",
+    "FIRST_PRODUCTION_SCHEDULER_AUTHORIZATION": "Separate bounded step after authorized Production one-shot/smoke PASS",
+    "FIRST_MYBB_PRODUCTION_CUTOVER_AUTHORIZATION": "Explicit cutover after MyBB staging and Production API smoke PASS",
+    "FIRST_MOBILE_PRODUCTION_AUTHORIZATION": "Explicit authorization after concerned mobile provisioning/compatibility acceptance",
+    "PRODUCTION_AUTHORIZATION_GATE": "Explicit maintainer decision after all applicable final acceptance gates; CI alone never authorizes"
+  },
+  "production_untouched_in_e": true,
+  "completion_never_authorizes_execution": true,
+  "rollback_strategies": [
+    "compatible_application_rollback",
+    "forward_corrective_migration",
+    "explicitly_safe_verified_backup_restore"
+  ],
+  "destructive_decision_history_deletion_forbidden": true
+};
+const r0Doc=read(files.r0Doc);
+const r0Marker=r0Doc.match(/<!-- R0-PRODUCTION-GATES\n([\s\S]*?)\nR0-PRODUCTION-GATES -->/);
+assert.ok(r0Marker,'R0: contrat structuré absent');
+assert.deepEqual(JSON.parse(r0Marker[1]),expectedR0Contract,'R0: contrat affaibli ou incomplet');
+for(const token of ['## F5-7D2','## F5-7E','## F5-7F','## Sorties F5-7 et F5','REAL_PROVIDER_REQUEST_BUDGET_D1=1/1 CONSUMED','DO_NOT_RETRY_D1_PROVIDER_REQUEST=YES','5.8','5.9','5.10','P3-02','P3-03','code du plugin réel','NOT_AUTHORIZED'])assert.ok(r0Doc.includes(token),`R0: clause absente ${token}`);
+// Aucun fait D0/D1 ou document de preuve certifié n'est réécrit par R0.
+const certifiedProgress=JSON.parse(git('show',`${expectedR0.base_head}:docs/handoff/PROGRESS.json`));
+const certifiedSlices=certifiedProgress.current.sub_lot_5_7_p.technical_gates['5.7-P-F'].provider_first_f5.subphases['F5-7'].subphases['F5-7D'].subphases;
+assert.deepEqual(f57d0,certifiedSlices['F5-7D0'],'R0 altère D0');
+assert.deepEqual(f57d1,certifiedSlices['F5-7D1'],'R0 altère D1');
+assert.equal(d1Doc.trim(),git('show',`${expectedR0.base_head}:${f57d1.evidence}`),'R0 altère la preuve D1');
+
 assert.equal(gateF.real_provider_execution_authorized,false);
 assert.equal(gateF.external_client_onboarding_authorized,false);
 assert.equal(gateF.production_preview_activation_authorized,false);
@@ -450,4 +676,4 @@ for(const token of [EXPECTED_F4_5_HEAD,EXPECTED_F4_5_TREE,EXPECTED_F4_6_HEAD,EXP
 assert.deepEqual(evidenceMarker(certification,'certification F4-5'),evidenceFacts,'certification F4-5 contredit la preuve runtime');
 assert.deepEqual(evidenceMarker(emptyDoc,'documentation F4-4'),evidenceFacts,'documentation F4-4 contredit la preuve runtime');
 
-console.log(JSON.stringify({status:'pass',baseline_git_head:evidence.baseline_git_head,baseline_git_tree:evidence.baseline_git_tree,f4_5_git_head:closure.git_head,f4_5_git_tree:closure.git_tree,f4_6_git_head:finalClosure.git_head,f4_6_git_tree:finalClosure.git_tree,current_head:currentHead,migration_head:migrations.at(-1),f4_5:'maintainer-validated',f4_6:'maintainer-validated',f4:'complete',f5_4:'maintainer-validated',f5_5:'maintainer-validated',f5_6:'maintainer-validated',f5_7:'in-progress',f5_7d:'in-progress',f5_7d0:'maintainer-validated',f5_7d1:'maintainer-validated'}));
+console.log(JSON.stringify({status:'pass',baseline_git_head:evidence.baseline_git_head,baseline_git_tree:evidence.baseline_git_tree,f4_5_git_head:closure.git_head,f4_5_git_tree:closure.git_tree,f4_6_git_head:finalClosure.git_head,f4_6_git_tree:finalClosure.git_tree,current_head:currentHead,migration_head:migrations.at(-1),f4_5:'maintainer-validated',f4_6:'maintainer-validated',f4:'complete',f5_4:'maintainer-validated',f5_5:'maintainer-validated',f5_6:'maintainer-validated',f5_7:'in-progress',f5_7d:'in-progress',f5_7d0:'maintainer-validated',f5_7d1:'maintainer-validated',r0:'complete-governance-only',f5_7d2:'not-started-not-authorized',f5_7e:'not-started-not-authorized',f5_7f:'not-started-not-authorized'}));

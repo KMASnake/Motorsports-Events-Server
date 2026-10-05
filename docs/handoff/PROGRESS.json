@@ -5,7 +5,7 @@
     "lot": "5",
     "name": "Providers and API synchronization core",
     "status": "lot-5.7-p-f3-proven-f4-complete-f5-7d1-maintainer-validated-gate-f-incomplete",
-    "updated_at": "2026-10-04",
+    "updated_at": "2026-10-05",
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -475,24 +475,108 @@
                             }
                           }
                         }
+                      },
+                      "F5-7D2": {
+                        "status": "not-started",
+                        "authorized": false,
+                        "implementation_complete": false,
+                        "maintainer_validated": false,
+                        "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#f5-7d2",
+                        "request_budget_authorized": null
                       }
                     }
                   },
                   "F5-7E": {
                     "status": "not-started",
                     "authorized": false,
-                    "implementation_complete": false
+                    "implementation_complete": false,
+                    "maintainer_validated": false,
+                    "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#f5-7e"
                   },
                   "F5-7F": {
                     "status": "not-started",
                     "authorized": false,
-                    "implementation_complete": false
+                    "implementation_complete": false,
+                    "maintainer_validated": false,
+                    "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#f5-7f"
+                  },
+                  "F5-7A": {
+                    "status": "complete",
+                    "implementation_complete": true,
+                    "maintainer_validated": true,
+                    "certification_provenance": "Certified current state supplied by maintainer in R0 authorization; no runtime recertification"
+                  },
+                  "F5-7B": {
+                    "status": "complete",
+                    "implementation_complete": true,
+                    "maintainer_validated": true,
+                    "certification_provenance": "Certified current state supplied by maintainer in R0 authorization; no runtime recertification"
+                  },
+                  "F5-7C": {
+                    "status": "complete",
+                    "implementation_complete": true,
+                    "maintainer_validated": true,
+                    "certification_provenance": "Certified current state supplied by maintainer in R0 authorization; no runtime recertification"
                   }
                 },
                 "do_not_retry_provider": true,
                 "provider_execution_authorized": false,
                 "offline_replay_authorized": false,
-                "real_database_access_authorized": false
+                "real_database_access_authorized": false,
+                "r0_governance": {
+                  "status": "complete",
+                  "governance_only": true,
+                  "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md",
+                  "base_head": "6ef82caaa5228ceee8badd27e0b10aa200bacf82",
+                  "base_tree": "c2b5ffd68c2125d045aafaa2d561a95358f07a11",
+                  "definition_date": "2026-10-05",
+                  "implementation_authorized": false,
+                  "execution_authorized": false,
+                  "target_mvp_championships": [
+                    "F1",
+                    "Formula E",
+                    "MotoGP",
+                    "Moto2",
+                    "Moto3",
+                    "WRC",
+                    "WSBK",
+                    "WSSP"
+                  ],
+                  "certified_real_championships": [
+                    "F1"
+                  ],
+                  "post_d1_audit": {
+                    "conclusion": "PASS",
+                    "P1": [],
+                    "P2_open": [
+                      "P2-01",
+                      "P2-02",
+                      "P2-03",
+                      "P2-04",
+                      "P2-05",
+                      "P2-06"
+                    ],
+                    "P3_resolved": [
+                      "P3-01"
+                    ],
+                    "P3_open": [
+                      "P3-02",
+                      "P3-03"
+                    ]
+                  },
+                  "certified_governance_ci": {
+                    "git_head": "6ef82caaa5228ceee8badd27e0b10aa200bacf82",
+                    "provenance": "Maintainer supplied; no external access in R0",
+                    "legacy": {
+                      "run_number": 294,
+                      "conclusion": "SUCCESS"
+                    },
+                    "node": {
+                      "run_number": 563,
+                      "conclusion": "SUCCESS"
+                    }
+                  }
+                }
               }
             }
           },
@@ -576,7 +660,7 @@
       },
       "full_lot_5_7_authorized": false
     },
-    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and F2-RPV retain their maintainer validations. F3 is complete/proven and F4 is complete. F5-1 through F5-6 are maintainer-validated. F5-7D0 and F5-7D1 are maintainer-validated and complete at their certified functional SHA. F5-7D and F5-7 remain in progress; F5-7E/F are not started and unauthorized. The real provider request budget is permanently 1/1 consumed; do not retry provider. No further offline replay or real certification DB access is authorized. F5 remains in progress. Gate F, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and F2-RPV retain their maintainer validations. F3 is complete/proven and F4 is complete. F5-1 through F5-6 are maintainer-validated. F5-7D0 and F5-7D1 are maintainer-validated and complete at their certified functional SHA. F5-7D and F5-7 remain in progress; F5-7D2/E/F are defined by R0, not started and unauthorized; R0 authorizes neither implementation nor execution. Applicable 5.8/5.9 acceptance and 5.10 final acceptance are required for F5 closure. The real provider request budget is permanently 1/1 consumed; do not retry provider. No further offline replay or real certification DB access is authorized. F5 remains in progress. Gate F, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
   "lot_5_6_approved_concepts": {
     "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
@@ -599,6 +683,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "F5-7D0 et F5-7D1 sont maintainer-validated et complets. F5-7D, F5-7 et F5 restent en cours ; F5-7E/F restent non démarrés et non autorisés. Attendre une autorisation mainteneur explicite pour toute étape suivante. Budget provider 1/1 définitivement consommé : ne jamais réessayer cette acquisition. Aucun replay offline ni accès à la DB réelle de certification n'est autorisé. Aucun déploiement, accès VPS, appel provider, worker, scheduler, Production Preview, Production, onboarding externe, Lot 5.7 complet, Lot 5.8+ ou merge main n'est autorisé."
+    "task": "F5-7D0 et F5-7D1 sont maintainer-validated et complets. F5-7D, F5-7 et F5 restent en cours ; R0 définit D2/E/F et les sorties F5-7/F5 sans autoriser leur implémentation ou exécution. D2/E/F restent non démarrés et non autorisés. Prochaine action : décision mainteneur séparée sur le périmètre des prérequis opérationnels 5.4/5.6/5.8/5.9 avant D2 ; aucune mise en œuvre n’est encore autorisée. Budget provider 1/1 définitivement consommé : ne jamais réessayer cette acquisition. Aucun replay offline ni accès à la DB réelle de certification n'est autorisé. Aucun déploiement, accès VPS, appel provider, worker, scheduler, Production Preview, Production, onboarding externe, Lot 5.7 complet, Lot 5.8+ ou merge main n'est autorisé."
   }
 }
