@@ -1,4 +1,5 @@
-import {AcquisitionRetryService} from './acquisitionRetryService.js';
+import {dueAcquisitionRetries,retryHandoffAllowsAcquisition} from './acquisitionRetryEligibility.js';
+import {AcquisitionRetryService,acquisitionRetryKey} from './acquisitionRetryService.js';
 import {classifyAcquisitionFailure,type ProviderFailureClassification} from './providerFailure.js';
 import {assertNoPendingHandoff,lockHandoffDomain,writeHandoffState} from './canonicalHandoffState.js';
 import { createHash, randomUUID } from 'node:crypto';
@@ -31,6 +32,7 @@ export class AcquisitionTransactionService{
     adapter:ProviderAdapter<P,S,C,AcquiredProviderSourceItem>;
     fetchInput:FetchWorkUnitInput<P,S,C>;
     traversalId?:string;
+    retryUnitId?:string;
     mappingVersionId?:string;
     partialErrorCodes?:readonly string[];
     beforeCommit?:()=>Promise<void>;
@@ -40,6 +42,7 @@ export class AcquisitionTransactionService{
     let retryUnitId:string|null=null;const retry=new AcquisitionRetryService(this.clock);
     const client=await pool.connect();try{await client.query('begin');
       await lockHandoffDomain(client);await assertNoPendingHandoff(client,input.providerChampionshipId);
+      if(input.retryUnitId){await client.query('select id from provider_acquisition_retry_units where id=$1 for update',[input.retryUnitId]);const due=(await dueAcquisitionRetries(this.clock.now(),1,input.retryUnitId,client,true))[0];if(!due||!retryHandoffAllowsAcquisition(due)||due.traversal_id!==input.traversalId||acquisitionRetryKey({cursor:input.fetchInput.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey})!==due.logical_unit_key)throw new Error('retry_activation_stale');}
       if(input.traversalId){
         const resumed=(await client.query(`update provider_acquisition_traversals traversal set run_id=$2,lease_generation=$7,status='running',finished_at=null from sync_streams stream,sync_runs run where traversal.id=$1 and traversal.stream_id=$3 and traversal.work_class=$4 and traversal.season=$5 and traversal.safe_unit_key=$6 and traversal.status in('running','partial') and traversal.complete=false and stream.id=traversal.stream_id and stream.lease_owner=$8 and stream.lease_generation=$7 and stream.lease_expires_at>$9 and run.id=$2 and run.stream_id=stream.id and run.worker_id=$8 and run.lease_generation=$7 and run.status='running' returning traversal.id`,[traversalId,input.lease.runId,input.lease.streamId,input.workClass,input.season,input.safeUnitKey,input.lease.generation,input.lease.workerId,this.clock.now()])).rowCount;
         if(!resumed)throw staleWorker();
@@ -50,6 +53,7 @@ export class AcquisitionTransactionService{
       if(input.mappingVersionId){const bound=await client.query(`insert into provider_acquisition_traversal_mappings(traversal_id,provider_championship_id,mapping_version_id) select traversal.id,stream.provider_championship_id,version.id from provider_acquisition_traversals traversal join sync_streams stream on stream.id=traversal.stream_id join normalization_mapping_versions version on version.id=$2 and version.provider_championship_id=stream.provider_championship_id join provider_championship_active_normalization_mappings active on active.provider_championship_id=stream.provider_championship_id and active.mapping_version_id=version.id where traversal.id=$1 on conflict(traversal_id) do nothing returning traversal_id`,[traversalId,input.mappingVersionId]);const existing=(await client.query('select mapping_version_id from provider_acquisition_traversal_mappings where traversal_id=$1',[traversalId])).rows[0];if(!bound.rowCount&&String(existing?.mapping_version_id)!==input.mappingVersionId)throw new Error('traversal_mapping_binding_failed');}
       await writeHandoffState(client,input.lease.streamId,traversalId,'ACQUIRING',this.clock.now());
       if(input.fetchInput.requestGate?.bindAcquisitionRetryUnit)retryUnitId=await retry.ensure(client,{providerId:input.providerInstanceId,streamId:input.lease.streamId,traversalId,cursor:input.fetchInput.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey});
+      if(input.retryUnitId&&retryUnitId!==input.retryUnitId)throw new Error('retry_identity_mismatch');
       await client.query('commit');
     }catch(error){await client.query('rollback');throw error;}finally{client.release();}
     let result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>;

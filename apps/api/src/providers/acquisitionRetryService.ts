@@ -7,6 +7,7 @@ import {systemClock,type Clock} from './schedulerService.js';
 import type {Jitter} from './quotaCadenceService.js';
 
 const canonical=(v:unknown):unknown=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b)).map(([k,value])=>[k,canonical(value)])):v;
+export const acquisitionRetryKey=(input:{cursor:JsonObject;workClass:string;season:number;safeUnitKey:string})=>createHash('sha256').update(JSON.stringify(canonical({cursor:input.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey}))).digest('hex');
 export type RetryState='ready'|'retry_wait'|'quota_wait'|'paused'|'permanent_failure'|'auth_failure'|'exhausted'|'succeeded';
 export const ACQUISITION_RETRY_POLICY={version:'acquisition_retry_v1',maxAttempts:5,transientMs:30000,rateLimitMs:60000,maxMs:3600000} as const;
 const terminal=(state:string)=>['paused','permanent_failure','auth_failure','exhausted','succeeded'].includes(state);
@@ -32,7 +33,7 @@ export function retryDisposition(count:number,failure:ProviderFailureClassificat
 export class AcquisitionRetryService{
   constructor(readonly clock:Clock=systemClock,readonly jitter:Jitter=max=>Math.floor(Math.random()*(max+1))){}
   async ensure(client:PoolClient,input:{providerId:string;streamId:string;traversalId:string;cursor:JsonObject;workClass:string;season:number;safeUnitKey:string}){
-    const key=createHash('sha256').update(JSON.stringify(canonical({cursor:input.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey}))).digest('hex');
+    const key=acquisitionRetryKey(input);
     const result=await client.query(`insert into provider_acquisition_retry_units(id,provider_instance_id,stream_id,traversal_id,logical_unit_key,created_at,updated_at)
       select $1,$2,s.id,t.id,$5,$6,$6 from sync_streams s join provider_championships pc on pc.id=s.provider_championship_id
       join provider_acquisition_traversals t on t.stream_id=s.id and t.id=$4 where s.id=$3 and pc.provider_instance_id=$2
