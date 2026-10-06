@@ -1,5 +1,5 @@
 import {dueAcquisitionRetries,retryHandoffAllowsAcquisition} from './acquisitionRetryEligibility.js';
-import {AcquisitionRetryService,acquisitionRetryKey} from './acquisitionRetryService.js';
+import {AcquisitionRetryService,acquisitionRetryKey,type RetryExecution} from './acquisitionRetryService.js';
 import {classifyAcquisitionFailure,type ProviderFailureClassification} from './providerFailure.js';
 import {assertNoPendingHandoff,lockHandoffDomain,writeHandoffState} from './canonicalHandoffState.js';
 import { createHash, randomUUID } from 'node:crypto';
@@ -39,6 +39,7 @@ export class AcquisitionTransactionService{
     afterPersist?:(client:PoolClient,result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>,totals:PersistedTraversalTotals)=>Promise<void>;
   }){
     const traversalId=input.traversalId??randomUUID();
+    let retryExecution:RetryExecution|undefined;
     let retryUnitId:string|null=null;const retry=new AcquisitionRetryService(this.clock);
     const client=await pool.connect();try{await client.query('begin');
       await lockHandoffDomain(client);await assertNoPendingHandoff(client,input.providerChampionshipId);
@@ -63,12 +64,16 @@ export class AcquisitionTransactionService{
       await writeHandoffState(client,input.lease.streamId,traversalId,'ACQUIRING',this.clock.now());
       if(input.fetchInput.requestGate?.bindAcquisitionRetryUnit)retryUnitId=await retry.ensure(client,{providerId:input.providerInstanceId,streamId:input.lease.streamId,traversalId,cursor:input.fetchInput.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey});
       if(input.retryUnitId&&retryUnitId!==input.retryUnitId)throw new Error('retry_identity_mismatch');
+      if(input.retryUnitId){
+        const unit=(await client.query('select row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[input.retryUnitId])).rows[0];
+        retryExecution={...input.lease,traversalId,outcomeSnapshot:unit.outcome_snapshot};
+      }
       await client.query('commit');
     }catch(error){await client.query('rollback');throw error;}finally{client.release();}
     let result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>;
     input.fetchInput.requestGate?.bindAcquisitionRetryUnit?.(retryUnitId);
     try{result=await input.adapter.fetchWorkUnit(input.fetchInput);}
-    catch(error){const classified=error as {traversalId?:string;classification?:ProviderFailureClassification};classified.classification??=classifyAcquisitionFailure(error);classified.traversalId=traversalId;const code=(error as {code?:string}).code;if(code&&input.partialErrorCodes?.includes(code)){await this.scheduler.commit({...input.lease,cursorAfter:input.fetchInput.cursor,apply:async client=>{if(retryUnitId)await retry.recordUnitFailure(client,retryUnitId,classified.classification!);await client.query(`update provider_acquisition_traversals set status='partial',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false`,[traversalId,this.clock.now(),input.lease.runId,input.lease.generation]);}});throw error;}await this.recordBlockingFailure(traversalId,input.providerChampionshipId,error,input.lease,retryUnitId);await this.scheduler.fail({...input.lease,durable:true,code:error instanceof ProviderAcquisitionError?error.anomaly.code:'acquisition_failed'});throw error;}finally{input.fetchInput.requestGate?.bindAcquisitionRetryUnit?.(null);}
+    catch(error){const classified=error as {traversalId?:string;classification?:ProviderFailureClassification};classified.classification??=classifyAcquisitionFailure(error);classified.traversalId=traversalId;const code=(error as {code?:string}).code;if(code&&input.partialErrorCodes?.includes(code)){await this.scheduler.commit({...input.lease,cursorAfter:input.fetchInput.cursor,apply:async client=>{if(retryUnitId)await retry.recordUnitFailure(client,retryUnitId,classified.classification!,retryExecution);await client.query(`update provider_acquisition_traversals set status='partial',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false`,[traversalId,this.clock.now(),input.lease.runId,input.lease.generation]);}});throw error;}await this.recordBlockingFailure(traversalId,input.providerChampionshipId,error,input.lease,retryUnitId,retryExecution);await this.scheduler.fail({...input.lease,durable:true,code:error instanceof ProviderAcquisitionError?error.anomaly.code:'acquisition_failed'});throw error;}finally{input.fetchInput.requestGate?.bindAcquisitionRetryUnit?.(null);}
     if(result.status==='cursor_invalid'){
       const failedClient=await pool.connect();try{await failedClient.query('begin');
       await failedClient.query(`update provider_acquisition_traversals set status='partial',received_items=$2,valid_items=$3,anomaly_items=$4,finished_at=$5 where id=$1 and run_id=$6 and lease_generation=$7 and complete=false`,[traversalId,result.items.length+result.itemAnomalies.length,result.items.length,result.itemAnomalies.length,this.clock.now(),input.lease.runId,input.lease.generation]);
@@ -121,9 +126,9 @@ export class AcquisitionTransactionService{
     await client.query(`insert into provider_acquisition_anomalies(id,provider_championship_id,anomaly_key,anomaly_type,scope,details,first_seen_at,last_seen_at) values($1,$2,$3,$4,'entity',$5::jsonb,$6,$6) on conflict(provider_championship_id,anomaly_key) where state='active' do update set last_seen_at=excluded.last_seen_at,occurrence_count=provider_acquisition_anomalies.occurrence_count+1,details=excluded.details,updated_at=excluded.last_seen_at`,[randomUUID(),providerChampionshipId,key,anomaly.code,JSON.stringify({index:anomaly.index,external_id:anomaly.externalId,message:anomaly.message}),now]);
   }
 
-  private async recordBlockingFailure(traversalId:string,providerChampionshipId:string,error:unknown,lease:Lease,retryUnitId:string|null){
+  private async recordBlockingFailure(traversalId:string,providerChampionshipId:string,error:unknown,lease:Lease,retryUnitId:string|null,retryExecution?:RetryExecution){
     const now=this.clock.now(),code=error instanceof ProviderAcquisitionError?error.anomaly.code:'acquisition_failed';
-    const client=await pool.connect();try{await client.query('begin');const owned=await client.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false returning id`,[traversalId,now,lease.runId,lease.generation]);if(owned.rowCount&&retryUnitId)await new AcquisitionRetryService(this.clock).recordUnitFailure(client,retryUnitId,classifyAcquisitionFailure(error));if(owned.rowCount)await client.query(`insert into provider_acquisition_anomalies(id,provider_championship_id,anomaly_key,anomaly_type,scope,details,first_seen_at,last_seen_at) values($1,$2,$3,$3,'stream','{}',$4,$4) on conflict(provider_championship_id,anomaly_key) where state='active' do update set last_seen_at=excluded.last_seen_at,occurrence_count=provider_acquisition_anomalies.occurrence_count+1,updated_at=excluded.last_seen_at`,[randomUUID(),providerChampionshipId,`stream:${code}`,now]);await client.query('commit');}catch(failure){await client.query('rollback');throw failure;}finally{client.release();}
+    const client=await pool.connect();try{await client.query('begin');if(retryUnitId&&retryExecution)await new AcquisitionRetryService(this.clock).recordUnitFailure(client,retryUnitId,classifyAcquisitionFailure(error),retryExecution);const owned=await client.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false returning id`,[traversalId,now,lease.runId,lease.generation]);if(owned.rowCount&&retryUnitId&&!retryExecution)await new AcquisitionRetryService(this.clock).recordUnitFailure(client,retryUnitId,classifyAcquisitionFailure(error));if(owned.rowCount)await client.query(`insert into provider_acquisition_anomalies(id,provider_championship_id,anomaly_key,anomaly_type,scope,details,first_seen_at,last_seen_at) values($1,$2,$3,$3,'stream','{}',$4,$4) on conflict(provider_championship_id,anomaly_key) where state='active' do update set last_seen_at=excluded.last_seen_at,occurrence_count=provider_acquisition_anomalies.occurrence_count+1,updated_at=excluded.last_seen_at`,[randomUUID(),providerChampionshipId,`stream:${code}`,now]);await client.query('commit');}catch(failure){await client.query('rollback');throw failure;}finally{client.release();}
   }
 
   private async closeTraversalFailure(traversalId:string,lease:Lease,retryUnitId:string|null,error:unknown){

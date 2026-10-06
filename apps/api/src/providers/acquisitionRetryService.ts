@@ -1,5 +1,6 @@
 import {createHash,randomUUID} from 'node:crypto';
 import type {PoolClient} from 'pg';
+import {readHandoffEnvelope} from './canonicalHandoffState.js';
 import {pool} from '../lib/db.js';
 import type {JsonObject} from './contracts.js';
 import {failureClassification,httpFailureCategory,normalizeRetryAfter,type ProviderFailureClassification} from './providerFailure.js';
@@ -8,6 +9,8 @@ import type {Jitter} from './quotaCadenceService.js';
 
 const canonical=(v:unknown):unknown=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b)).map(([k,value])=>[k,canonical(value)])):v;
 export const acquisitionRetryKey=(input:{cursor:JsonObject;workClass:string;season:number;safeUnitKey:string})=>createHash('sha256').update(JSON.stringify(canonical({cursor:input.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey}))).digest('hex');
+// Captured only after targeted activation, while the existing logical claim is held.
+export type RetryExecution={streamId:string;traversalId:string;runId:string;workerId:string;generation:number;outcomeSnapshot:string};
 export type RetryState='ready'|'retry_wait'|'quota_wait'|'paused'|'permanent_failure'|'auth_failure'|'exhausted'|'succeeded';
 export const ACQUISITION_RETRY_POLICY={version:'acquisition_retry_v1',maxAttempts:5,transientMs:30000,rateLimitMs:60000,maxMs:3600000} as const;
 const terminal=(state:string)=>['paused','permanent_failure','auth_failure','exhausted','succeeded'].includes(state);
@@ -85,10 +88,23 @@ export class AcquisitionRetryService{
   }
   // Called in the acquisition outcome transaction for local/adapter failures.
   // HTTP callbacks have already persisted authoritative charge outcomes atomically.
-  async recordUnitFailure(client:PoolClient,id:string,failure:ProviderFailureClassification){
-    const unit=(await client.query('select * from provider_acquisition_retry_units where id=$1 for update',[id])).rows[0];if(!unit)return;
+  async recordUnitFailure(client:PoolClient,id:string,failure:ProviderFailureClassification,execution?:RetryExecution){
+    if(execution){
+      // Use the existing stream -> traversal -> unit lock order. No new fencing token.
+      const stream=(await client.query('select lease_owner,lease_generation,lease_expires_at,historical_state from sync_streams where id=$1 for update',[execution.streamId])).rows[0];
+      if(!stream||stream.lease_owner!==execution.workerId||Number(stream.lease_generation)!==execution.generation||!stream.lease_expires_at||new Date(stream.lease_expires_at)<=this.clock.now())return;
+      const active=(await client.query(`select t.id from provider_acquisition_traversals t join sync_runs r on r.id=t.run_id
+        where t.id=$1 and t.stream_id=$2 and t.run_id=$3 and t.lease_generation=$4 and t.status='running' and t.complete=false
+        and r.stream_id=$2 and r.worker_id=$5 and r.lease_generation=$4 and r.status='running' for update of t`,[execution.traversalId,execution.streamId,execution.runId,execution.generation,execution.workerId])).rowCount;
+      if(!active||readHandoffEnvelope(stream.historical_state).traversals[execution.traversalId]?.state!=='ACQUIRING')return;
+    }
+    const unit=(await client.query('select u.*,row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[id])).rows[0];if(!unit)return;
     if(terminal(unit.state))return;
-    if(unit.state==='retry_wait'||unit.state==='quota_wait'||failure.code==='quota_deferred')return;
+    if(execution&&(unit.stream_id!==execution.streamId||unit.traversal_id!==execution.traversalId))return;
+    if(failure.code==='quota_deferred')return;
+    // Waiting states without current authority, or changed since activation (including
+    // HTTP/quota outcomes and duplicate dispositions), retain their durable outcome.
+    if((unit.state==='retry_wait'||unit.state==='quota_wait')&&(!execution||unit.outcome_snapshot!==execution.outcomeSnapshot))return;
     await this.transition(client,id,Number(unit.emitted_attempt_count),failure);
   }
 }

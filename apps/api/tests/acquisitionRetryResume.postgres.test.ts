@@ -3,7 +3,8 @@ import {execFile,spawn} from 'node:child_process';
 import {promisify} from 'node:util';
 import {afterAll,describe,it,expect,vi} from 'vitest';
 import {pool} from '../src/lib/db.js';
-import {AcquisitionRetryService} from '../src/providers/acquisitionRetryService.js';
+import {failureClassification,ProviderConfigurationError} from '../src/providers/providerFailure.js';
+import {AcquisitionRetryService,type RetryExecution} from '../src/providers/acquisitionRetryService.js';
 import {AcquisitionRetryResumeService} from '../src/providers/acquisitionRetryResumeService.js';
 import type {RetrySelectionCursor} from '../src/providers/acquisitionRetryEligibility.js';
 import {ProviderAdapterRegistry} from '../src/providers/registry.js';
@@ -211,6 +212,116 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
  }));
  it.each(['stream_backoff_until','next_eligible_at'])('respects future stream constraint %s',async field=>fixture(async f=>{
  await pool.query(`update sync_streams set ${field}=$2 where id=$1`,[f.stream,new Date(f.now.getTime()+60000)]);expect(await f.service.selectDue()).toEqual([]);expect((await f.service.resume(f.unit,context)).status).toBe('not_eligible');
+ }));
+
+ // A2.4-P2-01: actual targeted activation, with no synthetic transport emission.
+ const preEmissionCases=[
+  {code:'aborted',state:'paused'},
+  {code:'provider_credentials_missing',state:'permanent_failure'},
+  {code:'http_401',state:'auth_failure'},
+  {code:'http_400',state:'permanent_failure'},
+  {code:'http_429',state:'retry_wait'},
+  {code:'http_503',state:'retry_wait'},
+  {code:'timeout',state:'retry_wait'},
+  {code:'network_error',state:'retry_wait'},
+  {code:'internal_accounting_error',state:'permanent_failure'},
+  {code:'internal_callback_error',state:'permanent_failure'},
+ ];
+ it.each(['retry_wait','quota_wait'])('A2.4 pre-emission abort from %s remains paused after restart',async state=>fixture(async f=>{
+  await pool.query('update provider_acquisition_retry_units set state=$2,quota_deadline=$3 where id=$1',[f.unit,state,f.now]);
+  const controller=new AbortController();controller.abort();let emissions=0;f.behavior.inFetch=()=>{emissions++;};
+  await expect(f.service.resume(f.unit,async()=>({...await context(),signal:controller.signal}))).rejects.toMatchObject({code:'aborted',classification:{category:'CALLER_ABORTED'}});
+  expect(emissions).toBe(0);expect(await f.retry.load(f.unit)).toMatchObject({state:'paused',emitted_attempt_count:0,next_retry_at:null});
+  expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe('0');
+  const restarted=new AcquisitionRetryResumeService(f.service.adapters,{now:()=>f.now},f.scheduler,f.quota,f.service.handoff);
+  expect(await restarted.selectDue()).toEqual([]);expect((await restarted.resume(f.unit,context)).status).toBe('not_eligible');
+  const freshRetry=new AcquisitionRetryService({now:()=>f.now});expect((await freshRetry.load(f.unit)).state).toBe('paused');
+ }));
+ it.each(['retry_wait','quota_wait'])('A2.4 pre-emission disposition matrix from %s',async state=>{
+  for(const entry of preEmissionCases)await fixture(async f=>{
+   await pool.query('update provider_acquisition_retry_units set state=$2,quota_deadline=$3 where id=$1',[f.unit,state,f.now]);
+   const failure=entry.code==='provider_credentials_missing'?new ProviderConfigurationError(entry.code,'Synthetic credentials missing'):Object.assign(new Error('Synthetic pre-emission failure'),{code:entry.code,classification:failureClassification(entry.code,{...(/^http_/.test(entry.code)?{httpStatus:Number(entry.code.slice(5))}:{})})});
+   f.behavior.beforeFetch=async()=>{throw failure;};let emissions=0;f.behavior.inFetch=()=>{emissions++;};
+   await expect(f.service.resume(f.unit,context)).rejects.toBe(failure);
+   expect(emissions).toBe(0);expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe('0');
+   expect(await f.retry.load(f.unit)).toMatchObject({state:entry.state,emitted_attempt_count:0,failure_code:entry.code});
+   const restarted=new AcquisitionRetryResumeService(f.service.adapters,{now:()=>f.now},f.scheduler,f.quota,f.service.handoff);
+   expect(await restarted.selectDue()).toEqual([]);expect((await new AcquisitionRetryService({now:()=>f.now}).load(f.unit)).state).toBe(entry.state);
+   if(entry.state==='retry_wait')expect(new Date((await f.retry.load(f.unit)).next_retry_at).getTime()).toBeGreaterThan(f.now.getTime());
+  });
+ });
+ async function currentExecution(f:ResumeFixture):Promise<RetryExecution>{
+  const row=(await pool.query('select t.run_id,s.lease_owner,s.lease_generation,row_to_json(u)::text outcome_snapshot from provider_acquisition_traversals t join sync_streams s on s.id=t.stream_id join provider_acquisition_retry_units u on u.traversal_id=t.id where u.id=$1',[f.unit])).rows[0];
+  return {streamId:f.stream,traversalId:f.traversal,runId:row.run_id,workerId:row.lease_owner,generation:Number(row.lease_generation),outcomeSnapshot:row.outcome_snapshot};
+ }
+ async function recordFailure(f:ResumeFixture,execution:RetryExecution|undefined,code:string){
+  const client=await pool.connect();try{await client.query('begin');await f.retry.recordUnitFailure(client,f.unit,failureClassification(code),execution);await client.query('commit');}catch(error){await client.query('rollback');throw error;}finally{client.release();}
+ }
+ it.each(['succeeded','exhausted','permanent_failure','auth_failure','paused'])('A2.4 protects terminal %s from late outcomes with and without current context',async state=>fixture(async f=>{
+  f.behavior.beforeFetch=async()=>{
+   const execution=await currentExecution(f);
+   await pool.query('update provider_acquisition_retry_units set state=$2,next_retry_at=null,emitted_attempt_count=$3 where id=$1',[f.unit,state,state==='exhausted'?5:0]);
+   const before=await f.retry.load(f.unit);
+   for(const code of ['aborted','provider_credentials_missing','network_error']){await recordFailure(f,execution,code);await recordFailure(f,undefined,code);expect(await f.retry.load(f.unit)).toEqual(before);}
+   throw new ProviderConfigurationError('provider_credentials_missing','Synthetic');
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({code:'provider_credentials_missing'});expect((await f.retry.load(f.unit)).state).toBe(state);
+ }));
+ it.each(['owner','generation','expired','run','traversal','identity','handoff'])('A2.4 rejects stale %s authority against a newer waiting execution',async change=>fixture(async f=>{
+  let checked=false;
+  f.behavior.beforeFetch=async()=>{
+   const current=await currentExecution(f);const stale={...current};
+   if(change==='owner')stale.workerId='old-worker';
+   else if(change==='generation')stale.generation--;
+   else if(change==='run')stale.runId=randomUUID();
+   else if(change==='traversal')stale.traversalId=randomUUID();
+   else if(change==='identity')stale.streamId=randomUUID();
+   else if(change==='expired')await pool.query('update sync_streams set lease_expires_at=$2 where id=$1',[f.stream,f.now]);
+   else await pool.query('update sync_streams set historical_state=$2::jsonb where id=$1',[f.stream,JSON.stringify({canonical_handoff_v1:{version:1,traversals:{[f.traversal]:{state:'HANDOFF_PENDING',attempts:0,updated_at:f.now.toISOString(),error_code:null}}}})]);
+   const before=await f.retry.load(f.unit);await recordFailure(f,stale,'aborted');expect(await f.retry.load(f.unit)).toEqual(before);checked=true;
+   throw new ProviderConfigurationError('provider_credentials_missing','Synthetic');
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toThrow();expect(checked).toBe(true);
+ }));
+ it.each(['aborted','network_error'])('A2.4 duplicate current %s disposition is idempotent',async code=>fixture(async f=>{
+  f.behavior.beforeFetch=async()=>{
+   const execution=await currentExecution(f);await recordFailure(f,execution,code);const before=await f.retry.load(f.unit);
+   f.now.setTime(f.now.getTime()+1);await recordFailure(f,execution,code);expect(await f.retry.load(f.unit)).toEqual(before);
+   throw Object.assign(new Error('Synthetic abort'),{code:'aborted',classification:failureClassification('aborted')});
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({code:'aborted'});expect((await f.retry.load(f.unit)).state).toBe(code==='aborted'?'paused':'retry_wait');
+ }));
+ it('A2.4 preserves a newer authoritative HTTP outcome even against current local configuration failure',async()=>fixture(async f=>{
+  f.behavior.beforeFetch=async()=>{
+   const execution=await currentExecution(f);const charge=await f.quota.authorize(f.provider,'current',f.stream,f.unit);expect(charge.allowed).toBe(true);
+   await f.quota.recordOutcome(charge.chargeId!,{metadata:{status:503,headers:{'retry-after':'120'}},streamId:f.stream});
+   const before=await f.retry.load(f.unit);await recordFailure(f,execution,'provider_credentials_missing');expect(await f.retry.load(f.unit)).toEqual(before);
+   throw new ProviderConfigurationError('provider_credentials_missing','Synthetic');
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({code:'provider_credentials_missing'});
+  expect(await f.retry.load(f.unit)).toMatchObject({state:'retry_wait',emitted_attempt_count:1,failure_category:'HTTP_TRANSIENT',retry_after_state:'valid'});
+ }));
+ it('A2.4 old activated run cannot change a newer run on the same unit',async()=>fixture(async f=>{
+  let checked=false;
+  f.behavior.beforeFetch=async()=>{
+   const old=await currentExecution(f),newRun=randomUUID(),worker='replacement-retry',generation=old.generation+1;
+   const client=await pool.connect();try{
+    await client.query('begin');await client.query('select id from sync_streams where id=$1 for update',[f.stream]);
+    await client.query("update sync_runs set status='interrupted' where id=$1",[old.runId]);
+    await client.query("insert into sync_runs(id,stream_id,worker_id,lease_generation,work_class,cursor_before,status,request_id) values($1,$2,$3,$4,'current','{\"page\":1}','running',$5)",[newRun,f.stream,worker,generation,randomUUID()]);
+    await client.query('update sync_streams set lease_owner=$2,lease_generation=$3,lease_expires_at=$4 where id=$1',[f.stream,worker,generation,new Date(f.now.getTime()+120000)]);
+    await client.query("update provider_acquisition_traversals set run_id=$2,lease_generation=$3,status='running' where id=$1",[f.traversal,newRun,generation]);
+    await client.query('commit');
+   }catch(error){await client.query('rollback');throw error;}finally{client.release();}
+   const before=await f.retry.load(f.unit);await recordFailure(f,old,'aborted');await recordFailure(f,old,'provider_credentials_missing');expect(await f.retry.load(f.unit)).toEqual(before);checked=true;
+   throw new ProviderConfigurationError('provider_credentials_missing','Old synthetic execution');
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toThrow('stale_worker');expect(checked).toBe(true);expect((await f.retry.load(f.unit)).state).toBe('retry_wait');
+  expect((await pool.query('select status from provider_acquisition_traversals where id=$1',[f.traversal])).rows[0].status).toBe('running');
+ }));
+ it('A2.4 unqualified late waiting failure retains the authoritative deadline',async()=>fixture(async f=>{
+  const before=await f.retry.load(f.unit);for(const code of ['aborted','provider_credentials_missing','network_error'])await recordFailure(f,undefined,code);
+  expect(await f.retry.load(f.unit)).toEqual(before);
  }));
 
 });
