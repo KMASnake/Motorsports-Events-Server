@@ -1,5 +1,5 @@
 import {AcquisitionRetryService} from './acquisitionRetryService.js';
-import type {ProviderFailureClassification} from './providerFailure.js';
+import {failureClassification,type ProviderFailureClassification} from './providerFailure.js';
 import { randomUUID } from 'node:crypto';
 import { pool } from '../lib/db.js';
 import type { ProviderResponseMetadata, QuotaObservation } from './contracts.js';
@@ -65,7 +65,36 @@ export class QuotaCadenceService{
       await client.query(`update provider_quota_runtime set last_request_at=$2,last_blocking_reason=null,next_eligible_at=null,updated_at=$2 where provider_instance_id=$1`,[providerId,now]);await client.query('commit');return {allowed:true,chargeId,next_eligible_at:null,blocking_reason:null,quota_snapshot:snapshot};
     }catch(error){await client.query('rollback');throw error;}finally{client.release();}
   }
-  async markNotEmitted(chargeId:string){const client=await pool.connect();try{await client.query('begin');await client.query(`select q.provider_instance_id from provider_quota_runtime q join provider_request_charges c on c.provider_instance_id=q.provider_instance_id join provider_acquisition_retry_charges r on r.charge_id=c.id where c.id=$1 for update of q`,[chargeId]);const charge=(await client.query(`update provider_request_charges set emitted=false,outcome='not_emitted' where id=$1 and emitted is null returning *`,[chargeId])).rows[0];if(charge){const timezone=(await client.query(`select coalesce(provider_timezone,'UTC') timezone from provider_quota_policies where provider_instance_id=$1`,[charge.provider_instance_id])).rows[0]?.timezone??'UTC';for(const kind of ['minute','hour','day','month']){const start=windowStart(new Date(charge.charged_at),kind as any,timezone);await client.query(`update provider_quota_windows set consumed=greatest(0,consumed-1),updated_at=now() where provider_instance_id=$1 and window_kind=$2 and window_started_at=$3`,[charge.provider_instance_id,kind,start]);}await client.query(`update provider_quota_runtime set last_request_at=(select max(charged_at) from provider_request_charges where provider_instance_id=$1 and emitted is distinct from false),updated_at=now() where provider_instance_id=$1`,[charge.provider_instance_id]);}await client.query('commit');}catch(e){await client.query('rollback');throw e;}finally{client.release();}}
+  private async refundNotEmitted(client:import('pg').PoolClient,chargeId:string){
+    const charge=(await client.query(`update provider_request_charges set emitted=false,outcome='not_emitted' where id=$1 and emitted is null returning *`,[chargeId])).rows[0];
+    if(!charge)return;
+    await client.query("update provider_acquisition_retry_charges set emission_disposition='confirmed_not_emitted' where charge_id=$1",[chargeId]);
+    const timezone=(await client.query(`select coalesce(provider_timezone,'UTC') timezone from provider_quota_policies where provider_instance_id=$1`,[charge.provider_instance_id])).rows[0]?.timezone??'UTC';
+    for(const kind of ['minute','hour','day','month'] as const){const start=windowStart(new Date(charge.charged_at),kind,timezone);await client.query(`update provider_quota_windows set consumed=greatest(0,consumed-1),updated_at=now() where provider_instance_id=$1 and window_kind=$2 and window_started_at=$3`,[charge.provider_instance_id,kind,start]);}
+    await client.query(`update provider_quota_runtime set last_request_at=(select max(charged_at) from provider_request_charges where provider_instance_id=$1 and emitted is distinct from false),updated_at=now() where provider_instance_id=$1`,[charge.provider_instance_id]);
+  }
+  async markNotEmitted(chargeId:string){const client=await pool.connect();try{await client.query('begin');await client.query(`select q.provider_instance_id from provider_quota_runtime q join provider_request_charges c on c.provider_instance_id=q.provider_instance_id join provider_acquisition_retry_charges r on r.charge_id=c.id where c.id=$1 for update of q`,[chargeId]);await this.refundNotEmitted(client,chargeId);await client.query('commit');}catch(e){await client.query('rollback');throw e;}finally{client.release();}}
+  // Offline evidence disposition only. No stale detection, provider I/O or retry execution.
+  async resolveIndeterminateEmission(input:{chargeId:string;disposition:'confirmed_not_emitted'|'confirmed_emitted';evidenceReference:string}){
+    if(!['confirmed_not_emitted','confirmed_emitted'].includes(input.disposition)||!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$/.test(input.evidenceReference))throw new Error('emission_disposition_evidence_invalid');
+    const client=await pool.connect();try{await client.query('begin');
+      await client.query(`select q.provider_instance_id from provider_quota_runtime q join provider_request_charges c on c.provider_instance_id=q.provider_instance_id join provider_acquisition_retry_charges r on r.charge_id=c.id where c.id=$1 for update of q`,[input.chargeId]);
+      const charge=(await client.query(`select c.emitted,r.emission_disposition from provider_request_charges c join provider_acquisition_retry_charges r on r.charge_id=c.id where c.id=$1 for update of c,r`,[input.chargeId])).rows[0];
+      if(!charge)throw new Error('emission_disposition_charge_not_found');
+      if(charge.emitted!==null){
+        if(charge.emission_disposition!==input.disposition)throw new Error('emission_disposition_conflict');
+        await client.query('commit');return;
+      }
+      if(input.disposition==='confirmed_not_emitted')await this.refundNotEmitted(client,input.chargeId);
+      else{
+        await client.query("update provider_request_charges set emitted=true,outcome='emission_confirmed_outcome_unknown' where id=$1 and emitted is null",[input.chargeId]);
+        // Confirmation of emission is not proof of provider success/failure. Require operator action.
+        await new AcquisitionRetryService(this.clock,this.jitter).recordCharge(client,input.chargeId,{classification:failureClassification('emission_confirmed_outcome_unknown')});
+      }
+      await client.query('update provider_acquisition_retry_charges set disposition_evidence_reference=$2,disposed_at=$3 where charge_id=$1',[input.chargeId,input.evidenceReference,this.clock.now()]);
+      await client.query('commit');
+    }catch(e){await client.query('rollback');throw e;}finally{client.release();}
+  }
   async recordOutcome(chargeId:string,input:{metadata?:ProviderResponseMetadata;observation?:QuotaObservation|readonly QuotaObservation[]|null;errorCode?:string;classification?:ProviderFailureClassification;streamId?:string|null}){const now=this.clock.now();const client=await pool.connect();try{await client.query('begin');
       // Retry-bound operations take the existing quota runtime lock before the unit lock.
       const retryBound=await client.query(`select q.provider_instance_id from provider_quota_runtime q join provider_request_charges c on c.provider_instance_id=q.provider_instance_id join provider_acquisition_retry_charges r on r.charge_id=c.id where c.id=$1 for update of q`,[chargeId]);

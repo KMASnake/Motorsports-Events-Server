@@ -42,7 +42,9 @@ Synthetic adapters without a quota-backed gate do not claim emitted accounting.
 
 Terminal dispositions remain terminal even if another previously reserved
 request later succeeds; truthful emitted accounting still advances. At five,
-failed/terminal units become exhausted. Success of the logical acquisition
+failed/terminal units other than `succeeded` become exhausted. A committed
+`succeeded` state cannot be replaced by exhaustion, auth/permanent failure,
+or retryable failure; late distinct emissions still advance truthful accounting. Success of the logical acquisition
 closes `ready` atomically with source/checkpoint persistence. A repeated HTTP
 outcome never changes state or timestamps. Quota deferral preserves a prior
 retry deadline. An admission deadline check refuses an early request; it does
@@ -64,7 +66,74 @@ cannot exceed five; concurrent authorization cannot create a sixth reserved
 slot. An authorization not emitted retains count zero; `markNotEmitted` releases
 its slot through the existing emitted=false charge transition. A crash with an
 unknown emission leaves its reservation blocked, not guessed as emitted or
-reclaimed. Automatic recovery of ambiguous requests is not implemented here.
+reclaimed. The link explicitly persists `emission_disposition=indeterminate`;
+this is also the initial unconfirmed live reservation disposition, not an
+assertion that a stale request has been detected. `confirmed_not_emitted` and
+`confirmed_emitted` mirror the authoritative charge transitions. The database
+requires `counted` exactly when the disposition is `confirmed_emitted`.
+
+### Explicit offline disposition
+
+`QuotaCadenceService.resolveIndeterminateEmission({chargeId, disposition,
+evidenceReference})` is an internal primitive without a route, CLI, scheduler
+consumer or network reconciliation. The caller must possess external/offline
+proof of emission or non-emission and supply a safe opaque reference (1–80
+characters from letters, digits, `.`, `_`, `:`, `-`; starting with a letter or
+digit). Store no evidence body, URL, credential or exception text. The primitive
+validates the reference format, not the external evidence itself; deciding
+whether the proof is sufficient remains the trusted recovery caller's duty.
+The reference and `disposed_at` persist atomically with the decision.
+
+- `confirmed_not_emitted`: the existing quota refund transition releases only
+  that reservation. No confirmed attempt increments, no unit state is reopened,
+  and no acquisition is executed. Future eligibility remains governed by the
+  unit state, quota and future A2.3.
+- `confirmed_emitted`: the existing sovereign charge is marked emitted and
+  counted exactly once in the same transaction. Emission proof alone establishes
+  no provider outcome. Code `emission_confirmed_outcome_unknown` therefore keeps
+  a nonterminal unit operator-blocked (`permanent_failure`); at five it becomes
+  `exhausted`. Existing terminal success stays succeeded. No provider health
+  success/failure is invented and no quota consumption is refunded.
+- No evidence: retain `indeterminate` and its budget slot indefinitely. Neither
+  age, restart nor timeout can release or count it automatically.
+
+The quota runtime lock serializes ordinary outcome/refund and offline disposition.
+Repeating the same final disposition is an exact no-op, preserving the first
+reference/timestamp; an opposite disposition raises `emission_disposition_conflict`.
+There is no override or reopening of resolved charges. The same charge cannot be
+resolved both ways, and unrelated reservation rows remain unchanged. A late
+ordinary callback for an already resolved charge remains idempotent under the
+existing charge transition guard.
+
+The provider-call safety budget is confirmed emitted attempts PLUS all unresolved
+slots, at most five. Confirmed emitted telemetry counts only known emission.
+Explicit recovery prevents an orphan from having no supported disposition path;
+without sufficient evidence a unit can intentionally remain blocked permanently.
+Releasing an unknown slot or manufacturing emission evidence is forbidden.
+
+### Crash windows
+
+| Window | Durable contract and offline disposition |
+| --- | --- |
+| A: reserved, provably before emission | Initially indeterminate; non-emission evidence permits explicit `confirmed_not_emitted`, refunding one slot. |
+| B: during emission | Indeterminate unless external evidence proves emission/non-emission; retain the slot. |
+| C: possible emission before confirmation | Same as B; never infer non-emission from the missing callback. |
+| D: confirmed emitted without known outcome | Explicit emission proof can create this state; count once and block for operator action. Normal callbacks confirm emission and outcome atomically, so they expose no separate committed D window. |
+| E: response received but transaction uncommitted | Indeterminate after rollback/crash; use evidence if available, otherwise retain the slot. A committed callback has already counted atomically. |
+
+No automatic stale detection, timeout release, indeterminate recovery, due
+selection, retry execution or provider reconciliation is implemented.
+
+### Migration decision
+
+0042 is unpublished, uncertified and undeployed; the maintainer explicitly
+permits completing its schema in this correction. Extend its new charge-link
+table with disposition/evidence fields and consistency checks. Do not introduce
+0043 or rewrite certified migrations 0001–0041. Relative to certified base
+5083075 this remains additive. Empty DOWN/reapplication remains supported; populated
+DOWN still refuses without deleting retry state. Local databases built from the
+superseded candidate 0042 must be recreated; no deployed schema is claimed to
+upgrade in place.
 
 Outcome operations for linked charges acquire the same quota runtime lock before
 retry unit mutation. Charge, count, disposition and health all rollback together
@@ -126,7 +195,7 @@ quota, repository, schema, typecheck/lint/build/governance and dependency audit
 remain required. Successful local tests are candidate evidence, not maintainer
 validation or A2.3/A3/A4 authorization.
 
-Observed local candidate validation:
+Initial candidate validation (40de189, before the targeted correction):
 
 - A2.2: 34 PostgreSQL tests passed, including independent-process reload,
   reservation/outcome races, rollback and a preexisting HANDOFF_BACKOFF envelope.
@@ -141,3 +210,15 @@ Observed local candidate validation:
   override are unchanged.
 - Disposable resources were removed. No provider call, real credential/DB access,
   worker/scheduler daemon, preprod/production access, deployment or push occurred.
+
+Targeted correction validation (local evidence, not maintainer certification):
+
+- 50 A2.2 PostgreSQL cases passed, including stale success protection through the
+  fifth emission, concurrent contradictions, explicit evidence idempotence,
+  exact single-slot/quota refund and indeterminate links read by a new process.
+- A2.1 accounting: 11; A1: 31; quota: 64; acquisition/scheduler, 40 existing
+  canonical pipeline cases and 14 F5-7D handoff cases passed on disposable DBs.
+- API: 599 passed / 150 default PostgreSQL skips; web: 119 passed;
+  repository: 193 / 18 skips. Typecheck, lint, API/web builds and governance passed.
+- npm audit high exited 0 with the same two moderate advisories; certified
+  dependency metadata is unchanged. Disposable resources were removed.

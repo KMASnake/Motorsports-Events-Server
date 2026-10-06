@@ -141,4 +141,79 @@ describe.skipIf(!enabled)('A2.2 durable retry on disposable PostgreSQL',()=>{
  const unit=(await pool.query('select * from provider_acquisition_retry_units where stream_id=$1 and traversal_id<>$2',[f.stream,f.traversal])).rows[0];expect(unit).toMatchObject({emitted_attempt_count:1,state:kind==='success'?'succeeded':'permanent_failure',next_retry_at:null});if(kind==='cursor_invalid')expect(unit.failure_code).toBe('cursor_invalid');
  }));
 
+ it.each(['timeout','http_429','http_503','http_404','http_401'])('committed success is terminal under late unit failure %s',async code=>fixture(async f=>{
+ const charge=await authorize(f);await f.quota.recordOutcome(charge,{metadata:{status:200,headers:{}},streamId:f.stream});
+ const c=await pool.connect();try{await c.query('begin');await f.retry.completeUnit(c,f.unit);await c.query('commit');const before=await f.retry.load(f.unit);
+ await c.query('begin');await f.retry.recordUnitFailure(c,f.unit,failureClassification(code));await f.retry.completeUnit(c,f.unit);await c.query('commit');expect(await f.retry.load(f.unit)).toEqual(before);
+ expect(await processReload(f.unit)).toEqual({emitted_attempt_count:1,state:'succeeded',next_retry_at:null});
+ }finally{c.release();}
+ }));
+ it('late emitted outcomes including the fifth preserve committed success',async()=>fixture(async f=>{
+ const charges=await Promise.all(Array.from({length:5},()=>authorize(f)));await f.quota.recordOutcome(charges[0],{metadata:{status:200,headers:{}},streamId:f.stream});
+ const c=await pool.connect();try{await c.query('begin');await f.retry.completeUnit(c,f.unit);await c.query('commit');}finally{c.release();}
+ await Promise.all(charges.slice(1).map((charge,i)=>f.quota.recordOutcome(charge,{metadata:{status:[429,503,401,404][i],headers:{}},streamId:f.stream})));
+ expect(await f.retry.load(f.unit)).toMatchObject({state:'succeeded',emitted_attempt_count:5,next_retry_at:null});expect((await f.quota.authorize(f.provider,'current',f.stream,f.unit)).allowed).toBe(false);
+ }));
+ it('concurrent duplicate success and stale failures cannot reopen committed success',async()=>fixture(async f=>{
+ const charge=await authorize(f);await f.quota.recordOutcome(charge,{metadata:{status:200,headers:{}},streamId:f.stream});
+ const commit=async(failure=false)=>{const c=await pool.connect();try{await c.query('begin');if(failure)await f.retry.recordUnitFailure(c,f.unit,failureClassification('timeout'));else await f.retry.completeUnit(c,f.unit);await c.query('commit');}finally{c.release();}};
+ await commit();await Promise.all(Array.from({length:12},(_,i)=>commit(i%2===0)));expect(await f.retry.load(f.unit)).toMatchObject({state:'succeeded',emitted_attempt_count:1,next_retry_at:null});
+ }));
+ it('the underlying transition also protects succeeded after restart',async()=>fixture(async f=>{
+ const c=await pool.connect();try{await c.query('begin');await f.retry.completeUnit(c,f.unit);await c.query('commit');
+ const retry=new AcquisitionRetryService({now:()=>f.now},()=>0);await c.query('begin');await retry.transition(c,f.unit,0,failureClassification('timeout'));await c.query('commit');expect(await processReload(f.unit)).toEqual({emitted_attempt_count:0,state:'succeeded',next_retry_at:null});
+ }finally{c.release();}
+ }));
+ it('persists five indeterminate slots with zero telemetry, without automatic release across restart',async()=>fixture(async f=>{
+ await Promise.all(Array.from({length:5},()=>authorize(f)));advance(f);
+ expect(await processReload(f.unit)).toEqual({emitted_attempt_count:0,state:'ready',next_retry_at:null});
+ const restarted=await promisify(execFile)('node',['-e',"const {Pool}=require('pg');const p=new Pool({connectionString:process.env.DATABASE_URL});p.query(`select count(*) n from provider_acquisition_retry_charges r join provider_request_charges c on c.id=r.charge_id where r.retry_unit_id=$1 and c.emitted is null and r.emission_disposition='indeterminate' and not r.counted`,[process.argv[1]]).then(r=>{console.log(r.rows[0].n);return p.end();});",f.unit]);expect(restarted.stdout.trim()).toBe('5');
+ const rows=(await pool.query('select emission_disposition,counted,disposed_at from provider_acquisition_retry_charges where retry_unit_id=$1',[f.unit])).rows;
+ expect(rows).toHaveLength(5);expect(rows.every(r=>r.emission_disposition==='indeterminate'&&!r.counted&&r.disposed_at===null)).toBe(true);
+ expect((await f.quota.authorize(f.provider,'current',f.stream,f.unit)).blocking_reason).toBe('acquisition_retry_budget_reserved');
+ }));
+ it('explicit not-emitted evidence releases exactly one slot once, preserving other reservations',async()=>fixture(async f=>{
+ const charges=await Promise.all(Array.from({length:5},()=>authorize(f)));const before=(await pool.query('select * from provider_acquisition_retry_charges where charge_id=$1',[charges[1]])).rows[0];
+ const input={chargeId:charges[0],disposition:'confirmed_not_emitted' as const,evidenceReference:'audit:before-fetch:1'};
+ await f.quota.resolveIndeterminateEmission(input);const resolved=(await pool.query('select * from provider_acquisition_retry_charges where charge_id=$1',[charges[0]])).rows[0];
+ expect(Number((await pool.query("select consumed from provider_quota_windows where provider_instance_id=$1 and window_kind='minute'",[f.provider])).rows[0].consumed)).toBe(4);
+ advance(f);await f.quota.resolveIndeterminateEmission(input);expect(Number((await pool.query("select consumed from provider_quota_windows where provider_instance_id=$1 and window_kind='minute'",[f.provider])).rows[0].consumed)).toBe(4);expect((await pool.query('select * from provider_acquisition_retry_charges where charge_id=$1',[charges[0]])).rows[0]).toEqual(resolved);
+ expect(resolved).toMatchObject({emission_disposition:'confirmed_not_emitted',counted:false,disposition_evidence_reference:input.evidenceReference});expect(resolved.disposed_at).toBeInstanceOf(Date);
+ expect((await pool.query('select * from provider_acquisition_retry_charges where charge_id=$1',[charges[1]])).rows[0]).toEqual(before);expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);
+ const decisions=await Promise.all([f.quota.authorize(f.provider,'current',f.stream,f.unit),f.quota.authorize(f.provider,'current',f.stream,f.unit)]);expect(decisions.filter(d=>d.allowed)).toHaveLength(1);
+ }));
+ it('explicit emitted evidence counts once and leaves unknown outcome operator-blocked without changing health',async()=>fixture(async f=>{
+ const charge=await authorize(f);const health=(await pool.query('select * from provider_quota_runtime where provider_instance_id=$1',[f.provider])).rows[0];
+ const input={chargeId:charge,disposition:'confirmed_emitted' as const,evidenceReference:'audit:transport:2'};
+ await Promise.all(Array.from({length:10},()=>f.quota.resolveIndeterminateEmission(input)));
+ expect(await processReload(f.unit)).toEqual({emitted_attempt_count:1,state:'permanent_failure',next_retry_at:null});
+ expect((await pool.query('select * from provider_quota_runtime where provider_instance_id=$1',[f.provider])).rows[0]).toEqual(health);
+ expect((await pool.query('select emission_disposition,counted,disposition_evidence_reference from provider_acquisition_retry_charges where charge_id=$1',[charge])).rows[0]).toEqual({emission_disposition:'confirmed_emitted',counted:true,disposition_evidence_reference:input.evidenceReference});
+ await expect(f.quota.resolveIndeterminateEmission({...input,disposition:'confirmed_not_emitted'})).rejects.toThrow('emission_disposition_conflict');
+ }));
+ it('five explicit emitted confirmations exhaust once under concurrent duplicate resolutions',async()=>fixture(async f=>{
+ const charges=await Promise.all(Array.from({length:5},()=>authorize(f)));await Promise.all(charges.flatMap(chargeId=>Array.from({length:3},()=>f.quota.resolveIndeterminateEmission({chargeId,disposition:'confirmed_emitted',evidenceReference:'audit:emission'}))));
+ expect(await processReload(f.unit)).toEqual({emitted_attempt_count:5,state:'exhausted',next_retry_at:null});advance(f);expect((await f.quota.authorize(f.provider,'current',f.stream,f.unit)).allowed).toBe(false);
+ }));
+ it('contradictory concurrent dispositions have one winner and preserve ledger consistency',async()=>fixture(async f=>{
+ const charge=await authorize(f);const results=await Promise.allSettled(['confirmed_emitted','confirmed_not_emitted'].map(disposition=>f.quota.resolveIndeterminateEmission({chargeId:charge,disposition:disposition as 'confirmed_emitted'|'confirmed_not_emitted',evidenceReference:'audit:race'})));
+ expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);const rejected=results.find(r=>r.status==='rejected') as PromiseRejectedResult;expect(rejected.reason.message).toBe('emission_disposition_conflict');
+ const c=(await pool.query('select emitted from provider_request_charges where id=$1',[charge])).rows[0];expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(c.emitted?1:0);
+ }));
+ it('rejects disposition without a safe evidence reference or retry-bound charge',async()=>fixture(async f=>{
+ const charge=await authorize(f);await expect(f.quota.resolveIndeterminateEmission({chargeId:charge,disposition:'confirmed_emitted',evidenceReference:''})).rejects.toThrow('emission_disposition_evidence_invalid');
+ await expect(f.quota.resolveIndeterminateEmission({chargeId:randomUUID(),disposition:'confirmed_emitted',evidenceReference:'audit:missing'})).rejects.toThrow('emission_disposition_charge_not_found');
+ expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);
+ }));
+ it('rolls back explicit emission disposition and evidence if retry counting fails',async()=>fixture(async f=>{
+ const charge=await authorize(f);const spy=vi.spyOn(AcquisitionRetryService.prototype,'recordCharge').mockRejectedValueOnce(new Error('injected disposition failure'));
+ try{await expect(f.quota.resolveIndeterminateEmission({chargeId:charge,disposition:'confirmed_emitted',evidenceReference:'audit:atomic'})).rejects.toThrow('injected disposition failure');}finally{spy.mockRestore();}
+ expect((await pool.query('select emitted from provider_request_charges where id=$1',[charge])).rows[0].emitted).toBeNull();expect((await pool.query('select emission_disposition,counted,disposition_evidence_reference from provider_acquisition_retry_charges where charge_id=$1',[charge])).rows[0]).toEqual({emission_disposition:'indeterminate',counted:false,disposition_evidence_reference:null});
+ }));
+ it('normal authoritative callbacks maintain the same explicit emission dispositions',async()=>fixture(async f=>{
+ const a=await authorize(f),b=await authorize(f);await f.quota.markNotEmitted(a);await failure(f,b);
+ expect((await pool.query('select emission_disposition from provider_acquisition_retry_charges where charge_id=$1',[a])).rows[0].emission_disposition).toBe('confirmed_not_emitted');
+ expect((await pool.query('select emission_disposition from provider_acquisition_retry_charges where charge_id=$1',[b])).rows[0].emission_disposition).toBe('confirmed_emitted');
+ }));
+
 });

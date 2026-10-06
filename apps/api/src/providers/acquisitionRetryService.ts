@@ -57,18 +57,20 @@ export class AcquisitionRetryService{
     const unit=(await client.query('select * from provider_acquisition_retry_units where id=$1 for update',[link.retry_unit_id])).rows[0];
     const charge=(await client.query('select emitted from provider_request_charges where id=$1',[chargeId])).rows[0];
     if(charge?.emitted!==true)return;
-    const counted=await client.query('update provider_acquisition_retry_charges set counted=true where charge_id=$1 and counted=false returning charge_id',[chargeId]);if(!counted.rowCount)return;
+    const counted=await client.query("update provider_acquisition_retry_charges set counted=true,emission_disposition='confirmed_emitted' where charge_id=$1 and counted=false returning charge_id",[chargeId]);if(!counted.rowCount)return;
     const count=Number(unit.emitted_attempt_count)+1;
     if(count>Number(unit.max_emitted_attempts))throw new Error('retry_attempt_budget_exceeded');
     const now=this.clock.now();
     const failure=input.classification??(input.errorCode?failureClassification(input.errorCode,{httpStatus:input.status??null}):input.status!==undefined&&(input.status<200||input.status>=300)?failureClassification(`http_${input.status}`,{category:httpFailureCategory(input.status),httpStatus:input.status,...normalizeRetryAfter(input.headers?.['retry-after'],now)}):null);
     await client.query('update provider_acquisition_retry_units set emitted_attempt_count=$2,last_charge_id=$3 where id=$1',[unit.id,count,chargeId]);
-    if(terminal(unit.state)){await client.query("update provider_acquisition_retry_units set state=case when $3=5 then 'exhausted' else state end,updated_at=$2 where id=$1",[unit.id,now,count]);return;}
+    if(terminal(unit.state)){await client.query("update provider_acquisition_retry_units set state=case when state<>'succeeded' and $3=5 then 'exhausted' else state end,updated_at=$2 where id=$1",[unit.id,now,count]);return;}
     await this.transition(client,unit.id,count,failure,input.quotaDeadline);
     if(input.quotaIndefinite&&failure)await client.query("update provider_acquisition_retry_units set state='quota_wait',next_retry_at=null where id=$1 and state='retry_wait'",[unit.id]);
     if(!failure)await client.query("update provider_acquisition_retry_units set state='ready' where id=$1",[unit.id]);
   }
   async transition(client:PoolClient,id:string,count:number,failure:ProviderFailureClassification|null,additionalQuotaDeadline:Date|null=null){
+    const protectedUnit=(await client.query('select state from provider_acquisition_retry_units where id=$1 for update',[id])).rows[0];
+    if(protectedUnit?.state==='succeeded')return;
     const now=this.clock.now();
     const row=(await client.query(`select greatest(r.provider_backoff_until,r.next_eligible_at,s.stream_backoff_until,u.quota_deadline) deadline from provider_acquisition_retry_units u join sync_streams s on s.id=u.stream_id left join provider_quota_runtime r on r.provider_instance_id=u.provider_instance_id where u.id=$1`,[id])).rows[0];
     const existing=row?.deadline?new Date(row.deadline):null;
@@ -84,7 +86,7 @@ export class AcquisitionRetryService{
   // HTTP callbacks have already persisted authoritative charge outcomes atomically.
   async recordUnitFailure(client:PoolClient,id:string,failure:ProviderFailureClassification){
     const unit=(await client.query('select * from provider_acquisition_retry_units where id=$1 for update',[id])).rows[0];if(!unit)return;
-    if(terminal(unit.state)&&unit.state!=='succeeded')return;
+    if(terminal(unit.state))return;
     if(unit.state==='retry_wait'||unit.state==='quota_wait'||failure.code==='quota_deferred')return;
     await this.transition(client,id,Number(unit.emitted_attempt_count),failure);
   }

@@ -36,7 +36,14 @@ create table provider_acquisition_retry_units (
 create table provider_acquisition_retry_charges (
   charge_id uuid primary key references provider_request_charges(id) on delete cascade,
   retry_unit_id uuid not null references provider_acquisition_retry_units(id) on delete cascade,
-  counted boolean not null default false
+  counted boolean not null default false,
+  emission_disposition text not null default 'indeterminate'
+    check(emission_disposition in ('indeterminate','confirmed_not_emitted','confirmed_emitted')),
+  disposition_evidence_reference text check(disposition_evidence_reference ~ '^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$'),
+  disposed_at timestamptz,
+  check(counted = (emission_disposition='confirmed_emitted')),
+  check((disposition_evidence_reference is null) = (disposed_at is null)),
+  check(disposition_evidence_reference is null or emission_disposition<>'indeterminate')
 );
 create index provider_acquisition_retry_charges_unit_idx
   on provider_acquisition_retry_charges(retry_unit_id);
