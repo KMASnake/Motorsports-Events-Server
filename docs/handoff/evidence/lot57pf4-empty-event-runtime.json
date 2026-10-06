@@ -1,0 +1,32 @@
+{
+  "schema": "lot57pf4-empty-event-runtime-v1",
+  "status": "pass",
+  "evidence_classification": "maintainer-supplied-runtime-certification",
+  "baseline_git_head": "8553fb9c1b69790169f46a6e96ba4f02d8cf6601",
+  "baseline_git_tree": "dc0a25485a2ef056617ec4421cd84c5bbc28d0f1",
+  "runtime_mode": "docker",
+  "migration_head": "0031_real_circuit_reference_data",
+  "calendar_empty": true,
+  "harness_rc": 0,
+  "cleanup": {
+    "containers": 0,
+    "networks": 0,
+    "temp_dirs": 0
+  },
+  "provider_calls": 0,
+  "worker_started": false,
+  "preprod_mutated": false,
+  "production_mutated": false,
+  "ci": {
+    "legacy": {
+      "workflow": "Validate legacy Python server",
+      "run_number": 261,
+      "conclusion": "SUCCESS"
+    },
+    "node": {
+      "workflow": "CI — Node target",
+      "run_number": 530,
+      "conclusion": "SUCCESS"
+    }
+  }
+}

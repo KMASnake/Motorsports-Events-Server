@@ -1,7 +1,11 @@
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { MedsIcon } from './icons';
 import { NAVIGATION_SECTIONS } from './navigation';
 import { MotorsportsEventsLogo } from '../branding/MotorsportsEventsLogo';
+import { adminAuthorization } from '../../lib/adminAuth';
+
+const API = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:3001' : '');
 
 export function Sidebar({
   open,
@@ -10,6 +14,17 @@ export function Sidebar({
   open: boolean;
   onNavigate: () => void;
 }) {
+  const [correctionCount, setCorrectionCount] = useState<number | null>(null);
+  const [version, setVersion] = useState('Version indisponible');
+  useEffect(() => {
+    void fetch(`${API}/api/v1/admin/corrections`, { credentials: 'include', headers: adminAuthorization() })
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((rows: unknown[]) => setCorrectionCount(rows.length))
+      .catch(() => setCorrectionCount(null));
+    void fetch(`${API}/health`).then((response) => response.ok ? response.json() : Promise.reject())
+      .then((health: { version?: string }) => setVersion(health.version && health.version !== 'unknown' ? health.version : 'Version indisponible'))
+      .catch(() => setVersion('Version indisponible'));
+  }, []);
   return (
     <aside className={`sidebar ${open ? 'is-open' : ''}`} aria-label="Navigation principale">
       <div className="logo">
@@ -30,7 +45,7 @@ export function Sidebar({
               >
                 <i><MedsIcon name={item.icon} size={17} /></i>
                 <span>{item.label}</span>
-                {item.badge !== undefined && <b>{item.badge}</b>}
+                {item.path === '/corrections' && correctionCount !== null && correctionCount > 0 && <b>{correctionCount}</b>}
               </NavLink>
             ))}
           </div>
@@ -39,7 +54,7 @@ export function Sidebar({
 
       <footer>
         <div className="exit"><MedsIcon name="logout" size={18} /></div>
-        <span>8.1.0-alpha.2-lot.4.4<br/><small>© 2026 Motorsports Events</small></span>
+        <span>{version}<br/><small>© 2026 Motorsports Events</small></span>
       </footer>
     </aside>
   );

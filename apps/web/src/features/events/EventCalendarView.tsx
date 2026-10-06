@@ -10,6 +10,7 @@ interface Props {
   championships: Championship[];
   selectedId: string | null;
   onSelect: (event: EventRow) => void;
+  onEdit: (event: EventRow) => void;
   onCreateAt: (date: Date) => void;
   onCreateRange: (start: Date, end: Date) => void;
   onMove: (event: EventRow, date: Date) => void;
@@ -17,7 +18,10 @@ interface Props {
 
 const week = ['LUN.', 'MAR.', 'MER.', 'JEU.', 'VEN.', 'SAM.', 'DIM.'];
 
-export function EventCalendarView({ month, events, championships, selectedId, onSelect, onCreateAt, onCreateRange, onMove }: Props) {
+export function selectCalendarEvent(event:EventRow,onSelect:(event:EventRow)=>void,click:{stopPropagation:()=>void}){click.stopPropagation();onSelect(event);}
+export function editCalendarEvent(event:EventRow,onEdit:(event:EventRow)=>void,click:{stopPropagation:()=>void}){click.stopPropagation();onEdit(event);}
+
+export function EventCalendarView({ month, events, championships, selectedId, onSelect, onEdit, onCreateAt, onCreateRange, onMove }: Props) {
   const days = buildCalendarDays(month, events);
   const [rangeStart, setRangeStart] = useState<Date | null>(null);
   function selectRange(date: Date) { if (!rangeStart) setRangeStart(date); else { onCreateRange(rangeStart, date); setRangeStart(null); } }
@@ -33,12 +37,13 @@ export function EventCalendarView({ month, events, championships, selectedId, on
           onDragStart={(e)=>e.dataTransfer.setData('text/event-id',event.id)}
           className={`events-calendar-chip status-${event.status}${selectedId === event.id ? ' selected' : ''}`}
           style={{ '--event-color': eventColor(event, championships) } as React.CSSProperties}
-          onClick={(click) => { click.stopPropagation(); onSelect(event); }}
+          onClick={(click) => selectCalendarEvent(event,onSelect,click)}
+          onDoubleClick={(click) => editCalendarEvent(event,onEdit,click)}
           aria-pressed={selectedId === event.id}
         >
           <strong className="event-chip-brand"><img src={assetRegistry.championship(event.championship_slug,event.championship_logo_url).src} alt=""/><span>{event.championship_name}</span>{assetRegistry.country(event.country_code).src&&<img className="event-chip-flag" src={assetRegistry.country(event.country_code).src!} alt={assetRegistry.country(event.country_code).alt}/>}</strong>
-          <span>{event.name}</span>
-          <small>{event.session_title ?? event.category ?? (event.published ? 'Publié' : 'Privé')}</small>
+          <span>{event.meeting_name ?? event.name}</span>
+          <small>{event.session_title ?? (event.meeting_name ? event.name : event.category ?? (event.published ? 'Publié' : 'Privé'))}</small>
           {event.correction_count ? <em title="Correction locale">✎ {event.correction_count}</em> : null}
         </button>)}
         {day.events.length > 3 && <small className="events-calendar-more">+ {day.events.length - 3} autre(s)</small>}
