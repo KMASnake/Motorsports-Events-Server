@@ -75,6 +75,7 @@ export async function fetchProviderJson(input: {
     'Callback fournisseur interne en échec.', context.httpStatus ?? undefined, null, null,
     {...context, callbackStage:stage}
   );
+  if(input.signal?.aborted)throw new ProviderHttpError('aborted','Appel annulé avant émission.');
   let authorization: Awaited<ReturnType<ProviderRequestGate['beforeRequest']>> | undefined;
   try { authorization = await input.gate?.beforeRequest(); }
   catch { throw callbackError('beforeRequest'); }
@@ -84,7 +85,8 @@ export async function fetchProviderJson(input: {
     authorization.reason??null, authorization.nextEligibleAt??null
   );
   const chargeId=authorization?.chargeId;
-  try { input.counter?.increment(); } catch { throw callbackError('requestCounter', false); }
+  if(input.signal?.aborted){if(chargeId)await input.gate?.cancelAuthorization?.(chargeId);throw new ProviderHttpError('aborted','Appel annulé avant émission.');}
+  try { input.counter?.increment(); } catch { if(chargeId)await input.gate?.cancelAuthorization?.(chargeId);throw callbackError('requestCounter', false); }
   const controller = new AbortController();
   let timedOut = false;
   let outcomeAttempted = false;

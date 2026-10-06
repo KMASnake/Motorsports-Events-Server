@@ -39,7 +39,8 @@ export const APPLICATION_SCHEMA_MIGRATIONS = [
   '0038_f5_canonical_publication',
   '0039_f5_confirmed_event_status',
   '0040_f5_canonical_timezone_nullability',
-  '0041_f5_revisioned_normalization_decisions'
+  '0041_f5_revisioned_normalization_decisions',
+  '0042_acquisition_retry_state'
 ] as const;
 
 export const APPLICATION_SCHEMA_HEAD = APPLICATION_SCHEMA_MIGRATIONS.at(-1)!;

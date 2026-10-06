@@ -64,7 +64,7 @@ suite('F57D mandatory no-network production handoff gate',()=>{
       failureStage='quota_authorization';
       try{const result=await authorize(...args);console.info('F57D_QUOTA_GATE',JSON.stringify({allowed:result.allowed,blockingReason:result.blocking_reason}));return result;}catch(error){capture(error);throw error;}
     });
-    expect((await pool.query('select version from schema_migrations order by version desc limit 1')).rows[0].version).toBe('0041_f5_revisioned_normalization_decisions');
+    expect((await pool.query('select version from schema_migrations order by version desc limit 1')).rows[0].version).toBe('0042_acquisition_retry_state');
     expect((await pool.query('select count(*)::int count from sync_streams where lease_owner is not null')).rows[0].count).toBe(0);
     await pool.query("insert into championships(id,slug,name,season,active,sync_enabled) values('f1','f1','F57D F1 Fixture',$1,true,false) on conflict(id) do nothing",[year]);
     expect((await pool.query("select active from championships where id='f1'")).rows[0].active).toBe(true);

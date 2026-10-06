@@ -35,6 +35,7 @@ export interface ProviderAdapterContext<ProviderConfig extends JsonObject> {
 
 export interface ProviderRequestGate {
   readonly failureDomain?: 'accounting' | 'callback';
+  bindAcquisitionRetryUnit?(unitId: string | null): void;
   beforeRequest(): Promise<{ allowed: boolean; chargeId?: string; nextEligibleAt?: string | null; reason?: string | null }>;
   afterResponse(chargeId: string, response: ProviderResponseMetadata): Promise<void>;
   afterError(chargeId: string, error: { code: string; statusCode?: number; classification?: ProviderFailureClassification }): Promise<void>;
