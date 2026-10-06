@@ -38,6 +38,15 @@ for explicit bounded pagination, including pages emptied by identity/barrier
 refusals. Advancing this cursor avoids starvation behind unavailable checkpoints;
 no internal paging loop is added. Returned descriptors are hints, never activation tokens.
 
+The cursor deadline is canonical UTC text with six fractional digits, derived by
+PostgreSQL from the exact effective-deadline expression. The informational JavaScript
+`Date` is not used for pagination. Next-page comparisons cast the text back to
+`timestamptz` and compare strictly after `(deadline, UUID)` at PostgreSQL precision.
+JSON cursor round-trips preserve adjacent microseconds. Non-null cursors must contain
+a canonical timestamp and UUID; missing/null fields, invalid calendar dates and
+non-canonical representations are rejected before querying. Only an absent cursor
+has first-page semantics.
+
 The current durable stream checkpoint is restored using the registered adapter and
 its cursor version. The restored input plus traversal work class, season and safe
 unit key must reproduce the certified A2.2 SHA-256 logical identity. The canonical
@@ -85,6 +94,24 @@ handoff serialization root before changing traversal/handoff state or entering t
 adapter. The retry ID returned by the certified ensure operation must match the
 selected ID. Changed state, deadline, budget, cursor or handoff ownership blocks the
 request. Quota admission again enforces the sovereign budget/deadline rules.
+
+At this post-lease boundary, initialization re-reads the current durable stream
+checkpoint and cursor version while `assertNoPendingHandoff` holds the stream row
+lock. It restores that current cursor through the selected adapter, verifies the
+current traversal/work class/season/safe-unit key and associations against the
+target, and recomputes the certified logical hash. Both this reconstructed identity
+and the invocation's input must match the claimed retry unit. Supersession refuses
+initialization before any adapter execution, provider reservation or attempt increment;
+the newer checkpoint is preserved. The session advisory claim remains held throughout.
+
+Normal checkpoint writers do not acquire the A2.3 advisory lock. They share stream
+row locking and existing scheduler lease rules: reset/history rebuild/season queue
+refuse a leased stream; scheduler rollover only occurs during eligible lease
+acquisition; checkpoint commit requires the current owner, generation and unexpired
+lease. Initialization's row lock serializes the authoritative read with concurrent
+checkpoint transactions. A controlled SQL writer that advances the checkpoint before
+this read is also detected. This check does not fence arbitrary SQL writes or physical
+HTTP after the initialization transaction commits; A3 remains a separate boundary.
 
 ## A1 barrier
 
@@ -134,7 +161,7 @@ late handoff ownership, emission accounting, quota refusal/abort and crash recov
 A2.2/A2.1/A1, acquisition/scheduler/quota, repository, typecheck/lint/build, governance
 and npm audit high remain required. Local evidence is not maintainer validation.
 
-Observed local candidate evidence:
+Original candidate evidence (before the targeted correction):
 
 - A2.3: 53 focused PostgreSQL cases passed, including keyset pagination, twelve
   distinct concurrent claims, an actual killed claim process, late quota outcome,
@@ -154,3 +181,13 @@ hash. It remains refused; explicit pagination permits selecting later reconstruc
 work. This is a fail-closed reconstruction limitation, not permission to reset the
 stream or create a new traversal/budget. Local evidence remains a candidate for an
 independent maintainer audit, not an operational/production authorization.
+
+Targeted correction regression coverage reproduces adjacent microsecond deadlines,
+equal-deadline UUID ordering, limit-one pagination with every stable row returned
+exactly once, JSON cursor round-trip and malformed-cursor rejection. Supersession
+tests mutate the checkpoint after lease commit, including a separate transaction
+that initialization demonstrably waits for, and verify zero transport calls, zero
+new charges, unchanged attempt count and preservation of `page:99`. Changed work
+class, season, safe-unit key, traversal and cursor version are refused; the unchanged
+`page:1` identity remains executable. Restart and the existing A1/budget/claim tests
+remain covered. These are technical correction proofs, not maintainer certification.

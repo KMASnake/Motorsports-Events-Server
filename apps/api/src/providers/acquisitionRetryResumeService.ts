@@ -20,7 +20,7 @@ export class AcquisitionRetryResumeService{
     const adapter=this.adapters.get(work.adapter_key);if(!adapter)return null;
     try{const cursor=adapter.restoreCursor(work.cursor,Number(work.cursor_version));return acquisitionRetryKey({cursor,workClass:work.work_class,season:work.season,safeUnitKey:work.safe_unit_key})===work.logical_unit_key?{adapter,cursor}:null;}catch{return null;}
   }
-  async selectDuePage(limit=10,after:RetrySelectionCursor|null=null){const candidates=await dueAcquisitionRetries(this.clock.now(),limit,null,pool,false,after);const last=candidates.at(-1);return {units:candidates.filter(work=>this.restore(work)!==null),nextCursor:last?{deadline:last.effective_deadline,id:last.id}:null};}
+  async selectDuePage(limit=10,after:RetrySelectionCursor|null=null){const candidates=await dueAcquisitionRetries(this.clock.now(),limit,null,pool,false,after);const last=candidates.at(-1);return {units:candidates.filter(work=>this.restore(work)!==null),nextCursor:last?{deadline:last.effective_deadline_key,id:last.id}:null};}
   async selectDue(limit=10){return (await this.selectDuePage(limit)).units;}
   // Explicit one-unit call only. Credentials are supplied by a trusted caller, never loaded here.
   async resume(id:string,prepare:(work:DueAcquisitionRetry)=>Promise<RetryContext>){

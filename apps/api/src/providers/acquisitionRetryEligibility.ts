@@ -4,14 +4,23 @@ import {readHandoffEnvelope} from './canonicalHandoffState.js';
 import type {JsonObject} from './contracts.js';
 import type {AcquisitionWorkClass} from './acquisitionOrchestrator.js';
 
-export type DueAcquisitionRetry={id:string;provider_instance_id:string;stream_id:string;traversal_id:string;logical_unit_key:string;work_class:AcquisitionWorkClass;season:number;safe_unit_key:string;provider_championship_id:string;championship_id:string;cursor:JsonObject;cursor_version:number;phase:'current'|'historical';historical_state:JsonObject;mapping_version_id:string|null;effective_deadline:Date;adapter_key:string};
+export type DueAcquisitionRetry={id:string;provider_instance_id:string;stream_id:string;traversal_id:string;logical_unit_key:string;work_class:AcquisitionWorkClass;season:number;safe_unit_key:string;provider_championship_id:string;championship_id:string;cursor:JsonObject;cursor_version:number;phase:'current'|'historical';historical_state:JsonObject;mapping_version_id:string|null;effective_deadline:Date;effective_deadline_key:string;adapter_key:string};
 const deadline=`greatest(u.next_retry_at,u.local_backoff_until,u.quota_deadline,case when u.retry_after_state='valid' then u.retry_after_at end,q.provider_backoff_until,q.next_eligible_at,s.stream_backoff_until,s.next_eligible_at)`;
-export type RetrySelectionCursor={deadline:Date;id:string};
+export type RetrySelectionCursor={deadline:string;id:string};
+function validateSelectionCursor(cursor:RetrySelectionCursor|null){
+  if(cursor===null)return;
+  if(!cursor||typeof cursor!=='object'||Array.isArray(cursor)||typeof cursor.deadline!=='string'||typeof cursor.id!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(cursor.id))throw new Error('retry_selection_cursor_invalid');
+  const parts=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.\d{6}Z$/.exec(cursor.deadline);
+  if(!parts)throw new Error('retry_selection_cursor_invalid');
+  const [year,month,day,hour,minute,second]=parts.slice(1).map(Number),leap=year%4===0&&(year%100!==0||year%400===0),days=[31,leap?29:28,31,30,31,30,31,31,30,31,30,31];
+  if(year<1||month<1||month>12||day<1||day>days[month-1]||hour>23||minute>59||second>59)throw new Error('retry_selection_cursor_invalid');
+}
 export function retryHandoffAllowsAcquisition(row:DueAcquisitionRetry){try{const entry=readHandoffEnvelope(row.historical_state).traversals[row.traversal_id];return !entry||entry.state==='ACQUIRING';}catch{return false;}}
 // SQL is bounded before decoding cursor/handoff. Invalid or superseded identities fail closed.
 export async function dueAcquisitionRetries(now:Date,limit:number,id:string|null=null,client:Pick<PoolClient,'query'>=pool,owned=false,after:RetrySelectionCursor|null=null){
   if(!Number.isSafeInteger(limit)||limit<1||limit>100)throw new Error('retry_selection_limit_invalid');
-  const rows=(await client.query<DueAcquisitionRetry>(`select u.id,u.provider_instance_id,u.stream_id,u.traversal_id,u.logical_unit_key,t.work_class,t.season,t.safe_unit_key,s.provider_championship_id,pc.championship_id,s.cursor,s.cursor_version,s.phase,s.historical_state,p.adapter_key,m.mapping_version_id,${deadline} effective_deadline
+  validateSelectionCursor(after);
+  const rows=(await client.query<DueAcquisitionRetry>(`select u.id,u.provider_instance_id,u.stream_id,u.traversal_id,u.logical_unit_key,t.work_class,t.season,t.safe_unit_key,s.provider_championship_id,pc.championship_id,s.cursor,s.cursor_version,s.phase,s.historical_state,p.adapter_key,m.mapping_version_id,${deadline} effective_deadline,to_char(${deadline} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') effective_deadline_key
     from provider_acquisition_retry_units u join provider_acquisition_traversals t on t.id=u.traversal_id and t.stream_id=u.stream_id
     join sync_streams s on s.id=u.stream_id join provider_championships pc on pc.id=s.provider_championship_id and pc.provider_instance_id=u.provider_instance_id
     join provider_instances p on p.id=u.provider_instance_id join championships c on c.id=pc.championship_id

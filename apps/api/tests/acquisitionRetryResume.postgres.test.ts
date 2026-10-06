@@ -5,6 +5,7 @@ import {afterAll,describe,it,expect,vi} from 'vitest';
 import {pool} from '../src/lib/db.js';
 import {AcquisitionRetryService} from '../src/providers/acquisitionRetryService.js';
 import {AcquisitionRetryResumeService} from '../src/providers/acquisitionRetryResumeService.js';
+import type {RetrySelectionCursor} from '../src/providers/acquisitionRetryEligibility.js';
 import {ProviderAdapterRegistry} from '../src/providers/registry.js';
 import {QuotaCadenceService} from '../src/providers/quotaCadenceService.js';
 import {PersistentSchedulerService} from '../src/providers/schedulerService.js';
@@ -19,7 +20,7 @@ async function fixture(run:(f:{unit:string;stream:string;traversal:string;provid
  const retry=new AcquisitionRetryService(clock,()=>0),quota=new QuotaCadenceService(clock,()=>0),scheduler=new PersistentSchedulerService(clock);
  const behavior:{status:number;complete:boolean;requests:number;inFetch?:()=>void;beforeFetch?:(input:FetchWorkUnitInput<JsonObject,JsonObject,JsonObject>)=>Promise<void>}={status:200,complete:false,requests:1};
  const fetch=vi.fn(async(input:FetchWorkUnitInput<JsonObject,JsonObject,JsonObject>)=>{await behavior.beforeFetch?.(input);for(let request=0;request<behavior.requests;request++)await fetchProviderJson({url:new URL('https://fixture.test/'),allowedHosts:['fixture.test'],gate:input.requestGate,signal:input.signal,now:()=>now,fetchImpl:vi.fn(async()=>{behavior.inFetch?.();return new Response('{}',{status:behavior.status,headers:{'content-type':'application/json'}});})});return {status:'progress' as const,items:[],itemAnomalies:[],nextCursor:{page:2},requestCount:behavior.requests,complete:behavior.complete,completionReason:null};});
- const adapter:ProviderAdapter<JsonObject,JsonObject,JsonObject,AcquiredProviderSourceItem>={key:'fixture',capabilities:{supportsChampionshipDiscovery:false,supportsSeasonDiscovery:false,supportsQuotaHeaders:false,supportsConnectionTest:false},providerConfigVersion:1,sourceConfigVersion:1,cursorVersion:1,providerForm:()=>[],championshipForm:()=>[],validateProviderConfig:()=>({}),validateSourceConfig:()=>({}),initialCursor:()=>({page:1}),validateCursor:v=>v as JsonObject,serializeCursor:v=>v,restoreCursor:v=>({page:1,...v as JsonObject}),fetchWorkUnit:fetch,normalize:()=>({status:'invalid',reason:'synthetic'}) as ReturnType<typeof adapter.normalize>,confirmEmptySeason:async()=>({confirmed:false}) as Awaited<ReturnType<typeof adapter.confirmEmptySeason>>};
+ const adapter:ProviderAdapter<JsonObject,JsonObject,JsonObject,AcquiredProviderSourceItem>={key:'fixture',capabilities:{supportsChampionshipDiscovery:false,supportsSeasonDiscovery:false,supportsQuotaHeaders:false,supportsConnectionTest:false},providerConfigVersion:1,sourceConfigVersion:1,cursorVersion:1,providerForm:()=>[],championshipForm:()=>[],validateProviderConfig:()=>({}),validateSourceConfig:()=>({}),initialCursor:()=>({page:1}),validateCursor:v=>v as JsonObject,serializeCursor:v=>v,restoreCursor:(v,version)=>{if(version!==1)throw new Error('fixture_cursor_version_invalid');return {page:1,...v as JsonObject};},fetchWorkUnit:fetch,normalize:()=>({status:'invalid',reason:'synthetic'}) as ReturnType<typeof adapter.normalize>,confirmEmptySeason:async()=>({confirmed:false}) as Awaited<ReturnType<typeof adapter.confirmEmptySeason>>};
  const registry=new ProviderAdapterRegistry();registry.register(adapter);const handoff=vi.fn(async()=>({}));const service=new AcquisitionRetryResumeService(registry,clock,scheduler,quota,{handoffTraversal:handoff} as unknown as Pick<CanonicalAcquisitionPublicationService,'handoffTraversal'>);
  await pool.query("insert into provider_instances(id,adapter_key,name,enabled,state,config) values($1,'fixture',$2,true,'active','{}')",[provider,'Synthetic retry resume '+provider]);
  try{
@@ -120,6 +121,66 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
  await pool.query('update provider_acquisition_retry_units set next_retry_at=$2 where id=$1',[f.unit,new Date(f.now.getTime()-1000)]);await pool.query('update sync_streams set cursor=$2::jsonb where id=$1',[f.stream,JSON.stringify({page:99})]);
  const first=await f.service.selectDuePage(1);expect(first.units).toEqual([]);expect(first.nextCursor).not.toBeNull();const second=await f.service.selectDuePage(1,first.nextCursor);expect(second.units.map(r=>r.id)).toEqual([g.unit]);
  })));
+
+ it('round-trips microsecond ordering keys without duplicates or skips at limit one',async()=>fixtures(4,async rows=>{
+ const deadlines=['2025-12-31T23:59:59.000001Z','2025-12-31T23:59:59.000002Z','2025-12-31T23:59:59.000002Z','2025-12-31T23:59:59.000003Z'];
+ for(const [index,f] of rows.entries())await pool.query('update provider_acquisition_retry_units set next_retry_at=$2::timestamptz where id=$1',[f.unit,deadlines[index]]);
+ const expected=[...rows].sort((a,b)=>deadlines[rows.indexOf(a)].localeCompare(deadlines[rows.indexOf(b)])||a.unit.localeCompare(b.unit)).map(f=>f.unit);
+ const seen:string[]=[];let cursor:RetrySelectionCursor|null=null;
+ for(let page=0;page<rows.length;page++){
+  const result=await rows[0].service.selectDuePage(1,cursor);expect(result.units).toHaveLength(1);expect(result.nextCursor).not.toBeNull();
+  const unit=result.units[0];expect(seen).not.toContain(unit.id);seen.push(unit.id);
+  expect(result.nextCursor!.deadline).toBe(deadlines[rows.findIndex(f=>f.unit===unit.id)]);
+  cursor=JSON.parse(JSON.stringify(result.nextCursor)) as RetrySelectionCursor;
+ }
+ expect(seen).toEqual(expected);expect((await rows[0].service.selectDuePage(1,cursor)).units).toEqual([]);
+ expect((await rows[0].service.selectDuePage(100)).units).toHaveLength(4);await expect(rows[0].service.selectDuePage(0)).rejects.toThrow('retry_selection_limit_invalid');
+ }));
+
+ const malformedCursors:unknown[]=[{deadline:null,id:'00000000-0000-0000-0000-000000000000'}, {},{id:'00000000-0000-0000-0000-000000000000'},
+ {deadline:'2025-12-31T23:59:59.000001Z'},...['',null,'invalid'].map(id=>({deadline:'2025-12-31T23:59:59.000001Z',id})),
+ ...['invalid','2025-02-29T00:00:00.000001Z','2025-13-01T00:00:00.000001Z','2025-01-01T24:00:00.000001Z','2025-01-01T00:00:00.001Z','2025-01-01T00:00:00.000001+00:00','0000-01-01T00:00:00.000001Z'].map(deadline=>({deadline,id:'00000000-0000-0000-0000-000000000000'}))];
+ it.each(malformedCursors)('rejects malformed pagination cursor %j without provider work',async cursor=>fixture(async f=>{
+ await expect(f.service.selectDuePage(1,cursor as RetrySelectionCursor)).rejects.toThrow('retry_selection_cursor_invalid');expect(f.fetch).not.toHaveBeenCalled();
+ expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe('0');
+ }));
+
+ it.each(['checkpoint','work_class','season','safe_unit_key','traversal','cursor_version'])('reconstructs current identity after committed claim and blocks changed %s',async change=>fixture(async f=>{
+ const acquire=f.scheduler.acquire.bind(f.scheduler);vi.spyOn(f.scheduler,'acquire').mockImplementationOnce(async(...args)=>{
+  const lease=await acquire(...args);
+  if(change==='checkpoint')await pool.query('update sync_streams set cursor=$2::jsonb where id=$1',[f.stream,JSON.stringify({page:99})]);
+  else if(change==='cursor_version')await pool.query('update sync_streams set cursor_version=99 where id=$1',[f.stream]);
+  else if(change==='traversal'){const other=randomUUID();await pool.query("insert into provider_acquisition_traversals(id,stream_id,lease_generation,work_class,season,safe_unit_key,status) values($1,$2,1,'current_global',2026,'synthetic','partial')",[other,f.stream]);await pool.query('update provider_acquisition_retry_units set traversal_id=$2 where id=$1',[f.unit,other]);}
+  else await pool.query(`update provider_acquisition_traversals set ${change}=$2 where id=$1`,[f.traversal,change==='season'?2025:change==='work_class'?'finalization':'changed']);
+  return lease;
+ });
+ await expect(f.service.resume(f.unit,context)).rejects.toThrow('retry_activation_stale');expect(f.fetch).not.toHaveBeenCalled();
+ expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe('0');expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);
+ if(change==='checkpoint')expect((await pool.query('select cursor from sync_streams where id=$1',[f.stream])).rows[0].cursor).toEqual({page:99});
+ }));
+
+ it('allows the exact current checkpoint after the lease claim commits',async()=>fixture(async f=>{
+ await pool.query('update sync_streams set cursor=$2::jsonb where id=$1',[f.stream,JSON.stringify({page:1})]);
+ expect((await f.service.selectDue()).map(r=>r.id)).toContain(f.unit);expect((await f.service.resume(f.unit,context)).status).toBe('completed');
+ expect(f.fetch).toHaveBeenCalledTimes(1);expect(f.fetch.mock.calls[0][0].cursor).toEqual({page:1});expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(1);
+ }));
+
+ it('waits for a concurrent checkpoint writer then refuses the superseded unit',async()=>fixture(async f=>{
+ const writer=await pool.connect(),acquire=f.scheduler.acquire.bind(f.scheduler);let finish!:()=>void;let entered!:()=>void;
+ const pending=new Promise<void>(resolve=>entered=resolve),allowCommit=new Promise<void>(resolve=>finish=resolve);
+ vi.spyOn(f.scheduler,'acquire').mockImplementationOnce(async(...args)=>{const lease=await acquire(...args);await writer.query('begin');await writer.query('update sync_streams set cursor=$2::jsonb where id=$1',[f.stream,JSON.stringify({page:99})]);entered();return lease;});
+ const resume=f.service.resume(f.unit,context);const rejected=expect(resume).rejects.toThrow('retry_activation_stale');
+ try{await pending;await vi.waitFor(async()=>{expect((await pool.query("select count(*) n from pg_stat_activity where wait_event_type='Lock' and query like 'select historical_state from sync_streams%'")).rows[0].n).not.toBe('0');},{timeout:2000});expect(f.fetch).not.toHaveBeenCalled();const commit=allowCommit.then(()=>writer.query('commit'));finish();await commit;await rejected;
+ expect(f.fetch).not.toHaveBeenCalled();expect((await pool.query('select cursor from sync_streams where id=$1',[f.stream])).rows[0].cursor).toEqual({page:99});
+ expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe('0');expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);
+ }finally{await writer.query('rollback');writer.release();}
+ }));
+
+ it('rejects superseded checkpoints before claim and after service restart',async()=>fixture(async f=>{
+ expect((await f.service.selectDue()).map(r=>r.id)).toContain(f.unit);await pool.query('update sync_streams set cursor=$2::jsonb where id=$1',[f.stream,JSON.stringify({page:99})]);
+ const restarted=new AcquisitionRetryResumeService(f.service.adapters,{now:()=>f.now},f.scheduler,f.quota,f.service.handoff);
+ expect((await restarted.resume(f.unit,context)).status).toBe('identity_unavailable');expect(f.fetch).not.toHaveBeenCalled();expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);
+ }));
 
  it('distinct concurrent claims do not exhaust the shared pool and hang activation',async()=>fixtures(12,async rows=>{
  const results=await Promise.all(rows.map(f=>f.service.resume(f.unit,context)));expect(results.some(r=>r.status==='completed')).toBe(true);expect(results.every(r=>['completed','not_eligible','busy'].includes(r.status))).toBe(true);

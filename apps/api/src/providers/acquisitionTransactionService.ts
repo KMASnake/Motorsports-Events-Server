@@ -42,7 +42,16 @@ export class AcquisitionTransactionService{
     let retryUnitId:string|null=null;const retry=new AcquisitionRetryService(this.clock);
     const client=await pool.connect();try{await client.query('begin');
       await lockHandoffDomain(client);await assertNoPendingHandoff(client,input.providerChampionshipId);
-      if(input.retryUnitId){await client.query('select id from provider_acquisition_retry_units where id=$1 for update',[input.retryUnitId]);const due=(await dueAcquisitionRetries(this.clock.now(),1,input.retryUnitId,client,true))[0];if(!due||!retryHandoffAllowsAcquisition(due)||due.traversal_id!==input.traversalId||acquisitionRetryKey({cursor:input.fetchInput.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey})!==due.logical_unit_key)throw new Error('retry_activation_stale');}
+      if(input.retryUnitId){
+        await client.query('select id from provider_acquisition_retry_units where id=$1 for update',[input.retryUnitId]);
+        const due=(await dueAcquisitionRetries(this.clock.now(),1,input.retryUnitId,client,true))[0];
+        if(!due||!retryHandoffAllowsAcquisition(due)||due.traversal_id!==input.traversalId||due.stream_id!==input.lease.streamId||due.provider_instance_id!==input.providerInstanceId||due.provider_championship_id!==input.providerChampionshipId||due.adapter_key!==input.adapter.key||due.work_class!==input.workClass||Number(due.season)!==input.season||due.safe_unit_key!==input.safeUnitKey)throw new Error('retry_activation_stale');
+        // assertNoPendingHandoff already holds the stream row lock. Reconstruct from
+        // its current checkpoint after lease commit, while the A2.3 claim is held.
+        let currentCursor:C;
+        try{currentCursor=input.adapter.restoreCursor(due.cursor,Number(due.cursor_version));}catch{throw new Error('retry_activation_stale');}
+        if(acquisitionRetryKey({cursor:currentCursor,workClass:due.work_class,season:Number(due.season),safeUnitKey:due.safe_unit_key})!==due.logical_unit_key||acquisitionRetryKey({cursor:input.fetchInput.cursor,workClass:input.workClass,season:input.season,safeUnitKey:input.safeUnitKey})!==due.logical_unit_key)throw new Error('retry_activation_stale');
+      }
       if(input.traversalId){
         const resumed=(await client.query(`update provider_acquisition_traversals traversal set run_id=$2,lease_generation=$7,status='running',finished_at=null from sync_streams stream,sync_runs run where traversal.id=$1 and traversal.stream_id=$3 and traversal.work_class=$4 and traversal.season=$5 and traversal.safe_unit_key=$6 and traversal.status in('running','partial') and traversal.complete=false and stream.id=traversal.stream_id and stream.lease_owner=$8 and stream.lease_generation=$7 and stream.lease_expires_at>$9 and run.id=$2 and run.stream_id=stream.id and run.worker_id=$8 and run.lease_generation=$7 and run.status='running' returning traversal.id`,[traversalId,input.lease.runId,input.lease.streamId,input.workClass,input.season,input.safeUnitKey,input.lease.generation,input.lease.workerId,this.clock.now()])).rowCount;
         if(!resumed)throw staleWorker();
