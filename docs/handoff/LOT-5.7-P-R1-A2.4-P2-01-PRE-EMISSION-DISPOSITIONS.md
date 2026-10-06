@@ -84,3 +84,50 @@ post-emission abort health neutrality, taxonomy, migration 0042, dependencies,
 and scheduler policy are unchanged. This correction does not implement A3 physical
 provider-call fencing, association generations, heartbeat, periodic budgets or a
 periodic retry loop. R1-P1-01 remains for A3; no operational authorization follows.
+
+
+## A2.4-P2-02 — authority after lock waits
+
+The initial lease check is an early refusal, not final mutation authority.
+Targeted activation commits before adapter execution while retaining the session
+logical claim. Local outcome recording then acquires the stream row, validates
+owner/generation/expiry, locks the running traversal, and locks the retry unit.
+Terminal, association, handoff and activation-snapshot guards are unchanged.
+The transition re-reads the already-owned unit lock and reads deadline projections
+before computing the disposition. These asynchronous boundaries precede the
+mutation; an expiration checked before them can become stale while waiting.
+
+A synchronous authorization callback therefore re-reads the existing injectable
+clock immediately before the disposition UPDATE, after those locks, reads and
+policy calculation. The held stream/traversal/unit locks protect the checked
+identity and handoff state from application-authorized supersession; all runtime
+sync-run writers take the stream lock. No new locks or lock-order inversion are
+introduced. Time remains the condition requiring a fresh check. The convention
+matches the scheduler: `now >= lease_expires_at` is expired, including equality.
+Current owned-but-expired authority raises the existing `stale_worker`/409 refusal,
+both at the initial check and at the final mutation boundary. Noncurrent owner/run
+and terminal/snapshot protections still refuse replacement of newer durable truth.
+
+An expired final check throws before any disposition UPDATE. Existing partial
+scheduler-commit and blocking-failure transactions roll back before changing the
+unit or closing its traversal. The later scheduler failure cannot undo a previously
+committed unauthorized unit disposition because none has been written. Charge rows
+and confirmed attempt counts are untouched by this failure-recording path.
+Untargeted and authoritative charge-outcome transitions do not receive this callback.
+
+Focused deterministic PostgreSQL cases hold either the retry-unit or traversal
+row on another connection, observe the actual blocker in `pg_stat_activity`, advance
+only the injected clock to expiration minus one millisecond, equality, or plus one
+millisecond, and release the row lock. Both `retry_wait`/`quota_wait` and genuine
+pre-emission caller-abort/configuration failures are covered. Expired cases preserve
+the entire unit row and roll back traversal closure; valid controls persist the
+expected dispositions. No real-time sleep is used to expire a lease. Additional
+cases cover duplicate outcomes concurrent with scheduler recovery and expiration
+during deadline/policy calculation, ensuring the check stays at the UPDATE boundary.
+The P2-01 restart/terminal/older-run and A2.3 concurrency/handoff probes remain part
+of the same suite. Run `-t 'A2.4'` before the complete PostgreSQL gate.
+
+This correction adds no migration, generation, physical HTTP fence, heartbeat,
+periodic execution or A3 redesign. Arbitrary out-of-band SQL supersession after
+activation remains outside certified application-level guarantees. This contract
+and its tests do not constitute independent maintainer or cumulative certification.

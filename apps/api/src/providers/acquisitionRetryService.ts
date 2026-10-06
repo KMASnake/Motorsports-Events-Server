@@ -72,7 +72,7 @@ export class AcquisitionRetryService{
     if(input.quotaIndefinite&&failure)await client.query("update provider_acquisition_retry_units set state='quota_wait',next_retry_at=null where id=$1 and state='retry_wait'",[unit.id]);
     if(!failure)await client.query("update provider_acquisition_retry_units set state='ready' where id=$1",[unit.id]);
   }
-  async transition(client:PoolClient,id:string,count:number,failure:ProviderFailureClassification|null,additionalQuotaDeadline:Date|null=null){
+  async transition(client:PoolClient,id:string,count:number,failure:ProviderFailureClassification|null,additionalQuotaDeadline:Date|null=null,authorizeMutation?:()=>void){
     const protectedUnit=(await client.query('select state from provider_acquisition_retry_units where id=$1 for update',[id])).rows[0];
     if(protectedUnit?.state==='succeeded')return;
     const now=this.clock.now();
@@ -80,6 +80,8 @@ export class AcquisitionRetryService{
     const existing=row?.deadline?new Date(row.deadline):null;
     const quotaDeadline=additionalQuotaDeadline&&(!existing||additionalQuotaDeadline>existing)?additionalQuotaDeadline:existing;
     const disposition=retryDisposition(count,failure,now,quotaDeadline,this.jitter);
+    // All row locks and deadline reads precede this synchronous mutation boundary.
+    authorizeMutation?.();
     await client.query(`update provider_acquisition_retry_units set state=$2,next_retry_at=$3,local_backoff_until=$4,quota_deadline=$5,failure_category=$6,failure_code=$7,http_status=$8,retry_after_state=$9,retry_after_at=$10,updated_at=$11 where id=$1`,[id,disposition.state,disposition.next,disposition.local,quotaDeadline,failure?.category??null,failure?.code??null,failure?.httpStatus??null,failure?.retryAfterState??null,failure?.retryAfterState==='valid'?failure.retryAfterAt:null,now]);
   }
   async completeUnit(client:PoolClient,id:string){
@@ -89,14 +91,20 @@ export class AcquisitionRetryService{
   // Called in the acquisition outcome transaction for local/adapter failures.
   // HTTP callbacks have already persisted authoritative charge outcomes atomically.
   async recordUnitFailure(client:PoolClient,id:string,failure:ProviderFailureClassification,execution?:RetryExecution){
+    let authorizeMutation:(()=>void)|undefined;
     if(execution){
       // Use the existing stream -> traversal -> unit lock order. No new fencing token.
       const stream=(await client.query('select lease_owner,lease_generation,lease_expires_at,historical_state from sync_streams where id=$1 for update',[execution.streamId])).rows[0];
-      if(!stream||stream.lease_owner!==execution.workerId||Number(stream.lease_generation)!==execution.generation||!stream.lease_expires_at||new Date(stream.lease_expires_at)<=this.clock.now())return;
+      if(!stream||stream.lease_owner!==execution.workerId||Number(stream.lease_generation)!==execution.generation||!stream.lease_expires_at)return;
+      const expiresAt=new Date(stream.lease_expires_at).getTime();
+      authorizeMutation=()=>{if(this.clock.now().getTime()>=expiresAt)throw Object.assign(new Error('stale_worker'),{statusCode:409});};
+      authorizeMutation();
       const active=(await client.query(`select t.id from provider_acquisition_traversals t join sync_runs r on r.id=t.run_id
         where t.id=$1 and t.stream_id=$2 and t.run_id=$3 and t.lease_generation=$4 and t.status='running' and t.complete=false
         and r.stream_id=$2 and r.worker_id=$5 and r.lease_generation=$4 and r.status='running' for update of t`,[execution.traversalId,execution.streamId,execution.runId,execution.generation,execution.workerId])).rowCount;
       if(!active||readHandoffEnvelope(stream.historical_state).traversals[execution.traversalId]?.state!=='ACQUIRING')return;
+      // Stream/traversal locks retain the checked durable authority. Time can
+      // still advance during later unit locking/reads, so check it at the UPDATE.
     }
     const unit=(await client.query('select u.*,row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[id])).rows[0];if(!unit)return;
     if(terminal(unit.state))return;
@@ -105,6 +113,6 @@ export class AcquisitionRetryService{
     // Waiting states without current authority, or changed since activation (including
     // HTTP/quota outcomes and duplicate dispositions), retain their durable outcome.
     if((unit.state==='retry_wait'||unit.state==='quota_wait')&&(!execution||unit.outcome_snapshot!==execution.outcomeSnapshot))return;
-    await this.transition(client,id,Number(unit.emitted_attempt_count),failure);
+    await this.transition(client,id,Number(unit.emitted_attempt_count),failure,null,authorizeMutation);
   }
 }

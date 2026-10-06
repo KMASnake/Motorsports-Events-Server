@@ -278,7 +278,7 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
    else if(change==='identity')stale.streamId=randomUUID();
    else if(change==='expired')await pool.query('update sync_streams set lease_expires_at=$2 where id=$1',[f.stream,f.now]);
    else await pool.query('update sync_streams set historical_state=$2::jsonb where id=$1',[f.stream,JSON.stringify({canonical_handoff_v1:{version:1,traversals:{[f.traversal]:{state:'HANDOFF_PENDING',attempts:0,updated_at:f.now.toISOString(),error_code:null}}}})]);
-   const before=await f.retry.load(f.unit);await recordFailure(f,stale,'aborted');expect(await f.retry.load(f.unit)).toEqual(before);checked=true;
+   const before=await f.retry.load(f.unit);if(change==='expired')await expect(recordFailure(f,stale,'aborted')).rejects.toThrow('stale_worker');else await recordFailure(f,stale,'aborted');expect(await f.retry.load(f.unit)).toEqual(before);checked=true;
    throw new ProviderConfigurationError('provider_credentials_missing','Synthetic');
   };
   await expect(f.service.resume(f.unit,context)).rejects.toThrow();expect(checked).toBe(true);
@@ -322,6 +322,64 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
  it('A2.4 unqualified late waiting failure retains the authoritative deadline',async()=>fixture(async f=>{
   const before=await f.retry.load(f.unit);for(const code of ['aborted','provider_credentials_missing','network_error'])await recordFailure(f,undefined,code);
   expect(await f.retry.load(f.unit)).toEqual(before);
+ }));
+
+ const lockWaitCases=['retry_wait','quota_wait'].flatMap(state=>['aborted','provider_credentials_missing'].flatMap(code=>['unit','traversal'].flatMap(lock=>[-1,0,1].map(offset=>({state,code,lock,offset})))));
+ it.each(lockWaitCases)('A2.4 P2-02 $state/$code waiting on $lock at expiry offset $offset',async ({state,code,lock,offset})=>fixture(async f=>{
+  await pool.query('update provider_acquisition_retry_units set state=$2,quota_deadline=$3 where id=$1',[f.unit,state,f.now]);
+  const before=await f.retry.load(f.unit),locker=await pool.connect();let held=false;
+  const controller=new AbortController();if(code==='aborted')controller.abort();
+  const pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;
+  f.behavior.beforeFetch=async()=>{
+   await locker.query('begin');held=true;
+   await locker.query(lock==='unit'?'select id from provider_acquisition_retry_units where id=$1 for update':'select id from provider_acquisition_traversals where id=$1 for update',[lock==='unit'?f.unit:f.traversal]);
+   if(code==='provider_credentials_missing')throw new ProviderConfigurationError(code,'Synthetic missing credentials');
+  };
+  let emissions=0;f.behavior.inFetch=()=>{emissions++;};
+  const pending=f.service.resume(f.unit,async()=>({...await context(),signal:controller.signal})).then(value=>({value,error:null}),error=>({value:null,error}));
+  try{
+   let waiting=false;
+   for(let poll=0;poll<200;poll++){
+    const rows=(await pool.query("select query from pg_stat_activity where wait_event_type='Lock' and $1=any(pg_blocking_pids(pid))",[pid])).rows;
+    if(rows.some(r=>lock==='unit'?String(r.query).startsWith('select u.*,row_to_json(u)::text outcome_snapshot'):String(r.query).startsWith('select t.id from provider_acquisition_traversals'))){waiting=true;break;}
+   }
+   expect(waiting).toBe(true);
+   const expires=new Date((await pool.query('select lease_expires_at from sync_streams where id=$1',[f.stream])).rows[0].lease_expires_at);
+   f.now.setTime(expires.getTime()+offset);await locker.query('commit');held=false;
+   const result=await pending;
+   if(offset>=0){
+    expect(result.error).toMatchObject({message:'stale_worker',statusCode:409});expect(await f.retry.load(f.unit)).toEqual(before);
+    expect((await pool.query('select status,finished_at from provider_acquisition_traversals where id=$1',[f.traversal])).rows[0]).toEqual({status:'running',finished_at:null});
+   }else{
+    expect(result.error).toMatchObject({code});expect(await f.retry.load(f.unit)).toMatchObject({state:code==='aborted'?'paused':'permanent_failure',emitted_attempt_count:0});
+   }
+   expect(emissions).toBe(0);expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(before.emitted_attempt_count);
+   expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe('0');
+  }finally{if(held)await locker.query('rollback');locker.release();await pending;}
+ }));
+ it('A2.4 P2-02 outcome, duplicate outcome and scheduler recovery retain lock order',async()=>fixture(async f=>{
+  let checked=false;f.behavior.beforeFetch=async()=>{
+   const e=await currentExecution(f);
+   const results=await Promise.allSettled([recordFailure(f,e,'aborted'),recordFailure(f,e,'aborted'),f.scheduler.recover()]);
+   expect(results.every(r=>r.status==='fulfilled')).toBe(true);expect((await f.retry.load(f.unit)).state).toBe('paused');checked=true;
+   throw Object.assign(new Error('Synthetic abort'),{code:'aborted',classification:failureClassification('aborted')});
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({code:'aborted'});expect(checked).toBe(true);
+  expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);
+ }));
+ it('A2.4 P2-02 revalidates at the UPDATE after deadline/policy calculation',async()=>fixture(async f=>{
+  let checked=false;f.behavior.beforeFetch=async()=>{
+   const e=await currentExecution(f),before=await f.retry.load(f.unit);
+   const expires=new Date((await pool.query('select lease_expires_at from sync_streams where id=$1',[f.stream])).rows[0].lease_expires_at);
+   const retry=new AcquisitionRetryService({now:()=>f.now},()=>{f.now.setTime(expires.getTime());return 0;});
+   const client=await pool.connect();try{
+    await client.query('begin');await expect(retry.recordUnitFailure(client,f.unit,failureClassification('network_error'),e)).rejects.toThrow('stale_worker');
+    expect((await client.query('select * from provider_acquisition_retry_units where id=$1',[f.unit])).rows[0]).toEqual(before);
+   }finally{await client.query('rollback');client.release();}
+   checked=true;throw new ProviderConfigurationError('provider_credentials_missing','Synthetic');
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toThrow('stale_worker');expect(checked).toBe(true);
+  expect((await f.retry.load(f.unit)).state).toBe('retry_wait');
  }));
 
 });
