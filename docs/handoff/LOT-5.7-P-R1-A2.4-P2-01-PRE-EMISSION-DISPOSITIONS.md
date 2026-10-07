@@ -131,3 +131,54 @@ This correction adds no migration, generation, physical HTTP fence, heartbeat,
 periodic execution or A3 redesign. Arbitrary out-of-band SQL supersession after
 activation remains outside certified application-level guarantees. This contract
 and its tests do not constitute independent maintainer or cumulative certification.
+
+## A2.4-P2-03 — transaction commit authorization
+
+The pre-UPDATE guard does not authorize the remainder of the failure transaction.
+In the blocking-failure path, retry disposition and traversal failure metadata are
+written before an association-wide anomaly UPSERT. Two legitimate targeted
+resumes on current/historical streams can contend on the same active anomaly key.
+The lease can expire during that awaited UPSERT even though the unit UPDATE was
+authorized. A later scheduler refusal cannot undo a committed disposition.
+
+`recordUnitFailure` now returns its synchronous time-authorization callback to
+the transaction owner after checking the current targeted lease, including when
+a terminal/changed unit guard preserves the existing disposition.
+It still validates immediately before UPDATE. `recordBlockingFailure` calls the
+returned guard after the anomaly UPSERT and immediately before issuing COMMIT.
+The caller-abort/partial path passes the same guard to the existing scheduler
+transaction helper, which invokes it after all apply/run/checkpoint writes and
+immediately before issuing COMMIT. The callback adds no query, lock or awaited
+operation. Stream/traversal/unit authority locks and the logical session claim
+remain held. No lock order, scheduling policy or public failure category changes.
+
+At that precise commit-authorization boundary, `now >= expires_at` throws the
+existing `stale_worker`/409 error. The owning transaction catches it, awaits
+ROLLBACK, and only then propagates it. Unit disposition, anomaly changes and related
+failure metadata roll back together. A returned stale result is never treated as
+a successful transaction. The existing outer scheduler failure/lease cleanup is
+separate from these writes; an expired lease cannot authorize that cleanup either.
+Untargeted callers retain their existing behavior.
+
+This is authorization immediately before commit initiation, not a guarantee that
+wall-clock time cannot advance during PostgreSQL's physical COMMIT. No known
+application-level awaited/blocking operation remains between the final guard and
+issuing COMMIT. The blocking UPSERT and scheduler transaction operation must have
+completed first; an exception from either causes the existing rollback path.
+
+Deterministic PostgreSQL regressions use two legitimate targeted resumes sharing
+one association, observe the actual second UPSERT waiting in pg_stat_activity,
+and delay completion of the first UPSERT without mutating authority. Both source
+waiting states and expiry minus one millisecond/equality/plus one millisecond are
+covered. Expired cases compare complete unit/traversal rows and all anomalies;
+valid controls commit both dispositions and exactly two anomaly occurrences.
+Caller-abort cases advance the injected clock after the final scheduler write and
+verify rollback of disposition and partial traversal metadata at equality/expiry.
+Actual SQL errors injected before the unit UPDATE, after it, and at the anomaly
+UPSERT prove rollback of all disposition writes. Every case preserves zero
+charges and zero emitted attempts. Run Vitest `-t 'A2.4 P2-03'`, then `-t A2.4`
+and the full A2.3 disposable PostgreSQL gate.
+
+No migration, 0042 change, physical HTTP fence, association generation, heartbeat,
+periodic consumer or A3 work is introduced. These proofs are local correction
+evidence; independent audit and maintainer validation remain separate steps.

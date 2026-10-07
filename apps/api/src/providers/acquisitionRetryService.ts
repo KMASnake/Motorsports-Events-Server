@@ -102,17 +102,20 @@ export class AcquisitionRetryService{
       const active=(await client.query(`select t.id from provider_acquisition_traversals t join sync_runs r on r.id=t.run_id
         where t.id=$1 and t.stream_id=$2 and t.run_id=$3 and t.lease_generation=$4 and t.status='running' and t.complete=false
         and r.stream_id=$2 and r.worker_id=$5 and r.lease_generation=$4 and r.status='running' for update of t`,[execution.traversalId,execution.streamId,execution.runId,execution.generation,execution.workerId])).rowCount;
-      if(!active||readHandoffEnvelope(stream.historical_state).traversals[execution.traversalId]?.state!=='ACQUIRING')return;
+      if(!active||readHandoffEnvelope(stream.historical_state).traversals[execution.traversalId]?.state!=='ACQUIRING')return authorizeMutation;
       // Stream/traversal locks retain the checked durable authority. Time can
       // still advance during later unit locking/reads, so check it at the UPDATE.
     }
-    const unit=(await client.query('select u.*,row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[id])).rows[0];if(!unit)return;
-    if(terminal(unit.state))return;
-    if(execution&&(unit.stream_id!==execution.streamId||unit.traversal_id!==execution.traversalId))return;
-    if(failure.code==='quota_deferred')return;
+    const unit=(await client.query('select u.*,row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[id])).rows[0];if(!unit)return authorizeMutation;
+    if(terminal(unit.state))return authorizeMutation;
+    if(execution&&(unit.stream_id!==execution.streamId||unit.traversal_id!==execution.traversalId))return authorizeMutation;
+    if(failure.code==='quota_deferred')return authorizeMutation;
     // Waiting states without current authority, or changed since activation (including
     // HTTP/quota outcomes and duplicate dispositions), retain their durable outcome.
-    if((unit.state==='retry_wait'||unit.state==='quota_wait')&&(!execution||unit.outcome_snapshot!==execution.outcomeSnapshot))return;
+    if((unit.state==='retry_wait'||unit.state==='quota_wait')&&(!execution||unit.outcome_snapshot!==execution.outcomeSnapshot))return authorizeMutation;
     await this.transition(client,id,Number(unit.emitted_attempt_count),failure,null,authorizeMutation);
+    // The transaction owner must authorize COMMIT after its remaining writes.
+    // Held authority locks remain valid; the injectable clock must be read again.
+    return authorizeMutation;
   }
 }
