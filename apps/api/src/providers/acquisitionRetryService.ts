@@ -13,6 +13,7 @@ export const acquisitionRetryKey=(input:{cursor:JsonObject;workClass:string;seas
 export type RetryExecution={streamId:string;traversalId:string;runId:string;workerId:string;generation:number;outcomeSnapshot:string};
 export type RetryState='ready'|'retry_wait'|'quota_wait'|'paused'|'permanent_failure'|'auth_failure'|'exhausted'|'succeeded';
 export const ACQUISITION_RETRY_POLICY={version:'acquisition_retry_v1',maxAttempts:5,transientMs:30000,rateLimitMs:60000,maxMs:3600000} as const;
+const staleWorker=()=>Object.assign(new Error('stale_worker'),{statusCode:409});
 const terminal=(state:string)=>['paused','permanent_failure','auth_failure','exhausted','succeeded'].includes(state);
 export function retryDisposition(count:number,failure:ProviderFailureClassification|null,now:Date,quotaDeadline:Date|null,jitter:Jitter){
   let state:RetryState='succeeded',local:Date|null=null,next:Date|null=null;
@@ -88,27 +89,27 @@ export class AcquisitionRetryService{
     await client.query('select id from provider_acquisition_retry_units where id=$1 for update',[id]);
     await client.query("update provider_acquisition_retry_units set state='succeeded',next_retry_at=null,updated_at=$2 where id=$1 and state='ready'",[id,this.clock.now()]);
   }
+  // Internal guard shared by targeted failure transaction owners. No disposition write.
+  async authorizeExecutionFailure(client:PoolClient,execution:RetryExecution){
+    // Use the existing stream -> traversal -> unit lock order. No new fencing token.
+    const stream=(await client.query('select lease_owner,lease_generation,lease_expires_at,historical_state from sync_streams where id=$1 for update',[execution.streamId])).rows[0];
+    if(!stream||stream.lease_owner!==execution.workerId||Number(stream.lease_generation)!==execution.generation||!stream.lease_expires_at)throw staleWorker();
+    const expiresAt=new Date(stream.lease_expires_at).getTime();
+    const authorizeMutation=()=>{if(this.clock.now().getTime()>=expiresAt)throw staleWorker();};
+    authorizeMutation();
+    const active=(await client.query(`select t.id from provider_acquisition_traversals t join sync_runs r on r.id=t.run_id
+      where t.id=$1 and t.stream_id=$2 and t.run_id=$3 and t.lease_generation=$4 and t.status='running' and t.complete=false
+      and r.stream_id=$2 and r.worker_id=$5 and r.lease_generation=$4 and r.status='running' for update of t`,[execution.traversalId,execution.streamId,execution.runId,execution.generation,execution.workerId])).rowCount;
+    if(!active||readHandoffEnvelope(stream.historical_state).traversals[execution.traversalId]?.state!=='ACQUIRING')throw staleWorker();
+    return authorizeMutation;
+  }
   // Called in the acquisition outcome transaction for local/adapter failures.
   // HTTP callbacks have already persisted authoritative charge outcomes atomically.
   async recordUnitFailure(client:PoolClient,id:string,failure:ProviderFailureClassification,execution?:RetryExecution){
-    let authorizeMutation:(()=>void)|undefined;
-    if(execution){
-      // Use the existing stream -> traversal -> unit lock order. No new fencing token.
-      const stream=(await client.query('select lease_owner,lease_generation,lease_expires_at,historical_state from sync_streams where id=$1 for update',[execution.streamId])).rows[0];
-      if(!stream||stream.lease_owner!==execution.workerId||Number(stream.lease_generation)!==execution.generation||!stream.lease_expires_at)return;
-      const expiresAt=new Date(stream.lease_expires_at).getTime();
-      authorizeMutation=()=>{if(this.clock.now().getTime()>=expiresAt)throw Object.assign(new Error('stale_worker'),{statusCode:409});};
-      authorizeMutation();
-      const active=(await client.query(`select t.id from provider_acquisition_traversals t join sync_runs r on r.id=t.run_id
-        where t.id=$1 and t.stream_id=$2 and t.run_id=$3 and t.lease_generation=$4 and t.status='running' and t.complete=false
-        and r.stream_id=$2 and r.worker_id=$5 and r.lease_generation=$4 and r.status='running' for update of t`,[execution.traversalId,execution.streamId,execution.runId,execution.generation,execution.workerId])).rowCount;
-      if(!active||readHandoffEnvelope(stream.historical_state).traversals[execution.traversalId]?.state!=='ACQUIRING')return authorizeMutation;
-      // Stream/traversal locks retain the checked durable authority. Time can
-      // still advance during later unit locking/reads, so check it at the UPDATE.
-    }
-    const unit=(await client.query('select u.*,row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[id])).rows[0];if(!unit)return authorizeMutation;
+    const authorizeMutation=execution?await this.authorizeExecutionFailure(client,execution):undefined;
+    const unit=(await client.query('select u.*,row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[id])).rows[0];if(!unit){if(execution)throw staleWorker();return;}
     if(terminal(unit.state))return authorizeMutation;
-    if(execution&&(unit.stream_id!==execution.streamId||unit.traversal_id!==execution.traversalId))return authorizeMutation;
+    if(execution&&(unit.stream_id!==execution.streamId||unit.traversal_id!==execution.traversalId))throw staleWorker();
     if(failure.code==='quota_deferred')return authorizeMutation;
     // Waiting states without current authority, or changed since activation (including
     // HTTP/quota outcomes and duplicate dispositions), retain their durable outcome.

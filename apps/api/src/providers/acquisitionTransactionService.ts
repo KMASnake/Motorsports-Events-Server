@@ -76,9 +76,11 @@ export class AcquisitionTransactionService{
     catch(error){const classified=error as {traversalId?:string;classification?:ProviderFailureClassification};classified.classification??=classifyAcquisitionFailure(error);classified.traversalId=traversalId;const code=(error as {code?:string}).code;if(code&&input.partialErrorCodes?.includes(code)){let authorizeCommit:(()=>void)|undefined;await this.scheduler.commit({...input.lease,cursorAfter:input.fetchInput.cursor,authorizeCommit:()=>authorizeCommit?.(),apply:async client=>{if(retryUnitId)authorizeCommit=await retry.recordUnitFailure(client,retryUnitId,classified.classification!,retryExecution);await client.query(`update provider_acquisition_traversals set status='partial',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false`,[traversalId,this.clock.now(),input.lease.runId,input.lease.generation]);}});throw error;}await this.recordBlockingFailure(traversalId,input.providerChampionshipId,error,input.lease,retryUnitId,retryExecution);await this.scheduler.fail({...input.lease,durable:true,code:error instanceof ProviderAcquisitionError?error.anomaly.code:'acquisition_failed'});throw error;}finally{input.fetchInput.requestGate?.bindAcquisitionRetryUnit?.(null);}
     if(result.status==='cursor_invalid'){
       const failedClient=await pool.connect();try{await failedClient.query('begin');
+      const cursorFailure=classifyAcquisitionFailure(new ProviderAcquisitionError('cursor_invalid','Cursor invalid'));
+      const authorizeCommit=retryExecution?await retry.authorizeExecutionFailure(failedClient,retryExecution):undefined;
       await failedClient.query(`update provider_acquisition_traversals set status='partial',received_items=$2,valid_items=$3,anomaly_items=$4,finished_at=$5 where id=$1 and run_id=$6 and lease_generation=$7 and complete=false`,[traversalId,result.items.length+result.itemAnomalies.length,result.items.length,result.itemAnomalies.length,this.clock.now(),input.lease.runId,input.lease.generation]);
-      if(retryUnitId)await retry.recordUnitFailure(failedClient,retryUnitId,{...classifyAcquisitionFailure(new ProviderAcquisitionError('cursor_invalid','Cursor invalid'))});
-      await failedClient.query('commit');}catch(error){await failedClient.query('rollback');throw error;}finally{failedClient.release();}
+      if(retryUnitId)await retry.recordUnitFailure(failedClient,retryUnitId,cursorFailure);
+      authorizeCommit?.();await failedClient.query('commit');}catch(error){await failedClient.query('rollback');throw error;}finally{failedClient.release();}
       await this.scheduler.fail({...input.lease,durable:false,code:'cursor_invalid'});
       return {traversalId,result,checkpointAdvanced:false};
     }
@@ -89,7 +91,7 @@ export class AcquisitionTransactionService{
         cursorAfter:result.nextCursor,
         apply:async client=>{await this.persistUnit(client,{...input,traversalId,result});if(retryUnitId)await retry.completeUnit(client,retryUnitId);}
       });
-    }catch(error){await this.closeTraversalFailure(traversalId,input.lease,retryUnitId,error);throw error;}
+    }catch(error){await this.closeTraversalFailure(traversalId,input.lease,retryUnitId,error,retryExecution);throw error;}
     return {traversalId,result,checkpointAdvanced:true};
   }
 
@@ -131,9 +133,9 @@ export class AcquisitionTransactionService{
     const client=await pool.connect();try{await client.query('begin');const authorizeCommit=retryUnitId&&retryExecution?await new AcquisitionRetryService(this.clock).recordUnitFailure(client,retryUnitId,classifyAcquisitionFailure(error),retryExecution):undefined;const owned=await client.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false returning id`,[traversalId,now,lease.runId,lease.generation]);if(owned.rowCount&&retryUnitId&&!retryExecution)await new AcquisitionRetryService(this.clock).recordUnitFailure(client,retryUnitId,classifyAcquisitionFailure(error));if(owned.rowCount)await client.query(`insert into provider_acquisition_anomalies(id,provider_championship_id,anomaly_key,anomaly_type,scope,details,first_seen_at,last_seen_at) values($1,$2,$3,$3,'stream','{}',$4,$4) on conflict(provider_championship_id,anomaly_key) where state='active' do update set last_seen_at=excluded.last_seen_at,occurrence_count=provider_acquisition_anomalies.occurrence_count+1,updated_at=excluded.last_seen_at`,[randomUUID(),providerChampionshipId,`stream:${code}`,now]);authorizeCommit?.();await client.query('commit');}catch(failure){await client.query('rollback');throw failure;}finally{client.release();}
   }
 
-  private async closeTraversalFailure(traversalId:string,lease:Lease,retryUnitId:string|null,error:unknown){
-    const client=await pool.connect();try{await client.query('begin');const closed=await client.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false`,[traversalId,this.clock.now(),lease.runId,lease.generation]);
-    if(closed.rowCount&&retryUnitId)await new AcquisitionRetryService(this.clock).recordUnitFailure(client,retryUnitId,classifyAcquisitionFailure(error));await client.query('commit');
+  private async closeTraversalFailure(traversalId:string,lease:Lease,retryUnitId:string|null,error:unknown,retryExecution?:RetryExecution){
+    const client=await pool.connect();try{await client.query('begin');const authorizeCommit=retryExecution?await new AcquisitionRetryService(this.clock).authorizeExecutionFailure(client,retryExecution):undefined;const closed=await client.query(`update provider_acquisition_traversals set status='failed',complete=false,finished_at=$2 where id=$1 and run_id=$3 and lease_generation=$4 and complete=false`,[traversalId,this.clock.now(),lease.runId,lease.generation]);
+    if(closed.rowCount&&retryUnitId)await new AcquisitionRetryService(this.clock).recordUnitFailure(client,retryUnitId,classifyAcquisitionFailure(error));authorizeCommit?.();await client.query('commit');
     }catch(failure){await client.query('rollback');throw failure;}finally{client.release();}
   }
 }

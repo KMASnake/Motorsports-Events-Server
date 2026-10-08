@@ -182,3 +182,51 @@ and the full A2.3 disposable PostgreSQL gate.
 No migration, 0042 change, physical HTTP fence, association generation, heartbeat,
 periodic consumer or A3 work is introduced. These proofs are local correction
 evidence; independent audit and maintainer validation remain separate steps.
+
+## A2.4-P2-04 — explicit refusal after application recovery
+
+A missing/replaced lease owner used to return normally from `recordUnitFailure`.
+The blocking-failure owner then closed the recovered traversal and inserted an
+anomaly before its later scheduler failure returned `stale_worker`. Unit guards
+alone therefore did not protect transaction-wide failure metadata.
+
+The internal execution guard now throws the existing `stale_worker`/409 error for
+missing/replaced owner, generation, expiry, active run/traversal or ACQUIRING
+handoff authority. A missing/mismatched targeted unit also refuses explicitly.
+An authoritative disposition returns its existing synchronous commit guard;
+terminal, changed-snapshot and quota-owned outcomes remain legitimate no-ops
+with that guard. Untargeted no-context calls preserve their previous semantics.
+No public classification or new durable token is introduced.
+
+Every production caller was traced: partial failures use the scheduler transaction;
+blocking failures own their BEGIN/ROLLBACK/COMMIT; cursor-invalid result and
+post-fetch persistence-failure owners previously omitted targeted context. These
+last two now validate the same execution before metadata writes and before COMMIT,
+while retaining their original no-context disposition policy. Their waiting-outcome
+semantics are unchanged. The shared internal guard performs the existing stream
+then traversal locking; unit accounting locks still follow them. No lock order or
+scheduler recovery algorithm changes.
+
+A thrown authority refusal enters each owner's existing rollback catch before any
+outer propagation. The original recovery test uses only `scheduler.recover()` at
+injected expiry and then resumes the old adapter with a pre-emission configuration
+error. Fresh reads preserve the recovered unit, partial traversal, stream/run rows
+and absence of anomalies. The matrix includes caller abort, network and local quota
+failure from both waiting states. Post-fetch/cursor-invalid recovery and valid-owner
+controls cover the other metadata owners without altering disposition policy.
+
+Recovery uses SKIP LOCKED: while a failure owns the stream and waits for the retry
+unit or anomaly persistence, recovery cannot remove that lease. Deterministic tests
+observe the actual unit/anomaly blocker, verify recovery returns zero, advance the
+clock, and release contention. The existing final guards then roll back the outcome;
+recovery succeeds after the transaction releases its stream. Before-anomaly and
+after-anomaly/pre-authorization synchronization also proves this serialization.
+No wall-clock sleeps expire leases. Existing P2-01/02/03 valid and expired controls,
+terminal/idempotence, pagination, checkpoint, handoff and claim regressions remain
+required. Run the A2.4 filter followed by the complete disposable PostgreSQL gate.
+
+The commit boundary remains the synchronous guard after the last blocking write
+and before COMMIT initiation, with `now >= expires_at` stale. Physical COMMIT does
+not freeze time. No migration, 0042 change, recurring consumer, physical-call fence,
+heartbeat, association-generation redesign or A3 implementation is introduced.
+Local correction evidence is not independent maintainer certification.
