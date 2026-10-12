@@ -265,3 +265,49 @@ covered by the A2.4 filter and full PostgreSQL regression gate.
 This is a scoped success-path correction, not a certification of every scheduler
 transaction exit. No migration, 0042 change, provider execution, periodic consumer,
 physical-call fence, heartbeat or A3 implementation is introduced.
+
+## A2.4-P2-06 — scheduler failure transaction authority
+
+`scheduler.fail()` captured its clock before BEGIN/serialization-root locking.
+The stream lease check could therefore use a timestamp from before a long global
+lock wait. After that check, run, stream and optional provider-suspension writes
+also lacked final authorization before COMMIT initiation.
+
+All inspected fail callers provide an existing stream/run lease: blocking
+acquisition failure, invalid-cursor failure and targeted activation cleanup.
+This transaction does not borrow a targeted retry disposition transaction and
+must not require a running acquisition traversal: that traversal may have been
+legitimately closed by the preceding authorized failure transaction. No new
+requirement is imposed on lease-free canonical handoff workflows.
+
+The existing serialization root and stream lock now precede a fresh injectable
+clock read. Owner, generation and expiry must match, with equality stale. The run
+UPDATE additionally matches stream, worker, generation and running status, and
+its RETURNING/rowCount must prove exactly an eligible run was finalized. No row
+means an explicit stale_worker refusal and rollback, not implicit success.
+The held stream/run locks retain durable execution identity through the remaining
+writes. A mandatory synchronous guard checks time again after stream/provider
+writes and immediately before COMMIT initiation via the existing helper.
+Exceptions await ROLLBACK before propagation. Physical COMMIT does not freeze time.
+
+The scheduler failure transaction owns only run failure metadata, stream health/
+lease release and optional provider suspension. A preceding acquisition failure
+transaction committed while authority was valid remains legitimate and is not
+retroactively undone. No charge, retry accounting or traversal policy changes.
+Existing valid durable/transient/auth finalizations keep their established results.
+Repeated old finalization still refuses as stale_worker without further writes;
+terminal/idempotent acquisition and charge no-ops remain unchanged.
+
+Independent PostgreSQL reproduction observes the real global blocker and uses an
+injectable clock returning fresh Dates, matching systemClock semantics. Valid,
+equal and expired lease boundaries are covered. Regression tests additionally
+block stream/run/provider rows, compare all failure-owned rows after rollback,
+exercise actual application recovery, mismatched run identity, real SQL errors
+at every failure write, and expiry after the last successful provider write.
+The same lock order is retained: serialization root, stream, run, optional provider.
+No new lock or durable schema is introduced. Run the A2.4 filter and full A2.3,
+A2.2/A1/A2.1, ordinary acquisition/scheduler/quota and repository regressions.
+
+This is local correction evidence, not cumulative A2.4 certification. Independent
+maintainer audit remains required. Migration 0042, A3 physical-call fencing,
+heartbeat, distributed generations and periodic runtime are unchanged.

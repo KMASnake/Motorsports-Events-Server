@@ -556,4 +556,45 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
   finally{intercept.mockRestore();}
  }));
 
+ async function failureRows(f:ResumeFixture){return {disposition:await dispositionRows(f),stream:(await pool.query('select * from sync_streams where id=$1',[f.stream])).rows[0],runs:(await pool.query('select * from sync_runs where stream_id=$1 order by id',[f.stream])).rows,provider:(await pool.query('select * from provider_instances where id=$1',[f.provider])).rows[0]};}
+ async function withActiveFailureLease(f:ResumeFixture,probe:(execution:RetryExecution,scheduler:PersistentSchedulerService)=>Promise<void>){
+  let checked=false;f.behavior.beforeFetch=async()=>{await probe(await currentExecution(f),new PersistentSchedulerService({now:()=>new Date(f.now.getTime())}));checked=true;throw new ProviderConfigurationError('provider_credentials_missing','Synthetic probe finished');};
+  await expect(f.service.resume(f.unit,context)).rejects.toThrow();expect(checked).toBe(true);
+ }
+ async function observedFailureWait(pid:number,prefix:string){for(let poll=0;poll<500;poll++){const rows=(await pool.query("select query from pg_stat_activity where wait_event_type='Lock' and $1=any(pg_blocking_pids(pid))",[pid])).rows;if(rows.some(row=>String(row.query).startsWith(prefix)))return true;}return false;}
+ const schedulerFailureCases=[{durable:true,authentication:false},{durable:false,authentication:false},{durable:true,authentication:true}].flatMap(mode=>[-1,0,1].map(offset=>({...mode,offset})));
+ it.each(schedulerFailureCases)('A2.4 P2-06 global wait durable=$durable authentication=$authentication expiry=$offset',async ({durable,authentication,offset})=>fixture(async f=>withActiveFailureLease(f,async(execution,scheduler)=>{
+  const before=await failureRows(f),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,pending:Promise<unknown>|undefined;
+  try{await locker.query('begin');held=true;await locker.query('select singleton from scheduler_configuration where singleton=true for update');pending=scheduler.fail({...execution,durable,authentication,code:'synthetic'}).catch(error=>error);
+   expect(await observedFailureWait(pid,'select singleton from scheduler_configuration')).toBe(true);f.now.setTime(new Date(before.stream.lease_expires_at).getTime()+offset);await locker.query('commit');held=false;const result=await pending;
+   if(offset>=0){expect(result).toMatchObject({message:'stale_worker',statusCode:409});expect(await failureRows(f)).toEqual(before);}
+   else{expect(result).toEqual({state:authentication?'suspended':durable?'error':'backoff'});const after=await failureRows(f);expect(after.runs[0].status).toBe(durable?'failed_durable':'failed_transient');expect(after.stream.lease_owner).toBeNull();expect(after.provider.state).toBe(authentication?'suspended':'active');expect(after.disposition).toEqual(before.disposition);await expect(scheduler.fail({...execution,durable,authentication,code:'synthetic'})).rejects.toMatchObject({message:'stale_worker'});expect(await failureRows(f)).toEqual(after);}
+  }finally{if(held)await locker.query('rollback');locker.release();if(pending)await pending;}
+ })));
+ const failureRowWaitCases=['stream','run','provider'].flatMap(lock=>[-1,0,1].map(offset=>({lock,offset})));
+ it.each(failureRowWaitCases)('A2.4 P2-06 $lock row wait at expiry $offset',async ({lock,offset})=>fixture(async f=>withActiveFailureLease(f,async(execution,scheduler)=>{
+  const before=await failureRows(f),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,pending:Promise<unknown>|undefined;
+  try{await locker.query('begin');held=true;await locker.query(lock==='stream'?'select id from sync_streams where id=$1 for update':lock==='run'?'select id from sync_runs where id=$1 for update':'select id from provider_instances where id=$1 for update',[lock==='stream'?f.stream:lock==='run'?execution.runId:f.provider]);
+   pending=scheduler.fail({...execution,durable:true,authentication:lock==='provider',code:'synthetic'}).catch(error=>error);
+   expect(await observedFailureWait(pid,lock==='stream'?'select * from sync_streams':lock==='run'?'update sync_runs':"update provider_instances set state='suspended'")).toBe(true);
+   f.now.setTime(new Date(before.stream.lease_expires_at).getTime()+offset);await locker.query('commit');held=false;const result=await pending;
+   if(offset>=0){expect(result).toMatchObject({message:'stale_worker'});expect(await failureRows(f)).toEqual(before);}else expect(result).toEqual({state:lock==='provider'?'suspended':'error'});
+  }finally{if(held)await locker.query('rollback');locker.release();if(pending)await pending;}
+ })));
+ it('A2.4 P2-06 recovery preserves interrupted execution against old fail',async()=>fixture(async f=>withActiveFailureLease(f,async(execution,scheduler)=>{
+  f.now.setTime(new Date((await failureRows(f)).stream.lease_expires_at).getTime());expect(await scheduler.recover()).toEqual({recovered:1});const before=await failureRows(f);expect(before.disposition.traversal.status).toBe('partial');expect(before.runs[0].status).toBe('interrupted');await expect(scheduler.fail({...execution,durable:true,code:'synthetic'})).rejects.toMatchObject({message:'stale_worker'});expect(await failureRows(f)).toEqual(before);
+ })));
+ it.each(['run','stream','provider'])('A2.4 P2-06 SQL error in $stage rolls back all failure writes',async stage=>fixture(async f=>withActiveFailureLease(f,async(execution,scheduler)=>{
+  const before=await failureRows(f),original=Client.prototype.query;let injected=false;const intercept=vi.spyOn(Client.prototype,'query');intercept.mockImplementation(function(this:Client,...args:unknown[]){const sql=args[0];if(!injected&&typeof sql==='string'&&(stage==='run'?sql.startsWith('update sync_runs set status='):stage==='stream'?sql.startsWith('update sync_streams set state='):sql.startsWith("update provider_instances set state='suspended'"))){injected=true;return Reflect.apply(original,this,['select 1/0']);}return Reflect.apply(original,this,args);} as Parameters<typeof intercept.mockImplementation>[0]);
+  try{await expect(scheduler.fail({...execution,durable:true,authentication:true,code:'synthetic'})).rejects.toMatchObject({code:'22012'});expect(injected).toBe(true);expect(await failureRows(f)).toEqual(before);}finally{intercept.mockRestore();}
+ })));
+ it.each(['run_id','stream_id','worker_id','generation'])('A2.4 P2-06 mismatched $field cannot finalize a run',async field=>fixture(async f=>withActiveFailureLease(f,async(execution,scheduler)=>{
+  const before=await failureRows(f),invalid={...execution};if(field==='run_id')invalid.runId=randomUUID();else if(field==='stream_id')invalid.streamId=randomUUID();else if(field==='worker_id')invalid.workerId='old-worker';else invalid.generation--;
+  await expect(scheduler.fail({...invalid,durable:true,code:'synthetic'})).rejects.toMatchObject({message:'stale_worker'});expect(await failureRows(f)).toEqual(before);
+ })));
+ it('A2.4 P2-06 rechecks after the last successful failure write',async()=>fixture(async f=>withActiveFailureLease(f,async(execution,scheduler)=>{
+  const before=await failureRows(f),original=Client.prototype.query;let advanced=false;const intercept=vi.spyOn(Client.prototype,'query');intercept.mockImplementation(function(this:Client,...args:unknown[]){const result=Reflect.apply(original,this,args);if(!advanced&&typeof args[0]==='string'&&args[0].startsWith("update provider_instances set state='suspended'")){advanced=true;return Promise.resolve(result).then(value=>{f.now.setTime(new Date(before.stream.lease_expires_at).getTime());return value;});}return result;} as Parameters<typeof intercept.mockImplementation>[0]);
+  try{await expect(scheduler.fail({...execution,durable:true,authentication:true,code:'synthetic'})).rejects.toMatchObject({message:'stale_worker'});expect(advanced).toBe(true);expect(await failureRows(f)).toEqual(before);}finally{intercept.mockRestore();}
+ })));
+
 });
