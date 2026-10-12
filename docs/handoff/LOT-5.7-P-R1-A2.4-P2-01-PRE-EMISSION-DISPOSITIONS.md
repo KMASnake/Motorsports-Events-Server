@@ -230,3 +230,38 @@ and before COMMIT initiation, with `now >= expires_at` stale. Physical COMMIT do
 not freeze time. No migration, 0042 change, recurring consumer, physical-call fence,
 heartbeat, association-generation redesign or A3 implementation is introduced.
 Local correction evidence is not independent maintainer certification.
+
+## A2.4-P2-05 — targeted success commit authorization
+
+A targeted successful result previously entered the scheduler commit transaction
+without its final authorization callback. A retry-unit lock wait in completeUnit
+could outlast the lease after the scheduler's initial check and still publish
+checkpoint/run completion.
+
+The targeted success apply callback now captures the existing execution guard
+before applying source/traversal writes. It checks current owner, generation,
+run/traversal and ACQUIRING handoff under the existing stream/traversal locks.
+The target unit association and logical identity are those verified by targeted
+activation, retained by the logical claim and application checkpoint/stream locks.
+Its synchronous time guard is mandatory at final commit authorization: a missing
+captured guard refuses as stale_worker. The check runs after all source, unit,
+run and checkpoint operations and immediately before COMMIT initiation. Expiry
+(including equality) throws through the owning rollback before propagation; no
+successful checkpoint/run/unit/traversal changes survive. Own successful traversal
+completion or handoff preparation is not mistaken for external authority loss.
+Untargeted acquisitions do not require this targeted callback and retain their
+existing behavior. No new lock or accounting policy is introduced.
+
+Regression cases observe actual completeUnit row-lock contention and cover valid,
+equal and expired leases, with both complete/partial results and zero/one simulated
+emissions. Valid controls preserve the existing unit completion policy, while stale
+cases compare full stream/run/unit/traversal/anomaly rows after rollback. Independent
+zero-emission reproduction preserves page:1 and running and returns stale_worker.
+Application recovery and actual SQL errors in application, checkpoint and unit
+completion are also covered. Sovereign confirmed charges remain accounted; rollback
+of acquisition success never invents an emission refund. P2-01 through P2-04 remain
+covered by the A2.4 filter and full PostgreSQL regression gate.
+
+This is a scoped success-path correction, not a certification of every scheduler
+transaction exit. No migration, 0042 change, provider execution, periodic consumer,
+physical-call fence, heartbeat or A3 implementation is introduced.

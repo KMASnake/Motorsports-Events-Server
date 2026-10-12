@@ -86,10 +86,12 @@ export class AcquisitionTransactionService{
     }
     try{
       await input.beforeCommit?.();
+      let authorizeCommit:(()=>void)|undefined;
       await this.scheduler.commit({
         ...input.lease,
         cursorAfter:result.nextCursor,
-        apply:async client=>{await this.persistUnit(client,{...input,traversalId,result});if(retryUnitId)await retry.completeUnit(client,retryUnitId);}
+        authorizeCommit:retryExecution?()=>{if(!authorizeCommit)throw staleWorker();authorizeCommit();}:undefined,
+        apply:async client=>{if(retryExecution)authorizeCommit=await retry.authorizeExecutionFailure(client,retryExecution);await this.persistUnit(client,{...input,traversalId,result});if(retryUnitId)await retry.completeUnit(client,retryUnitId);}
       });
     }catch(error){await this.closeTraversalFailure(traversalId,input.lease,retryUnitId,error,retryExecution);throw error;}
     return {traversalId,result,checkpointAdvanced:true};

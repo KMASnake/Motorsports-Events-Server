@@ -528,4 +528,32 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
   expect((await f.retry.load(f.unit)).state).toBe('retry_wait');expect((await dispositionRows(f)).traversal.status).toBe(outcome==='cursor_invalid'?'partial':'failed');expect((await dispositionRows(f)).anomalies).toEqual([]);expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);
  }));
 
+ const successLeaseCases=[false,true].flatMap(emitted=>[false,true].flatMap(complete=>[-1,0,1].map(offset=>({emitted,complete,offset}))));
+ it.each(successLeaseCases)('A2.4 P2-05 success emitted=$emitted complete=$complete at expiry offset $offset',async ({emitted,complete,offset})=>fixture(async f=>{
+  f.behavior.requests=emitted?1:0;f.behavior.complete=complete;
+  const original=f.fetch.getMockImplementation()!,locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false;
+  let before:Awaited<ReturnType<typeof dispositionRows>>|undefined,streamBefore:unknown,runsBefore:unknown;
+  f.fetch.mockImplementation(async input=>{const result=await original(input);await locker.query('begin');held=true;await locker.query('select id from provider_acquisition_retry_units where id=$1 for update',[f.unit]);before=await dispositionRows(f);streamBefore=(await pool.query('select * from sync_streams where id=$1',[f.stream])).rows[0];runsBefore=(await pool.query('select * from sync_runs where stream_id=$1',[f.stream])).rows;return result;});
+  const pending=f.service.resume(f.unit,context).then(value=>({value,error:null}),error=>({value:null,error}));
+  try{
+   let waiting=false;for(let poll=0;poll<500;poll++){const rows=(await pool.query("select query from pg_stat_activity where wait_event_type='Lock' and $1=any(pg_blocking_pids(pid))",[pid])).rows;if(rows.some(row=>String(row.query).startsWith('select id from provider_acquisition_retry_units'))){waiting=true;break;}}
+   expect(waiting).toBe(true);const expiry=new Date((await pool.query('select lease_expires_at from sync_streams where id=$1',[f.stream])).rows[0].lease_expires_at);f.now.setTime(expiry.getTime()+offset);await locker.query('commit');held=false;
+   const result=await pending;
+   if(offset>=0){expect(result.error).toMatchObject({message:'stale_worker',statusCode:409});expect(await dispositionRows(f)).toEqual(before);expect((await pool.query('select * from sync_streams where id=$1',[f.stream])).rows[0]).toEqual(streamBefore);expect((await pool.query('select * from sync_runs where stream_id=$1',[f.stream])).rows).toEqual(runsBefore);expect(f.handoff).not.toHaveBeenCalled();}
+   else{expect(result.error).toBeNull();expect(result.value?.status).toBe('completed');expect((await pool.query('select cursor from sync_streams where id=$1',[f.stream])).rows[0].cursor).toEqual({page:2});expect((await pool.query('select status from sync_runs where stream_id=$1',[f.stream])).rows[0].status).toBe('completed');expect((await f.retry.load(f.unit)).state).toBe(emitted?'succeeded':'retry_wait');if(complete)expect(f.handoff).toHaveBeenCalledOnce();}
+   expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(emitted?1:0);expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe(emitted?'1':'0');
+  }finally{if(held)await locker.query('rollback');locker.release();await pending;}
+ }));
+ it('A2.4 P2-05 application recovery rejects old successful completion',async()=>fixture(async f=>{
+  f.behavior.requests=0;let recovered:Awaited<ReturnType<typeof dispositionRows>>|undefined;
+  f.behavior.beforeFetch=async()=>{f.now.setTime(new Date((await pool.query('select lease_expires_at from sync_streams where id=$1',[f.stream])).rows[0].lease_expires_at).getTime());expect(await f.scheduler.recover()).toEqual({recovered:1});recovered=await dispositionRows(f);};
+  await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({message:'stale_worker'});expect(await dispositionRows(f)).toEqual(recovered);expect((await pool.query('select cursor from sync_streams where id=$1',[f.stream])).rows[0].cursor).toEqual({});expect((await pool.query('select status from sync_runs where stream_id=$1',[f.stream])).rows[0].status).toBe('interrupted');
+ }));
+ it.each(['application','checkpoint','completeUnit'])('A2.4 P2-05 SQL error in success $stage cannot publish success',async stage=>fixture(async f=>{
+  f.behavior.requests=0;const before=await f.retry.load(f.unit),original=Client.prototype.query;let injected=false;
+  const intercept=vi.spyOn(Client.prototype,'query');intercept.mockImplementation(function(this:Client,...args:unknown[]){const sql=args[0];const match=typeof sql==='string'&&(stage==='application'?sql.startsWith('update provider_source_entities child'):stage==='checkpoint'?sql.startsWith('update sync_streams set cursor='):sql.startsWith("update provider_acquisition_retry_units set state='succeeded'"));if(match&&!injected){injected=true;return Reflect.apply(original,this,['select 1/0']);}return Reflect.apply(original,this,args);} as Parameters<typeof intercept.mockImplementation>[0]);
+  try{await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({code:'22012'});expect(injected).toBe(true);expect(await f.retry.load(f.unit)).toEqual(before);expect((await pool.query('select cursor from sync_streams where id=$1',[f.stream])).rows[0].cursor).toEqual({});expect((await pool.query('select status from sync_runs where stream_id=$1',[f.stream])).rows[0].status).not.toBe('completed');expect(f.handoff).not.toHaveBeenCalled();}
+  finally{intercept.mockRestore();}
+ }));
+
 });
