@@ -311,3 +311,55 @@ A2.2/A1/A2.1, ordinary acquisition/scheduler/quota and repository regressions.
 This is local correction evidence, not cumulative A2.4 certification. Independent
 maintainer audit remains required. Migration 0042, A3 physical-call fencing,
 heartbeat, distributed generations and periodic runtime are unchanged.
+
+## A2.4-P2-07 — targeted initialization commit authority
+
+The resumed-traversal UPDATE bound its lease timestamp before a traversal lock
+wait. After expiry, that statement could still use the old timestamp and commit
+running state, the new run binding and ACQUIRING handoff. A later refusal did not
+undo this already-committed initialization.
+
+Targeted initialization now requires its captured RetryExecution and invokes the
+existing execution guard after all initialization writes and the final unit
+snapshot read. The guard checks current stream owner/generation/expiry, active
+run/traversal identity and ACQUIRING handoff. Its synchronous clock callback is
+then called immediately before COMMIT initiation, after its last awaited read.
+Exact unit/checkpoint/work/season/safe-key identity was checked under the unit,
+stream and traversal locks and remains protected by those locks and the caller's
+logical claim. Mapping bindings preserve the same targeted traversal contract.
+No application-level blocking operation remains between the final clock check
+and COMMIT dispatch. Equality is stale; physical COMMIT does not freeze time.
+A refusal awaits the owning ROLLBACK before propagating stale_worker. Untargeted
+initialization does not receive a targeted-retry requirement.
+
+Deterministic probes observe the actual resumed UPDATE waiting on a traversal
+row, advance only the injectable clock, and compare all initialization rows after
+rollback. Both waiting states and expiry -1/equal/+1 are covered. Valid controls
+observe running state, the intended run and ACQUIRING before adapter execution.
+SQL failures before/during/after the traversal/run-binding statement, in handoff,
+at snapshot and final authorization prove atomic rollback. Application recovery,
+newer lease issuance, checkpoint commit and completed ordinary acquisition handoff
+supersede the old initialization without arbitrary authority SQL. Expiry after
+the last snapshot read is also refused. No stale case reaches the adapter or
+creates charges/attempts.
+
+### Targeted execution transaction boundaries
+
+| Owner/path | Writes and blocking operations | Commit authorization / rollback |
+| --- | --- | --- |
+| Scheduler acquire / claim preparation | Eligibility reads/locks, traversal preparation, lease generation and run issuance | Serialization root and exact-unit eligibility issue a new lease; this is not finalization under an existing lease. Initialization independently validates it. Errors roll back preparation. |
+| Acquisition initialization | Stream/unit/traversal locks, run binding, mapping, ACQUIRING and unit snapshot | Existing execution guard plus final clock callback after all writes; owning catch rolls back. |
+| Scheduler commit / targeted success | Source, observations, traversal, unit completion, run and checkpoint writes | Mandatory targeted callback captured before apply, invoked by helper after all writes; helper rolls back before propagation. |
+| Scheduler commit / partial abort, quota, budget | Targeted disposition/no-op, partial traversal, run and checkpoint writes | Current targeted outcome returns its guard; helper validates after remaining writes and rolls back refusals. |
+| Blocking acquisition failure | Unit disposition, traversal failure and anomaly UPSERT | Final returned guard follows UPSERT; owning catch rolls back. |
+| Cursor-invalid / post-fetch failure | Traversal metadata and existing disposition policy | Execution guard before metadata and final clock guard before owning COMMIT; errors roll back. |
+| Scheduler fail / activation cleanup | Run failure, stream health/lease release, optional provider state | Matching owner/generation/run plus fresh post-lock and final clock guards; helper rolls back. |
+| Scheduler recovery | Interrupted run, partial traversal and lease release | Expired stream locked under serialization root; replacement cannot race those writes. Recovery does not require the expired execution's authority. Errors roll back. |
+| Sovereign charge outcome | Confirmed emission, count and quota/disposition facts | Charge/idempotence locks authorize accounting independently of an acquisition lease; late truthful accounting is not a targeted result COMMIT. Errors roll back together. |
+
+No stale return is treated as transaction success in the reviewed targeted
+initialization/outcome owners. Terminal/duplicate no-ops keep their existing
+semantics; SQL exceptions do not authorize COMMIT. Initialization reuses held
+locks and adds no lock-order inversion. Migration 0042 and ordinary acquisition,
+A1 handoff, A2 accounting and A3 boundaries are unchanged. This correction and
+inventory are local evidence; cumulative certification requires independent audit.

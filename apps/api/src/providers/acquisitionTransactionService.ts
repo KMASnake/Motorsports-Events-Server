@@ -68,6 +68,13 @@ export class AcquisitionTransactionService{
         const unit=(await client.query('select row_to_json(u)::text outcome_snapshot from provider_acquisition_retry_units u where id=$1 for update',[input.retryUnitId])).rows[0];
         retryExecution={...input.lease,traversalId,outcomeSnapshot:unit.outcome_snapshot};
       }
+      // Exact target/checkpoint locks and the logical claim are retained here.
+      // Validate after initialization writes, then read time at COMMIT initiation.
+      if(input.retryUnitId){
+        if(!retryExecution)throw staleWorker();
+        const authorizeCommit=await retry.authorizeExecutionFailure(client,retryExecution);
+        authorizeCommit();
+      }
       await client.query('commit');
     }catch(error){await client.query('rollback');throw error;}finally{client.release();}
     let result:FetchWorkUnitResult<AcquiredProviderSourceItem,C>;

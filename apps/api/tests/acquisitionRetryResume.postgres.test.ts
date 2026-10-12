@@ -597,4 +597,49 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
   try{await expect(scheduler.fail({...execution,durable:true,authentication:true,code:'synthetic'})).rejects.toMatchObject({message:'stale_worker'});expect(advanced).toBe(true);expect(await failureRows(f)).toEqual(before);}finally{intercept.mockRestore();}
  })));
 
+ const initLeaseCases=['retry_wait','quota_wait'].flatMap(state=>[-1,0,1].map(offset=>({state,offset})));
+ it.each(initLeaseCases)('A2.4 P2-07 initialization from $state at expiry offset $offset',async ({state,offset})=>fixture(async f=>{
+  await pool.query('update provider_acquisition_retry_units set state=$2,quota_deadline=$3 where id=$1',[f.unit,state,f.now]);f.behavior.requests=0;
+  const acquire=f.scheduler.acquire.bind(f.scheduler),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,before:Awaited<ReturnType<typeof failureRows>>|undefined,intendedRun:string|undefined;
+  f.scheduler.acquire=async(...args)=>{const lease=await acquire(...args);expect(lease).toBeTruthy();intendedRun=lease!.run_id;before=await failureRows(f);await locker.query('begin');held=true;await locker.query('select id from provider_acquisition_traversals where id=$1 for update',[f.traversal]);return lease;};
+  let initialized=false;f.behavior.beforeFetch=async()=>{const rows=await failureRows(f);expect(rows.disposition.traversal.status).toBe('running');expect(rows.disposition.traversal.run_id).toBe(intendedRun);expect(rows.stream.historical_state.canonical_handoff_v1.traversals[f.traversal].state).toBe('ACQUIRING');initialized=true;};
+  const pending=f.service.resume(f.unit,context).then(value=>({value,error:null}),error=>({value:null,error}));
+  try{expect(await observedFailureWait(pid,'update provider_acquisition_traversals traversal set run_id=')).toBe(true);expect(before?.disposition.traversal.status).toBe('partial');expect(before?.disposition.traversal.run_id).toBeNull();expect(before?.stream.historical_state).toEqual({});f.now.setTime(new Date(before!.stream.lease_expires_at).getTime()+offset);await locker.query('commit');held=false;const result=await pending;
+   if(offset>=0){expect(result.error).toMatchObject({message:'stale_worker',statusCode:409});expect(await failureRows(f)).toEqual(before);expect(f.fetch).not.toHaveBeenCalled();expect(initialized).toBe(false);}else{expect(result.error).toBeNull();expect(result.value?.status).toBe('completed');expect(initialized).toBe(true);}
+   expect((await f.retry.load(f.unit)).emitted_attempt_count).toBe(0);expect((await pool.query('select count(*) n from provider_request_charges where provider_instance_id=$1',[f.provider])).rows[0].n).toBe('0');
+  }finally{if(held)await locker.query('rollback');locker.release();await pending;}
+ }));
+ it.each(['before_traversal','traversal_run_binding','after_traversal','handoff','snapshot','authorization'])('A2.4 P2-07 SQL error at initialization %s rolls back all writes',async stage=>fixture(async f=>{
+  const acquire=f.scheduler.acquire.bind(f.scheduler);let before:Awaited<ReturnType<typeof failureRows>>|undefined,intercept:ReturnType<typeof vi.spyOn>|undefined,injected=false;
+  f.scheduler.acquire=async(...args)=>{const lease=await acquire(...args);before=await failureRows(f);const original=Client.prototype.query;const spy=vi.spyOn(Client.prototype,'query');intercept=spy;spy.mockImplementation(function(this:Client,...queryArgs:unknown[]){const sql=queryArgs[0];const match=typeof sql==='string'&&(stage==='before_traversal'?sql.startsWith('select id from provider_acquisition_retry_units'):stage==='traversal_run_binding'?sql.startsWith('update provider_acquisition_traversals traversal'):stage==='after_traversal'?sql.startsWith('select historical_state from sync_streams where id='):stage==='handoff'?sql.startsWith('update sync_streams set historical_state=jsonb_set'):stage==='snapshot'?sql.startsWith('select row_to_json(u)::text outcome_snapshot'):sql.startsWith('select lease_owner,lease_generation,lease_expires_at,historical_state'));
+   if(match&&!injected){injected=true;return Reflect.apply(original,this,['select 1/0']);}return Reflect.apply(original,this,queryArgs);
+  } as Parameters<typeof spy.mockImplementation>[0]);return lease;};
+  try{await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({code:'22012'});expect(injected).toBe(true);const after=await failureRows(f);expect(after.disposition).toEqual(before!.disposition);expect(after.stream.historical_state).toEqual(before!.stream.historical_state);expect(after.stream.cursor).toEqual(before!.stream.cursor);expect(f.fetch).not.toHaveBeenCalled();}
+  finally{intercept?.mockRestore();}
+ }));
+ it('A2.4 P2-07 expiry after the last snapshot read rolls back initialization',async()=>fixture(async f=>{
+  const acquire=f.scheduler.acquire.bind(f.scheduler);let before:Awaited<ReturnType<typeof failureRows>>|undefined,intercept:ReturnType<typeof vi.spyOn>|undefined,advanced=false;
+  f.scheduler.acquire=async(...args)=>{const lease=await acquire(...args);before=await failureRows(f);const original=Client.prototype.query;const spy=vi.spyOn(Client.prototype,'query');intercept=spy;spy.mockImplementation(function(this:Client,...queryArgs:unknown[]){const result=Reflect.apply(original,this,queryArgs);if(!advanced&&typeof queryArgs[0]==='string'&&queryArgs[0].startsWith('select row_to_json(u)::text outcome_snapshot')){advanced=true;return Promise.resolve(result).then(value=>{f.now.setTime(new Date(before!.stream.lease_expires_at).getTime());return value;});}return result;} as Parameters<typeof spy.mockImplementation>[0]);return lease;};
+  try{await expect(f.service.resume(f.unit,context)).rejects.toMatchObject({message:'stale_worker'});expect(advanced).toBe(true);expect(await failureRows(f)).toEqual(before);expect(f.fetch).not.toHaveBeenCalled();}finally{intercept?.mockRestore();}
+ }));
+ it.each(['recovery','replacement','checkpoint'])('A2.4 P2-07 application %s supersedes initialization',async transition=>fixture(async f=>{
+  const acquire=f.scheduler.acquire.bind(f.scheduler);let newer:Awaited<ReturnType<typeof failureRows>>|undefined;
+  f.scheduler.acquire=async(...args)=>{const lease=await acquire(...args);expect(lease).toBeTruthy();
+   if(transition==='checkpoint')await f.scheduler.commit({streamId:f.stream,runId:lease!.run_id,workerId:args[0],generation:lease!.lease_generation,cursorAfter:{page:99}});
+   else{f.now.setTime(new Date((await failureRows(f)).stream.lease_expires_at).getTime());expect(await f.scheduler.recover()).toEqual({recovered:1});if(transition==='replacement')expect(await acquire('newer-execution',{streamId:f.stream,preserveCursor:true})).toBeTruthy();}
+   newer=await failureRows(f);return lease;
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toThrow();expect(await failureRows(f)).toEqual(newer);expect(f.fetch).not.toHaveBeenCalled();
+ }));
+
+ it('A2.4 P2-07 completed ordinary acquisition owns handoff before old targeted initialization',async()=>fixture(async f=>{
+  const acquire=f.scheduler.acquire.bind(f.scheduler);let newer:Awaited<ReturnType<typeof failureRows>>|undefined;
+  f.scheduler.acquire=async(...args)=>{const lease=await acquire(...args);expect(lease).toBeTruthy();const association=(await pool.query('select provider_championship_id from sync_streams where id=$1',[f.stream])).rows[0].provider_championship_id;const championship=(await pool.query('select championship_id from provider_championships where id=$1',[association])).rows[0].championship_id;
+   const {AcquisitionTransactionService}=await import('../src/providers/acquisitionTransactionService.js');const ordinary=new AcquisitionTransactionService(f.scheduler,{now:()=>f.now});const adapter={...f.service.adapters.get('fixture')!,fetchWorkUnit:async()=>({status:'progress' as const,items:[],itemAnomalies:[],nextCursor:{page:2},requestCount:0,complete:true,completionReason:null})};
+   await ordinary.executeUnit({providerInstanceId:f.provider,providerChampionshipId:association,season:2026,workClass:'current_global',safeUnitKey:'synthetic',traversalId:f.traversal,lease:{streamId:f.stream,runId:lease!.run_id,workerId:args[0],generation:lease!.lease_generation},adapter,fetchInput:{providerInstanceId:f.provider,providerChampionshipId:association,championshipId:championship,providerConfig:{},sourceConfig:{},credentials:{},phase:'current',season:2026,cursor:{page:1},signal:new AbortController().signal}});
+   newer=await failureRows(f);expect(newer.stream.historical_state.canonical_handoff_v1.traversals[f.traversal].state).toBe('HANDOFF_PENDING');return lease;
+  };
+  await expect(f.service.resume(f.unit,context)).rejects.toThrow();expect(await failureRows(f)).toEqual(newer);expect(f.fetch).not.toHaveBeenCalled();
+ }));
+
 });
