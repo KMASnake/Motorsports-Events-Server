@@ -698,5 +698,64 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
   const spy=vi.spyOn(Client.prototype,'query');spy.mockImplementation(function(this:Client,...args:unknown[]){if(!triggered&&typeof args[0]==='string'&&args[0].startsWith('update sync_streams set cursor=')){triggered=true;if(mode==='sql')return Reflect.apply(original,this,['select 1/0']);return Promise.resolve(Reflect.apply(original,this,args)).then(value=>{f.now.setTime(new Date(before.stream.lease_expires_at).getTime());return value;});}return Reflect.apply(original,this,args);} as Parameters<typeof spy.mockImplementation>[0]);
   try{await expect(scheduler.commit({streamId:f.stream,runId:lease!.run_id,workerId:'final-probe',generation:lease!.lease_generation,cursorAfter:{page:2},apply:async client=>{await client.query("update provider_acquisition_traversals set status='failed' where id=$1",[f.traversal]);}})).rejects.toMatchObject(mode==='sql'?{code:'22012'}:{message:'stale_worker'});expect(triggered).toBe(true);expect(await failureRows(f)).toEqual(before);}finally{spy.mockRestore();}
  }));
+ async function renewalFixture(f:ResumeFixture,kind:'stream'|'discovery'){
+  const scheduler=new PersistentSchedulerService({now:()=>new Date(f.now.getTime())}),worker='renewal-'+randomUUID();let generation:number,runId:string|null=null;
+  if(kind==='stream'){await pool.query("update sync_streams set state='ready',cursor='{\"page\":1}' where id=$1",[f.stream]);const lease=await scheduler.acquire(worker,{streamId:f.stream,preserveCursor:true});expect(lease).toBeTruthy();generation=lease!.lease_generation;runId=lease!.run_id;}
+  else{await pool.query('update provider_instances set discovery_enabled=true where id=$1',[f.provider]);const lease=await scheduler.acquireDueDiscovery(worker);expect(lease?.id).toBe(f.provider);generation=Number(lease.discovery_lease_generation);}
+  const before=await failureRows(f),expiresAt=new Date(kind==='stream'?before.stream.lease_expires_at:before.provider.discovery_lease_expires_at).getTime(),duration=Number((await scheduler.config()).lease_duration_seconds)*1000;
+  f.now.setTime(expiresAt-duration*0.75);
+  return {scheduler,worker,generation,runId,expiresAt,duration,id:kind==='stream'?f.stream:f.provider,table:kind==='stream'?'sync_streams':'provider_instances',field:kind==='stream'?'lease_expires_at':'discovery_lease_expires_at',renew:()=>kind==='stream'?scheduler.heartbeat(f.stream,worker,generation):scheduler.heartbeatDiscovery(f.provider,worker,generation)};
+ }
+ const renewalWaitCases=(['stream','discovery'] as const).flatMap(kind=>(['root','owner'] as const).flatMap(lock=>[-1,0,1].map(offset=>({kind,lock,offset}))));
+ it.each(renewalWaitCases)('A2.4 P2-13/P2-14 $kind heartbeat $lock wait expiry=$offset',async({kind,lock,offset})=>fixture(async f=>{
+  const r=await renewalFixture(f,kind),before=await failureRows(f),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,pending:ReturnType<typeof r.renew>|undefined;
+  try{await locker.query('begin');held=true;if(lock==='root')await locker.query('select singleton from scheduler_configuration where singleton=true for update');else await locker.query(`select id from ${r.table} where id=$1 for update`,[r.id]);
+   const resultPromise=r.renew().then(value=>({value,error:null}),error=>({value:null,error}));pending=resultPromise.then(result=>result.value);
+   expect(await observedFailureWait(pid,lock==='root'?'select singleton from scheduler_configuration':kind==='stream'?'select lease_owner owner':'select discovery_lease_owner owner')).toBe(true);
+   f.now.setTime(r.expiresAt+offset);await locker.query('commit');held=false;const result=await resultPromise;
+   if(offset>=0){expect(result.error).toMatchObject({message:'lease_lost',statusCode:409});expect(await failureRows(f)).toEqual(before);
+    if(kind==='stream'){await expect(r.scheduler.commit({streamId:f.stream,runId:r.runId!,workerId:r.worker,generation:r.generation,cursorAfter:{page:2}})).rejects.toMatchObject({message:'stale_worker'});expect(await failureRows(f)).toEqual(before);}else await expect(r.scheduler.assertDiscoveryLease(f.provider,r.worker,r.generation)).rejects.toMatchObject({message:'lease_lost'});
+   }else{expect(result.error).toBeNull();expect(new Date(result.value[r.field]).getTime()).toBe(f.now.getTime()+r.duration);const after=await failureRows(f);expect(kind==='stream'?after.stream.lease_owner:after.provider.discovery_lease_owner).toBe(r.worker);expect(Number(kind==='stream'?after.stream.lease_generation:after.provider.discovery_lease_generation)).toBe(r.generation);
+    if(kind==='stream'){await r.scheduler.commit({streamId:f.stream,runId:r.runId!,workerId:r.worker,generation:r.generation,cursorAfter:{page:2}});expect((await failureRows(f)).runs[0].status).toBe('completed');}else expect((await r.scheduler.assertDiscoveryLease(f.provider,r.worker,r.generation)).id).toBe(f.provider);
+   }
+  }finally{if(held)await locker.query('rollback');if(pending)await pending;locker.release();}
+ }));
+ const renewalPostUpdateCases=(['stream','discovery'] as const).flatMap(kind=>[-1,0,1].map(offset=>({kind,offset})));
+ it.each(renewalPostUpdateCases)('A2.4 P2-13/P2-14 $kind AFTER UPDATE lock expiry=$offset rolls back using original expiry',async({kind,offset})=>fixture(async f=>{
+  const r=await renewalFixture(f,kind),before=await failureRows(f),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid,trigger='renewal_'+f.provider.replaceAll('-','');let held=false,pending:Promise<unknown>|undefined;
+  try{
+   await locker.query(`create function pg_temp.${trigger}() returns trigger language plpgsql as $$begin if new.id='${r.id}'::uuid and new.${r.field} is distinct from old.${r.field} then perform pg_advisory_xact_lock(514,hashtext('${r.id}')); end if; return new; end$$`);
+   await locker.query(`create trigger ${trigger} after update on ${r.table} for each row execute function pg_temp.${trigger}()`);
+   await locker.query('select pg_advisory_lock(514,hashtext($1))',[r.id]);held=true;
+   const resultPromise=r.renew().then(value=>({value,error:null}),error=>({value:null,error}));pending=resultPromise;
+   expect(await observedFailureWait(pid,`update ${r.table} set ${r.field}=`)).toBe(true);expect(await failureRows(f)).toEqual(before);
+   f.now.setTime(r.expiresAt+offset);await locker.query('select pg_advisory_unlock(514,hashtext($1))',[r.id]);held=false;const result=await resultPromise;
+   if(offset>=0){expect(result.error).toMatchObject({message:'lease_lost'});expect(await failureRows(f)).toEqual(before);}else{expect(result.error).toBeNull();expect(new Date(result.value[r.field]).getTime()).toBe(r.expiresAt+r.duration*0.25);}
+  }finally{if(held)await locker.query('select pg_advisory_unlock(514,hashtext($1))',[r.id]);if(pending)await pending;await locker.query(`drop trigger if exists ${trigger} on ${r.table}`);await locker.query(`drop function if exists pg_temp.${trigger}()`);locker.release();}
+ }));
+ it.each(['stream','discovery'] as const)('A2.4 P2-13/P2-14 %s SQL AFTER UPDATE error rolls back renewal',async kind=>fixture(async f=>{
+  const r=await renewalFixture(f,kind),before=await failureRows(f),client=await pool.connect(),trigger='renewal_sql_'+f.provider.replaceAll('-','');
+  try{await client.query(`create function pg_temp.${trigger}() returns trigger language plpgsql as $$begin if new.id='${r.id}'::uuid and new.${r.field} is distinct from old.${r.field} then perform 1/0; end if; return new; end$$`);await client.query(`create trigger ${trigger} after update on ${r.table} for each row execute function pg_temp.${trigger}()`);
+   await expect(r.renew()).rejects.toMatchObject({code:'22012'});expect(await failureRows(f)).toEqual(before);
+  }finally{await client.query(`drop trigger if exists ${trigger} on ${r.table}`);await client.query(`drop function if exists pg_temp.${trigger}()`);client.release();}
+ }));
+ it.each((['stream','discovery'] as const).flatMap(kind=>['worker','generation','replacement','recovery'].map(change=>({kind,change}))))('A2.4 P2-13/P2-14 $kind $change rejects former authority',async({kind,change})=>fixture(async f=>{
+  const r=await renewalFixture(f,kind),prefix=kind==='stream'?'':'discovery_';
+  if(change==='worker')await pool.query(`update ${r.table} set ${prefix}lease_owner='replacement-worker' where id=$1`,[r.id]);
+  else if(change==='generation')await pool.query(`update ${r.table} set ${prefix}lease_generation=${prefix}lease_generation+1 where id=$1`,[r.id]);
+  else{f.now.setTime(r.expiresAt);if(kind==='stream'){expect(await r.scheduler.recover()).toEqual({recovered:1});if(change==='replacement')expect(await r.scheduler.acquire('replacement-worker',{streamId:f.stream,preserveCursor:true})).toBeTruthy();}else{expect(await r.scheduler.recover()).toEqual({recovered:0});if(change==='replacement')expect((await r.scheduler.acquireDueDiscovery('replacement-worker')).id).toBe(f.provider);}}
+  const newer=await failureRows(f);await expect(r.renew()).rejects.toMatchObject({message:'lease_lost'});expect(await failureRows(f)).toEqual(newer);
+ }));
+ it.each(['stream','discovery'] as const)('A2.4 P2-13/P2-14 two concurrent %s heartbeats serialize without generation drift',async kind=>fixture(async f=>{
+  const r=await renewalFixture(f,kind);const results=await Promise.all([r.renew(),r.renew()]);expect(results).toHaveLength(2);for(const result of results)expect(new Date(result[r.field]).getTime()).toBe(f.now.getTime()+r.duration);const after=await failureRows(f);expect(Number(kind==='stream'?after.stream.lease_generation:after.provider.discovery_lease_generation)).toBe(r.generation);
+ }));
+ it.each(['commit','fail','recover-valid','recover-expired'])('A2.4 P2-13 stream heartbeat concurrent with %s has no deadlock or resurrection',async action=>fixture(async f=>{
+  const r=await renewalFixture(f,'stream');if(action==='recover-expired')f.now.setTime(r.expiresAt);
+  const finalizer=()=>action==='commit'?r.scheduler.commit({streamId:f.stream,runId:r.runId!,workerId:r.worker,generation:r.generation,cursorAfter:{page:2}}):action==='fail'?r.scheduler.fail({streamId:f.stream,runId:r.runId!,workerId:r.worker,generation:r.generation,durable:true,code:'synthetic'}):r.scheduler.recover();
+  const [heartbeat,finalization]=await Promise.allSettled([r.renew(),finalizer()]);expect(finalization.status).toBe('fulfilled');const after=await failureRows(f);expect(Number(after.stream.lease_generation)).toBe(r.generation);
+  if(action==='recover-expired'){expect(heartbeat.status).toBe('rejected');expect(after.stream.lease_owner).toBeNull();expect(after.runs[0].status).toBe('interrupted');}
+  else if(action==='recover-valid'){expect(heartbeat.status).toBe('fulfilled');expect(after.stream.lease_owner).toBe(r.worker);expect(after.runs[0].status).toBe('running');}
+  else{expect(after.stream.lease_owner).toBeNull();expect(after.runs[0].status).toBe(action==='commit'?'completed':'failed_durable');if(heartbeat.status==='rejected')expect(heartbeat.reason).toMatchObject({message:'lease_lost'});}
+ }));
 
 });
