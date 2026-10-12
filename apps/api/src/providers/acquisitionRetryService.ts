@@ -4,7 +4,7 @@ import {readHandoffEnvelope} from './canonicalHandoffState.js';
 import {pool} from '../lib/db.js';
 import type {JsonObject} from './contracts.js';
 import {failureClassification,httpFailureCategory,normalizeRetryAfter,type ProviderFailureClassification} from './providerFailure.js';
-import {systemClock,type Clock} from './schedulerService.js';
+import {authorizeStreamRun,systemClock,type Clock} from './schedulerService.js';
 import type {Jitter} from './quotaCadenceService.js';
 
 const canonical=(v:unknown):unknown=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b)).map(([k,value])=>[k,canonical(value)])):v;
@@ -91,12 +91,8 @@ export class AcquisitionRetryService{
   }
   // Internal guard shared by targeted failure transaction owners. No disposition write.
   async authorizeExecutionFailure(client:PoolClient,execution:RetryExecution){
-    // Use the existing stream -> traversal -> unit lock order. No new fencing token.
-    const stream=(await client.query('select lease_owner,lease_generation,lease_expires_at,historical_state from sync_streams where id=$1 for update',[execution.streamId])).rows[0];
-    if(!stream||stream.lease_owner!==execution.workerId||Number(stream.lease_generation)!==execution.generation||!stream.lease_expires_at)throw staleWorker();
-    const expiresAt=new Date(stream.lease_expires_at).getTime();
-    const authorizeMutation=()=>{if(this.clock.now().getTime()>=expiresAt)throw staleWorker();};
-    authorizeMutation();
+    // Use the stream -> run -> traversal -> unit lock order. No new fencing token.
+    const {stream,authorizeCommit:authorizeMutation}=await authorizeStreamRun(client,execution,this.clock);
     const active=(await client.query(`select t.id from provider_acquisition_traversals t join sync_runs r on r.id=t.run_id
       where t.id=$1 and t.stream_id=$2 and t.run_id=$3 and t.lease_generation=$4 and t.status='running' and t.complete=false
       and r.stream_id=$2 and r.worker_id=$5 and r.lease_generation=$4 and r.status='running' for update of t`,[execution.traversalId,execution.streamId,execution.runId,execution.generation,execution.workerId])).rowCount;

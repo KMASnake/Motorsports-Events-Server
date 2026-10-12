@@ -641,5 +641,62 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
   };
   await expect(f.service.resume(f.unit,context)).rejects.toThrow();expect(await failureRows(f)).toEqual(newer);expect(f.fetch).not.toHaveBeenCalled();
  }));
+ const ordinaryCases=['P2-08','P2-09','P2-10','P2-11','P2-12','T03','T06'].flatMap(path=>[-1,0,1].map(offset=>({path,offset})));
+ it.each(ordinaryCases)('A2.4 consolidated $path real PostgreSQL wait expiry=$offset',async({path,offset})=>fixture(async f=>{
+  const {AcquisitionTransactionService}=await import('../src/providers/acquisitionTransactionService.js');
+  const clock={now:()=>new Date(f.now.getTime())},scheduler=new PersistentSchedulerService(clock),transactions=new AcquisitionTransactionService(scheduler,clock);
+  await pool.query("update sync_streams set state='ready',cursor='{\"page\":1}' where id=$1",[f.stream]);
+  await pool.query("update provider_acquisition_traversals set status='partial' where id=$1",[f.traversal]);
+  await pool.query("update provider_acquisition_retry_units set state='ready' where id=$1",[f.unit]);
+  const lease=await scheduler.acquire('ordinary-probe',{streamId:f.stream,preserveCursor:true});expect(lease).toBeTruthy();
+  const row=(await pool.query('select provider_championship_id from sync_streams where id=$1',[f.stream])).rows[0];
+  const locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;
+  let held=false,before:Awaited<ReturnType<typeof failureRows>>|undefined;
+  const block=async()=>{before=await failureRows(f);await locker.query('begin');held=true;
+   if(['P2-08','P2-09'].includes(path))await locker.query('select singleton from scheduler_configuration where singleton=true for update');
+   else if(path==='P2-10'||path==='T06')await locker.query('select id from sync_streams where id=$1 for update',[f.stream]);
+   else if(path==='T03')await locker.query('select id from provider_acquisition_retry_units where id=$1 for update',[f.unit]);
+   else await locker.query('select id from provider_acquisition_traversals where id=$1 for update',[f.traversal]);
+  };
+  if(path==='P2-11')await block();
+  const adapter={...f.service.adapters.get('fixture')!,fetchWorkUnit:async()=>{
+   if(!['P2-09','P2-11','T06'].includes(path))await block();
+   if(path==='P2-10')throw new ProviderConfigurationError('provider_credentials_missing','Synthetic');
+   if(path==='T03')throw Object.assign(new Error('Synthetic abort'),{code:'aborted'});
+   return {status:path==='P2-12'?'cursor_invalid' as const:'progress' as const,items:[],itemAnomalies:[],nextCursor:{page:2},requestCount:0,complete:path!=='P2-12',completionReason:null};
+  }};
+  const {acquisitionQuotaGate}=await import('../src/providers/providerOneShotRunner.js');
+  const pending=transactions.executeUnit({providerInstanceId:f.provider,providerChampionshipId:row.provider_championship_id,season:2026,workClass:'current_global',safeUnitKey:'synthetic',traversalId:f.traversal,lease:{streamId:f.stream,runId:lease!.run_id,workerId:'ordinary-probe',generation:lease!.lease_generation},adapter,partialErrorCodes:['aborted'],beforeCommit:path==='P2-09'?block:path==='T06'?async()=>{await block();throw new Error('persistence_failure');}:undefined,fetchInput:{providerInstanceId:f.provider,providerChampionshipId:row.provider_championship_id,championshipId:randomUUID(),providerConfig:{},sourceConfig:{},credentials:{},phase:'current',season:2026,cursor:{page:1},signal:new AbortController().signal,requestGate:acquisitionQuotaGate(f.quota,f.provider,f.stream,adapter)}}).then(value=>({value,error:null}),error=>({value:null,error}));
+  try{
+   const prefix=['P2-08','P2-09'].includes(path)?'select singleton from scheduler_configuration':path==='P2-10'||path==='T06'?'select lease_owner':path==='P2-11'?'update provider_acquisition_traversals traversal':path==='P2-12'?"update provider_acquisition_traversals set status='partial'":'select u.*,row_to_json(u)::text';
+   expect(await observedFailureWait(pid,prefix)).toBe(true);expect(before).toBeDefined();
+   f.now.setTime(new Date(before!.stream.lease_expires_at).getTime()+offset);
+   await locker.query('commit');held=false;const result=await pending;
+   if(offset>=0){expect(result.error).toMatchObject({message:'stale_worker',statusCode:409});expect(await failureRows(f)).toEqual(before);expect((await pool.query('select * from provider_acquisition_traversal_mappings where traversal_id=$1',[f.traversal])).rows).toEqual([]);}
+   else if(path==='P2-10'){expect(result.error).toBeInstanceOf(ProviderConfigurationError);const after=await failureRows(f);expect(after.disposition.traversal.status).toBe('failed');expect(after.runs[0].status).toBe('failed_durable');expect(after.disposition.anomalies).toHaveLength(1);}
+   else if(path==='T06'){expect(result.error).toMatchObject({message:'persistence_failure'});expect((await failureRows(f)).disposition.traversal.status).toBe('failed');}
+   else if(path==='T03'){expect(result.error).toMatchObject({code:'aborted'});const after=await failureRows(f);expect(after.disposition.traversal.status).toBe('partial');expect(after.runs[0].status).toBe('completed');}
+   else if(path==='P2-12'){expect(result.error).toBeNull();expect(result.value?.checkpointAdvanced).toBe(false);expect((await failureRows(f)).runs[0].status).toBe('failed_transient');}
+   else{expect(result.error).toBeNull();expect(result.value?.checkpointAdvanced).toBe(true);expect((await failureRows(f)).stream.cursor).toEqual({page:2});}
+  }finally{if(held)await locker.query('rollback');await pending;locker.release();}
+ }));
+ it.each(['recovery','replacement'])('A2.4 consolidated ordinary %s cannot be overwritten',async mode=>fixture(async f=>{
+  const {AcquisitionTransactionService}=await import('../src/providers/acquisitionTransactionService.js');const clock={now:()=>new Date(f.now.getTime())},scheduler=new PersistentSchedulerService(clock);
+  await pool.query("update sync_streams set state='ready',cursor='{\"page\":1}' where id=$1",[f.stream]);await pool.query("update provider_acquisition_traversals set status='partial' where id=$1",[f.traversal]);
+  const lease=await scheduler.acquire('old-ordinary',{streamId:f.stream,preserveCursor:true});const link=(await pool.query('select provider_championship_id from sync_streams where id=$1',[f.stream])).rows[0].provider_championship_id;
+  let recovered:Awaited<ReturnType<typeof failureRows>>|undefined;
+  const adapter={...f.service.adapters.get('fixture')!,fetchWorkUnit:async()=>{f.now.setTime(new Date(lease!.stream.lease_expires_at).getTime());expect(await scheduler.recover()).toEqual({recovered:1});if(mode==='replacement')expect(await scheduler.acquire('new-ordinary',{streamId:f.stream,preserveCursor:true})).toBeTruthy();recovered=await failureRows(f);return {status:'progress' as const,items:[],itemAnomalies:[],nextCursor:{page:99},requestCount:0,complete:true,completionReason:null};}};
+  await expect(new AcquisitionTransactionService(scheduler,clock).executeUnit({providerInstanceId:f.provider,providerChampionshipId:link,season:2026,workClass:'current_global',safeUnitKey:'synthetic',traversalId:f.traversal,lease:{streamId:f.stream,runId:lease!.run_id,workerId:'old-ordinary',generation:lease!.lease_generation},adapter,fetchInput:{providerInstanceId:f.provider,providerChampionshipId:link,championshipId:randomUUID(),providerConfig:{},sourceConfig:{},credentials:{},phase:'current',season:2026,cursor:{page:1},signal:new AbortController().signal}})).rejects.toMatchObject({message:'stale_worker'});expect(await failureRows(f)).toEqual(recovered);
+ }));
+ it.each(['runId','streamId','workerId','generation'])('A2.4 consolidated commit refuses wrong %s',async field=>fixture(async f=>{
+  await pool.query("update sync_streams set state='ready' where id=$1",[f.stream]);const scheduler=new PersistentSchedulerService({now:()=>new Date(f.now.getTime())}),lease=await scheduler.acquire('identity-probe',{streamId:f.stream,preserveCursor:true});
+  const execution={streamId:f.stream,runId:lease!.run_id,workerId:'identity-probe',generation:lease!.lease_generation};if(field==='generation')execution.generation--;else execution[field as 'streamId'|'runId'|'workerId']=randomUUID();const before=await failureRows(f);
+  await expect(scheduler.commit({...execution,cursorAfter:{page:99}})).rejects.toMatchObject({message:'stale_worker'});expect(await failureRows(f)).toEqual(before);
+ }));
+ it.each(['sql','expiry'])('A2.4 consolidated ordinary final checkpoint %s rolls back self-finalization',async mode=>fixture(async f=>{
+  await pool.query("update sync_streams set state='ready',cursor='{\"page\":1}' where id=$1",[f.stream]);const scheduler=new PersistentSchedulerService({now:()=>new Date(f.now.getTime())}),lease=await scheduler.acquire('final-probe',{streamId:f.stream,preserveCursor:true}),before=await failureRows(f),original=Client.prototype.query;let triggered=false;
+  const spy=vi.spyOn(Client.prototype,'query');spy.mockImplementation(function(this:Client,...args:unknown[]){if(!triggered&&typeof args[0]==='string'&&args[0].startsWith('update sync_streams set cursor=')){triggered=true;if(mode==='sql')return Reflect.apply(original,this,['select 1/0']);return Promise.resolve(Reflect.apply(original,this,args)).then(value=>{f.now.setTime(new Date(before.stream.lease_expires_at).getTime());return value;});}return Reflect.apply(original,this,args);} as Parameters<typeof spy.mockImplementation>[0]);
+  try{await expect(scheduler.commit({streamId:f.stream,runId:lease!.run_id,workerId:'final-probe',generation:lease!.lease_generation,cursorAfter:{page:2},apply:async client=>{await client.query("update provider_acquisition_traversals set status='failed' where id=$1",[f.traversal]);}})).rejects.toMatchObject(mode==='sql'?{code:'22012'}:{message:'stale_worker'});expect(triggered).toBe(true);expect(await failureRows(f)).toEqual(before);}finally{spy.mockRestore();}
+ }));
 
 });

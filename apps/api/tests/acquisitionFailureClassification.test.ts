@@ -3,7 +3,7 @@ import {AcquisitionTransactionService} from '../src/providers/acquisitionTransac
 import {ProviderHttpError} from '../src/providers/providerHttp.js';
 import type {PersistentSchedulerService} from '../src/providers/schedulerService.js';
 
-const database=vi.hoisted(()=>({query:vi.fn(async(sql:string)=>({rowCount:1,rows:sql.startsWith('select historical_state')?[{historical_state:{}}]:[]})),release:vi.fn()}));
+const database=vi.hoisted(()=>({query:vi.fn(async(sql:string)=>({rowCount:1,rows:sql.startsWith('select lease_owner')?[{lease_owner:'synthetic-test',lease_generation:1,lease_expires_at:new Date('2100-01-01T00:00:00Z'),historical_state:{},provider_championship_id:'link-fixture'}]:sql.startsWith('select historical_state')?[{historical_state:{}}]:[]})),release:vi.fn()}));
 vi.mock('../src/lib/db.js',()=>({pool:{connect:async()=>database,query:database.query}}));
 
 describe('R1-A2.1 acquisition transaction error boundary',()=>{

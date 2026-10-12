@@ -9,6 +9,22 @@ import { CanonicalCatalogPublicationService } from '../public/canonicalCatalogPu
 
 export type Clock={now():Date};
 export const systemClock:Clock={now:()=>new Date()};
+export type StreamRunExecution={streamId:string;runId:string;workerId:string;generation:number};
+export const isStaleWorker=(error:unknown):error is Error=>error instanceof Error&&error.message==='stale_worker';
+// Establish identity under locks before the transaction finalizes its own run/lease.
+// Only time can invalidate this held authority; check it again at COMMIT initiation.
+export async function authorizeStreamRun(client:PoolClient,execution:StreamRunExecution,clock:Clock){
+  const stale=()=>Object.assign(new Error('stale_worker'),{statusCode:409});
+  const stream=(await client.query('select lease_owner,lease_generation,lease_expires_at,historical_state,provider_championship_id from sync_streams where id=$1 for update',[execution.streamId])).rows[0];
+  if(!stream||stream.lease_owner!==execution.workerId||Number(stream.lease_generation)!==execution.generation||!stream.lease_expires_at)throw stale();
+  const expiresAt=new Date(stream.lease_expires_at).getTime();
+  const authorizeCommit=()=>{if(clock.now().getTime()>=expiresAt)throw stale();};
+  authorizeCommit();
+  const run=(await client.query(`select id from sync_runs where id=$1 and stream_id=$2 and worker_id=$3 and lease_generation=$4 and status='running' for update`,[execution.runId,execution.streamId,execution.workerId,execution.generation])).rowCount;
+  if(!run)throw stale();
+  authorizeCommit();
+  return {stream,authorizeCommit};
+}
 export type WorkClass='current'|'recent_catchup'|'deep_history';
 const status=(code:number,message:string)=>Object.assign(new Error(message),{statusCode:code});
 const currentStart=(now:Date,days:number)=>{const value=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()));value.setUTCDate(value.getUTCDate()-days);return value.toISOString().slice(0,10);};
@@ -47,7 +63,20 @@ export class PersistentSchedulerService{
   async heartbeatDiscovery(providerId:string,workerId:string,generation:number){const now=this.clock.now(),config=await this.config(),expires=new Date(now.getTime()+config.lease_duration_seconds*1000);const result=await pool.query(`update provider_instances set discovery_lease_expires_at=$4,updated_at=$3 where id=$1 and discovery_lease_owner=$2 and discovery_lease_generation=$5 and discovery_lease_expires_at>$3 returning discovery_lease_expires_at`,[providerId,workerId,now,expires,generation]);if(!result.rowCount)throw status(409,'lease_lost');return result.rows[0];}
   async assertDiscoveryLease(providerId:string,workerId:string,generation:number){const row=(await pool.query(`select id from provider_instances where id=$1 and discovery_lease_owner=$2 and discovery_lease_generation=$3 and discovery_lease_expires_at>$4`,[providerId,workerId,generation,this.clock.now()])).rows[0];if(!row)throw status(409,'lease_lost');return row;}
   async heartbeat(streamId:string,workerId:string,generation:number){const now=this.clock.now(),config=await this.config(),expires=new Date(now.getTime()+config.lease_duration_seconds*1000);const result=await pool.query(`update sync_streams set lease_expires_at=$4,updated_at=$3 where id=$1 and lease_owner=$2 and lease_generation=$5 and lease_expires_at>$3 returning lease_expires_at`,[streamId,workerId,now,expires,generation]);if(!result.rowCount)throw status(409,'lease_lost');return result.rows[0];}
-  async commit(input:{streamId:string;runId:string;workerId:string;generation:number;cursorAfter:JsonObject;historicalStateAfter?:JsonObject;apply?:(client:PoolClient)=>Promise<void>;authorizeCommit?:()=>void}){const now=this.clock.now();return tx(async client=>{const stream=(await client.query('select * from sync_streams where id=$1 for update',[input.streamId])).rows[0];if(!stream||stream.lease_owner!==input.workerId||Number(stream.lease_generation)!==input.generation||new Date(stream.lease_expires_at)<=now)throw status(409,'stale_worker');await assertNoPendingHandoff(client,stream.provider_championship_id);if(input.apply)await input.apply(client);await client.query(`update sync_runs set status='completed',cursor_after=$2::jsonb,finished_at=$3 where id=$1 and stream_id=$4 and status='running'`,[input.runId,JSON.stringify(input.cursorAfter),now,input.streamId]);const updated=(await client.query(`update sync_streams set cursor=$2::jsonb,historical_state=coalesce($4::jsonb,historical_state),state='ready',failure_count=0,last_error_code=null,lease_owner=null,lease_acquired_at=null,lease_expires_at=null,last_completed_at=$3,priority_boost_until=null,updated_at=$3 where id=$1 returning *`,[input.streamId,JSON.stringify(input.cursorAfter),now,input.historicalStateAfter?JSON.stringify(preserveHandoffEnvelope((await client.query('select historical_state from sync_streams where id=$1',[input.streamId])).rows[0].historical_state,input.historicalStateAfter)):null])).rows[0];return updated;},input.authorizeCommit);}
+  async commit(input:StreamRunExecution&{cursorAfter:JsonObject;historicalStateAfter?:JsonObject;apply?:(client:PoolClient)=>Promise<void>;authorizeCommit?:()=>void}){
+    let authority:(()=>void)|undefined;
+    return tx(async client=>{
+      const granted=await authorizeStreamRun(client,input,this.clock);authority=granted.authorizeCommit;
+      await assertNoPendingHandoff(client,granted.stream.provider_championship_id);
+      authority();
+      if(input.apply)await input.apply(client);
+      authority();const now=this.clock.now();
+      const run=await client.query(`update sync_runs set status='completed',cursor_after=$2::jsonb,finished_at=$3 where id=$1 and stream_id=$4 and worker_id=$5 and lease_generation=$6 and status='running' returning id`,[input.runId,JSON.stringify(input.cursorAfter),now,input.streamId,input.workerId,input.generation]);
+      if(!run.rowCount)throw status(409,'stale_worker');
+      const historical=input.historicalStateAfter?preserveHandoffEnvelope((await client.query('select historical_state from sync_streams where id=$1',[input.streamId])).rows[0].historical_state,input.historicalStateAfter):null;
+      return (await client.query(`update sync_streams set cursor=$2::jsonb,historical_state=coalesce($4::jsonb,historical_state),state='ready',failure_count=0,last_error_code=null,lease_owner=null,lease_acquired_at=null,lease_expires_at=null,last_completed_at=$3,priority_boost_until=null,updated_at=$3 where id=$1 returning *`,[input.streamId,JSON.stringify(input.cursorAfter),now,historical?JSON.stringify(historical):null])).rows[0];
+    },()=>{if(!authority)throw status(409,'stale_worker');authority();input.authorizeCommit?.();});
+  }
   async fail(input:{streamId:string;runId:string;workerId:string;generation:number;durable:boolean;code:string;nextEligibleAt?:Date;authentication?:boolean}){
     let authorizeCommit:(()=>void)|undefined;
     return tx(async client=>{
