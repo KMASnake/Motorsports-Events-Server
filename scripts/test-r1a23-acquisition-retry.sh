@@ -75,4 +75,4 @@ cd "${ROOT}"
 npm run build --workspace @mse/api
 DATABASE_URL="postgresql://mse:r1a23-local-only@127.0.0.1:${PORT}/r1a23_gate" \
   RUN_R1_A2_3_RETRY_POSTGRES=1 PREVIEW_API_ENABLED=false \
-  npm run test --workspace @mse/api -- --run tests/acquisitionRetryResume.postgres.test.ts
+  npm run test --workspace @mse/api -- --run --no-file-parallelism tests/acquisitionRetryResume.postgres.test.ts tests/discoveryAuthority.postgres.test.ts

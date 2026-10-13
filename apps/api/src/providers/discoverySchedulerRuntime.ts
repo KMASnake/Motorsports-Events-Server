@@ -73,7 +73,7 @@ export class DiscoverySchedulerRuntime {
       await this.discovery.discover(lease.id, 'periodic', {
         principal: { sub: this.workerId, role: 'admin', exp: 2_147_483_647, auth_method: 'technical_hmac' },
         requestId: randomUUID()
-      }, () => this.scheduler.assertDiscoveryLease(lease.id, this.workerId, generation));
+      }, {workerId:this.workerId,generation});
       if (leaseLost) throw new Error('Discovery lease lost before completion');
       await this.scheduler.releaseDiscovery(lease.id, this.workerId, generation);
     } catch (error) {

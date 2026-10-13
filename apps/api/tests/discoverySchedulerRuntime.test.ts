@@ -14,7 +14,7 @@ describe('periodic discovery runtime', () => {
     const runtime = new DiscoverySchedulerRuntime(scheduler as never, discovery as never, logger as never);
     await runtime.runOnce();
     expect(scheduler.acquireDueDiscovery).toHaveBeenCalledOnce();
-    expect(discovery.discover).toHaveBeenCalledWith('provider-a', 'periodic', expect.any(Object), expect.any(Function));
+    expect(discovery.discover).toHaveBeenCalledWith('provider-a', 'periodic', expect.any(Object), {workerId:expect.stringMatching(/^discovery:/),generation:7});
     expect(scheduler.releaseDiscovery).toHaveBeenCalledWith('provider-a', expect.stringMatching(/^discovery:/), 7);
   });
 
