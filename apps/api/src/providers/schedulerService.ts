@@ -94,6 +94,21 @@ export class PersistentSchedulerService{
       return (await client.query(`update sync_streams set cursor=$2::jsonb,historical_state=coalesce($4::jsonb,historical_state),state='ready',failure_count=0,last_error_code=null,lease_owner=null,lease_acquired_at=null,lease_expires_at=null,last_completed_at=$3,priority_boost_until=null,updated_at=$3 where id=$1 returning *`,[input.streamId,JSON.stringify(input.cursorAfter),now,historical?JSON.stringify(historical):null])).rows[0];
     },()=>{if(!authority)throw status(409,'stale_worker');authority();input.authorizeCommit?.();});
   }
+  // Between pages the lease has already been released. Only the last completed,
+  // unchanged generation may close its traversal while the stream is still idle.
+  async closeCommittedTraversal(input:StreamRunExecution&{traversalId:string}){
+    return tx(async client=>{
+      const stream=(await client.query('select id,lease_owner,lease_generation,cursor,historical_state from sync_streams where id=$1 for update',[input.streamId])).rows[0];
+      if(!stream||stream.lease_owner!==null||Number(stream.lease_generation)!==input.generation)return {closed:false};
+      const run=(await client.query(`select id from sync_runs where id=$1 and stream_id=$2 and worker_id=$3 and lease_generation=$4 and status='completed' and cursor_after=$5::jsonb for update`,[input.runId,input.streamId,input.workerId,input.generation,JSON.stringify(stream.cursor)])).rows[0];
+      if(!run||readHandoffEnvelope(stream.historical_state).traversals[input.traversalId]?.state!=='ACQUIRING')return {closed:false};
+      const traversal=(await client.query(`select id from provider_acquisition_traversals where id=$1 and stream_id=$2 and run_id=$3 and lease_generation=$4 and status='running' and complete=false for update`,[input.traversalId,input.streamId,input.runId,input.generation])).rows[0];
+      if(!traversal)return {closed:false};
+      const changed=await client.query(`update provider_acquisition_traversals set status='partial',finished_at=$5 where id=$1 and stream_id=$2 and run_id=$3 and lease_generation=$4 and status='running' and complete=false returning id`,[input.traversalId,input.streamId,input.runId,input.generation,this.clock.now()]);
+      if(changed.rowCount!==1)throw new Error('committed_traversal_closure_conflict');
+      return {closed:true};
+    });
+  }
   async fail(input:{streamId:string;runId:string;workerId:string;generation:number;durable:boolean;code:string;nextEligibleAt?:Date;authentication?:boolean}){
     let authorizeCommit:(()=>void)|undefined;
     return tx(async client=>{

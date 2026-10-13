@@ -757,5 +757,71 @@ suite('A2.3 explicitly invoked targeted retry',()=>{
   else if(action==='recover-valid'){expect(heartbeat.status).toBe('fulfilled');expect(after.stream.lease_owner).toBe(r.worker);expect(after.runs[0].status).toBe('running');}
   else{expect(after.stream.lease_owner).toBeNull();expect(after.runs[0].status).toBe(action==='commit'?'completed':'failed_durable');if(heartbeat.status==='rejected')expect(heartbeat.reason).toMatchObject({message:'lease_lost'});}
  }));
+ async function committedClosureFixture(f:ResumeFixture){
+  const {AcquisitionTransactionService}=await import('../src/providers/acquisitionTransactionService.js');const clock={now:()=>new Date(f.now.getTime())},scheduler=new PersistentSchedulerService(clock),worker='closure-'+randomUUID();
+  await pool.query("update sync_streams set state='ready',cursor='{\"page\":1}' where id=$1",[f.stream]);await pool.query("update provider_acquisition_traversals set status='partial' where id=$1",[f.traversal]);
+  const lease=await scheduler.acquire(worker,{streamId:f.stream,preserveCursor:true}),link=(await pool.query('select provider_championship_id from sync_streams where id=$1',[f.stream])).rows[0].provider_championship_id;
+  const adapter={...f.service.adapters.get('fixture')!,fetchWorkUnit:async()=>({status:'progress' as const,items:[],itemAnomalies:[],nextCursor:{page:2},requestCount:0,complete:false,completionReason:null})};
+  const input={providerInstanceId:f.provider,providerChampionshipId:link,season:2026,workClass:'current_global' as const,safeUnitKey:'synthetic',traversalId:f.traversal,lease:{streamId:f.stream,runId:lease!.run_id,workerId:worker,generation:lease!.lease_generation},adapter,fetchInput:{providerInstanceId:f.provider,providerChampionshipId:link,championshipId:randomUUID(),providerConfig:{},sourceConfig:{},credentials:{},phase:'current' as const,season:2026,cursor:{page:1},signal:new AbortController().signal}};
+  const transactions=new AcquisitionTransactionService(scheduler,clock);expect((await transactions.executeUnit(input)).checkpointAdvanced).toBe(true);
+  return {scheduler,transactions,input,context:Object.freeze({...input.lease,traversalId:f.traversal})};
+ }
+ it.each(['root','stream','traversal'])('A2.4 P2-15 legitimate closure waits on %s and changes only its traversal',async lock=>fixture(async f=>{
+  const r=await committedClosureFixture(f),before=await failureRows(f),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,pending:Promise<unknown>|undefined;
+  try{await locker.query('begin');held=true;await locker.query(lock==='root'?'select singleton from scheduler_configuration where singleton=true for update':lock==='stream'?'select id from sync_streams where id=$1 for update':'select id from provider_acquisition_traversals where id=$1 for update',lock==='root'?[]:[lock==='stream'?f.stream:f.traversal]);
+   pending=r.scheduler.closeCommittedTraversal(r.context);expect(await observedFailureWait(pid,lock==='root'?'select singleton from scheduler_configuration':lock==='stream'?'select id,lease_owner,lease_generation,cursor':'select id from provider_acquisition_traversals')).toBe(true);await locker.query('commit');held=false;expect(await pending).toEqual({closed:true});
+   const after=await failureRows(f);expect(after).toEqual({...before,disposition:{...before.disposition,traversal:{...before.disposition.traversal,status:'partial',finished_at:f.now}}});expect(await r.scheduler.closeCommittedTraversal(r.context)).toEqual({closed:false});expect(await failureRows(f)).toEqual(after);
+  }finally{if(held)await locker.query('rollback');if(pending)await pending;locker.release();}
+ }));
+ it.each(['runId','generation','workerId','streamId','traversalId'])('A2.4 P2-15 wrong %s is a mutation-free no-op',async field=>fixture(async f=>{
+  const r=await committedClosureFixture(f),before=await failureRows(f),wrong={...r.context};if(field==='generation')wrong.generation++;else wrong[field as 'runId'|'workerId'|'streamId'|'traversalId']=randomUUID();expect(await r.scheduler.closeCommittedTraversal(wrong)).toEqual({closed:false});expect(await failureRows(f)).toEqual(before);
+ }));
+ it.each(['partial','failed','complete','empty_confirmed'])('A2.4 P2-15 traversal already %s cannot be closed again',async status=>fixture(async f=>{
+  const r=await committedClosureFixture(f);await pool.query('update provider_acquisition_traversals set status=$2,complete=$3,finished_at=$4 where id=$1',[f.traversal,status,['complete','empty_confirmed'].includes(status),f.now]);const before=await failureRows(f);expect(await r.scheduler.closeCommittedTraversal(r.context)).toEqual({closed:false});expect(await failureRows(f)).toEqual(before);
+ }));
+ it('A2.4 P2-15 an idle checkpoint reset also supersedes closure',async()=>fixture(async f=>{
+  const r=await committedClosureFixture(f);await pool.query('update sync_streams set cursor=$2::jsonb where id=$1',[f.stream,JSON.stringify({page:99})]);const before=await failureRows(f);expect(await r.scheduler.closeCommittedTraversal(r.context)).toEqual({closed:false});expect(await failureRows(f)).toEqual(before);
+ }));
+ it('A2.4 P2-15 actual resume rebinds the traversal before a stale closure acquires root',async()=>fixture(async f=>{
+  const r=await committedClosureFixture(f),workerB='resume-'+randomUUID(),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,pending:Promise<unknown>|undefined;
+  const leaseB=await r.scheduler.acquire(workerB,{streamId:f.stream,preserveCursor:true});expect(leaseB!.lease_generation).toBeGreaterThan(r.context.generation);
+  await r.transactions.executeUnit({...r.input,lease:{streamId:f.stream,runId:leaseB!.run_id,workerId:workerB,generation:leaseB!.lease_generation},fetchInput:{...r.input.fetchInput,cursor:{page:2}},adapter:{...r.input.adapter,fetchWorkUnit:async()=>{
+   const before=await failureRows(f);expect(before.disposition.traversal.run_id).toBe(leaseB!.run_id);expect(before.disposition.traversal.status).toBe('running');
+   try{await locker.query('begin');held=true;await locker.query('select singleton from scheduler_configuration where singleton=true for update');pending=r.scheduler.closeCommittedTraversal(r.context);expect(await observedFailureWait(pid,'select singleton from scheduler_configuration')).toBe(true);await locker.query('commit');held=false;expect(await pending).toEqual({closed:false});expect(await failureRows(f)).toEqual(before);}finally{if(held)await locker.query('rollback');if(pending)await pending;locker.release();}
+   return {status:'progress' as const,items:[],itemAnomalies:[],nextCursor:{page:3},requestCount:0,complete:false,completionReason:null};
+  }}});expect((await failureRows(f)).stream.cursor).toEqual({page:3});
+ }));
+ it('A2.4 P2-15 closure queued behind a new acquisition cannot change the old traversal',async()=>fixture(async f=>{
+  const r=await committedClosureFixture(f);let enter!:()=>void,release!:()=>void;const entered=new Promise<void>(resolve=>enter=resolve),gate=new Promise<void>(resolve=>release=resolve);
+  const acquiring=r.scheduler.acquire('new-generation',{streamId:f.stream,preserveCursor:true,prepare:async()=>{enter();await gate;return true;}});await entered;
+  const closing=r.scheduler.closeCommittedTraversal(r.context);try{let observed=false;for(let poll=0;poll<500;poll++){const rows=(await pool.query("select query from pg_stat_activity where wait_event_type='Lock' and query like 'select singleton from scheduler_configuration%'")).rows;if(rows.length){observed=true;break;}}expect(observed).toBe(true);}finally{release();}
+  const lease=await acquiring;expect(lease!.lease_generation).toBeGreaterThan(r.context.generation);const before=await failureRows(f);expect(await closing).toEqual({closed:false});expect(await failureRows(f)).toEqual(before);expect(before.disposition.traversal.status).toBe('running');
+ }));
+ it('A2.4 P2-15 recovery of a newer active run remains authoritative',async()=>fixture(async f=>{
+  const r=await committedClosureFixture(f),leaseB=await r.scheduler.acquire('recovered-generation',{streamId:f.stream,preserveCursor:true});f.now.setTime(new Date(leaseB!.stream.lease_expires_at).getTime());expect(await r.scheduler.recover()).toEqual({recovered:1});const before=await failureRows(f);expect(await r.scheduler.closeCommittedTraversal(r.context)).toEqual({closed:false});expect(await failureRows(f)).toEqual(before);
+ }));
+ it.each(['HANDOFF_PENDING','DONE','DONE_WITH_REVIEW','ABANDONED'])('A2.4 P2-15 handoff %s owns the traversal metadata',async state=>fixture(async f=>{
+  const r=await committedClosureFixture(f),{writeHandoffState}=await import('../src/providers/canonicalHandoffState.js'),client=await pool.connect();try{await client.query('begin');await writeHandoffState(client,f.stream,f.traversal,state as Parameters<typeof writeHandoffState>[3],f.now);await client.query('commit');}catch(error){await client.query('rollback');throw error;}finally{client.release();}
+  const before=await failureRows(f);expect(await r.scheduler.closeCommittedTraversal(r.context)).toEqual({closed:false});expect(await failureRows(f)).toEqual(before);
+ }));
+ it('A2.4 P2-15 two concurrent closures perform exactly one transition',async()=>fixture(async f=>{
+  const r=await committedClosureFixture(f);expect((await Promise.all([r.scheduler.closeCommittedTraversal(r.context),r.scheduler.closeCommittedTraversal(r.context)])).filter(result=>result.closed)).toHaveLength(1);expect((await failureRows(f)).disposition.traversal.status).toBe('partial');
+ }));
+ it.each(['sql-error','zero-rows'])('A2.4 P2-15 %s after locks rolls back and never initiates secondary cleanup',async mode=>fixture(async f=>{
+  const r=await committedClosureFixture(f),before=await failureRows(f),client=await pool.connect(),trigger='closure_'+f.provider.replaceAll('-','');
+  try{await client.query(`create function pg_temp.${trigger}() returns trigger language plpgsql as $$begin if new.id='${f.traversal}'::uuid and new.status='partial' then ${mode==='sql-error'?'perform 1/0;':'return null;'} end if; return new; end$$`);await client.query(`create trigger ${trigger} ${mode==='sql-error'?'after':'before'} update on provider_acquisition_traversals for each row execute function pg_temp.${trigger}()`);
+   await expect(r.scheduler.closeCommittedTraversal(r.context)).rejects.toMatchObject(mode==='sql-error'?{code:'22012'}:{message:'committed_traversal_closure_conflict'});expect(await failureRows(f)).toEqual(before);
+  }finally{await client.query(`drop trigger if exists ${trigger} on provider_acquisition_traversals`);await client.query(`drop function if exists pg_temp.${trigger}()`);client.release();}
+ }));
+ it('A2.4 P2-15 closure and recovery queued on root preserve recovery writes',async()=>fixture(async f=>{
+  const r=await committedClosureFixture(f),leaseB=await r.scheduler.acquire('concurrent-recovery',{streamId:f.stream,preserveCursor:true}),locker=await pool.connect(),pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,recovery:Promise<unknown>|undefined,closing:Promise<unknown>|undefined;
+  try{f.now.setTime(new Date(leaseB!.stream.lease_expires_at).getTime());await locker.query('begin');held=true;await locker.query('select singleton from scheduler_configuration where singleton=true for update');recovery=r.scheduler.recover();closing=r.scheduler.closeCommittedTraversal(r.context);expect(await observedFailureWait(pid,'select singleton from scheduler_configuration')).toBe(true);await locker.query('commit');held=false;expect(await recovery).toEqual({recovered:1});expect(await closing).toEqual({closed:false});const after=await failureRows(f);expect(after.stream.lease_owner).toBeNull();expect(Number(after.stream.lease_generation)).toBe(leaseB!.lease_generation);expect(after.runs.find(run=>run.id===leaseB!.run_id).status).toBe('interrupted');expect(after.disposition.traversal.status).toBe('partial');expect(await r.scheduler.closeCommittedTraversal(r.context)).toEqual({closed:false});expect(await failureRows(f)).toEqual(after);
+  }finally{if(held)await locker.query('rollback');if(recovery)await recovery;if(closing)await closing;locker.release();}
+ }));
+ it('A2.4 P2-15 closure queued behind handoff retains all handoff metadata',async()=>fixture(async f=>{
+  const r=await committedClosureFixture(f),{writeHandoffState,lockHandoffDomain}=await import('../src/providers/canonicalHandoffState.js'),client=await pool.connect(),pid=(await client.query('select pg_backend_pid() pid')).rows[0].pid;let held=false,pending:Promise<unknown>|undefined;
+  try{await client.query('begin');held=true;await lockHandoffDomain(client);await client.query("update provider_acquisition_traversals set status='empty_confirmed',complete=true,finished_at=$2 where id=$1",[f.traversal,f.now]);await writeHandoffState(client,f.stream,f.traversal,'HANDOFF_PENDING',f.now);pending=r.scheduler.closeCommittedTraversal(r.context);expect(await observedFailureWait(pid,'select singleton from scheduler_configuration')).toBe(true);await client.query('commit');held=false;const committed=await failureRows(f);expect(await pending).toEqual({closed:false});expect(await failureRows(f)).toEqual(committed);expect(committed.disposition.traversal.status).toBe('empty_confirmed');expect(committed.stream.historical_state.canonical_handoff_v1.traversals[f.traversal].state).toBe('HANDOFF_PENDING');
+  }finally{if(held)await client.query('rollback');if(pending)await pending;client.release();}
+ }));
 
 });
