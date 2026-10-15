@@ -5,7 +5,84 @@
     "lot": "5",
     "name": "Providers and API synchronization core",
     "status": "lot-5.7-p-f3-proven-f4-complete-f5-7d1-maintainer-validated-gate-f-incomplete",
-    "updated_at": "2026-10-05",
+    "updated_at": "2026-10-15",
+    "r1_a2_4_certification": {
+      "scope": "R1-A2.4 only",
+      "status": "CERTIFIED — PASS WITH EXPLICIT RESERVATIONS",
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-15",
+      "acceptance_provenance": "Explicit maintainer instruction accepting the final independent audit and its reservations; not inferred from tests or CI.",
+      "certified_branch": "codex/lot-5-providers-sync",
+      "certified_head": "049ddbf00db4fd6beb44c4b4e33cdcc74a1a273a",
+      "certified_tree": "bcf9ab3a78944b5025797b63174d4e73fd9f8f43",
+      "reference_scope": "Immutable audited application commit/tree; excludes this subsequent governance-only worktree.",
+      "final_report": "/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf/reports/FINAL-CERTIFICATION-REPORT.md",
+      "evidence_archive": "/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf.zip",
+      "evidence_archive_sha256": "89886e8f0c60964b13fda46bbc6625b63a08e19e80071ce2cc3fb1fed1d117fa",
+      "new_p1_findings": [],
+      "new_p2_findings": [],
+      "p3_open_accepted": [
+        {
+          "id": "IA-P3-01",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "M04 can bind an unbound traversal without execution authority. No runtime caller identified; existing bindings are immutable. Reassess before any new runtime caller."
+        },
+        {
+          "id": "IA-P3-02",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Runner reports page2 while its last committed checkpoint is page3. Durable state and resume remain correct; reporting defect remains open."
+        },
+        {
+          "id": "IA-P3-03",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Legacy F5-4 snapshot predates explicit administrative CREATE publication under F5-7B. Preserve the separate no-publication-on-observation invariant."
+        }
+      ],
+      "legacy_exceptions_accepted": [
+        {
+          "id": "legacy-F5-4",
+          "command_or_test": "championshipDiscoveryResolution.postgres.test.ts:137",
+          "result": "FAIL",
+          "exit_code": 1,
+          "accepted": true,
+          "reason": "Obsolete snapshot expects zero publication after administrative CREATE; current F5-7B contract explicitly publishes championship and championshipSeason. Observation alone remains non-publishing."
+        },
+        {
+          "id": "validate-lot53",
+          "command_or_test": "node scripts/validate-lot53.mjs",
+          "result": "FAIL",
+          "exit_code": 1,
+          "sqlstate": "23502",
+          "accepted": true,
+          "reason": "Legacy fixture omits required discoveryEnabled, causing a NOT NULL violation before the intended validation. No coverage is attributed to this failed script."
+        }
+      ],
+      "accepted_audit_limits": [
+        "480 API PostgreSQL skips were executed separately: 479 PASS, 1 legacy FAIL, 0 SKIP; do not double-count. The 18 repository skips remain unexecuted.",
+        "validate-lot53-manual.mjs was not executed by the final independent audit: historical expectations conflict with the current sync_streams schema.",
+        "npm audit high passed with two moderate development-dependency advisories remaining.",
+        "S12 can issue an already-expired lease; consumers refuse it fail-closed. S17 can release its own expired generation after a wait, but cannot release a successor generation.",
+        "No real environment, provider, remote CI or manual browser validation; no certification of external transport fencing or the physical COMMIT instant."
+      ],
+      "restrictions": {
+        "R1_P1_01": "OPEN",
+        "A3_IMPLEMENTED": false,
+        "A3_AUTHORIZED": false,
+        "PROVIDER_CALLS": 0,
+        "provider_execution_authorized": false,
+        "periodic_activation_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "DEPLOYMENT_AUTHORIZED": false,
+        "production_authorized": false,
+        "F5_7D2_AUTHORIZED": false,
+        "F5_7E_AUTHORIZED": false,
+        "F5_7F_AUTHORIZED": false
+      }
+    },
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -683,6 +760,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "F5-7D0 et F5-7D1 sont maintainer-validated et complets. F5-7D, F5-7 et F5 restent en cours ; R0 définit D2/E/F et les sorties F5-7/F5 sans autoriser leur implémentation ou exécution. D2/E/F restent non démarrés et non autorisés. Prochaine action : décision mainteneur séparée sur le périmètre des prérequis opérationnels 5.4/5.6/5.8/5.9 avant D2 ; aucune mise en œuvre n’est encore autorisée. Budget provider 1/1 définitivement consommé : ne jamais réessayer cette acquisition. Aucun replay offline ni accès à la DB réelle de certification n'est autorisé. Aucun déploiement, accès VPS, appel provider, worker, scheduler, Production Preview, Production, onboarding externe, Lot 5.7 complet, Lot 5.8+ ou merge main n'est autorisé."
+    "task": "Valider le diff documentaire d’enregistrement de l’acceptation mainteneur R1-A2.4 avec réserves explicites, exclusivement au HEAD 049ddbf00db4fd6beb44c4b4e33cdcc74a1a273a et TREE bcf9ab3a78944b5025797b63174d4e73fd9f8f43. Aucun commit ni push n’est autorisé dans cette étape. Les trois P3 restent ouvertes et les deux exceptions legacy restent FAIL, acceptées sans être transformées en PASS. R1_P1_01 reste OPEN ; A3 n’est ni implémenté ni autorisé. F5-7D2/E/F restent non démarrés et non autorisés. Aucune activation périodique, exécution provider, worker, scheduler, DB réelle, préproduction, production ou déploiement n’est autorisé. Aucune autre certification ni prochaine implémentation n’est accordée ; attendre la validation du diff et une autorisation mainteneur distincte."
   }
 }

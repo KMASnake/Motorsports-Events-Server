@@ -2,6 +2,41 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-10-15 — Acceptation mainteneur de R1-A2.4 avec réserves explicites
+
+Le mainteneur accepte explicitement la recommandation du rapport indépendant
+final pour le seul périmètre transactionnel R1-A2.4 :
+**CERTIFIED — PASS WITH EXPLICIT RESERVATIONS ; décision ACCEPTED**.
+La référence auditée est la branche `codex/lot-5-providers-sync`, commit
+`049ddbf00db4fd6beb44c4b4e33cdcc74a1a273a`, tree
+`bcf9ab3a78944b5025797b63174d4e73fd9f8f43`. Elle exclut le worktree
+documentaire ultérieur et ne résulte pas d’une inférence depuis une CI verte.
+
+L’acceptation conserve les trois P3 ouvertes : IA-P3-01 (binding autonome M04
+sans appelant runtime identifié), IA-P3-02 (curseur du rapport runner décalé
+par rapport à son checkpoint engagé), IA-P3-03 (attente legacy F5-4 obsolète
+après CREATE administratif F5-7B). Aucun nouveau P1/P2 n’est confirmé.
+
+Deux exceptions legacy sont explicitement acceptées, **sans convertir leur
+FAIL en PASS** : `championshipDiscoveryResolution.postgres.test.ts:137`
+(code retour 1, snapshot incompatible avec la publication administrative
+F5-7B) et `validate-lot53.mjs` (code retour 1, SQLSTATE 23502, fixture omettant
+`discoveryEnabled`). Les SKIP, limites et réserves du rapport restent applicables.
+
+Rapport :
+`/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf/reports/FINAL-CERTIFICATION-REPORT.md`.
+Archive : `/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf.zip`.
+SHA-256 : `89886e8f0c60964b13fda46bbc6625b63a08e19e80071ce2cc3fb1fed1d117fa`.
+La mention `CERTIFICATION_EFFECTIVE=NO` du rapport décrit sa recommandation
+avant décision ; le rapport de preuve reste immuable. La présente acceptation
+explicite est enregistrée dans l’état canonique
+[`PROGRESS.json`](../handoff/PROGRESS.json).
+
+Cette décision ne ferme pas R1_P1_01, n’implémente ni n’autorise A3 et
+n’autorise aucun appel provider, déploiement, activation périodique,
+F5-7D2, F5-7E ou F5-7F. Les autorisations et la prochaine action restent
+exclusivement définies par `docs/handoff/PROGRESS.json`.
+
 ## 2026-08-25 — Revalidation mainteneur et VPS finale de 5.7-P-E
 
 - 5.7-P-E est implémenté et revalidé mainteneur/VPS au SHA
