@@ -2,6 +2,64 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-10-17 — Acceptation officielle mainteneur d’A3-01 avec réserve explicite
+
+Le mainteneur accepte officiellement et explicitement le verdict indépendant
+**PASS_WITH_RESERVATIONS** pour le seul périmètre
+**SIMULATED_AUTHORITY_CONTRACT_AND_HARNESS** : contrats d’autorité et harnais
+de concurrence simulé A3-01. Cette décision clôt la validation mainteneur de
+ce périmètre ; elle ne résulte ni du PASS local ni d’une CI verte.
+
+La référence est la branche `codex/lot-5-providers-sync`, base
+`75d8eb80e3a2d12b6792e544a7f3b8ffaab8c916`, tree
+`309a8c5886708b3529c35393939ba17378207487`, complétée par les quatre fichiers
+A3-01 actuellement non suivis, identifiés par leurs SHA-256 dans
+[`PROGRESS.json`](../handoff/PROGRESS.json). Le commit de base ne contient
+pas ces fichiers : cette acceptation ne prétend pas désigner un commit
+A3-01 déjà créé. Le diff de gouvernance est ultérieur aux sources auditées.
+
+La réserve **LCA-01 — OPEN_LOW** reste explicitement ouverte et acceptée :
+avant le premier enregistrement d’un `intentId`, un autre worker authentifié
+connaissant cet ID peut y associer un tombstone d’annulation avec son propre
+payload différent, bloquant l’identité légitime. Aucune émission sous mauvaise
+autorité, réactivation d’un terminal ou violation d’exclusion n’a été démontrée.
+L’acceptation est limitée au modèle sous hypothèse d’allocation initiale des
+IDs de confiance. Elle ne corrige pas ce comportement et ne valide pas une
+protection de l’allocation. Toute intégration future à des workloads non fiables
+devra protéger ou définir l’association serveur ID/propriétaire et la tester ;
+aucune telle implémentation n’est autorisée par la présente décision.
+
+Les garanties concernent une instance partagée en mémoire et un transport
+simulé. Admission, invocation HTTP et réception distante demeurent distinctes :
+une suspension après le dernier contrôle peut conduire à une émission tardive,
+et une requête déjà invoquée peut être reçue après annulation ou révocation.
+Aucun fencing HTTP physique absolu, atomicité DB/réseau, exactly-once physique,
+journal durable ou exclusion inter-processus n’est certifié. Les limites de
+mémoire, de reprise fermée et de lecteur indéfiniment en attente sont conservées.
+
+Rapport indépendant :
+`/home/kmasnake/projects/audits/a3-01-lifecycle-audit/A3-01-LIFECYCLE-AUDIT.md`.
+Réserve et reproduction : `A3-01-FINDINGS.md` dans le même dossier.
+Manifeste : `/home/kmasnake/projects/audits/a3-01-lifecycle-audit/SHA256SUMS.json`.
+SHA-256 du manifeste :
+`c2b2e30241a9dab7532423d2a9966304de0cd0e444a8e76ac8abcf5da0815590`.
+Les 310 preuves et les quatre empreintes A3-01 ont été vérifiées avant
+l’enregistrement de cette décision. Les rapports d’audit restent immuables ;
+leurs mentions d’une acceptation à venir décrivent leur date de rédaction.
+L’état courant, les validations, interdictions et la prochaine action sont
+exclusivement définis dans `docs/handoff/PROGRESS.json`.
+
+Les réserves et exceptions legacy de R1-A2.4 restent inchangées, sans convertir
+un FAIL en PASS. Le résultat PostgreSQL 479 PASS / 1 FAIL legacy est hérité,
+non rejoué dans l’audit de cycle de vie ; les 18 SKIP repository restent ignorés.
+Cette acceptation ne ferme pas R1_P1_01 et ne vaut aucune autorisation implicite
+d’A3-02, d’un runtime A3, d’un appel provider, d’un environnement réel ou d’un
+déploiement. A3-02 reste non implémenté ; aucun accès à la production ou à la
+préproduction n’est effectué. La proposition de commit local de cette étape
+porte uniquement sur les deux documents de gouvernance. Les quatre fichiers
+techniques A3-01 restent inchangés et non suivis. Toute écriture Git exige une
+validation mainteneur distincte ; aucun staging, commit ni push n’est effectué.
+
 ## 2026-10-15 — Acceptation mainteneur de R1-A2.4 avec réserves explicites
 
 Le mainteneur accepte explicitement la recommandation du rapport indépendant

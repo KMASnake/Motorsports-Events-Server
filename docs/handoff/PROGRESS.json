@@ -5,7 +5,7 @@
     "lot": "5",
     "name": "Providers and API synchronization core",
     "status": "lot-5.7-p-f3-proven-f4-complete-f5-7d1-maintainer-validated-gate-f-incomplete",
-    "updated_at": "2026-10-15",
+    "updated_at": "2026-10-17",
     "r1_a2_4_certification": {
       "scope": "R1-A2.4 only",
       "status": "CERTIFIED — PASS WITH EXPLICIT RESERVATIONS",
@@ -82,6 +82,88 @@
         "F5_7E_AUTHORIZED": false,
         "F5_7F_AUTHORIZED": false
       }
+    },
+    "a3_01_certification": {
+      "status": "PASS_WITH_RESERVATIONS",
+      "scope": "SIMULATED_AUTHORITY_CONTRACT_AND_HARNESS",
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-17",
+      "acceptance_provenance": "Explicit official maintainer acceptance of the independent A3-01 lifecycle audit PASS_WITH_RESERVATIONS, limited to the simulated authority contract and concurrency harness. Only governance preparation is authorized; no commit, push, A3-02, runtime integration or real provider execution. Not inferred from local tests or CI.",
+      "certification_effective": true,
+      "local_implementation_complete": true,
+      "reference_branch": "codex/lot-5-providers-sync",
+      "base_head": "75d8eb80e3a2d12b6792e544a7f3b8ffaab8c916",
+      "base_tree": "309a8c5886708b3529c35393939ba17378207487",
+      "reference_scope": "Tracked base commit/tree plus the four A3-01 files identified by SHA-256 below. The four files are currently untracked, not an A3 implementation commit. This subsequent governance diff is outside the audited source identity; committing requires separate maintainer approval.",
+      "audited_files_sha256": {
+        "apps/api/src/providers/executionAuthorityContract.ts": "44b75cb458c66edacab716dca94b1255928559fef45c5bbc10351a7b6dd3de45",
+        "apps/api/tests/executionAuthorityContract.test.ts": "d38b468bebc925c547aa6c3140514a346cb63010811c1d3be7e10260b101c387",
+        "apps/api/tests/support/authorityConcurrencyHarness.ts": "221536aa924137d3819da9a5569a644add7a379750d44d7244e32a5ea691c4a1",
+        "apps/api/tests/support/A3-01-AUTHORITY-HARNESS.md": "a542567fd34ca75f83cbf427d3db89d4a548086747de3173ae69608771ae41f0"
+      },
+      "independent_audit_directory": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/",
+      "independent_audit_report": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/A3-01-LIFECYCLE-AUDIT.md",
+      "independent_findings_report": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/A3-01-FINDINGS.md",
+      "evidence_manifest": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/SHA256SUMS.json",
+      "evidence_manifest_sha256": "c2b2e30241a9dab7532423d2a9966304de0cd0e444a8e76ac8abcf5da0815590",
+      "evidence_verified_files": 310,
+      "id_allocation_reservation": {
+        "id": "LCA-01",
+        "status": "OPEN_LOW",
+        "severity": "LOW",
+        "accepted": true,
+        "reservation": "Before first registration, another authenticated worker knowing an intentId can bind a cancellation tombstone with its own differing payload, blocking the legitimate ID. No unauthorized emission, terminal reactivation, owner release or overlap was demonstrated.",
+        "accepted_model_assumption": "Trusted initial intentId allocation for this simulated shared-instance model only; this acceptance does not resolve the reservation.",
+        "required_follow_up": "Protect or explicitly define the server-side association between intentId and workload/owner before any future integration with mutually untrusted workloads, with an inter-worker collision probe. No such implementation is authorized by this certification."
+      },
+      "accepted_validation": {
+        "targeted_tests_passed": 147,
+        "additional_lifecycle_cases_passed": 53,
+        "faulty_mutants_detected": 6,
+        "identity_characterization_cases": 2,
+        "api_tests_passed": 711,
+        "web_tests_passed": 119,
+        "repository_tests_passed": 175,
+        "repository_tests_skipped": 18,
+        "typecheck": "PASS",
+        "explicit_harness_typecheck": "PASS",
+        "lint": "PASS",
+        "builds": "PASS",
+        "governance": "PASS",
+        "max_active_observed": 1,
+        "counting_note": "The 111 local A3 cases are included in API711. Targeted reruns and repeated measured exploration are not additional unique coverage. The two identity characterizations demonstrate the LOW reservation, not an allocation protection."
+      },
+      "accepted_audit_limits": [
+        "Only one shared simulated executor instance and its in-memory lifecycle are certified; no exhaustive proof of all interleavings or inter-process exclusion.",
+        "Admission, transport invocation and remote receipt are distinct. Suspension after the last local check and receipt after cancellation/revocation can be late; no absolute physical HTTP fencing, DB/network atomicity or physical exactly-once guarantee.",
+        "No real provider HTTP transport, credentials, operational worker/scheduler, durable attempt journal or cryptographic workload authentication is connected. SIMULATED_ONLY is not a sandbox against arbitrary malicious callbacks.",
+        "Terminal retention is unbounded in this finite in-memory model; no eviction/restart durability. Restart stays CLOSED; no settlement bound if the authority reader never completes.",
+        "480 PostgreSQL cases were not rerun in the lifecycle audit: verified inherited independent evidence is 479 PASS, 1 known legacy F5-4 FAIL, 0 SKIP on identical tracked runtime/migrations/tests. The 18 repository skips remain unexecuted.",
+        "Existing R1-A2.4 reservations and legacy FAIL exceptions remain accepted unchanged; no legacy failure is reclassified as PASS."
+      ],
+      "restrictions": {
+        "R1_P1_01": "OPEN",
+        "A3_02_AUTHORIZED": false,
+        "A3_02_IMPLEMENTED": false,
+        "broader_A3_authorized": false,
+        "runtime_A3_implemented": false,
+        "provider_execution_authorized": false,
+        "periodic_activation_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "production_authorized": false,
+        "preproduction_authorized": false,
+        "PRODUCTION_ACCESS": "NO",
+        "PREPRODUCTION_ACCESS": "NO",
+        "deployment_authorized": false,
+        "REAL_PROVIDER_CALLS": 0,
+        "DEPLOYMENT": "NO",
+        "commit_authorized": false,
+        "push_authorized": false,
+        "COMMIT_CREATED": "NO",
+        "PUSH_EXECUTED": "NO"
+      },
+      "historical_scope_note": "The A3=false flags within r1_a2_4_certification remain its historical R1-A2.4 acceptance snapshot. This newer explicit acceptance covers A3-01 simulated contracts/tests only and grants no global A3 or runtime authorization."
     },
     "implementation_percent": 100,
     "architecture_percent": 100,
@@ -760,6 +842,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Valider le diff documentaire d’enregistrement de l’acceptation mainteneur R1-A2.4 avec réserves explicites, exclusivement au HEAD 049ddbf00db4fd6beb44c4b4e33cdcc74a1a273a et TREE bcf9ab3a78944b5025797b63174d4e73fd9f8f43. Aucun commit ni push n’est autorisé dans cette étape. Les trois P3 restent ouvertes et les deux exceptions legacy restent FAIL, acceptées sans être transformées en PASS. R1_P1_01 reste OPEN ; A3 n’est ni implémenté ni autorisé. F5-7D2/E/F restent non démarrés et non autorisés. Aucune activation périodique, exécution provider, worker, scheduler, DB réelle, préproduction, production ou déploiement n’est autorisé. Aucune autre certification ni prochaine implémentation n’est accordée ; attendre la validation du diff et une autorisation mainteneur distincte."
+    "task": "Examiner le diff complet des deux documents de gouvernance enregistrant l’acceptation officielle mainteneur A3-01 PASS_WITH_RESERVATIONS au périmètre SIMULATED_AUTHORITY_CONTRACT_AND_HARNESS. Vérifier la proposition de commit documentaire local, sans la réaliser : aucune écriture Git (index, commit, push) n’est autorisée avant validation distincte. Les quatre fichiers techniques A3-01 restent inchangés et non suivis ; leurs SHA-256 définissent le périmètre audité avec le HEAD de base. LCA-01 reste OPEN_LOW (allocation initiale des IDs et tombstones préenregistrement). R1-A2.4 reste certifié avec réserves et R1_P1_01 reste OPEN ; aucune preuve de fencing HTTP physique absolu. A3-02 n’est ni autorisé ni implémenté ; aucune intégration runtime, appel provider réel, production/préproduction, activation worker/scheduler, déploiement ou étape suivante. Les décisions A1/A2, F5-7D2/E/F et merge main restent inchangées. Arrêter après remise du diff et attendre la validation explicite du mainteneur."
   }
 }
