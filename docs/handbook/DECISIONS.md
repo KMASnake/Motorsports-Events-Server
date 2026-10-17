@@ -2,6 +2,74 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-10-17 — Acceptation officielle mainteneur d’ADM-01 avec réserves
+
+Le mainteneur accepte officiellement et explicitement le verdict indépendant
+**PASS_WITH_RESERVATIONS** pour le seul périmètre
+**READ_ONLY_MEETING_EVENT_CANDIDATE_LIST_DETAIL** : consultation en lecture seule
+des candidats Meeting/Event, intégrée à la rubrique existante **Doublons**
+(`/duplicates` et `/duplicates/:id`) de la console d’administration.
+Cette décision vient de l’acceptation mainteneur, pas d’un résultat développeur
+ou d’une CI verte. Aucun enrichissement fonctionnel ou backend n’est autorisé.
+
+Référence auditée : branche `codex/lot-5-providers-sync`, base
+`ead7141a9dff5a79ac4bd029873e104f16f3e2e3`, tree
+`2eb5ea703c474a97de4c0aae305c03574d765688`, complétée par les neuf fichiers web
+identifiés par SHA-256 dans [`PROGRESS.json`](../handoff/PROGRESS.json).
+Deux sont des modifications suivies et sept des ajouts non suivis : le HEAD
+seul ne contient pas ADM-01. Le présent diff documentaire est distinct des
+sources fonctionnelles auditées ; ces neuf contenus restent inchangés.
+
+Aucune anomalie critique, haute, moyenne ou faible n’est confirmée dans le
+périmètre de l’audit. Cette absence de finding ne garantit pas l’absence
+universelle de défaut. Trois réserves restent ouvertes et explicitement acceptées :
+
+- **R-GET-01 — Provenance partielle** : identifiant existant de l’audit,
+  conservé plutôt que le nouvel alias proposé ADM01-R01. Les deux GET ne
+  fournissent pas une traçabilité complète multi-providers, source brute,
+  candidat et canonique publié. Les données absentes ne sont pas reconstruites.
+- **R-PAGE-01 — Pagination sans total ni snapshot** : identifiant existant,
+  conservé plutôt que l’alias proposé ADM01-R02. La pagination offset peut
+  déplacer les lignes entre lectures et ne certifie pas une vue exhaustive
+  cohérente lorsque les données évoluent.
+- **ADM01-R03 — Validation navigateur simulée** : les tests Chromium utilisent
+  des réponses synthétiques. Aucun bout en bout contre une API et une base
+  PostgreSQL réelles n’est validé.
+
+Ces réserves de contrat et de validation ne sont pas des anomalies bloquantes
+sans nouvelle preuve. L’acceptation ne les clôt pas et ne vaut pas validation
+d’une traçabilité complète, du backend ou du produit pour la production.
+
+Résultats indépendants acceptés : **131 tests web PASS**, **18 scénarios
+Chromium synthétiques PASS** (8 initiaux + 10 indépendants), **29 tests API
+ciblés PASS** (21 existants + 8 indépendants), typecheck, lint, builds et
+contrôle de gouvernance PASS. Les 12 tests ADM-01 sont inclus dans les 131.
+Ces suites ne sont pas relancées par la présente opération documentaire.
+Les limitations de couverture, dont API/DB réelles et comparaison visuelle
+exhaustive non validées, restent déclarées ; aucun échec legacy n’est requalifié.
+
+Rapports indépendants : `/home/kmasnake/projects/audits/adm01-independent-audit/`
+(`ADM-01-AUDIT-REPORT.md`, `ADM-01-FUNCTIONAL-REVIEW.md`,
+`ADM-01-READ-ONLY-SECURITY.md`, `ADM-01-PROVENANCE-REVIEW.md`,
+`ADM-01-REGRESSION-RESULTS.md`, `ADM-01-FINDINGS.md`).
+Manifeste : `SHA256SUMS.json` dans ce dossier ; SHA-256 :
+`e27a0d0e01a5b8ef71d839e33ef8c81a61fe8a9bc35b24bc67e7579c61588d3f`.
+Les 151 preuves et les neuf contenus web ont été vérifiés avant enregistrement.
+Rapport de développement :
+`/home/kmasnake/projects/audits/adm01/ADM-01-IMPLEMENTATION-REPORT.md`.
+Les rapports restent immuables ; leurs mentions d’une acceptation à venir
+reflètent leur date de rédaction. L’état et la prochaine action courants
+restent exclusivement portés par `docs/handoff/PROGRESS.json`.
+
+Les décisions A1/A2, les garanties et réserves d’A3-01, dont LCA-01 OPEN_LOW,
+et R1_P1_01 OPEN sont préservées intégralement. A3-01 demeure accepté
+PASS_WITH_RESERVATIONS ; aucun fencing HTTP physique absolu n’est ajouté.
+ADM-02 et A3-02 ne sont pas autorisés, A3-02 n’est pas implémenté. Aucun
+appel provider réel, accès production/préproduction, worker/scheduler ou
+déploiement n’est effectué. Cette étape autorise uniquement la préparation
+des deux documents : aucun staging, commit ou push. Une consolidation Git
+locale exige une autorisation mainteneur distincte après revue du diff.
+
 ## 2026-10-17 — Acceptation officielle mainteneur d’A3-01 avec réserve explicite
 
 Le mainteneur accepte officiellement et explicitement le verdict indépendant

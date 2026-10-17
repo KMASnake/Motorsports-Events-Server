@@ -165,6 +165,116 @@
       },
       "historical_scope_note": "The A3=false flags within r1_a2_4_certification remain its historical R1-A2.4 acceptance snapshot. This newer explicit acceptance covers A3-01 simulated contracts/tests only and grants no global A3 or runtime authorization."
     },
+    "adm_01_certification": {
+      "status": "PASS_WITH_RESERVATIONS",
+      "scope": "READ_ONLY_MEETING_EVENT_CANDIDATE_LIST_DETAIL",
+      "admin_integration": "EXISTING_DUPLICATES_ROUTE",
+      "admin_routes": [
+        "/duplicates",
+        "/duplicates/:id"
+      ],
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-17",
+      "acceptance_provenance": "Explicit maintainer acceptance of the independent ADM-01 audit PASS_WITH_RESERVATIONS, limited to read-only Meeting/Event candidate list/detail in the existing Duplicates administration. Only governance preparation is authorized; not inferred from developer tests, CI or production readiness.",
+      "certification_effective": true,
+      "local_implementation_complete": true,
+      "reference_branch": "codex/lot-5-providers-sync",
+      "base_head": "ead7141a9dff5a79ac4bd029873e104f16f3e2e3",
+      "base_tree": "2eb5ea703c474a97de4c0aae305c03574d765688",
+      "reference_scope": "Tracked base commit/tree plus the nine audited web files identified by SHA-256 below: two tracked modifications and seven untracked additions. The base HEAD alone does not contain ADM-01. This subsequent governance diff is outside the audited functional identity; no staging or commit is authorized.",
+      "audited_files_sha256": {
+        "apps/web/src/App.tsx": "948b37ed6a7daecee9cc9a43d834b6765d46824764852ff91ed05aac155742b3",
+        "apps/web/src/design-system/layout/navigation.ts": "966beef21875638c7430b21f5c2538c03e44e9c922df2f513566e32e5cefb3b0",
+        "apps/web/src/features/meeting-event-candidates/CandidatesPage.tsx": "8ddb10166e20974e06572cf01760cb19e2cf421b844ba698f882823a0b4074dd",
+        "apps/web/src/features/meeting-event-candidates/candidates.css": "324e3fccdc0fe59fef5edbeeda2d0ed9390052e2cd36102a53082f4ab5a14d7b",
+        "apps/web/src/features/meeting-event-candidates/candidates.fixtures.ts": "e0294ad3aa4e8537b06e5463ea101e1fc7033e0125ff92d46af71162b7dd30f4",
+        "apps/web/src/features/meeting-event-candidates/candidatesApi.test.ts": "2c0d9db7e299de76e772901f10c3b209b22cd27aec34e22b62a6877be1385bdd",
+        "apps/web/src/features/meeting-event-candidates/candidatesApi.ts": "5040e7fac945aa12688eb43c2cefe846e8a2bbf79415425b01a96685e97afa1d",
+        "apps/web/tests/adm01/candidates.pw.ts": "b67351929fac000bf013c79c8bbcf394a9738a7dfaf60b45fab2ee043cf1a1aa",
+        "apps/web/tests/adm01/playwright.config.ts": "84e3e13b96bd778cf5000d86623a282b35a7810c0179d272c433590c1e7f2352"
+      },
+      "independent_audit_directory": "/home/kmasnake/projects/audits/adm01-independent-audit/",
+      "independent_audit_reports": [
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-AUDIT-REPORT.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-FUNCTIONAL-REVIEW.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-READ-ONLY-SECURITY.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-PROVENANCE-REVIEW.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-REGRESSION-RESULTS.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-FINDINGS.md"
+      ],
+      "development_report": "/home/kmasnake/projects/audits/adm01/ADM-01-IMPLEMENTATION-REPORT.md",
+      "evidence_manifest": "/home/kmasnake/projects/audits/adm01-independent-audit/SHA256SUMS.json",
+      "evidence_manifest_sha256": "e27a0d0e01a5b8ef71d839e33ef8c81a61fe8a9bc35b24bc67e7579c61588d3f",
+      "evidence_verified_files": 151,
+      "confirmed_findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "accepted_reservations": [
+        {
+          "id": "R-GET-01",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Partial provenance imposed by the two existing GETs: no complete provider/source/raw-data/canonical-publication traceability, provider/external identifiers or observation joins. Missing values remain explicit. This is an accepted contract limitation, not a confirmed frontend anomaly."
+        },
+        {
+          "id": "R-PAGE-01",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Existing limit/offset pagination has neither a guaranteed total nor a stable snapshot. Rows may move between requests; exhaustive and coherent coverage of changing data is not certified."
+        },
+        {
+          "id": "ADM01-R03",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Browser validation uses synthetic API responses in local Chromium only. End-to-end behavior against a real API and PostgreSQL database is NOT_VALIDATED."
+        }
+      ],
+      "accepted_validation": {
+        "web_tests_passed": 131,
+        "browser_tests_passed": 18,
+        "browser_validation": "SYNTHETIC_CHROMIUM",
+        "api_tests_passed": 29,
+        "governance": "PASS",
+        "typecheck": "PASS",
+        "lint": "PASS",
+        "builds": "PASS",
+        "counting_note": "131 web includes 12 ADM-01 tests. Browser18 = 8 original + 10 independent; API29 = 21 existing targeted + 8 independent. These are accepted independent audit results, not suites rerun by this documentary operation."
+      },
+      "provenance": "PARTIAL_EXISTING_GET_LIMITATION",
+      "pagination": "OFFSET_WITHOUT_TOTAL_OR_SNAPSHOT",
+      "real_api_db_e2e": "NOT_VALIDATED",
+      "accepted_audit_limits": [
+        "Only read-only administration using the two existing candidate GET families is certified; no new backend endpoint, business write, decision, publication or provider enrichment.",
+        "No general API suite, PostgreSQL, repository Python, real API/DB, external provider, remote CI or exhaustive visual 98% comparison was validated by this audit. No product/backend production readiness is inferred.",
+        "Existing A1/A2 decisions, R1-A2.4 reservations/legacy FAIL exceptions and A3-01 guarantees/reservations remain unchanged; no historical failure is reclassified as PASS."
+      ],
+      "restrictions": {
+        "ADM_02_AUTHORIZED": false,
+        "A3_02_AUTHORIZED": false,
+        "A3_02_IMPLEMENTED": false,
+        "R1_P1_01": "OPEN",
+        "A3_01_CERTIFICATION": "PASS_WITH_RESERVATIONS",
+        "LCA_01": "OPEN_LOW",
+        "provider_execution_authorized": false,
+        "periodic_activation_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "REAL_PROVIDER_CALLS": 0,
+        "production_authorized": false,
+        "preproduction_authorized": false,
+        "PRODUCTION_ACCESS": "NO",
+        "PREPRODUCTION_ACCESS": "NO",
+        "deployment_authorized": false,
+        "DEPLOYMENT": "NO",
+        "commit_authorized": false,
+        "push_authorized": false,
+        "COMMIT_CREATED": "NO",
+        "PUSH_EXECUTED": "NO"
+      }
+    },
     "implementation_percent": 100,
     "architecture_percent": 100,
     "documentation_readiness_percent": 100,
@@ -842,6 +952,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Examiner le diff complet des deux documents de gouvernance enregistrant l’acceptation officielle mainteneur A3-01 PASS_WITH_RESERVATIONS au périmètre SIMULATED_AUTHORITY_CONTRACT_AND_HARNESS. Vérifier la proposition de commit documentaire local, sans la réaliser : aucune écriture Git (index, commit, push) n’est autorisée avant validation distincte. Les quatre fichiers techniques A3-01 restent inchangés et non suivis ; leurs SHA-256 définissent le périmètre audité avec le HEAD de base. LCA-01 reste OPEN_LOW (allocation initiale des IDs et tombstones préenregistrement). R1-A2.4 reste certifié avec réserves et R1_P1_01 reste OPEN ; aucune preuve de fencing HTTP physique absolu. A3-02 n’est ni autorisé ni implémenté ; aucune intégration runtime, appel provider réel, production/préproduction, activation worker/scheduler, déploiement ou étape suivante. Les décisions A1/A2, F5-7D2/E/F et merge main restent inchangées. Arrêter après remise du diff et attendre la validation explicite du mainteneur."
+    "task": "Examiner le diff complet des deux documents de gouvernance enregistrant l’acceptation officielle mainteneur ADM-01 PASS_WITH_RESERVATIONS pour READ_ONLY_MEETING_EVENT_CANDIDATE_LIST_DETAIL dans la rubrique Doublons existante. Les neuf fichiers web audités restent inchangés, non consolidés dans HEAD ; leurs empreintes complètent la base ead7141a9dff5a79ac4bd029873e104f16f3e2e3. Maintenir ouvertes et acceptées R-GET-01 (provenance partielle), R-PAGE-01 (offset sans total/snapshot) et ADM01-R03 (navigateur synthétique, API/DB réelle non validée). Après revue, demander une autorisation explicite distincte avant toute consolidation Git locale : aucun staging, commit ni push autorisé dans cette étape. A3-01 PASS_WITH_RESERVATIONS, LCA-01 OPEN_LOW et R1_P1_01 OPEN sont préservés ; aucune modification des décisions A1/A2 ou réserves R1-A2.4. ADM-02 et A3-02 ne sont pas autorisés ; aucun runtime A3, provider réel, worker/scheduler, préproduction, production ou déploiement. Arrêter après remise des preuves et attendre la décision du mainteneur."
   }
 }
