@@ -15,3 +15,11 @@
 .candidates-page .panel > :is(.candidate-toolbar,.candidate-note) { margin-left:14px; margin-right:14px; }
 .candidate-detail .panel > :not(header) { margin-left:14px; margin-right:14px; }
 .candidate-toolbar select { background:var(--mse-bg-canvas); color:var(--mse-text-primary); border:1px solid var(--mse-border-subtle); border-radius:4px; padding:8px; max-width:100%; }
+.candidate-rejection { margin:16px 0; }
+.candidate-rejection-dialog { color:var(--mse-text-primary); background:var(--mse-bg-canvas); border:1px solid var(--mse-border-subtle); border-radius:6px; width:min(600px,calc(100vw - 24px)); max-height:90vh; overflow:auto; padding:20px; }
+.candidate-rejection-dialog::backdrop { background:rgb(0 0 0 / 70%); }
+.candidate-rejection-dialog textarea { display:block; width:100%; min-height:110px; margin-top:8px; background:var(--mse-bg-canvas); color:inherit; border:1px solid var(--mse-border-subtle); padding:8px; }
+.candidate-rejection-dialog p { overflow-wrap:anywhere; }
+.candidate-rejection-dialog textarea:focus-visible { outline:2px solid var(--mse-brand); }
+.candidate-rejection-confirmation { display:flex; align-items:flex-start; gap:8px; }
+.candidate-rejection-confirmation input[type=checkbox] { width:16px; min-width:16px; margin:3px 0; padding:0; accent-color:var(--mse-brand); }

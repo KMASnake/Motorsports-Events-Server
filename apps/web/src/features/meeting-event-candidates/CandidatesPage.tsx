@@ -1,7 +1,9 @@
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {Link,useParams,useSearchParams} from 'react-router-dom';
 import {Button,EmptyState,PageHeader,Panel,StatusChip} from '../../design-system';
 import {candidateData,candidateStates,getCandidate,listCandidates,PAGE_SIZE,record,type CandidateDetail,type CandidateRow,type CandidateState} from './candidatesApi';
+import {CandidateRejection} from './CandidateRejection';
+import {rejectionLedger} from './rejection';
 import './candidates.css';
 
 const labels:Record<CandidateState,string>={PENDING:'En attente',REVIEW_REQUIRED:'À examiner',RESOLVED_LINKED:'Rapproché',RESOLVED_CREATED:'Créé',REJECTED:'Rejeté'};
@@ -9,7 +11,7 @@ export const display=(value:unknown):string=>typeof value==='string'&&value.trim
 const kind=(value:CandidateRow['resource_kind'])=>value==='meeting'?'Meeting':'Event';
 const fields=(values:Record<string,unknown>)=><dl className="candidate-fields">{Object.entries(values).map(([label,value])=><div key={label}><dt>{label}</dt><dd>{display(value)}</dd></div>)}</dl>;
 function ReadFailure({message}:{message:string}){return <div className="sources-error" role="alert">{message}</div>;}
-function Boundary(){return <div className="sources-boundary">Lecture seule des candidats normalisés. Leur présence ne prouve pas une publication canonique. Aucune synchronisation ni décision n’est déclenchée.</div>;}
+function Boundary(){return <div className="sources-boundary">Consultation des candidats normalisés. Leur présence ne prouve pas une publication canonique. Aucune synchronisation n’est déclenchée ; tout rejet exige une confirmation explicite.</div>;}
 export function CandidatesPage(){
   const {id}=useParams();const[params]=useSearchParams();
   return <div className="candidates-page"><PageHeader title="CANDIDATS MEETING / EVENT" subtitle="Doublons — consultation et traçabilité"/><Boundary/>{id?<CandidateInspection key={id} id={id} search={params.toString()}/>:<CandidateList key={params.toString()}/>}</div>;
@@ -34,12 +36,21 @@ function CandidateList(){
   </Panel>;
 }
 function CandidateInspection({id,search}:{id:string;search:string}){
-  const[data,setData]=useState<CandidateDetail|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[refresh,setRefresh]=useState(0);const heading=useRef<HTMLHeadingElement>(null);
+  const[data,setData]=useState<CandidateDetail|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[refresh,setRefresh]=useState(0);const heading=useRef<HTMLHeadingElement>(null),listRefresh=useRef<AbortController|null>(null);
+  const[notice,setNotice]=useState(''),[listWarning,setListWarning]=useState('');
+  const busy=useSyncExternalStore(rejectionLedger.subscribe,()=>rejectionLedger.pending(id),()=>false);
+  useEffect(()=>()=>listRefresh.current?.abort(),[]);
+  function reloadAfterDecision(message:string){
+    setNotice(message);setLoading(true);setError('');setRefresh(value=>value+1);
+    const q=new URLSearchParams(search),raw=q.get('state'),state=candidateStates.includes(raw as CandidateState)?raw as CandidateState:'REVIEW_REQUIRED',offset=Number(q.get('offset')??0);
+    listRefresh.current?.abort();const controller=new AbortController();listRefresh.current=controller;setListWarning('');
+    void listCandidates(state,Number.isSafeInteger(offset)&&offset>=0?offset:0,controller.signal).catch(()=>{if(!controller.signal.aborted)setListWarning('La liste n’a pas pu être actualisée. Actualiser la liste au retour.');});
+  }
   useEffect(()=>{heading.current?.focus();const controller=new AbortController();setLoading(true);setError('');
     void getCandidate(id,controller.signal).then(value=>{if(!controller.signal.aborted)setData(value);}).catch(reason=>{if(!controller.signal.aborted)setError((reason as Error).message);}).finally(()=>{if(!controller.signal.aborted)setLoading(false);});
     return ()=>controller.abort();
   },[id,refresh]);
-  return <><Link to={`/duplicates${search?`?${search}`:''}`}>Retour aux candidats</Link><h2 ref={heading} tabIndex={-1}>Détail du candidat</h2><div className="candidate-toolbar toolbar"><Button disabled={loading} onClick={()=>setRefresh(value=>value+1)}>Actualiser le détail</Button></div>{error&&<ReadFailure message={error}/>} {loading?<p role="status">Chargement du détail…</p>:data?<CandidateContent detail={data}/>:null}</>;
+  return <><Link to={`/duplicates${search?`?${search}`:''}`}>Retour aux candidats</Link><h2 ref={heading} tabIndex={-1}>Détail du candidat</h2><div className="candidate-toolbar toolbar"><Button disabled={loading||busy} onClick={()=>{setLoading(true);setRefresh(value=>value+1);}}>Actualiser le détail</Button></div>{notice&&<p role="status">{notice}</p>}{listWarning&&<ReadFailure message={listWarning}/>} {error&&<ReadFailure message={error}/>} {loading?<p role="status">Chargement du détail…</p>:data?<><CandidateRejection detail={data} readable={!error} onAccepted={replayed=>reloadAfterDecision(replayed?'Rejet confirmé par le serveur (rejeu idempotent).':'Rejet confirmé par le serveur.')} onReloadRequired={reloadAfterDecision}/><CandidateContent detail={data}/></>:null}</>;
 }
 export function CandidateContent({detail}:{detail:CandidateDetail}){
   const{candidate,decisions}=detail,data=candidateData(candidate.candidate_data),normalized=record(data.normalized),provenance=record(normalized.provenance),resolution=record(data.resolution),fieldOrigins=record(provenance.fields);
