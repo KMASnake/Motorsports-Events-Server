@@ -1,0 +1,29 @@
+preprod.motorsports-events.fr {
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    route {
+        @metrics path /metrics
+        respond @metrics 404
+
+        @sensitive path /.env /.env.* /.git/* /.svn/* /.hg/* /.DS_Store /.vscode/* /.idea/* /server-status /actuator/* /trace.axd /info.php /phpinfo.php /telescope/* /v2/_catalog /wp-admin* /wp-login.php /xmlrpc.php
+        respond @sensitive 404
+
+        @api path /health /health/* /api/*
+        reverse_proxy @api mse-preprod-api:3001
+
+        reverse_proxy mse-preprod-web:3000
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}

@@ -59,7 +59,25 @@ expect_rollback_failure() {
 
 lot42_fingerprint() {
   sql "select md5(jsonb_build_object(
-    'events', (select coalesce(jsonb_agg(to_jsonb(t) - 'session_title' order by id), '[]'::jsonb) from events t),
+    'events', (select coalesce(jsonb_agg(jsonb_build_object(
+      'id',e.id,
+      'championship_id',e.championship_id,
+      'circuit_id',e.circuit_id,
+      'name',e.name,
+      'slug',e.slug,
+      'category',e.category,
+      'starts_at',e.starts_at,
+      'ends_at',e.ends_at,
+      'timezone',e.timezone,
+      'status',e.status,
+      'published',e.published,
+      'origin',e.origin,
+      'provider_key',e.provider_key,
+      'external_id',e.external_id,
+      'description',e.description,
+      'created_at',e.created_at,
+      'updated_at',e.updated_at
+    ) order by e.id), '[]'::jsonb) from events e),
     'event_corrections', (select coalesce(jsonb_agg(to_jsonb(t) order by id), '[]'::jsonb) from event_corrections t),
     'admin_audit_log', (select coalesce(jsonb_agg(to_jsonb(t) order by id), '[]'::jsonb) from admin_audit_log t)
   )::text)"
@@ -86,6 +104,8 @@ sql "create table if not exists schema_migrations (
 apply_file 0001_event_corrections.up.sql >/dev/null
 apply_file 0002_utc_storage.up.sql >/dev/null
 apply_file 0003_admin_audit_and_provider_identity.up.sql >/dev/null
+
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U mse -d motorsports_events < tests/fixtures/lot43_events.sql
 
 sql "insert into event_corrections(
   id,event_id,provider_key,external_id,field_name,

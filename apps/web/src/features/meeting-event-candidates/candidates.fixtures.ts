@@ -1,0 +1,12 @@
+import type {CandidateDetail,CandidateRow} from './candidatesApi';
+// Synthetic test fixtures only; never loaded by the page or used as fallback data.
+export const candidateId=(n:number)=>`ad010000-0000-4000-8000-${String(n).padStart(12,'0')}`;
+export function fixtureDetail(n:number,kind:'meeting'|'event'='event'):CandidateDetail{
+  const row:CandidateRow={id:candidateId(n),source_entity_id:candidateId(n+100),resource_kind:kind,resolution_state:'REVIEW_REQUIRED',revision:1,created_at:'2026-10-01T08:00:00.000Z',updated_at:'2026-10-17T08:00:00.000Z'};
+  return {candidate:{...row,source_hash:`synthetic-hash-${n}`,normalization_version:'synthetic-v1',candidate_data:{source_revision:2,proposed_uuid:candidateId(n+200),normalized:{resourceKind:kind,name:kind==='meeting'?'Meeting synthétique':'Course synthétique',sessionType:kind==='meeting'?'other':'race',status:'scheduled',startsAt:'2026-10-25T02:30:00',endsAt:null,timezone:null,championshipId:'synthetic-championship',championshipSeasonId:candidateId(300),season:2026,venueId:null,provenance:{sourceEntityId:row.source_entity_id,sourceHash:`synthetic-hash-${n}`,mappingVersion:'synthetic-v1',rulesVersion:'synthetic-rules',fields:{name:{origin:'source'},startsAt:{origin:'correction',correctionId:candidateId(400)}}}},resolution:{decision:'review',reason:'manual_review',targetId:null,score:null,signals:[]}}},decisions:[{id:candidateId(n+500),decision:'review',reason:'manual_review',actor_id:'synthetic-normalizer',candidate_revision:1,decided_at:'2026-10-17T08:00:00.000Z',target_kind:null,target_id:null}]};
+}
+export const fixtureRows:CandidateRow[]=Array.from({length:25},(_,i)=>{const {candidate}=fixtureDetail(i+1,i===0?'meeting':'event');const{id,source_entity_id,resource_kind,resolution_state,revision,created_at,updated_at}=candidate;return {id,source_entity_id,resource_kind,resolution_state,revision,created_at,updated_at};});
+export const incompleteDetail:CandidateDetail={candidate:{id:candidateId(3),resource_kind:'event',resolution_state:'PENDING',revision:1,candidate_data:{}},decisions:[]};
+// Ground truth of the synthetic scenario, NOT fields returned by list/detail GETs.
+// The UI must not infer these provider/parent relations from the candidate DTO.
+export const syntheticScenario={providers:[{id:'synthetic-provider-a',sourceIds:[candidateId(101),candidateId(102)]},{id:'synthetic-provider-b',sourceIds:[candidateId(103),candidateId(104)]}],meeting:{candidateId:candidateId(1),eventCandidateIds:[candidateId(2),candidateId(3)]},similarCandidates:[candidateId(2),candidateId(4)]};

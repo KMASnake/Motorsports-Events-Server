@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 
-if [[ ! -f "${ENV_FILE}" ]]; then
-  echo "Fichier .env absent."
-  exit 1
-fi
+require_preprod_context
 
-POSTGRES_USER="$(python3 "${PROJECT_ROOT}/scripts/env_get.py" POSTGRES_USER --env "${ENV_FILE}" --required)"
-POSTGRES_DB="$(python3 "${PROJECT_ROOT}/scripts/env_get.py" POSTGRES_DB --env "${ENV_FILE}" --required)"
+POSTGRES_USER="$(python3 "${PROJECT_ROOT}/scripts/env_get.py" POSTGRES_USER --env "${PREPROD_ENV_FILE}" --required)"
+POSTGRES_DB="$(python3 "${PROJECT_ROOT}/scripts/env_get.py" POSTGRES_DB --env "${PREPROD_ENV_FILE}" --required)"
 
 mkdir -p "${BACKUP_DIR}"
 STAMP="$(date +%Y%m%d-%H%M%S)"
@@ -16,7 +13,7 @@ PARTIAL="${FILE}.partial"
 RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-30}"
 
 trap 'rm -f "${PARTIAL}"' EXIT
-compose exec -T db pg_dump \
+preprod_compose exec -T postgres pg_dump \
   --no-owner \
   --no-privileges \
   -U "${POSTGRES_USER}" \

@@ -1,5 +1,6 @@
 export type EventStatus = 'draft' | 'scheduled' | 'completed' | 'cancelled' | 'postponed';
 export type EventOrigin = 'manual' | 'provider' | 'mixed';
+export type EventCategory = 'practice' | 'qualifying' | 'race' | 'other';
 export type EventView = 'month' | 'week' | 'day' | 'agenda' | 'list';
 
 export interface Championship {
@@ -29,6 +30,8 @@ export interface EventRow {
   circuit_name: string | null;
   circuit_city: string | null;
   country_code: string | null;
+  meeting_id?: string | null;
+  meeting_name?: string | null;
   name: string;
   slug: string;
   category: string | null;

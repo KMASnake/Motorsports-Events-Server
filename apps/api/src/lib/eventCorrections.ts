@@ -1,5 +1,5 @@
-import { randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
+import {CanonicalFieldOverrideService} from '../reconciliation/canonicalFieldOverrideService.js';
 import {
   decideLocalOverride,
   decideProviderSync,
@@ -26,6 +26,7 @@ type CorrectionRow = {
   override_value: unknown;
   status: 'active' | 'conflict';
 };
+const overrideService=new CanonicalFieldOverrideService();
 
 const fieldSet = new Set<string>(correctableEventFields);
 
@@ -35,15 +36,21 @@ export function assertCorrectableField(field: string): CorrectableEventField {
 }
 
 export async function lockEvent(client: PoolClient, eventId: string): Promise<EventDatabaseRow | null> {
+  const identity = await client.query('select normalized_uuid from events where id=$1', [eventId]);
+  const normalizedUuid = identity.rows[0]?.normalized_uuid;
+  if (normalizedUuid) {
+    await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))', [`event:${normalizedUuid}`]);
+  }
   const result = await client.query('select * from events where id=$1 for update', [eventId]);
   return result.rows[0] ?? null;
 }
 
 async function activeCorrections(client: PoolClient, eventId: string): Promise<Map<CorrectableEventField, CorrectionRow>> {
   const result = await client.query(
-    `select id,event_id,field_name,provider_value,override_value,status
-       from event_corrections
-      where event_id=$1 and status in ('active','conflict')
+    `select id,canonical_record_id event_id,field_name,provider_value_at_creation provider_value,override_value,
+            case when legacy_status='conflict' then 'conflict' else 'active' end status
+       from canonical_field_overrides
+      where entity_kind='event' and canonical_record_id=$1 and status='active'
       for update`,
     [eventId]
   );
@@ -64,39 +71,14 @@ export async function reconcileAdministrativePatch(
     const decision = decideLocalOverride(current, current[field], patch[field], correction);
     if (decision.action === 'none') continue;
     if (decision.action === 'remove') {
-      await client.query('delete from event_corrections where id=$1', [correction!.id]);
+      await overrideService.revokeCompatibleInTransaction(client,{entityKind:'event',entityUuid:String(current.normalized_uuid),overrideId:correction!.id,actorId:actor,reason:'Legacy Event administration: provider value explicitly restored',legacyOperationId:`event-patch:${current.id}:${field}`});
       continue;
     }
     if (decision.action === 'create') {
-      await client.query(
-        `insert into event_corrections(
-          id,event_id,provider_key,external_id,field_name,provider_value,override_value,created_by
-        ) values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8)
-        on conflict(event_id,field_name) do update
-          set provider_key=excluded.provider_key,
-              external_id=excluded.external_id,
-              provider_value=excluded.provider_value,
-              override_value=excluded.override_value,
-              status='active',
-              created_by=excluded.created_by,
-              last_provider_seen_at=null,
-              conflict_detected_at=null,
-              updated_at=now()`,
-        [
-          randomUUID(), current.id, current.provider_key, current.external_id, field,
-          JSON.stringify(decision.providerValue), JSON.stringify(decision.overrideValue), actor
-        ]
-      );
+      await overrideService.setCompatibleInTransaction(client,{entityKind:'event',entityUuid:String(current.normalized_uuid),canonicalRecordId:current.id,fieldName:field,value:decision.overrideValue,providerValueAtCreation:decision.providerValue,actorId:actor,reason:'Legacy Event administration',legacyOperationId:`event-patch:${current.id}:${field}`,legacyStatus:'active'});
       continue;
     }
-    await client.query(
-      `update event_corrections
-          set override_value=$2::jsonb,
-              status=$3,
-              updated_at=now()
-        where id=$1`,
-      [correction!.id, JSON.stringify(decision.overrideValue), decision.keepConflict ? 'conflict' : 'active']
-    );
+    await overrideService.setCompatibleInTransaction(client,{entityKind:'event',entityUuid:String(current.normalized_uuid),canonicalRecordId:current.id,fieldName:field,value:decision.overrideValue,providerValueAtCreation:decision.providerValue,actorId:actor,reason:'Legacy Event administration',legacyOperationId:`event-patch:${current.id}:${field}`,legacyStatus:decision.keepConflict?'conflict':'active'});
   }
 }
 
@@ -114,20 +96,7 @@ export async function applyProviderPatch(
     const nextProviderValue = normalizeCorrectionValue(patch[field]);
     const decision = decideProviderSync(nextProviderValue, correction);
     effectivePatch[field] = decision.effectiveValue;
-    if (decision.correctionAction === 'remove') {
-      await client.query('delete from event_corrections where id=$1', [correction!.id]);
-    } else if (decision.correctionAction === 'update') {
-      await client.query(
-        `update event_corrections
-            set provider_value=$2::jsonb,
-                status=$3,
-                last_provider_seen_at=now(),
-                conflict_detected_at=case when $3='conflict' then coalesce(conflict_detected_at,now()) else null end,
-                updated_at=now()
-          where id=$1`,
-        [correction!.id, JSON.stringify(nextProviderValue), decision.conflict ? 'conflict' : 'active']
-      );
-    }
+    if (decision.correctionAction === 'update') await overrideService.recordProviderObservationInTransaction(client,{overrideId:correction!.id,entityUuid:String(current.normalized_uuid),providerValue:nextProviderValue,legacyStatus:decision.conflict?'conflict':'active'});
   }
   return effectivePatch;
 }
@@ -160,14 +129,15 @@ export async function resolveCorrection(
   expectedField?: CorrectableEventField
 ): Promise<{ deleted: boolean; correction?: CorrectionRow }> {
   const identity = await client.query(
-    'select event_id from event_corrections where id=$1',
+    `select canonical_record_id event_id from canonical_field_overrides where id::text=$1 or legacy_event_correction_id=$1`,
     [correctionId]
   );
   if (!identity.rowCount) throw new Error('Correction introuvable.');
   await lockEvent(client, identity.rows[0].event_id);
   const result = await client.query(
-    `select id,event_id,field_name,provider_value,override_value,status
-       from event_corrections where id=$1 for update`,
+    `select id,canonical_record_id event_id,field_name,provider_value_at_creation provider_value,override_value,
+            case when legacy_status='conflict' then 'conflict' else 'active' end status
+       from canonical_field_overrides where (id::text=$1 or legacy_event_correction_id=$1) and status='active' for update`,
     [correctionId]
   );
   if (!result.rowCount) throw new Error('Correction introuvable.');
@@ -179,28 +149,20 @@ export async function resolveCorrection(
 
   if (action === 'keep-override') {
     await updateEventFields(client, row.event_id, { [field]: row.override_value });
-    const updated = await client.query(
-      `update event_corrections
-          set status='active',conflict_detected_at=null,updated_at=now()
-        where id=$1 returning *`,
-      [correctionId]
-    );
-    return { deleted: false, correction: updated.rows[0] };
+    const updated=await overrideService.setCompatibleInTransaction(client,{entityKind:'event',entityUuid:String((await client.query('select normalized_uuid from events where id=$1',[row.event_id])).rows[0].normalized_uuid),canonicalRecordId:row.event_id,fieldName:field,value:row.override_value,providerValueAtCreation:row.provider_value,actorId:'administrator',reason:'Legacy correction keep override',legacyOperationId:`legacy-correction:${correctionId}:keep`,legacyStatus:'active'});
+    return { deleted: false, correction: updated.override };
   }
 
   if (action === 'accept-provider' || action === 'delete-override' || sameCorrectionValue(overrideValue, row.provider_value)) {
     await updateEventFields(client, row.event_id, { [field]: row.provider_value });
-    await client.query('delete from event_corrections where id=$1', [correctionId]);
+    const eventUuid=String((await client.query('select normalized_uuid from events where id=$1',[row.event_id])).rows[0].normalized_uuid);
+    await overrideService.revokeCompatibleInTransaction(client,{entityKind:'event',entityUuid:eventUuid,overrideId:row.id,actorId:'administrator',reason:`Legacy correction ${action}`,legacyOperationId:`legacy-correction:${correctionId}:${action}`});
     return { deleted: true };
   }
 
   const next = normalizeCorrectionValue(overrideValue);
   await updateEventFields(client, row.event_id, { [field]: next });
-  const updated = await client.query(
-    `update event_corrections
-        set override_value=$2::jsonb,status='active',conflict_detected_at=null,updated_at=now()
-      where id=$1 returning *`,
-    [correctionId, JSON.stringify(next)]
-  );
-  return { deleted: false, correction: updated.rows[0] };
+  const eventUuid=String((await client.query('select normalized_uuid from events where id=$1',[row.event_id])).rows[0].normalized_uuid);
+  const updated=await overrideService.setCompatibleInTransaction(client,{entityKind:'event',entityUuid:eventUuid,canonicalRecordId:row.event_id,fieldName:field,value:next,providerValueAtCreation:row.provider_value,actorId:'administrator',reason:'Legacy correction set override',legacyOperationId:`legacy-correction:${correctionId}:set`,legacyStatus:'active'});
+  return { deleted: false, correction: updated.override };
 }

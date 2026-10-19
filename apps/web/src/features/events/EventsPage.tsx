@@ -108,14 +108,14 @@ export function EventsPage() {
     <EventsFilters value={filters} championships={championships} providers={providers} onChange={setFilters} onRefresh={() => void load()} />
     {loading ? <div className="events-loading">Chargement des événements…</div> : <div className="events-workspace">
       <main>{view === 'month'
-        ? <><EventCalendarView month={month} events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onCreateAt={startCreate} onCreateRange={startCreateRange} onMove={(event,date)=>void move(event,date)} /><EventLegend events={filtered} championships={championships} /></>
+        ? <><EventCalendarView month={month} events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onEdit={startEdit} onCreateAt={startCreate} onCreateRange={startCreateRange} onMove={(event,date)=>void move(event,date)} /><EventLegend events={filtered} championships={championships} /></>
         : view === 'list' ? <EventListView events={filtered} championships={championships} selectedId={selectedId} onSelect={(event) => setSelectedId(event.id)} onEdit={startEdit} onDelete={(event) => void remove(event)} onTogglePublication={(event) => void togglePublication(event)} />
-        : <EventCalendarAlternativeViews view={view} date={month} events={filtered} selectedId={selectedId} onSelect={(event)=>setSelectedId(event.id)} onMove={(event,date)=>void move(event,date)} onCreateAt={startCreate}/>}
+        : <EventCalendarAlternativeViews view={view} date={month} events={filtered} selectedId={selectedId} onSelect={(event)=>setSelectedId(event.id)} onEdit={startEdit} onMove={(event,date)=>void move(event,date)} onCreateAt={startCreate}/>}
       </main>
       <EventDetailsPanel event={selected} championships={championships} onEdit={startEdit} onDuplicate={startDuplicate} onDelete={(event) => void remove(event)} onResize={(event,end)=>void resize(event,end)} />
     </div>}
     {conflicts.size > 0 && <div className="events-conflict-warning" role="alert">⚠ {conflicts.size} événement(s) publié(s) se chevauchent sur un même circuit.</div>}
     <div className="events-selection-bar"><span>{selected ? `1 sélectionné · ${selected.name}` : '0 sélectionné'}</span><button disabled={!selected} onClick={() => selected && startEdit(selected)}>Modifier</button><button onClick={() => void load()}>↻ Synchroniser l’affichage</button><b>{filtered.length} événement(s)</b></div>
-    <EventEditorDialog open={editorOpen} editing={Boolean(editing)} saving={saving} value={form} championships={championships} circuits={circuits} sessionTitles={sessionTitles} error={formError} onChange={setForm} onNameChange={changeName} onClose={() => setEditorOpen(false)} onSubmit={submit} />
+    <EventEditorDialog open={editorOpen} editing={Boolean(editing)} saving={saving} value={form} meetingName={editing?.meeting_name ?? null} championships={championships} circuits={circuits} sessionTitles={sessionTitles} error={formError} onChange={setForm} onNameChange={changeName} onClose={() => setEditorOpen(false)} onSubmit={submit} />
   </>;
 }

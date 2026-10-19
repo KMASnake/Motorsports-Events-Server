@@ -1,18 +1,34 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, persistOptimisticEvent, resizeEvent, slugify, sortEventList } from './eventUtils';
+import { buildCalendarDays, calendarPeriodLabel, eventDuration, eventPage, eventPresentationStatus, eventToForm, filterEvents, formDateForDay, formDatesForRange, moveEvent, navigateCalendarDate, nearestEventsFirst, overlappingEvents, persistOptimisticEvent, resizeEvent, slugify, sortEventList } from './eventUtils';
 import type { EventRow } from './eventTypes';
 import { availableProviderOptions, providerLabel } from './providerDisplay';
 
 const event = (overrides: Partial<EventRow> = {}): EventRow => ({
   id: 'event-1', championship_id: 'champ-1', championship_name: 'Formule 1',
   championship_slug: 'formula-1', circuit_id: null, circuit_name: null,
-  circuit_city: null, country_code: null, name: 'Grand Prix de France',
-  slug: 'grand-prix-france', category: 'Course', starts_at: '2026-06-11T14:00:00.000Z',
+  circuit_city: null, country_code: null, meeting_id:null, meeting_name:null, name: 'Grand Prix de France',
+  slug: 'grand-prix-france', category: 'race', starts_at: '2026-06-11T14:00:00.000Z',
   ends_at: '2026-06-11T16:00:00.000Z', timezone: 'UTC', status: 'scheduled',
   published: true, origin: 'manual', description: null, ...overrides
 });
 
 describe('eventUtils', () => {
+  it('préremplit tous les champs métier de l’éditeur depuis l’Event API', () => {
+    const row=event({championship_id:'f1',circuit_id:'silverstone',name:'British Grand Prix',ends_at:'2026-07-05T16:00:00.000Z',status:'postponed',published:false,description:'Pluie',session_title:'Race'});
+    const form=eventToForm(row);
+    expect(form).toMatchObject({championship_id:'f1',circuit_id:'silverstone',name:'British Grand Prix',category:'race',status:'postponed',published:false,description:'Pluie',session_title:'Race'});
+    expect(new Date(form.starts_at).toISOString()).toBe(row.starts_at);
+    expect(new Date(form.ends_at).toISOString()).toBe(row.ends_at);
+  });
+
+  it('laisse la fin vide lorsque ends_at est null',()=>expect(eventToForm(event({ends_at:null})).ends_at).toBe(''));
+
+  it('préserve une valeur de catégorie historique dans le formulaire',()=>expect(eventToForm(event({category:'Grand Prix'})).category).toBe('Grand Prix'));
+  it('présente les anciens types Sprint dans leur famille métier sans toucher à la session',()=>{
+    expect(eventToForm(event({category:'sprint',session_title:'Sprint'}))).toMatchObject({category:'race',session_title:'Sprint'});
+    expect(eventToForm(event({category:'sprint_qualifying',session_title:'Qualifications Sprint'}))).toMatchObject({category:'qualifying',session_title:'Qualifications Sprint'});
+  });
+
   it('construit une grille mensuelle de six semaines commençant un lundi', () => {
     const days = buildCalendarDays(new Date(2026, 5, 1), [event()]);
     expect(days).toHaveLength(42);
@@ -20,9 +36,20 @@ describe('eventUtils', () => {
     expect(days.find((day) => day.key === '2026-06-11')?.events).toHaveLength(1);
   });
 
+  it('ne présente pas comme à venir un événement planifié dont la borne temporelle est passée', () => {
+    expect(eventPresentationStatus(event(), new Date('2026-06-12T00:00:00Z'))).toBe('completed');
+    expect(eventPresentationStatus(event({ends_at:null}), new Date('2026-06-12T00:00:00Z'))).toBe('completed');
+    expect(eventPresentationStatus(event({status:'cancelled'}), new Date('2026-06-12T00:00:00Z'))).toBe('cancelled');
+  });
+
   it('partage les filtres entre calendrier et liste', () => {
     const rows = [event(), event({ id: 'event-2', championship_id: 'champ-2', name: 'Rallye du Portugal', published: false })];
     expect(filterEvents(rows, { search: 'rallye', championship: 'all', status: 'all', publication: 'private', provider: 'all' }).map((row) => row.id)).toEqual(['event-2']);
+  });
+
+  it('retrouve les sessions par le nom du Meeting parent',()=>{
+    const rows=[event({name:'Qualifying',session_title:'Qualifying',meeting_id:'meeting-1',meeting_name:'Singapore Grand Prix'})];
+    expect(filterEvents(rows,{search:'Singapore Grand Prix',championship:'all',status:'all',publication:'all',provider:'all'})).toEqual(rows);
   });
 
   it('filtre les événements par fournisseur administratif', () => {
@@ -34,8 +61,15 @@ describe('eventUtils', () => {
 
   it('ajoute automatiquement un futur fournisseur au filtre', () => {
     const options = availableProviderOptions([{ origin: 'provider', provider_key: 'future-racing-api' }]);
-    expect(options).toContainEqual({ value: 'provider:future-racing-api', label: 'Future Racing API' });
+    expect(options).toEqual([{ value: 'provider:future-racing-api', label: 'Future Racing API' }]);
     expect(providerLabel('manual', null)).toBe('Motorsports Events');
+    expect(providerLabel('provider', null)).toBe('Identité fournisseur manquante');
+    expect(availableProviderOptions([{origin:'provider',provider_key:null}])).toContainEqual({value:'provider-identity-missing',label:'Identité fournisseur manquante'});
+  });
+
+  it('ne propose que les fournisseurs réellement présents dans les événements chargés', () => {
+    expect(availableProviderOptions([])).toEqual([]);
+    expect(availableProviderOptions([{origin:'provider',provider_key:'ocblacktop'}])).toEqual([{value:'ocblacktop',label:'OC BlackTop'}]);
   });
 
   it('prépare une création depuis un jour et normalise le slug', () => {

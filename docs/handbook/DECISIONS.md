@@ -1,5 +1,401 @@
 # Journal des décisions
 
+> Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
+
+## 2026-10-18 — Certification officielle ADM-02 avec réserves
+
+Le mainteneur décide explicitement de certifier le rejet motivé confirmé des
+candidats Meeting/Event éligibles depuis Doublons, au commit publié
+`6c37aa09436356eb6c85c310114dce5f4c2a5fd2` (tree `c424d391e4ee1d443c49f0a857dc18c920c8fa44`).
+Cette décision porte uniquement sur ADM-02, pas sur les 18 commits publiés.
+L’état canonique, les preuves et restrictions sont consignés dans
+[`PROGRESS.json`](../handoff/PROGRESS.json), objet `adm_02_certification`.
+La décision n’est pas déduite des seules CI ni de la publication GitHub.
+
+Sont retenus : éligibilité, motif obligatoire, confirmation explicite de
+l’irréversibilité via l’API actuelle, backend reject existant, idempotence,
+conflit 409 avec relecture et nouvelle confirmation, authentification/CSRF,
+persistance/audit, non-publication observée et non-régression ADM-01.
+Les workflows Node 39156810440 et Legacy Python 39156810395 sont terminés
+SUCCESS sur ce SHA exact ; ils ne remplacent pas les preuves fonctionnelles.
+
+Réserves expressément conservées : données intégrées synthétiques ; tables
+canoniques partiellement vides au baseline ; couverture HTTP 500 intégrée
+incomplète ; réserves ADM-01 non levées ; publication sans validation de
+déploiement ; CI sans couverture universelle des scénarios. Restent aussi
+les limites d’idempotence en mémoire, des révisions JS sûres et de visibilité
+réseau/intégrations documentées. Aucun échec historique requalifié.
+
+Aucun backend supplémentaire, link/create, matching guidé, déploiement ou
+A3-02 inclus. Toutes les décisions ADM-01/A1/A2/A3 sont préservées ;
+R1_P1_01 reste OPEN. Cette opération est documentaire sans commit ni push.
+Rapport : `/home/kmasnake/projects/audits/adm02-official-certification/ADM-02-OFFICIAL-CERTIFICATE.md`.
+
+## 2026-10-17 — Acceptation officielle mainteneur d’ADM-01 avec réserves
+
+Le mainteneur accepte officiellement et explicitement le verdict indépendant
+**PASS_WITH_RESERVATIONS** pour le seul périmètre
+**READ_ONLY_MEETING_EVENT_CANDIDATE_LIST_DETAIL** : consultation en lecture seule
+des candidats Meeting/Event, intégrée à la rubrique existante **Doublons**
+(`/duplicates` et `/duplicates/:id`) de la console d’administration.
+Cette décision vient de l’acceptation mainteneur, pas d’un résultat développeur
+ou d’une CI verte. Aucun enrichissement fonctionnel ou backend n’est autorisé.
+
+Référence auditée : branche `codex/lot-5-providers-sync`, base
+`ead7141a9dff5a79ac4bd029873e104f16f3e2e3`, tree
+`2eb5ea703c474a97de4c0aae305c03574d765688`, complétée par les neuf fichiers web
+identifiés par SHA-256 dans [`PROGRESS.json`](../handoff/PROGRESS.json).
+Deux sont des modifications suivies et sept des ajouts non suivis : le HEAD
+seul ne contient pas ADM-01. Le présent diff documentaire est distinct des
+sources fonctionnelles auditées ; ces neuf contenus restent inchangés.
+
+Aucune anomalie critique, haute, moyenne ou faible n’est confirmée dans le
+périmètre de l’audit. Cette absence de finding ne garantit pas l’absence
+universelle de défaut. Trois réserves restent ouvertes et explicitement acceptées :
+
+- **R-GET-01 — Provenance partielle** : identifiant existant de l’audit,
+  conservé plutôt que le nouvel alias proposé ADM01-R01. Les deux GET ne
+  fournissent pas une traçabilité complète multi-providers, source brute,
+  candidat et canonique publié. Les données absentes ne sont pas reconstruites.
+- **R-PAGE-01 — Pagination sans total ni snapshot** : identifiant existant,
+  conservé plutôt que l’alias proposé ADM01-R02. La pagination offset peut
+  déplacer les lignes entre lectures et ne certifie pas une vue exhaustive
+  cohérente lorsque les données évoluent.
+- **ADM01-R03 — Validation navigateur simulée** : les tests Chromium utilisent
+  des réponses synthétiques. Aucun bout en bout contre une API et une base
+  PostgreSQL réelles n’est validé.
+
+Ces réserves de contrat et de validation ne sont pas des anomalies bloquantes
+sans nouvelle preuve. L’acceptation ne les clôt pas et ne vaut pas validation
+d’une traçabilité complète, du backend ou du produit pour la production.
+
+Résultats indépendants acceptés : **131 tests web PASS**, **18 scénarios
+Chromium synthétiques PASS** (8 initiaux + 10 indépendants), **29 tests API
+ciblés PASS** (21 existants + 8 indépendants), typecheck, lint, builds et
+contrôle de gouvernance PASS. Les 12 tests ADM-01 sont inclus dans les 131.
+Ces suites ne sont pas relancées par la présente opération documentaire.
+Les limitations de couverture, dont API/DB réelles et comparaison visuelle
+exhaustive non validées, restent déclarées ; aucun échec legacy n’est requalifié.
+
+Rapports indépendants : `/home/kmasnake/projects/audits/adm01-independent-audit/`
+(`ADM-01-AUDIT-REPORT.md`, `ADM-01-FUNCTIONAL-REVIEW.md`,
+`ADM-01-READ-ONLY-SECURITY.md`, `ADM-01-PROVENANCE-REVIEW.md`,
+`ADM-01-REGRESSION-RESULTS.md`, `ADM-01-FINDINGS.md`).
+Manifeste : `SHA256SUMS.json` dans ce dossier ; SHA-256 :
+`e27a0d0e01a5b8ef71d839e33ef8c81a61fe8a9bc35b24bc67e7579c61588d3f`.
+Les 151 preuves et les neuf contenus web ont été vérifiés avant enregistrement.
+Rapport de développement :
+`/home/kmasnake/projects/audits/adm01/ADM-01-IMPLEMENTATION-REPORT.md`.
+Les rapports restent immuables ; leurs mentions d’une acceptation à venir
+reflètent leur date de rédaction. L’état et la prochaine action courants
+restent exclusivement portés par `docs/handoff/PROGRESS.json`.
+
+Les décisions A1/A2, les garanties et réserves d’A3-01, dont LCA-01 OPEN_LOW,
+et R1_P1_01 OPEN sont préservées intégralement. A3-01 demeure accepté
+PASS_WITH_RESERVATIONS ; aucun fencing HTTP physique absolu n’est ajouté.
+ADM-02 et A3-02 ne sont pas autorisés, A3-02 n’est pas implémenté. Aucun
+appel provider réel, accès production/préproduction, worker/scheduler ou
+déploiement n’est effectué. Cette étape autorise uniquement la préparation
+des deux documents : aucun staging, commit ou push. Une consolidation Git
+locale exige une autorisation mainteneur distincte après revue du diff.
+
+## 2026-10-17 — Acceptation officielle mainteneur d’A3-01 avec réserve explicite
+
+Le mainteneur accepte officiellement et explicitement le verdict indépendant
+**PASS_WITH_RESERVATIONS** pour le seul périmètre
+**SIMULATED_AUTHORITY_CONTRACT_AND_HARNESS** : contrats d’autorité et harnais
+de concurrence simulé A3-01. Cette décision clôt la validation mainteneur de
+ce périmètre ; elle ne résulte ni du PASS local ni d’une CI verte.
+
+La référence est la branche `codex/lot-5-providers-sync`, base
+`75d8eb80e3a2d12b6792e544a7f3b8ffaab8c916`, tree
+`309a8c5886708b3529c35393939ba17378207487`, complétée par les quatre fichiers
+A3-01 actuellement non suivis, identifiés par leurs SHA-256 dans
+[`PROGRESS.json`](../handoff/PROGRESS.json). Le commit de base ne contient
+pas ces fichiers : cette acceptation ne prétend pas désigner un commit
+A3-01 déjà créé. Le diff de gouvernance est ultérieur aux sources auditées.
+
+La réserve **LCA-01 — OPEN_LOW** reste explicitement ouverte et acceptée :
+avant le premier enregistrement d’un `intentId`, un autre worker authentifié
+connaissant cet ID peut y associer un tombstone d’annulation avec son propre
+payload différent, bloquant l’identité légitime. Aucune émission sous mauvaise
+autorité, réactivation d’un terminal ou violation d’exclusion n’a été démontrée.
+L’acceptation est limitée au modèle sous hypothèse d’allocation initiale des
+IDs de confiance. Elle ne corrige pas ce comportement et ne valide pas une
+protection de l’allocation. Toute intégration future à des workloads non fiables
+devra protéger ou définir l’association serveur ID/propriétaire et la tester ;
+aucune telle implémentation n’est autorisée par la présente décision.
+
+Les garanties concernent une instance partagée en mémoire et un transport
+simulé. Admission, invocation HTTP et réception distante demeurent distinctes :
+une suspension après le dernier contrôle peut conduire à une émission tardive,
+et une requête déjà invoquée peut être reçue après annulation ou révocation.
+Aucun fencing HTTP physique absolu, atomicité DB/réseau, exactly-once physique,
+journal durable ou exclusion inter-processus n’est certifié. Les limites de
+mémoire, de reprise fermée et de lecteur indéfiniment en attente sont conservées.
+
+Rapport indépendant :
+`/home/kmasnake/projects/audits/a3-01-lifecycle-audit/A3-01-LIFECYCLE-AUDIT.md`.
+Réserve et reproduction : `A3-01-FINDINGS.md` dans le même dossier.
+Manifeste : `/home/kmasnake/projects/audits/a3-01-lifecycle-audit/SHA256SUMS.json`.
+SHA-256 du manifeste :
+`c2b2e30241a9dab7532423d2a9966304de0cd0e444a8e76ac8abcf5da0815590`.
+Les 310 preuves et les quatre empreintes A3-01 ont été vérifiées avant
+l’enregistrement de cette décision. Les rapports d’audit restent immuables ;
+leurs mentions d’une acceptation à venir décrivent leur date de rédaction.
+L’état courant, les validations, interdictions et la prochaine action sont
+exclusivement définis dans `docs/handoff/PROGRESS.json`.
+
+Les réserves et exceptions legacy de R1-A2.4 restent inchangées, sans convertir
+un FAIL en PASS. Le résultat PostgreSQL 479 PASS / 1 FAIL legacy est hérité,
+non rejoué dans l’audit de cycle de vie ; les 18 SKIP repository restent ignorés.
+Cette acceptation ne ferme pas R1_P1_01 et ne vaut aucune autorisation implicite
+d’A3-02, d’un runtime A3, d’un appel provider, d’un environnement réel ou d’un
+déploiement. A3-02 reste non implémenté ; aucun accès à la production ou à la
+préproduction n’est effectué. La proposition de commit local de cette étape
+porte uniquement sur les deux documents de gouvernance. Les quatre fichiers
+techniques A3-01 restent inchangés et non suivis. Toute écriture Git exige une
+validation mainteneur distincte ; aucun staging, commit ni push n’est effectué.
+
+## 2026-10-15 — Acceptation mainteneur de R1-A2.4 avec réserves explicites
+
+Le mainteneur accepte explicitement la recommandation du rapport indépendant
+final pour le seul périmètre transactionnel R1-A2.4 :
+**CERTIFIED — PASS WITH EXPLICIT RESERVATIONS ; décision ACCEPTED**.
+La référence auditée est la branche `codex/lot-5-providers-sync`, commit
+`049ddbf00db4fd6beb44c4b4e33cdcc74a1a273a`, tree
+`bcf9ab3a78944b5025797b63174d4e73fd9f8f43`. Elle exclut le worktree
+documentaire ultérieur et ne résulte pas d’une inférence depuis une CI verte.
+
+L’acceptation conserve les trois P3 ouvertes : IA-P3-01 (binding autonome M04
+sans appelant runtime identifié), IA-P3-02 (curseur du rapport runner décalé
+par rapport à son checkpoint engagé), IA-P3-03 (attente legacy F5-4 obsolète
+après CREATE administratif F5-7B). Aucun nouveau P1/P2 n’est confirmé.
+
+Deux exceptions legacy sont explicitement acceptées, **sans convertir leur
+FAIL en PASS** : `championshipDiscoveryResolution.postgres.test.ts:137`
+(code retour 1, snapshot incompatible avec la publication administrative
+F5-7B) et `validate-lot53.mjs` (code retour 1, SQLSTATE 23502, fixture omettant
+`discoveryEnabled`). Les SKIP, limites et réserves du rapport restent applicables.
+
+Rapport :
+`/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf/reports/FINAL-CERTIFICATION-REPORT.md`.
+Archive : `/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf.zip`.
+SHA-256 : `89886e8f0c60964b13fda46bbc6625b63a08e19e80071ce2cc3fb1fed1d117fa`.
+La mention `CERTIFICATION_EFFECTIVE=NO` du rapport décrit sa recommandation
+avant décision ; le rapport de preuve reste immuable. La présente acceptation
+explicite est enregistrée dans l’état canonique
+[`PROGRESS.json`](../handoff/PROGRESS.json).
+
+Cette décision ne ferme pas R1_P1_01, n’implémente ni n’autorise A3 et
+n’autorise aucun appel provider, déploiement, activation périodique,
+F5-7D2, F5-7E ou F5-7F. Les autorisations et la prochaine action restent
+exclusivement définies par `docs/handoff/PROGRESS.json`.
+
+## 2026-08-25 — Revalidation mainteneur et VPS finale de 5.7-P-E
+
+- 5.7-P-E est implémenté et revalidé mainteneur/VPS au SHA
+  `74f45b7d341ca214d4569b5d9917a46bb1d38254` ;
+- E01-E18 et 0028/0029 fresh/upgrade/down/up avec protection du rollback peuplé
+  sont PASS, avec migration head 0029 en préproduction ;
+- Preview OFF/ON, les sept routes protégées, l’entitlement `f1`, les scopes,
+  `/changes`, le lifecycle client/clé et les limites atomiques sont PASS ;
+- l’état final conserve Preview OFF, les services healthy, le client
+  synthétique suspendu et toutes ses clés révoquées ;
+- 5.7-P-F, l’activation Preview Production, l’onboarding externe, le Lot 5.7
+  complet, 5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-24 — Réouverture et correction d’intégration de 5.7-P-E
+
+- la validation VPS a révélé une collision Fastify entre quatre lectures
+  historiques et leurs routes Preview définitives ;
+- la validation mainteneur E est rouverte malgré le PASS confirmé de la
+  migration 0028 et de la recette E01-E18 ;
+- l’assemblage partagé par `server.ts` conserve les lectures historiques avec
+  Preview OFF et installe les lectures Preview sécurisées sans collision avec
+  Preview ON, sans retirer les routes admin/write ;
+- la correction est complète mais exige une revalidation mainteneur et VPS ;
+- 5.7-P-F, la visibilité Production, l’onboarding externe, le Lot 5.7 complet,
+  5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-24 — Validation mainteneur de 5.7-P-E
+
+- l’audit mainteneur de 5.7-P-E est PASS au SHA
+  `bfe6d4818b105a08417e6c524084cae0a176690d` ;
+- PP-T29 à PP-T35, les critères fonctionnels E applicables PP-105 à PP-135 et
+  PP-180, E01-E18 et la migration 0028 fresh/down/up avec protection du
+  rollback peuplé sont PASS ;
+- aucun appel fournisseur réel et aucun crédit fournisseur n’ont été consommés ;
+- aucun gate d’implémentation suivant n’est autorisé ; 5.7-P-F, la visibilité
+  Production, l’onboarding externe, le Lot 5.7 complet, 5.8+ et merge `main`
+  restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-24 — Achèvement de l’implémentation 5.7-P-E
+
+- PP-T29 à PP-T35 sont implémentés et disposent de preuves ciblées et
+  PostgreSQL reproductibles ;
+- l’activation Preview reste désactivée par défaut et aucun client externe
+  n’est onboardé ;
+- 5.7-P-E attend l’audit mainteneur et n’est pas déclaré validé ;
+- `authorized_gate` reste `5.7-P-E` et n’ouvre pas automatiquement F ;
+- 5.7-P-F, la visibilité Production, le Lot 5.7 complet, 5.8+ et merge `main`
+  restent non autorisés.
+
+Voir `architecture/ADR-0022-LOT-5.7-P-E-CLIENT-SECURITY.md`.
+
+## 2026-08-21 — Validation mainteneur de 5.6-H et ouverture du gate 5.6-I
+
+- l’Acceptance finale de 5.6-H est 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- l’audit mainteneur de 5.6-H est PASS et le sous-lot est validé ;
+- le P3 non bloquant hérité de 5.6-G sur les queries anomalies invalides reste
+  tracé sans rouvrir 5.6-G ou 5.6-H ;
+- le dernier sous-lot technique du plan approuvé est 5.6-I — recette complète,
+  audit et passation ; seul ce gate de validation finale est ouvert ;
+- aucune implémentation fonctionnelle 5.6-I n’est autorisée par cette décision ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés.
+
+## 2026-08-21 — Validation mainteneur de 5.6-G et ouverture de 5.6-H
+
+- l’Acceptance finale de 5.6-G est 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- P1, P2 fonctionnels et P2 preuves ouverts : 0 ;
+- l’audit mainteneur de 5.6-G est PASS et le sous-lot est validé ;
+- le P3 non bloquant sur les filtres invalides de la route anomalies (`[]` au
+  lieu d’un HTTP 400) est tracé sans rouvrir 5.6-G ;
+- le prochain sous-lot du plan approuvé est 5.6-H — interface ACP — dont
+  l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-I, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision n’implémente aucun code 5.6-H.
+
+## 2026-08-21 — Validation mainteneur de 5.6-F et ouverture de 5.6-G
+
+- l’Acceptance finale de 5.6-F est 26 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- P1, P2 fonctionnels, P2 preuves et P3 bloquants ouverts : 0 ;
+- l’audit mainteneur de 5.6-F est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-G — API et actions ACP — dont
+  l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-H, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision n’implémente aucun code 5.6-G.
+
+## 2026-08-21 — Validation mainteneur de 5.6-E et ouverture de 5.6-F
+
+- l’Acceptance finale de 5.6-E est 35 PASS, 0 PARTIAL, 0 FAIL et 0 NOT TESTED ;
+- le ré-audit mainteneur de 5.6-E est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-F — protection des corrections
+  et observations — dont l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-G, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision n’implémente aucun code 5.6-F et ne modifie aucun invariant
+  fonctionnel validé de 5.6-E.
+
+## 2026-08-21 — Validation mainteneur de 5.6-D et ouverture de 5.6-E
+
+- le ré-audit mainteneur de 5.6-D est PASS et le sous-lot est validé ;
+- le prochain sous-lot du plan approuvé est 5.6-E — temporalité et
+  finalization — dont l’implémentation seule est autorisée ;
+- le Lot 5.6 global reste non validé et non fusionnable ;
+- 5.6-F, les Lots 5.7 et suivants, ainsi que 5.7-P, restent non autorisés ;
+- cette décision ne modifie aucun invariant fonctionnel validé de 5.6-D.
+
+## 2026-08-15 — Exception mainteneur TheSportsDB v1
+
+- le mainteneur impose le maintien de TheSportsDB v1 et accepte explicitement
+  que sa clé gratuite apparaisse dans le segment de chemin de l’appel réseau ;
+- cette exception ne s’étend à aucun autre fournisseur ni à une query string ;
+- le secret et l’URL credentialisée restent interdits dans logs, erreurs,
+  traces, audits, stockage et surfaces applicatives ;
+- ADR-0016 reste applicable pour toutes les autres garanties.
+
+Voir `architecture/ADR-0020-THESPORTSDB-V1-CREDENTIAL-PATH.md`.
+
+## 2026-08-15 — Application d’ADR-0016 aux versions d’API fournisseur
+
+- aucune compatibilité fournisseur ne justifie un secret dans une URL ;
+- lorsqu’un fournisseur propose une version authentifiée par header, cette
+  version est obligatoire même si une version historique gratuite utilise une
+  clé dans son chemin ;
+- l’adaptateur TheSportsDB utilise l’API v2 et `X-API-KEY` ; l’API v1
+  credentialisée est refusée pour les appels 5.6 ;
+- cette clarification ne crée aucune exception à AC-5.6-161.
+
+Voir `architecture/ADR-0016-HTTP-SECURITY-BOUNDARY.md`.
+
+## 2026-08-14 — Autorisation d'implémentation du Lot 5.6
+
+- le Concept, le contrat UI et l'Acceptance consolidée du Lot 5.6 ont été audités contre 5.4, 5.5, la baseline sécurité et la frontière 5.7 ;
+- les constats de l'audit ont été corrigés et la revue post-corrections est PASS ;
+- le mainteneur a explicitement déclaré : « Je valide et j'autorise l'implémentation du lot 5.6 » ;
+- `authorized_sub_lot = 5.6` ;
+- l'implémentation du seul Lot 5.6 est autorisée ;
+- cette autorisation ne vaut ni validation finale du Lot 5.6, ni autorisation de fusion dans `main` ;
+- les Lots 5.7 et suivants restent non autorisés à l'implémentation.
+
+Voir `architecture/ADR-0019-LOT-5.6-ACQUISITION-AUTHORIZATION.md`.
+
+## 2026-08-14 — Validation mainteneur du Lot 5.5
+
+- l'audit initial de l'implémentation 5.5 et ses ré-audits ont été menés à
+  terme ;
+- les corrections P1, P2 et P3 sont closes et le ré-audit final est PASS ;
+- la recette PostgreSQL dédiée compte 61 cas réussis ;
+- la sécurité et la non-régression du scheduler 5.4 sont validées ;
+- `REAL PROVIDER REQUESTS = 0` et `PROVIDER CREDITS CONSUMED = 0` ;
+- l'implémentation du Lot 5.5 est validée par le mainteneur le 2026-08-14 ;
+- **à la date de cette décision**, le Lot 5.6 restait non autorisé ; cet état historique a ensuite été remplacé par l'autorisation formalisée dans l'ADR-0019.
+
+Voir `architecture/ADR-0018-LOT-5.5-MAINTAINER-VALIDATION.md`.
+
+## 2026-08-14 — Autorisation du Lot 5.5 Quotas et cadence
+
+- la baseline sécurité pré-5.5 est explicitement validée par le mainteneur ;
+- le Concept et l'Acceptance 5.5 ont passé l'audit croisé avec 5.4 et sécurité après corrections ;
+- l'implémentation du seul Lot 5.5 est autorisée avec `authorized_sub_lot = 5.5` ;
+- cette autorisation ne vaut pas validation finale de 5.5 ;
+- Codex doit s'arrêter après implémentation et preuves de validation pour audit mainteneur ;
+- **à la date de cette décision**, les Lots 5.6 et suivants restaient non autorisés ; le Lot 5.6 a ensuite été autorisé par l'ADR-0019, tandis que 5.7+ restent non autorisés.
+
+Voir `architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
+
+## 2026-08-14 — Frontière de sécurité HTTP pré‑5.5
+
+- la confiance proxy est fermée par défaut et limitée à `TRUST_PROXY_CIDRS` ;
+- Fastify impose headers de sécurité, redaction des secrets et corps de 1 Mio ;
+- Nginx impose les headers de l’ACP et une CSP dont `connect-src` est aligné
+  sur l’origine API configurée au build ;
+- HSTS appartient à la terminaison qui voit réellement le HTTPS public ;
+- les réponses publiques de championnats sont actives uniquement et utilisent
+  une projection explicite, distincte du contrat administratif ;
+- les mutations sensibles historiques écrivent mutation et audit dans une
+  même transaction ;
+- les transports fournisseurs exigent HTTPS, allowlist exacte et lecture
+  streaming bornée, sans redirection ni destination privée ;
+- ces règles ne démarrent aucune fonctionnalité du Lot 5.5.
+
+Voir `architecture/ADR-0016-HTTP-SECURITY-BOUNDARY.md`.
+
+## 2026-08-12 — Scheduler de synchronisation persistant
+
+- deux flux persistants `current` et `historical` portent trois classes de
+  travail pondérées 3/2/1 ;
+- les leases PostgreSQL, heartbeats et générations de fencing empêchent un
+  worker périmé de valider ;
+- résultat, curseur, état et exécution sont validés dans une transaction unique ;
+- le pool global et la concurrence fournisseur sont tous deux appliqués ;
+- discovery et sync partagent les mêmes plafonds, leases et règles de fencing ;
+- la désactivation mémorise puis restaure l'état exact sans auto-activer un
+  flux inactif ou en pause ;
+- l'ingestion complète et le moteur de quotas restent hors du Lot 5.4.
+
+Voir `architecture/ADR-0015-PERSISTENT-SYNC-SCHEDULER.md`.
+
 ## 2026-08-11 — Authentification humaine de la console
 
 - un compte administrateur unique est initialisé par une commande dédiée ;
@@ -33,6 +429,16 @@ Voir `architecture/ADR-0013-EVENT-AS-SESSION.md`.
   `0004`, sans devenir un second champ visible.
 
 Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
+
+## 2026-08-14 — Quota gate fournisseur atomique
+
+- le scheduler conserve la sélection et les leases ; le quota gate décide et charge séparément avant tout outbound ;
+- les fenêtres minute/heure/jour/mois et l'intervalle minimal s'appliquent simultanément ;
+- le compteur local est conservateur et les observations fournisseur normalisées ne réécrivent pas la policy ;
+- seule la classe current accède à la réserve, après application de la marge ;
+- seule une non-émission prouvée permet une compensation ; une émission reste chargée malgré timeout ou stale fencing.
+
+Voir `architecture/ADR-0017-LOT-5.5-QUOTA-CADENCE-AUTHORIZATION.md`.
 
 ## 2026-08-10 — Projection publique des Sessions
 
@@ -202,6 +608,7 @@ Voir `architecture/ADR-0012-SESSIONS-MODEL.md`.
   continuent d'utiliser le service transactionnel unique.
 
 Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
+
 ## 2026-08-09 — Protection de l'API d'administration
 
 - toute route `/api/v1/admin/` exige un Bearer HMAC valide et non expiré ;
@@ -212,6 +619,7 @@ Voir `architecture/ADR-0003-PROVIDER-CORRECTIONS.md`.
   chemin public existant.
 
 Voir `architecture/ADR-0010-ADMIN-API-AUTHORIZATION.md`.
+
 ## 2026-08-09 — Pagination et audit administratifs
 
 - filtres et tris sont validés et exécutés avant la pagination serveur ;
@@ -229,3 +637,134 @@ Voir `architecture/ADR-0011-ADMIN-PAGINATION-AND-AUDIT.md`.
   les changements d'heure civile.
 
 Voir `architecture/ADR-0007-CALENDAR.md`.
+## 2026-08-21 — Recette finale 5.6-I PASS et décision mainteneur attendue
+
+- la recette complète 5.6-I est PASS et clôt le dernier sous-lot technique du
+  plan approuvé, sans changement fonctionnel ;
+- les preuves PostgreSQL, API, Web, Chromium, sécurité, reprise, régressions
+  5.4/5.5 et release sont consignées dans
+  `docs/handoff/LOT-5.6-I-FINAL-VALIDATION.md` ;
+- cette clôture technique ne vaut pas validation globale du Lot 5.6 ;
+- `merge_authorized` reste faux et la fusion dans `main` reste interdite ;
+- 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
+- le prochain gate appartient au mainteneur : décider explicitement de la
+  validation globale du Lot 5.6.
+
+## 2026-08-21 — Validation mainteneur globale du Lot 5.6
+
+- le mainteneur accepte le dossier final 5.6-I et ses 26/26 PASS ;
+- les sous-lots 5.6-A à 5.6-H sont validés et 5.6-I est un gate final PASS ;
+- P1 ouverts : 0 ; P2 ouverts : 0 ; P3 bloquants : 0 ;
+- le P3 hérité de 5.6-G sur la query anomalies invalide reste connu et non
+  bloquant ;
+- le Lot 5.6 est globalement validé le 2026-08-21 et complet à 100 % ;
+- le prochain gate identifié est 5.7-P — tranche verticale de normalisation
+  Production Preview — déjà conçu mais non autorisé ;
+- 5.7, 5.7-P et les lots ultérieurs restent non autorisés ;
+- la fusion dans `main` reste soumise à une décision séparée et non autorisée.
+
+## 2026-08-21 — Autorisation mainteneur de 5.7-P
+
+- le mainteneur autorise 5.7-P, tranche verticale de normalisation Production
+  Preview ;
+- le Concept, l’Acceptance effective PP-001 à PP-183 et les corrections
+  d’audit constituent les normes existantes ;
+- ces normes ne définissent aucun sous-lot technique ni premier gate
+  d’implémentation nommé : seule leur traduction en plan technique ordonné est
+  autorisée dans le premier gate ;
+- l’implémentation 5.7-P reste non commencée et aucun sous-lot technique n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
+- le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.
+
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-A
+
+- les fondations persistantes PP-T01 à PP-T06 sont implémentées et prouvées ;
+- 5.7-P-A est complet et attend l’audit mainteneur, sans être validé mainteneur ;
+- aucun moteur de normalisation, mapping, endpoint Preview, publication ou
+  contrôle client n’est ajouté ;
+- l’autorisation technique de A est consommée et aucun gate B à F n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.
+
+## 2026-08-22 — Validation de 5.7-P-A et autorisation de 5.7-P-B
+
+- l’audit mainteneur de 5.7-P-A est PASS et A est validé mainteneur ;
+- PP-T01 à PP-T06 et la recette dédiée 18/18 sont PASS, sans P1, P2 ni P3
+  bloquant ;
+- seul 5.7-P-B — normalisation déterministe et mapping source — est autorisé et
+  reste non commencé ; son Acceptance est PP-T07 à PP-T16 avec les critères
+  fonctionnels pertinents PP-030 à PP-061 et PP-181 à PP-183 ;
+- B doit s’arrêter aux candidats normalisés persistés, sans publication ;
+- 5.7-P-C à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni 5.6 ni A.
+
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-B
+
+- la normalisation déterministe et le mapping source PP-T07 à PP-T16 sont
+  implémentés et prouvés ;
+- B s’arrête aux candidats, décisions, liens et checkpoints persistés ; aucune
+  publication, API Preview ou surface client n’est ajoutée ;
+- 5.7-P-B est complet et attend l’audit mainteneur, sans être validé
+  mainteneur ;
+- l’autorisation technique de B est consommée et aucun gate C à F n’est
+  autorisé ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et inchangé.
+
+## 2026-08-22 — Validation de 5.7-P-B et autorisation de 5.7-P-C
+
+- l’audit mainteneur de 5.7-P-B est PASS et B est validé mainteneur ;
+- 45 critères applicables sont PASS, sans PARTIAL, FAIL ni NOT TESTED ;
+- seul 5.7-P-C — état de publication, last-known-good et journal de
+  changements — est autorisé et reste non commencé ;
+- C couvre PP-T17 à PP-T22 et les critères fonctionnels pertinents PP-062 à
+  PP-073 / PP-086 à PP-104, avec persistance interne atomique mais sans route
+  client ;
+- 5.7-P-D à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 hérité de 5.6-G reste non bloquant et ne rouvre ni A ni B.
+
+## 2026-08-22 — Achèvement de l’implémentation 5.7-P-C
+
+- PP-T17 à PP-T22 sont implémentés et prouvés sur PostgreSQL réel ;
+- état public interne, last-known-good, révisions, journal monotone, kill switch
+  et tombstones sont durables et transactionnels ;
+- 5.7-P-C est complet et attend l’audit mainteneur sans être validé ;
+- aucun gate suivant n’est autorisé et 5.7-P-D ne doit pas commencer ;
+- aucune route Preview ni sécurité client n’est ajoutée ;
+- le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
+Voir `architecture/ADR-0021-LOT-5.7-P-C-DURABLE-PUBLICATION.md`.
+
+## 2026-08-22 — Validation mainteneur de C et readiness préproduction interne
+
+- l’audit mainteneur de 5.7-P-C est PASS et C est validé mainteneur ;
+- PP-T17 à PP-T22 et 25 critères applicables sont PASS sans constat bloquant ;
+- la stack A/B/C est prête localement pour une préproduction VPS interne avec
+  PostgreSQL persistant, migration 0025, restart, healthchecks et backup/restore ;
+- aucun déploiement/reboot VPS réel n’est encore déclaré ;
+- 5.7-P-D à F, le Lot 5.7 complet, 5.8+ et merge `main` restent non autorisés.
+
+## 2026-08-21 — Design technique 5.7-P prêt pour audit mainteneur
+
+- la matrice fonctionnelle PP-F01 à PP-F25 consolide les normes existantes ;
+- le design technique et l’Acceptance PP-T01 à PP-T42 sont complets ;
+- 5.7-P est décomposé en six gates ordonnés 5.7-P-A à 5.7-P-F ;
+- le cross-audit documentaire est PASS sans P1/P2/P3 bloquant ;
+- 5.7-P-A est le premier gate candidat mais reste non autorisé ;
+- l’implémentation reste à 0 % et non commencée ;
+- le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non autorisés.
+## 2026-08-21 — Validation du design 5.7-P et autorisation de 5.7-P-A
+
+- l’audit mainteneur du design technique, de l’Acceptance PP-T01 à PP-T42 et
+  de la décomposition A→F est PASS ;
+- le design 5.7-P est validé par le mainteneur le 2026-08-21 ;
+- seul 5.7-P-A — fondations d’identité normalisée et de persistance — est
+  autorisé pour implémentation et reste non commencé ;
+- A couvre PP-T01 à PP-T06 et les critères fonctionnels pertinents PP-001 à
+  PP-009 et PP-024 à PP-036, sans normalisation ni exposition client ;
+- 5.7-P-B à F, le Lot 5.7 complet, 5.8+ et la fusion dans `main` restent non
+  autorisés ;
+- le P3 non bloquant hérité de 5.6-G reste connu sans rouvrir 5.6.

@@ -1,97 +1,1087 @@
 {
   "canonical": true,
   "canonical_path": "docs/handoff/PROGRESS.json",
-  "baseline": {
-    "lot": "4.4",
-    "name": "Administration authentication",
-    "version": "8.1.0-alpha.2-lot.4.4",
-    "status": "merged-and-user-validated",
-    "validated_on_user_workstation": true,
-    "validated_on_vps": true,
-    "validation_date": "2026-08-12",
-    "merged_to_main": true,
-    "merge_pr": 28,
-    "merge_commit": "b42a97129a8aa1cb9a42ce01ba0affb8e5a848a1",
-    "final_branch_sha": "5428c1bc2c65193e2b0b623297ea366c2ddd196e"
-  },
   "current": {
     "lot": "5",
     "name": "Providers and API synchronization core",
-    "status": "concept-approved-specification-pending",
-    "updated_at": "2026-08-12",
-    "implementation_percent": 0,
-    "architecture_percent": 0,
-    "documentation_readiness_percent": 20,
-    "validated_on_user_workstation": false,
-    "validated_on_vps": false,
+    "status": "lot-5.7-p-f3-proven-f4-complete-f5-7d1-maintainer-validated-gate-f-incomplete",
+    "updated_at": "2026-10-18",
+    "r1_a2_4_certification": {
+      "scope": "R1-A2.4 only",
+      "status": "CERTIFIED — PASS WITH EXPLICIT RESERVATIONS",
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-15",
+      "acceptance_provenance": "Explicit maintainer instruction accepting the final independent audit and its reservations; not inferred from tests or CI.",
+      "certified_branch": "codex/lot-5-providers-sync",
+      "certified_head": "049ddbf00db4fd6beb44c4b4e33cdcc74a1a273a",
+      "certified_tree": "bcf9ab3a78944b5025797b63174d4e73fd9f8f43",
+      "reference_scope": "Immutable audited application commit/tree; excludes this subsequent governance-only worktree.",
+      "final_report": "/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf/reports/FINAL-CERTIFICATION-REPORT.md",
+      "evidence_archive": "/home/kmasnake/projects/audits/r1-a2.4-final-049ddbf.zip",
+      "evidence_archive_sha256": "89886e8f0c60964b13fda46bbc6625b63a08e19e80071ce2cc3fb1fed1d117fa",
+      "new_p1_findings": [],
+      "new_p2_findings": [],
+      "p3_open_accepted": [
+        {
+          "id": "IA-P3-01",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "M04 can bind an unbound traversal without execution authority. No runtime caller identified; existing bindings are immutable. Reassess before any new runtime caller."
+        },
+        {
+          "id": "IA-P3-02",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Runner reports page2 while its last committed checkpoint is page3. Durable state and resume remain correct; reporting defect remains open."
+        },
+        {
+          "id": "IA-P3-03",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Legacy F5-4 snapshot predates explicit administrative CREATE publication under F5-7B. Preserve the separate no-publication-on-observation invariant."
+        }
+      ],
+      "legacy_exceptions_accepted": [
+        {
+          "id": "legacy-F5-4",
+          "command_or_test": "championshipDiscoveryResolution.postgres.test.ts:137",
+          "result": "FAIL",
+          "exit_code": 1,
+          "accepted": true,
+          "reason": "Obsolete snapshot expects zero publication after administrative CREATE; current F5-7B contract explicitly publishes championship and championshipSeason. Observation alone remains non-publishing."
+        },
+        {
+          "id": "validate-lot53",
+          "command_or_test": "node scripts/validate-lot53.mjs",
+          "result": "FAIL",
+          "exit_code": 1,
+          "sqlstate": "23502",
+          "accepted": true,
+          "reason": "Legacy fixture omits required discoveryEnabled, causing a NOT NULL violation before the intended validation. No coverage is attributed to this failed script."
+        }
+      ],
+      "accepted_audit_limits": [
+        "480 API PostgreSQL skips were executed separately: 479 PASS, 1 legacy FAIL, 0 SKIP; do not double-count. The 18 repository skips remain unexecuted.",
+        "validate-lot53-manual.mjs was not executed by the final independent audit: historical expectations conflict with the current sync_streams schema.",
+        "npm audit high passed with two moderate development-dependency advisories remaining.",
+        "S12 can issue an already-expired lease; consumers refuse it fail-closed. S17 can release its own expired generation after a wait, but cannot release a successor generation.",
+        "No real environment, provider, remote CI or manual browser validation; no certification of external transport fencing or the physical COMMIT instant."
+      ],
+      "restrictions": {
+        "R1_P1_01": "OPEN",
+        "A3_IMPLEMENTED": false,
+        "A3_AUTHORIZED": false,
+        "PROVIDER_CALLS": 0,
+        "provider_execution_authorized": false,
+        "periodic_activation_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "DEPLOYMENT_AUTHORIZED": false,
+        "production_authorized": false,
+        "F5_7D2_AUTHORIZED": false,
+        "F5_7E_AUTHORIZED": false,
+        "F5_7F_AUTHORIZED": false
+      }
+    },
+    "a3_01_certification": {
+      "status": "PASS_WITH_RESERVATIONS",
+      "scope": "SIMULATED_AUTHORITY_CONTRACT_AND_HARNESS",
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-17",
+      "acceptance_provenance": "Explicit official maintainer acceptance of the independent A3-01 lifecycle audit PASS_WITH_RESERVATIONS, limited to the simulated authority contract and concurrency harness. Only governance preparation is authorized; no commit, push, A3-02, runtime integration or real provider execution. Not inferred from local tests or CI.",
+      "certification_effective": true,
+      "local_implementation_complete": true,
+      "reference_branch": "codex/lot-5-providers-sync",
+      "base_head": "75d8eb80e3a2d12b6792e544a7f3b8ffaab8c916",
+      "base_tree": "309a8c5886708b3529c35393939ba17378207487",
+      "reference_scope": "Tracked base commit/tree plus the four A3-01 files identified by SHA-256 below. The four files are currently untracked, not an A3 implementation commit. This subsequent governance diff is outside the audited source identity; committing requires separate maintainer approval.",
+      "audited_files_sha256": {
+        "apps/api/src/providers/executionAuthorityContract.ts": "44b75cb458c66edacab716dca94b1255928559fef45c5bbc10351a7b6dd3de45",
+        "apps/api/tests/executionAuthorityContract.test.ts": "d38b468bebc925c547aa6c3140514a346cb63010811c1d3be7e10260b101c387",
+        "apps/api/tests/support/authorityConcurrencyHarness.ts": "221536aa924137d3819da9a5569a644add7a379750d44d7244e32a5ea691c4a1",
+        "apps/api/tests/support/A3-01-AUTHORITY-HARNESS.md": "a542567fd34ca75f83cbf427d3db89d4a548086747de3173ae69608771ae41f0"
+      },
+      "independent_audit_directory": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/",
+      "independent_audit_report": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/A3-01-LIFECYCLE-AUDIT.md",
+      "independent_findings_report": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/A3-01-FINDINGS.md",
+      "evidence_manifest": "/home/kmasnake/projects/audits/a3-01-lifecycle-audit/SHA256SUMS.json",
+      "evidence_manifest_sha256": "c2b2e30241a9dab7532423d2a9966304de0cd0e444a8e76ac8abcf5da0815590",
+      "evidence_verified_files": 310,
+      "id_allocation_reservation": {
+        "id": "LCA-01",
+        "status": "OPEN_LOW",
+        "severity": "LOW",
+        "accepted": true,
+        "reservation": "Before first registration, another authenticated worker knowing an intentId can bind a cancellation tombstone with its own differing payload, blocking the legitimate ID. No unauthorized emission, terminal reactivation, owner release or overlap was demonstrated.",
+        "accepted_model_assumption": "Trusted initial intentId allocation for this simulated shared-instance model only; this acceptance does not resolve the reservation.",
+        "required_follow_up": "Protect or explicitly define the server-side association between intentId and workload/owner before any future integration with mutually untrusted workloads, with an inter-worker collision probe. No such implementation is authorized by this certification."
+      },
+      "accepted_validation": {
+        "targeted_tests_passed": 147,
+        "additional_lifecycle_cases_passed": 53,
+        "faulty_mutants_detected": 6,
+        "identity_characterization_cases": 2,
+        "api_tests_passed": 711,
+        "web_tests_passed": 119,
+        "repository_tests_passed": 175,
+        "repository_tests_skipped": 18,
+        "typecheck": "PASS",
+        "explicit_harness_typecheck": "PASS",
+        "lint": "PASS",
+        "builds": "PASS",
+        "governance": "PASS",
+        "max_active_observed": 1,
+        "counting_note": "The 111 local A3 cases are included in API711. Targeted reruns and repeated measured exploration are not additional unique coverage. The two identity characterizations demonstrate the LOW reservation, not an allocation protection."
+      },
+      "accepted_audit_limits": [
+        "Only one shared simulated executor instance and its in-memory lifecycle are certified; no exhaustive proof of all interleavings or inter-process exclusion.",
+        "Admission, transport invocation and remote receipt are distinct. Suspension after the last local check and receipt after cancellation/revocation can be late; no absolute physical HTTP fencing, DB/network atomicity or physical exactly-once guarantee.",
+        "No real provider HTTP transport, credentials, operational worker/scheduler, durable attempt journal or cryptographic workload authentication is connected. SIMULATED_ONLY is not a sandbox against arbitrary malicious callbacks.",
+        "Terminal retention is unbounded in this finite in-memory model; no eviction/restart durability. Restart stays CLOSED; no settlement bound if the authority reader never completes.",
+        "480 PostgreSQL cases were not rerun in the lifecycle audit: verified inherited independent evidence is 479 PASS, 1 known legacy F5-4 FAIL, 0 SKIP on identical tracked runtime/migrations/tests. The 18 repository skips remain unexecuted.",
+        "Existing R1-A2.4 reservations and legacy FAIL exceptions remain accepted unchanged; no legacy failure is reclassified as PASS."
+      ],
+      "restrictions": {
+        "R1_P1_01": "OPEN",
+        "A3_02_AUTHORIZED": false,
+        "A3_02_IMPLEMENTED": false,
+        "broader_A3_authorized": false,
+        "runtime_A3_implemented": false,
+        "provider_execution_authorized": false,
+        "periodic_activation_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "production_authorized": false,
+        "preproduction_authorized": false,
+        "PRODUCTION_ACCESS": "NO",
+        "PREPRODUCTION_ACCESS": "NO",
+        "deployment_authorized": false,
+        "REAL_PROVIDER_CALLS": 0,
+        "DEPLOYMENT": "NO",
+        "commit_authorized": false,
+        "push_authorized": false,
+        "COMMIT_CREATED": "NO",
+        "PUSH_EXECUTED": "NO"
+      },
+      "historical_scope_note": "The A3=false flags within r1_a2_4_certification remain its historical R1-A2.4 acceptance snapshot. This newer explicit acceptance covers A3-01 simulated contracts/tests only and grants no global A3 or runtime authorization."
+    },
+    "adm_01_certification": {
+      "status": "PASS_WITH_RESERVATIONS",
+      "scope": "READ_ONLY_MEETING_EVENT_CANDIDATE_LIST_DETAIL",
+      "admin_integration": "EXISTING_DUPLICATES_ROUTE",
+      "admin_routes": [
+        "/duplicates",
+        "/duplicates/:id"
+      ],
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-17",
+      "acceptance_provenance": "Explicit maintainer acceptance of the independent ADM-01 audit PASS_WITH_RESERVATIONS, limited to read-only Meeting/Event candidate list/detail in the existing Duplicates administration. Only governance preparation is authorized; not inferred from developer tests, CI or production readiness.",
+      "certification_effective": true,
+      "local_implementation_complete": true,
+      "reference_branch": "codex/lot-5-providers-sync",
+      "base_head": "ead7141a9dff5a79ac4bd029873e104f16f3e2e3",
+      "base_tree": "2eb5ea703c474a97de4c0aae305c03574d765688",
+      "reference_scope": "Tracked base commit/tree plus the nine audited web files identified by SHA-256 below: two tracked modifications and seven untracked additions. The base HEAD alone does not contain ADM-01. This subsequent governance diff is outside the audited functional identity; no staging or commit is authorized.",
+      "audited_files_sha256": {
+        "apps/web/src/App.tsx": "948b37ed6a7daecee9cc9a43d834b6765d46824764852ff91ed05aac155742b3",
+        "apps/web/src/design-system/layout/navigation.ts": "966beef21875638c7430b21f5c2538c03e44e9c922df2f513566e32e5cefb3b0",
+        "apps/web/src/features/meeting-event-candidates/CandidatesPage.tsx": "8ddb10166e20974e06572cf01760cb19e2cf421b844ba698f882823a0b4074dd",
+        "apps/web/src/features/meeting-event-candidates/candidates.css": "324e3fccdc0fe59fef5edbeeda2d0ed9390052e2cd36102a53082f4ab5a14d7b",
+        "apps/web/src/features/meeting-event-candidates/candidates.fixtures.ts": "e0294ad3aa4e8537b06e5463ea101e1fc7033e0125ff92d46af71162b7dd30f4",
+        "apps/web/src/features/meeting-event-candidates/candidatesApi.test.ts": "2c0d9db7e299de76e772901f10c3b209b22cd27aec34e22b62a6877be1385bdd",
+        "apps/web/src/features/meeting-event-candidates/candidatesApi.ts": "5040e7fac945aa12688eb43c2cefe846e8a2bbf79415425b01a96685e97afa1d",
+        "apps/web/tests/adm01/candidates.pw.ts": "b67351929fac000bf013c79c8bbcf394a9738a7dfaf60b45fab2ee043cf1a1aa",
+        "apps/web/tests/adm01/playwright.config.ts": "84e3e13b96bd778cf5000d86623a282b35a7810c0179d272c433590c1e7f2352"
+      },
+      "independent_audit_directory": "/home/kmasnake/projects/audits/adm01-independent-audit/",
+      "independent_audit_reports": [
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-AUDIT-REPORT.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-FUNCTIONAL-REVIEW.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-READ-ONLY-SECURITY.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-PROVENANCE-REVIEW.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-REGRESSION-RESULTS.md",
+        "/home/kmasnake/projects/audits/adm01-independent-audit/ADM-01-FINDINGS.md"
+      ],
+      "development_report": "/home/kmasnake/projects/audits/adm01/ADM-01-IMPLEMENTATION-REPORT.md",
+      "evidence_manifest": "/home/kmasnake/projects/audits/adm01-independent-audit/SHA256SUMS.json",
+      "evidence_manifest_sha256": "e27a0d0e01a5b8ef71d839e33ef8c81a61fe8a9bc35b24bc67e7579c61588d3f",
+      "evidence_verified_files": 151,
+      "confirmed_findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "accepted_reservations": [
+        {
+          "id": "R-GET-01",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Partial provenance imposed by the two existing GETs: no complete provider/source/raw-data/canonical-publication traceability, provider/external identifiers or observation joins. Missing values remain explicit. This is an accepted contract limitation, not a confirmed frontend anomaly."
+        },
+        {
+          "id": "R-PAGE-01",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Existing limit/offset pagination has neither a guaranteed total nor a stable snapshot. Rows may move between requests; exhaustive and coherent coverage of changing data is not certified."
+        },
+        {
+          "id": "ADM01-R03",
+          "status": "OPEN",
+          "accepted": true,
+          "reservation": "Browser validation uses synthetic API responses in local Chromium only. End-to-end behavior against a real API and PostgreSQL database is NOT_VALIDATED."
+        }
+      ],
+      "accepted_validation": {
+        "web_tests_passed": 131,
+        "browser_tests_passed": 18,
+        "browser_validation": "SYNTHETIC_CHROMIUM",
+        "api_tests_passed": 29,
+        "governance": "PASS",
+        "typecheck": "PASS",
+        "lint": "PASS",
+        "builds": "PASS",
+        "counting_note": "131 web includes 12 ADM-01 tests. Browser18 = 8 original + 10 independent; API29 = 21 existing targeted + 8 independent. These are accepted independent audit results, not suites rerun by this documentary operation."
+      },
+      "provenance": "PARTIAL_EXISTING_GET_LIMITATION",
+      "pagination": "OFFSET_WITHOUT_TOTAL_OR_SNAPSHOT",
+      "real_api_db_e2e": "NOT_VALIDATED",
+      "accepted_audit_limits": [
+        "Only read-only administration using the two existing candidate GET families is certified; no new backend endpoint, business write, decision, publication or provider enrichment.",
+        "No general API suite, PostgreSQL, repository Python, real API/DB, external provider, remote CI or exhaustive visual 98% comparison was validated by this audit. No product/backend production readiness is inferred.",
+        "Existing A1/A2 decisions, R1-A2.4 reservations/legacy FAIL exceptions and A3-01 guarantees/reservations remain unchanged; no historical failure is reclassified as PASS."
+      ],
+      "restrictions": {
+        "ADM_02_AUTHORIZED": false,
+        "A3_02_AUTHORIZED": false,
+        "A3_02_IMPLEMENTED": false,
+        "R1_P1_01": "OPEN",
+        "A3_01_CERTIFICATION": "PASS_WITH_RESERVATIONS",
+        "LCA_01": "OPEN_LOW",
+        "provider_execution_authorized": false,
+        "periodic_activation_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "REAL_PROVIDER_CALLS": 0,
+        "production_authorized": false,
+        "preproduction_authorized": false,
+        "PRODUCTION_ACCESS": "NO",
+        "PREPRODUCTION_ACCESS": "NO",
+        "deployment_authorized": false,
+        "DEPLOYMENT": "NO",
+        "commit_authorized": false,
+        "push_authorized": false,
+        "COMMIT_CREATED": "NO",
+        "PUSH_EXECUTED": "NO"
+      }
+    },
+    "adm_02_certification": {
+      "status": "PASS_WITH_RESERVATIONS",
+      "scope": "CONFIRMED_REASONED_REJECTION_OF_ELIGIBLE_MEETING_EVENT_CANDIDATES",
+      "admin_integration": "EXISTING_DUPLICATES_ROUTE",
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-18",
+      "acceptance_provenance": "Explicit current maintainer mandate authorizing official ADM-02 certification after evidence and exact-SHA GitHub CI verification; not inferred from publication or CI alone.",
+      "certified_branch": "codex/lot-5-providers-sync",
+      "certified_head": "6c37aa09436356eb6c85c310114dce5f4c2a5fd2",
+      "certified_tree": "c424d391e4ee1d443c49f0a857dc18c920c8fa44",
+      "reference_scope": "ADM-02 functional scope only at this immutable published SHA; not blanket certification of the 18 published commits. Subsequent documentary worktree excluded.",
+      "validation": {
+        "implementation": "PASS",
+        "integration": "PASS",
+        "evidence_review": "PASS",
+        "local_commit": "PASS",
+        "github_push": "PASS",
+        "node_ci": "PASS",
+        "legacy_python_ci": "PASS",
+        "synthetic_web_passed": 158,
+        "synthetic_targeted_included_in_web": 39,
+        "synthetic_browser_passed": 27,
+        "synthetic_api_passed": 21,
+        "integrated_api_postgres_groups_passed": 12,
+        "integrated_browser_and_check_groups_passed": 9,
+        "counting_note": "Historical executed campaigns reviewed and linked by hashes; no application test rerun by certification. Nine integrated browser/check groups = eight flows plus final DB check; counts overlap and are not additive."
+      },
+      "github_actions": [
+        {
+          "id": 39156810440,
+          "url": "https://github.com/KMASnake/Motorsports-Events-Server/actions/runs/39156810440",
+          "head_sha": "6c37aa09436356eb6c85c310114dce5f4c2a5fd2",
+          "conclusion": "success"
+        },
+        {
+          "id": 39156810395,
+          "url": "https://github.com/KMASnake/Motorsports-Events-Server/actions/runs/39156810395",
+          "head_sha": "6c37aa09436356eb6c85c310114dce5f4c2a5fd2",
+          "conclusion": "success"
+        }
+      ],
+      "audited_files_sha256": {
+        "apps/web/src/features/meeting-event-candidates/CandidatesPage.tsx": "ca92df4cc9314b2b6ce5040a12be59c83a759e53e05acd6f20d00a314ff77452",
+        "apps/web/src/features/meeting-event-candidates/candidates.css": "cc4c41752212b71f1b9de0709a7241b183d75b80d363a118abab53519a7a578c",
+        "apps/web/src/features/meeting-event-candidates/candidatesApi.ts": "cf2b78c0c5c78e5a61b52f7b22323b4027e821e0736e2b24f3a347c07259a548",
+        "apps/web/src/features/meeting-event-candidates/CandidateRejection.tsx": "f58e833f96c70d5a10077ac794503fec9309ab736c08cb0817ddaafb253a173d",
+        "apps/web/src/features/meeting-event-candidates/rejection.test.ts": "90f426ad8d2dbafce81558ba4e86024d833e34fdb930d1f1ea7f3e736fce60c5",
+        "apps/web/src/features/meeting-event-candidates/rejection.ts": "8b695ab96af8bad1d9abaec63c5021c6a372b65c19d6b5a8cc2593f71ccc5f9b",
+        "apps/web/tests/adm02/playwright.config.ts": "feb5dfdc6cf833a455135bbf70f4e47574f3bb0a3a32782ae1111ce9108c141d",
+        "apps/web/tests/adm02/rejection.pw.ts": "505f439cd51c560d733ab1028d55698503428551a628557a44f10f8eb72c9315"
+      },
+      "accepted_reservations": [
+        {
+          "id": "ADM02-R01",
+          "status": "OPEN",
+          "reservation": "La validation intégrée utilise uniquement des données synthétiques dans une API et une base PostgreSQL jetables."
+        },
+        {
+          "id": "ADM02-R02",
+          "status": "OPEN",
+          "reservation": "Plusieurs tables canoniques Meeting/Event étaient vides avant le test de non-publication : absence de création/publication démontrée dans les scénarios exécutés, pas conservation exhaustive de canoniques préexistants peuplés."
+        },
+        {
+          "id": "ADM02-R03",
+          "status": "OPEN",
+          "reservation": "Tous les scénarios HTTP 500 ne sont pas exercés en intégration ; couverture synthétique distincte, sans preuve intégrée universelle des erreurs serveur."
+        },
+        {
+          "id": "ADM02-R04",
+          "status": "OPEN",
+          "reservation": "Les réserves historiques ADM-01 R-GET-01, R-PAGE-01 et ADM01-R03 ne sont pas automatiquement levées ; preuves intégrées nouvelles limitées à leurs scénarios."
+        },
+        {
+          "id": "ADM02-R05",
+          "status": "OPEN",
+          "reservation": "La publication GitHub ne valide ni n’autorise un déploiement ; aucune aptitude production déduite."
+        },
+        {
+          "id": "ADM02-R06",
+          "status": "OPEN",
+          "reservation": "Les deux CI réussies au SHA exact ne remplacent pas les validations spécifiques de tous les scénarios fonctionnels ADM-02."
+        },
+        {
+          "id": "ADM02-R07",
+          "status": "OPEN",
+          "reservation": "Idempotence frontend en mémoire du document navigateur : pas de persistance après rechargement complet/fermeture ni coordination multi-onglets ; résultat incertain après perte de réponse jusqu’à confirmation/rejeu."
+        },
+        {
+          "id": "ADM02-R08",
+          "status": "OPEN",
+          "reservation": "Révisions hors entier JavaScript sûr refusées pour le rejet, sans conversion permissive."
+        },
+        {
+          "id": "ADM02-R09",
+          "status": "OPEN",
+          "reservation": "Quatre refus réseau initiaux sans destination ; reproduction de deux IPC locaux TSX, sans attribution rétrospective certaine. Visibilité des Apps externes limitée lors du prépush, risque accepté séparément pour publication, sans autorisation de déploiement."
+        }
+      ],
+      "evidence_directories": [
+        "/home/kmasnake/projects/audits/adm02-discovery",
+        "/home/kmasnake/projects/audits/adm02-implementation",
+        "/home/kmasnake/projects/audits/adm02-integration-validation",
+        "/home/kmasnake/projects/audits/adm02-consolidation-preparation",
+        "/home/kmasnake/projects/audits/adm02-local-commit",
+        "/home/kmasnake/projects/audits/adm02-github-push-retry"
+      ],
+      "certificate_report": "/home/kmasnake/projects/audits/adm02-official-certification/ADM-02-OFFICIAL-CERTIFICATE.md",
+      "exclusions": [
+        "additional backend development",
+        "link",
+        "create",
+        "guided matching",
+        "deployment",
+        "A3-02",
+        "blanket certification of the 18-commit chain"
+      ],
+      "restrictions": {
+        "deployment_authorized": false,
+        "production_deployed": false,
+        "A3_02_AUTHORIZED": false,
+        "provider_execution_authorized": false,
+        "database_write_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "commit_authorized": false,
+        "push_authorized": false,
+        "R1_P1_01": "OPEN"
+      },
+      "historical_scope_note": "ADM-01 and all other certification objects remain unchanged historical acceptance snapshots; this newer ADM-02 decision supersedes only their historical absence of ADM-02 authorization, without closing their reservations."
+    },
+    "implementation_percent": 100,
+    "architecture_percent": 100,
+    "documentation_readiness_percent": 100,
     "merged_to_main": false,
     "merge_authorized": false,
-    "concept_validated_by_maintainer": true,
-    "concept_document": "docs/handoff/LOT-5-PROVIDERS-SYNC-CONCEPT.md",
-    "validation_rule": "Phase 0 documentation must be explicitly reviewed by the maintainer before application implementation starts."
+    "authorized_sub_lot": "5.7-P",
+    "sub_lot_5_1": {"implementation_percent":100,"maintainer_validated":true},
+    "sub_lot_5_2": {"implementation_percent":100,"maintainer_validated":true},
+    "sub_lot_5_3": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
+    "sub_lot_5_4": {"implementation_percent":100,"maintainer_validated":true,"authorized":true},
+    "sub_lot_5_5": {"implementation_percent":100,"maintainer_validated":true,"maintainer_validation_date":"2026-08-14","authorized":true},
+    "sub_lot_5_6": {
+      "implementation_percent": 100,
+      "completed_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F", "5.6-G", "5.6-H", "5.6-I"],
+      "maintainer_validated_technical_sub_lots": ["5.6-A", "5.6-B", "5.6-C", "5.6-D", "5.6-E", "5.6-F", "5.6-G", "5.6-H"],
+      "audit_status": "lot-5.6-maintainer-audit-pass-and-validated",
+      "sub_lot_5_6_d_maintainer_reaudit": "pass",
+      "sub_lot_5_6_d_maintainer_validated": true,
+      "sub_lot_5_6_d_maintainer_validation_date": "2026-08-21",
+      "sub_lot_5_6_e_maintainer_reaudit": "pass",
+      "sub_lot_5_6_e_maintainer_validated": true,
+      "sub_lot_5_6_e_maintainer_validation_date": "2026-08-21",
+      "sub_lot_5_6_f_maintainer_audit": "pass",
+      "sub_lot_5_6_f_maintainer_validated": true,
+      "sub_lot_5_6_f_maintainer_validation_date": "2026-08-21",
+      "sub_lot_5_6_g_maintainer_audit": "pass",
+      "sub_lot_5_6_g_maintainer_validated": true,
+      "sub_lot_5_6_g_maintainer_validation_date": "2026-08-21",
+      "sub_lot_5_6_h_maintainer_audit": "pass",
+      "sub_lot_5_6_h_maintainer_validated": true,
+      "sub_lot_5_6_h_maintainer_validation_date": "2026-08-21",
+      "sub_lot_5_6_i_status": "pass",
+      "sub_lot_5_6_i_completed": true,
+      "sub_lot_5_6_i_completion_date": "2026-08-21",
+      "maintainer_audit": "pass",
+      "maintainer_validation_date": "2026-08-21",
+      "authorized_technical_sub_lot": null,
+      "concept_validated": true,
+      "ui_contract_validated": true,
+      "acceptance_validated": true,
+      "cross_audit_passed": true,
+      "audit_corrections_closed": true,
+      "consolidated": true,
+      "authorized": true,
+      "authorization_date": "2026-08-14",
+      "maintainer_validated": true
+    },
+    "sub_lot_5_7_p": {
+      "implementation_percent": 0,
+      "authorized": true,
+      "authorization_date": "2026-08-21",
+      "implementation_started": true,
+      "implementation_percent_method": "completed-gate-count; no weighted percentage is defined for gates A-F, so no arbitrary percentage is assigned",
+      "completed_technical_gates": ["5.7-P-A", "5.7-P-B", "5.7-P-C", "5.7-P-D", "5.7-P-E"],
+      "maintainer_validated_technical_gates": ["5.7-P-A", "5.7-P-B", "5.7-P-C", "5.7-P-D", "5.7-P-E"],
+      "design_status": "maintainer-validated",
+      "design_maintainer_audit": "pass",
+      "design_maintainer_validated": true,
+      "design_maintainer_validation_date": "2026-08-21",
+      "vps_preproduction_validation": "pass",
+      "vps_preproduction_validated": true,
+      "vps_preproduction_validation_date": "2026-08-22",
+      "vps_preproduction_validated_sha": "cb7d04795b156dc23af6c57efe2bce788569e3da",
+      "authorized_gate": "5.7-P-F",
+      "authorized_technical_sub_lot": null,
+      "technical_gates": {
+        "5.7-P-A": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
+        "5.7-P-B": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
+        "5.7-P-C": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"additive_correction_complete":true,"additive_correction_vps_validated":true,"additive_correction_vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-22","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
+        "5.7-P-D": {"status":"maintainer-validated","implementation_started":true,"implementation_complete":true,"vps_validated":true,"vps_validation_date":"2026-08-22","vps_validated_sha":"90e7f7cf5bd975aeb7610c3f98d1dbef0f323b96","maintainer_audit":"pass","maintainer_validated":true,"maintainer_validation_date":"2026-08-22"},
+        "5.7-P-E": {"status":"maintainer-vps-revalidated","authorization_date":"2026-08-23","implementation_started":true,"implementation_complete":true,"integration_correction_complete":true,"maintainer_audit":"pass","maintainer_validated":true,"maintainer_revalidated":true,"maintainer_revalidation_date":"2026-08-25","maintainer_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","vps_revalidated":true,"vps_revalidation_date":"2026-08-25","vps_validated_sha":"74f45b7d341ca214d4569b5d9917a46bb1d38254","migration_head":"0029_lot57pe_canonical_championship_entitlements","authorization":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-AUTHORIZATION.md","implementation":"docs/archive/handoff-history/handoff/LOT-5.7-P-E-IMPLEMENTATION.md"},
+        "5.7-P-F": {
+          "status":"f3-proven-f4-complete-gate-f-incomplete",
+          "authorization_date":"2026-08-25",
+          "worker_isolation_correction_authorized":true,
+          "worker_isolation_correction_complete":true,
+          "worker_exit_loop_correction_complete":true,
+          "worker_isolation_vps_validated":true,
+          "worker_isolation_correction_maintainer_audit":"pass",
+          "implementation_started":true,
+          "implementation_complete":false,
+          "implementation_authorized":true,
+          "maintainer_validated":false,
+          "vps_validation_required":true,
+          "real_provider_validation_required":true,
+          "evidence":"docs/handoff/LOT-5.7-P-F-IMPLEMENTATION.md",
+          "authorized_subphase":null,
+          "operational_closure_f3": {
+            "status": "complete-proven",
+            "implementation_complete": true,
+            "maintainer_validated": true,
+            "maintainer_validation_date": "2026-09-21",
+            "certified_git_sha": "e70f7e18e2ae01f4af8161577aaaefc834723cdb",
+            "certified_git_tree": "e8aafaf69076b0e38b7b78f3ca0c336f2b8d3998",
+            "criteria": {"PP-178":"PROVEN","PP-T38":"PROVEN"},
+            "evidence": "docs/handoff/LOT-5.7-P-F3-CLOSURE.md",
+            "baseline_path": "docs/handoff/evidence/lot57pf3-prospective-baseline-N.json",
+            "baseline_sha256": "75dd9583fa3dc83b7c902028e7ad2b0f7abf17f1ce023ea8c151a93ebd3cfbd9",
+            "historical_identity_sha256": "208b80bfcef35c36efe5e5dcbf82d7bbba6feca1887c6286f8fc7fe18bafcf59",
+            "phase2_evidence": {
+              "versioned_in_git": false,
+              "validation_location": "/home/debian/f3-phase2-evidence-20260921-143751/lot57pf3-phase2-evidence.json",
+              "sha256": "4f7706f0d3f38eea74fcf8ffbb1dd60068d507a198d748789d8b6dd1f40cb5c1",
+              "artifact_status": "eligible-for-maintainer-validation",
+              "maintainer_validation": "PASS",
+              "provenance": "VPS Phase 2 execution; location, checksum and results supplied by maintainer; no VPS access or artifact reconstruction during F4-0"
+            },
+            "final_migration_head": "0031_real_circuit_reference_data",
+            "final_runtime_release": "N+1",
+            "provider_calls": 0,
+            "provider_credits": 0,
+            "worker_started": false
+          },
+          "preproduction_stabilization_f4": {
+            "status": "complete",
+            "implementation_complete": true,
+            "maintainer_validated": true,
+            "authorized_subphase": null,
+            "authorization_date": "2026-09-22",
+            "scope": "Final static/documentary F4 gate only: record the maintainer-validated F4-5 identity and CI, preserve F3/F4 evidence and prepare explicit maintainer closure without runtime replay, application behavior, migration, Compose, provider-first or deployment changes.",
+            "baseline_git_head": "8553fb9c1b69790169f46a6e96ba4f02d8cf6601",
+            "baseline_git_tree": "dc0a25485a2ef056617ec4421cd84c5bbc28d0f1",
+            "runtime_evidence": "docs/handoff/evidence/lot57pf4-empty-event-runtime.json",
+            "f4_5_closure": {
+              "status": "maintainer-validated",
+              "git_head": "a455e720fe49061a818881a9385942ad6d613261",
+              "git_tree": "f81d71f15368e08e5427f9ecb23815c3a06d4432",
+              "ci": {
+                "legacy": {"workflow":"Validate legacy Python server","run_number":263,"conclusion":"SUCCESS"},
+                "node": {"workflow":"CI — Node target","run_number":532,"conclusion":"SUCCESS"}
+              }
+            },
+            "f4_6_closure": {
+              "status": "maintainer-validated",
+              "git_head": "5776aca7d3bab642f7655a8df6975d243a5b8796",
+              "git_tree": "16b20c5208faa6187b9402d29ed873f7fe08b69e",
+              "ci": {
+                "legacy": {"workflow":"Validate legacy Python server","run_number":264,"conclusion":"SUCCESS"},
+                "node": {"workflow":"CI — Node target","run_number":533,"conclusion":"SUCCESS"}
+              }
+            },
+            "runtime_certification": {
+              "baseline_git_head": "8553fb9c1b69790169f46a6e96ba4f02d8cf6601",
+              "baseline_git_tree": "dc0a25485a2ef056617ec4421cd84c5bbc28d0f1",
+              "runtime_mode": "docker",
+              "migration_head": "0031_real_circuit_reference_data",
+              "calendar_empty": true,
+              "harness_rc": 0,
+              "cleanup": {"containers":0,"networks":0,"temp_dirs":0},
+              "provider_calls": 0,
+              "worker_started": false,
+              "preprod_mutated": false,
+              "production_mutated": false,
+              "ci": {
+                "legacy": {"workflow":"Validate legacy Python server","run_number":261,"conclusion":"SUCCESS"},
+                "node": {"workflow":"CI — Node target","run_number":530,"conclusion":"SUCCESS"}
+              }
+            },
+            "subphases": {
+              "F4-0": {"status":"maintainer-validated"},
+              "F4-1": {"status":"maintainer-validated"},
+              "F4-2": {"status":"maintainer-validated"},
+              "F4-3": {"status":"maintainer-validated"},
+              "F4-4": {
+                "status": "maintainer-validated",
+                "runtime_validation": "pass",
+                "migration_head": "0031_real_circuit_reference_data",
+                "calendar_empty": true,
+                "provider_calls": 0,
+                "worker_started": false,
+                "cleanup_verified": true
+              },
+              "F4-5": {
+                "status": "maintainer-validated",
+                "implementation_complete": true,
+                "maintainer_validated": true,
+                "git_head": "a455e720fe49061a818881a9385942ad6d613261",
+                "git_tree": "f81d71f15368e08e5427f9ecb23815c3a06d4432"
+              },
+              "F4-6": {
+                "status": "maintainer-validated",
+                "implementation_complete": true,
+                "maintainer_validated": true,
+                "git_head": "5776aca7d3bab642f7655a8df6975d243a5b8796",
+                "git_tree": "16b20c5208faa6187b9402d29ed873f7fe08b69e"
+              }
+            },
+            "f4_6_scope": "Final static/documentary gate maintainer-validated at its exact commit and CI; no runtime, functional, migration, Compose, provider-first or deployment change.",
+            "runtime_execution_authorized": false,
+            "vps_access_authorized": false,
+            "cleanup_authorized": false
+          },
+          "provider_first_f5": {
+            "status": "in-progress",
+            "implementation_started": true,
+            "authorized": true,
+            "authorized_subphase": null,
+            "subphases": {
+              "F5-1": {
+                "status": "maintainer-validated",
+                "authorized": true,
+                "implementation_complete": true,
+                "maintainer_audit": "pass",
+                "maintainer_validated": true,
+                "git_head": "3e80099d56ff85df6eebe6b84d615a89180e12e9",
+                "git_tree": "34c8a030e3a5d8af2bda71421eba31cf4f7d1114",
+                "migration_head": "0032_f5_canonical_taxonomy",
+                "ci": {
+                  "legacy": {"workflow":"Validate legacy Python server","run_number":266,"conclusion":"SUCCESS"},
+                  "node": {"workflow":"CI — Node target","run_number":535,"conclusion":"SUCCESS"}
+                },
+                "blockers": "NONE"
+              },
+              "F5-2": {
+                "status": "maintainer-validated",
+                "authorized": true,
+                "implementation_complete": true,
+                "maintainer_audit": "pass",
+                "maintainer_validated": true,
+                "git_head": "5f03705ba362f868017ed41b2c1278fb9a81ff08",
+                "git_tree": "c3df6e27b8c0495532ccef5aa2c4c867fc9c500d",
+                "migration_head": "0033_f5_championship_seasons",
+                "ci": {
+                  "legacy": {"workflow":"Validate legacy Python server","run_number":268,"conclusion":"SUCCESS"},
+                  "node": {"workflow":"CI — Node target","run_number":537,"conclusion":"SUCCESS"}
+                },
+                "blockers": "NONE"
+              },
+              "F5-3": {
+                "status": "maintainer-validated",
+                "authorized": true,
+                "implementation_complete": true,
+                "maintainer_audit": "pass",
+                "maintainer_validated": true,
+                "git_head": "dc34c2ca192a7fa58768ab048a86036ebf63f847",
+                "git_tree": "a170c3b54acec9fdef008d82552c080069858911",
+                "migration_head": "0034_f5_canonical_venues",
+                "ci": {
+                  "legacy": {"workflow":"Validate legacy Python server","run_number":270,"conclusion":"SUCCESS"},
+                  "node": {"workflow":"CI — Node target","run_number":539,"conclusion":"SUCCESS"}
+                },
+                "blockers": "NONE"
+              },
+              "F5-4": {
+                "status":"maintainer-validated",
+                "authorized":true,
+                "implementation_complete":true,
+                "maintainer_audit":"pass",
+                "maintainer_validated":true,
+                "git_head":"a79323c12076bda1824b9c8c7a2fc9613bf2ad33",
+                "git_tree":"4bea3e9b179cc3d438a435c1e76b0839e8874ec0",
+                "migration_head":"0035_f5_provider_discovery_resolution",
+                "ci": {
+                  "legacy":{"workflow":"Validate legacy Python server","run_number":272,"conclusion":"SUCCESS"},
+                  "node":{"workflow":"CI — Node target","run_number":541,"conclusion":"SUCCESS"}
+                },
+                "blockers":"NONE",
+                "provider_calls":0,
+                "worker_started":false,
+                "scheduler_started":false,
+                "evidence":"docs/handoff/LOT-5.7-P-F5-4-PROVIDER-DISCOVERY-RESOLUTION.md"
+              },
+              "F5-5": {
+                "status":"maintainer-validated",
+                "authorized":true,
+                "implementation_complete":true,
+                "maintainer_audit":"pass",
+                "maintainer_validated":true,
+                "git_head":"0e8247e0891d7572b933ffa0e3cd2258bd250c16",
+                "git_tree":"0beb035181e77816b90cc543ffd6bfec61eeed80",
+                "migration_head":"0036_f5_meeting_event_canonical_resolution",
+                "ci": {
+                  "legacy":{"workflow":"Validate legacy Python server","run_number":274,"conclusion":"SUCCESS"},
+                  "node":{"workflow":"CI — Node target","run_number":543,"conclusion":"SUCCESS"}
+                },
+                "blockers":"NONE",
+                "provider_calls":0,
+                "worker_started":false,
+                "scheduler_started":false,
+                "evidence":"docs/handoff/LOT-5.7-P-F5-5-CANONICAL-MEETING-EVENT-RESOLUTION.md"
+              },
+              "F5-6": {
+                "status":"maintainer-validated",
+                "authorized":true,
+                "implementation_complete":true,
+                "maintainer_audit":"pass",
+                "maintainer_validated":true,
+                "git_head":"92fbf798fcd8f51faa3f4adfbc9f7cfa189069b1",
+                "git_tree":"fc20934ed21b72165003599d73e30cd3feadc2bc",
+                "migration_head":"0037_f5_multi_provider_reconciliation",
+                "ci": {
+                  "legacy":{"workflow":"Validate legacy Python server","run_number":283,"conclusion":"SUCCESS"},
+                  "node":{"workflow":"CI — Node target","run_number":552,"conclusion":"SUCCESS"}
+                },
+                "playwright":{"passed":18,"total":18,"conclusion":"SUCCESS"},
+                "blockers":"NONE",
+                "provider_calls":0,
+                "worker_started":false,
+                "scheduler_started":false,
+                "evidence":"docs/handoff/LOT-5.7-P-F5-6-MULTI-PROVIDER-RECONCILIATION.md"
+              },
+              "F5-7": {
+                "status": "in-progress",
+                "implementation_complete": false,
+                "maintainer_validated": false,
+                "authorized_subphase": null,
+                "authorized": false,
+                "authorization_scope": "Completed D0/D1 certification only; no further execution authorized",
+                "subphases": {
+                  "F5-7D": {
+                    "status": "in-progress",
+                    "implementation_complete": false,
+                    "maintainer_validated": false,
+                    "authorized_subphase": null,
+                    "subphases": {
+                      "F5-7D0": {
+                        "status": "maintainer-validated",
+                        "implementation_complete": true,
+                        "maintainer_validated": true,
+                        "maintainer_validation_date": "2026-10-04",
+                        "evidence": "docs/handoff/LOT-5.7-P-F5-7D1-REAL-PROVIDER-CERTIFICATION.md",
+                        "git_head": "959130e5295ff753dcde10d94695d23796e92865",
+                        "git_tree": "7b5ee0cd53b9b70c91af97ced2cb594ae47e67f8"
+                      },
+                      "F5-7D1": {
+                        "status": "maintainer-validated",
+                        "implementation_complete": true,
+                        "maintainer_validated": true,
+                        "maintainer_validation_date": "2026-10-04",
+                        "evidence": "docs/handoff/LOT-5.7-P-F5-7D1-REAL-PROVIDER-CERTIFICATION.md",
+                        "git_head": "41bf9d34605567b39ab2f6f5b608107ddbecb6ab",
+                        "git_tree": "c27a8058c11876672c56e15fd3fc785cfb6e36ae",
+                        "migration_head": "0041_f5_revisioned_normalization_decisions",
+                        "maintainer_audit": "pass",
+                        "audit_recommendation": "FAVORABLE_FOR_SCOPED_MAINTAINER_CERTIFICATION",
+                        "findings": {
+                          "P1": "NONE",
+                          "P2": "NONE",
+                          "P3": "NONE"
+                        },
+                        "certification": {
+                          "evidence_classification": "maintainer-supplied-certification-and-final-cumulative-audit",
+                          "provider": "OCBlackTop",
+                          "championship": "F1",
+                          "season": 2026,
+                          "stream": "current",
+                          "provider_instance_id": "57f10000-0000-4000-8000-000000000001",
+                          "provider_championship_id": "57f10000-0000-4000-8000-000000000002",
+                          "stream_id": "57f10000-0000-4000-8000-000000000003",
+                          "mapping_version_id": "e65cde43-186d-4f9e-868d-035e2e2dca4b",
+                          "traversal_id": "cdae6918-4850-47a5-8a78-c0c85e5ae019",
+                          "acquisition": {
+                            "requests": 1,
+                            "request_budget": 1,
+                            "budget_consumed": true,
+                            "http_status": 200,
+                            "traversals": 1,
+                            "observations": 158,
+                            "received": 158,
+                            "valid": 158,
+                            "anomalies": 0,
+                            "source_meetings": 27,
+                            "source_events": 131
+                          },
+                          "migration": {
+                            "before_head": "0040_f5_canonical_timezone_nullability",
+                            "before_count": 40,
+                            "after_head": "0041_f5_revisioned_normalization_decisions",
+                            "after_count": 41,
+                            "transactional": true,
+                            "provider_invariants": [
+                              1,
+                              1,
+                              158
+                            ],
+                            "candidates": 158,
+                            "decisions": 158,
+                            "revision_1_decisions": 158,
+                            "canonical_public_counts_before_replay": 0
+                          },
+                          "replay_1": {
+                            "entities_seen": 158,
+                            "entities_normalized": 158,
+                            "candidates_ready": 134,
+                            "candidates_review": 24,
+                            "publications_created": 134,
+                            "publications_unchanged": 0,
+                            "meetings": 26,
+                            "events": 108,
+                            "meeting_events": 108,
+                            "public_changes": 134,
+                            "public_versions": 134,
+                            "public_states": 134,
+                            "revision_1_review": 158,
+                            "revision_2_create": 134,
+                            "revision_2_review": 24
+                          },
+                          "reviews": {
+                            "classification": "VALID_FAIL_CLOSED_NON_BLOCKING",
+                            "ambiguous_margin": 18,
+                            "parent_identity_unresolved": 5,
+                            "required_identity_unknown": 1,
+                            "total": 24,
+                            "canonicalized": false
+                          },
+                          "replay_2": {
+                            "entities_seen": 158,
+                            "entities_normalized": 158,
+                            "candidates_ready": 134,
+                            "candidates_review": 24,
+                            "publications_created": 0,
+                            "publications_unchanged": 134,
+                            "highest_change_sequence": null,
+                            "status": "review_required",
+                            "before_after": {
+                              "provider_invariants": [
+                                1,
+                                1,
+                                158
+                              ],
+                              "meetings": 26,
+                              "events": 108,
+                              "public_changes": 134,
+                              "public_versions": 134,
+                              "candidates": 158,
+                              "decisions": 316,
+                              "reviews": 24
+                            },
+                            "candidate_states": {
+                              "event_resolved_created_promoted": 108,
+                              "event_review_required_pending": 23,
+                              "meeting_resolved_created_promoted": 26,
+                              "meeting_review_required_pending": 1
+                            },
+                            "new_canonical_resources": 0,
+                            "new_public_changes": 0,
+                            "new_public_versions": 0,
+                            "new_normalization_decisions": 0,
+                            "real_data_idempotence": "PASS"
+                          },
+                          "automated_certification": {
+                            "f5_7d_postgres": 14,
+                            "f5_5_postgres": 13,
+                            "f5_6_postgres": 22,
+                            "f5_7c_postgres": 5,
+                            "api": 534,
+                            "web": 119,
+                            "repository": 189,
+                            "repository_skipped": 18,
+                            "migration_graph": "PASS",
+                            "schema_compatibility_0041": "PASS",
+                            "typecheck": "PASS",
+                            "lint": "PASS",
+                            "build": "PASS",
+                            "diff_check": "PASS"
+                          },
+                          "ci": {
+                            "legacy": {
+                              "workflow": "Validate legacy Python server",
+                              "run_number": 293,
+                              "conclusion": "SUCCESS"
+                            },
+                            "node": {
+                              "workflow": "CI — Node target",
+                              "run_number": 562,
+                              "conclusion": "SUCCESS"
+                            }
+                          }
+                        }
+                      },
+                      "F5-7D2": {
+                        "status": "not-started",
+                        "authorized": false,
+                        "implementation_complete": false,
+                        "maintainer_validated": false,
+                        "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#f5-7d2",
+                        "request_budget_authorized": null
+                      }
+                    }
+                  },
+                  "F5-7E": {
+                    "status": "not-started",
+                    "authorized": false,
+                    "implementation_complete": false,
+                    "maintainer_validated": false,
+                    "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#f5-7e"
+                  },
+                  "F5-7F": {
+                    "status": "not-started",
+                    "authorized": false,
+                    "implementation_complete": false,
+                    "maintainer_validated": false,
+                    "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md#f5-7f"
+                  },
+                  "F5-7A": {
+                    "status": "complete",
+                    "implementation_complete": true,
+                    "maintainer_validated": true,
+                    "certification_provenance": "Certified current state supplied by maintainer in R0 authorization; no runtime recertification"
+                  },
+                  "F5-7B": {
+                    "status": "complete",
+                    "implementation_complete": true,
+                    "maintainer_validated": true,
+                    "certification_provenance": "Certified current state supplied by maintainer in R0 authorization; no runtime recertification"
+                  },
+                  "F5-7C": {
+                    "status": "complete",
+                    "implementation_complete": true,
+                    "maintainer_validated": true,
+                    "certification_provenance": "Certified current state supplied by maintainer in R0 authorization; no runtime recertification"
+                  }
+                },
+                "do_not_retry_provider": true,
+                "provider_execution_authorized": false,
+                "offline_replay_authorized": false,
+                "real_database_access_authorized": false,
+                "r0_governance": {
+                  "status": "complete",
+                  "governance_only": true,
+                  "contract": "docs/handoff/LOT-5.7-P-F5-7-R0-PRODUCTION-GATES.md",
+                  "base_head": "6ef82caaa5228ceee8badd27e0b10aa200bacf82",
+                  "base_tree": "c2b5ffd68c2125d045aafaa2d561a95358f07a11",
+                  "definition_date": "2026-10-05",
+                  "implementation_authorized": false,
+                  "execution_authorized": false,
+                  "target_mvp_championships": [
+                    "F1",
+                    "Formula E",
+                    "MotoGP",
+                    "Moto2",
+                    "Moto3",
+                    "WRC",
+                    "WSBK",
+                    "WSSP"
+                  ],
+                  "certified_real_championships": [
+                    "F1"
+                  ],
+                  "post_d1_audit": {
+                    "conclusion": "PASS",
+                    "P1": [],
+                    "P2_open": [
+                      "P2-01",
+                      "P2-02",
+                      "P2-03",
+                      "P2-04",
+                      "P2-05",
+                      "P2-06"
+                    ],
+                    "P3_resolved": [
+                      "P3-01"
+                    ],
+                    "P3_open": [
+                      "P3-02",
+                      "P3-03"
+                    ]
+                  },
+                  "certified_governance_ci": {
+                    "git_head": "6ef82caaa5228ceee8badd27e0b10aa200bacf82",
+                    "provenance": "Maintainer supplied; no external access in R0",
+                    "legacy": {
+                      "run_number": 294,
+                      "conclusion": "SUCCESS"
+                    },
+                    "node": {
+                      "run_number": 563,
+                      "conclusion": "SUCCESS"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "sources_admin_mvp_authorized":true,
+          "sources_admin_mvp_authorization_date":"2026-08-26",
+          "sources_admin_mvp_implementation_complete":true,
+          "sources_admin_mvp_maintainer_reaudit":"pass",
+          "sources_admin_mvp_maintainer_validated":true,
+          "sources_admin_mvp_maintainer_validation_date":"2026-08-27",
+          "sources_admin_mvp_maintainer_validated_sha":"298356fdcba4375582ea2d36588afb16815c55dd",
+          "sources_admin_mvp_audit_corrections_complete":true,
+          "sources_admin_configuration_execution_readiness_separated":true,
+          "sources_admin_configuration_execution_readiness_maintainer_validated":true,
+          "sources_admin_zero_credit_preflight_vps_validated":true,
+          "sources_admin_zero_credit_preflight_vps_validation_date":"2026-08-27",
+          "sources_admin_zero_credit_preflight_vps_validated_sha":"298356fdcba4375582ea2d36588afb16815c55dd",
+          "sources_admin_mvp_reaudit_required":false,
+          "sources_admin_mvp_evidence":"docs/handoff/LOT-5.7-P-F1-UI-SOURCES-ADMIN.md",
+          "sources_admin_mvp_scope":"Implement the existing Providers > Sources administration UI by reusing the existing provider backend, credentials encryption, championships, source configuration, quota/cadence, immutable normalization mappings and bounded-runner preflight. Preserve the validated Sources / Synchronisations / Taches planifiees separation and existing UI contract.",
+          "sources_admin_zero_credit_preflight_required":true,
+          "events_admin_meeting_projection_correction_complete":true,
+          "events_admin_meeting_projection_preproduction_validation":"pass",
+          "events_admin_meeting_projection_maintainer_ui_validation":"pass",
+          "events_admin_meeting_projection_validated_sha":"e21c9d6f85678236ea92712a8e758957790f7e60",
+          "events_admin_meeting_projection_validation_date":"2026-08-27",
+          "events_admin_meeting_projection_validated":true,
+          "events_admin_event_prefill_validated":true,
+          "events_admin_double_click_edit_validated":true,
+          "events_admin_canonical_meeting_event_separation_real_data_validated":true,
+          "events_admin_meeting_projection_migration_required":false,
+          "events_admin_meeting_projection_provider_calls":0,
+          "events_admin_meeting_projection_evidence":"docs/handoff/LOT-5.7-P-F1-UI-EVENT-MEETING-VALIDATION.md",
+          "events_admin_controlled_category_editing_complete":true,
+          "events_admin_controlled_category_editing_preproduction_validation":"pass",
+          "events_admin_controlled_category_editing_maintainer_validated":true,
+          "events_admin_controlled_category_editing_maintainer_validation_date":"2026-08-28",
+          "events_admin_controlled_category_editing_validated_sha":"4b22f5315cfc03a54bd56c03eec34b80eea99b33",
+          "events_admin_controlled_category_values":["practice","qualifying","sprint","race","other"],
+          "events_admin_controlled_category_provider_override_cycle_validated":true,
+          "events_admin_controlled_category_session_title_independence_validated":true,
+          "events_admin_controlled_category_residual_corrections":0,
+          "events_admin_controlled_category_validation_provider_calls":0,
+          "events_admin_controlled_category_validation_total_provider_calls":4,
+          "events_admin_controlled_category_validation_worker_stopped":true,
+          "events_admin_controlled_category_evidence":"docs/handoff/LOT-5.7-P-F1-UI-EVENT-MEETING-VALIDATION.md",
+          "real_provider_validation_authorized":true,
+          "real_provider_validation_authorization_date":"2026-08-27",
+          "real_provider_validation_status":"maintainer-validated",
+          "real_provider_validation_implementation_started":true,
+          "real_provider_validation_implementation_complete":true,
+          "real_provider_validation_maintainer_validated":true,
+          "real_provider_validation_maintainer_validation_date":"2026-08-27",
+          "real_provider_validation_application_sha":"e21c9d6f85678236ea92712a8e758957790f7e60",
+          "real_provider_validation_documentation_base_sha":"ab0d458cae59850a38f768418cb19f24d05a0a40",
+          "real_provider_validation_external_calls":1,
+          "real_provider_validation_provider_credits":1,
+          "real_provider_validation_traversal_id":"de03e4cf-3c51-41da-8f4a-d0427fbe2ec8",
+          "real_provider_validation_run_id":"fc320dcf-7531-444b-a52d-4bf673ca0e79",
+          "real_provider_validation_replay_idempotent":true,
+          "real_provider_validation_orphan_events":0,
+          "real_provider_validation_expected_reviews":33,
+          "real_provider_validation_final_provider_safe":true,
+          "real_provider_validation_worker_remained_stopped":true,
+          "real_provider_validation_evidence":"docs/handoff/LOT-5.7-P-F2-REAL-PROVIDER-VALIDATION.md",
+          "real_provider_validation_scope":"One strictly controlled bounded real-provider validation of OCBlackTop F1 in preproduction, manually triggered by the maintainer through the canonical providerAcquireOnce CLI, with explicit per-execution request budget and the worker stopped.",
+          "real_provider_validation_environment":"preproduction-only",
+          "real_provider_validation_provider":"ocblacktop",
+          "real_provider_validation_championship":"f1",
+          "real_provider_validation_manual_only":true,
+          "real_provider_validation_bounded_requests_required":true,
+          "real_provider_validation_worker_must_remain_stopped":true,
+          "real_provider_validation_backup_required":true,
+          "real_provider_validation_zero_credit_preflight_required":true,
+          "real_provider_validation_exact_call_accounting_required":true,
+          "real_provider_execution_authorized":false,
+          "real_provider_execution_authorization_scope":"No new provider execution is authorized. The completed F2-RPV authorization and validation above are historical evidence, not authorization for another call.",
+          "production_preview_activation_authorized":false,
+          "production_authorized":false,
+          "external_client_onboarding_authorized":false
+        }
+      },
+      "full_lot_5_7_authorized": false
+    },
+    "validation_rule": "Technical gates 5.7-P-A/B/C/D/E, the API/worker isolation prerequisite, 5.7-P-F1-UI and F2-RPV retain their maintainer validations. F3 is complete/proven and F4 is complete. F5-1 through F5-6 are maintainer-validated. F5-7D0 and F5-7D1 are maintainer-validated and complete at their certified functional SHA. F5-7D and F5-7 remain in progress; F5-7D2/E/F are defined by R0, not started and unauthorized; R0 authorizes neither implementation nor execution. Applicable 5.8/5.9 acceptance and 5.10 final acceptance are required for F5 closure. The real provider request budget is permanently 1/1 consumed; do not retry provider. No further offline replay or real certification DB access is authorized. F5 remains in progress. Gate F, Production Preview activation, Production, external onboarding, full Lot 5.7, Lot 5.8+ and merge to main remain unauthorized."
   },
-  "lot_5_approved_concepts": {
-    "provider_model": "Adapter plus provider instance plus provider/championship synchronization stream",
-    "championship_discovery": "Automatic where possible, visible as discovered but never auto-synchronized before manual activation",
-    "manual_configuration": "Adapter-specific form when automatic discovery is unavailable or insufficient",
-    "wrc": "Special adapter behavior where seasons/endpoints require it, normalized into the common core",
-    "bootstrap": "Current year first across active championships in round-robin, then historical backfill in background",
-    "historical_depth": "Discover seasons where possible; otherwise N-1 recursively until a confirmed empty season, with optional manual start year",
-    "current_loop": "Scan from January 1 through available current-year data, then restart from January 1 continuously",
-    "scheduler": "Persistent round-robin scheduler with provider-specific cursor and lease per stream",
-    "quota_cadence": "Automatically computed from configured/observed short-term and monthly limits, remaining budget, reset time and active streams",
-    "quota_reserve": "30 percent of monthly quota reserved for current-year work by default",
-    "quota_unknown": "No automatic synchronization without known safe limits unless reliable provider limits are exposed",
-    "retry": "Exponential backoff plus jitter for transient failures; suspend on durable auth/configuration failure",
-    "secrets": "Encrypted in database with environment master key, authenticated encryption, nonce and key_version",
-    "source_policy": "One principal provider per championship in V1",
-    "normalization": "Adapter normalization plus stored mappings; ambiguous relationships require manual association",
-    "idempotence": "Stable external ID first, safe business key second, normalized provider hash for unchanged detection",
-    "corrections": "Provider values continue to update but existing local override remains effective",
-    "missing_events": "Alert after three complete missing cycles by default; never automatically delete",
-    "disabled_championship": "Keep data and admin visibility, stop synchronization, exclude from public API; priority current-year refresh on reactivation",
-    "logs": "Durable run summary in PostgreSQL plus structured technical logs with rotation/compression",
-    "logo": "Local championship logo upload belongs to championship and is never overwritten by provider"
-  },
-  "approved_defaults": {
-    "current_year_monthly_quota_reserve_percent": 30,
-    "detailed_log_retention_days": 30,
-    "log_rotation_max_size_mb": 100,
-    "log_rotation_daily": true,
-    "provider_default_concurrency": 1,
-    "provider_missing_event_cycles_before_alert": 3
-  },
-  "ui_concepts_validated": [
-    "Providers overview",
-    "Provider detail overview",
-    "Configuration tab",
-    "Quotas tab",
-    "Championships tab",
-    "Synchronization tab",
-    "History and logs tab",
-    "Championship local logo upload"
-  ],
-  "phase_0_required": {
-    "implementation_started": false,
-    "deliverables": [
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-SPEC.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-ACCEPTANCE.md",
-      "docs/handoff/LOT-5-PROVIDERS-SYNC-IMPACT-ANALYSIS.md",
-      "Implementation and validation step breakdown",
-      "Migration plan if schema changes are necessary",
-      "ADR only for durable new architecture decisions"
-    ],
-    "stop_rule": "After Phase 0 documentation is committed and pushed, Codex must stop and wait for explicit maintainer validation."
+  "lot_5_6_approved_concepts": {
+    "current": "Acquire all future provider data from today until provider future exhaustion; J+30 is only the configurable hot window",
+    "finalization": "30-day default configurable finalization period with anomaly if provider still does not identify event as finished",
+    "recent_catchup": "Past portion of current season during initial bootstrap only",
+    "deep_history": "Previous seasons until provider exhaustion; five consecutive valid empty seasons by default",
+    "priority": "finalization approximately current-hot > current-future > recent_catchup > deep_history while preserving 5.4 fairness",
+    "source_storage": "Durable structured replayable source representation without full-version duplication",
+    "identity": "provider_instance_id + championship_source_id + entity_kind + external_id, with explicit synthetic source key fallback",
+    "absence": "Only after complete provider traversal and always non-destructive in 5.6",
+    "checkpoint": "Advance only after durable successful unit persistence; invalid cursor restarts smallest safe unit",
+    "pre_1970": "No positive Unix timestamp assumption or zero-date sentinel",
+    "manual_overrides": "Provider acquisition updates source but never destroys active local override",
+    "security": "ADR-0016 outbound HTTPS allowlist, redirects, timeout, bounded streaming and redaction apply without exception",
+    "boundary_5_7": "Source graph is technical only; no final business normalization, merging or Event-to-Sessions model is introduced in 5.6"
   },
   "quality_baseline": {
-    "lot_4_4_node_tests": "110-passed",
-    "lot_4_4_windows_recipe": "passed-by-maintainer-2026-08-12",
-    "lot_4_4_vps": "passed-by-maintainer-2026-08-12",
-    "lot_4_4_ci": "success-on-5428c1bc2c65193e2b0b623297ea366c2ddd196e",
-    "lot_4_4_docker_build": "success-on-5428c1bc2c65193e2b0b623297ea366c2ddd196e"
+    "lot_5_5": "maintainer-validated-2026-08-14",
+    "lot_5_6_design": "cross-audit-passed-consolidated-and-authorized-2026-08-14"
   },
   "next_action": {
-    "owner": "Codex",
-    "task": "Create the Lot 5 working branch and produce Phase 0 specification, acceptance criteria, impact analysis, migration assessment and a staged implementation/validation plan from the approved concept document. Do not modify application code."
+    "owner": "Maintainer",
+    "task": "Examiner le diff documentaire de certification officielle ADM-02 PASS_WITH_RESERVATIONS au SHA publié 6c37aa09436356eb6c85c310114dce5f4c2a5fd2. Les deux CI exact-SHA sont SUCCESS ; les réserves ADM-02 et historiques ADM-01/A1/A2/A3 restent préservées. Cette certification concerne uniquement le rejet motivé confirmé Meeting/Event, pas les 18 commits publiés dans leur ensemble. Aucun commit, push, merge, déploiement, provider, accès DB ou A3-02 autorisé ; attendre une nouvelle décision du mainteneur après remise des livrables."
   }
 }

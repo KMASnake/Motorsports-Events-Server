@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: pp171_certification
+      POSTGRES_USER: pp171_certification
+      POSTGRES_PASSWORD: ${PP171_DATABASE_PASSWORD:?PP171_DATABASE_PASSWORD is required}
+    volumes:
+      - pp171_postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - pp171_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pp171_certification -d pp171_certification"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    security_opt:
+      - no-new-privileges:true
+
+  migrate:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: pp171_certification
+      POSTGRES_USER: pp171_certification
+      POSTGRES_PASSWORD: ${PP171_DATABASE_PASSWORD:?PP171_DATABASE_PASSWORD is required}
+      PGPASSWORD: ${PP171_DATABASE_PASSWORD:?PP171_DATABASE_PASSWORD is required}
+      PGHOST: postgres
+      PGPORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./infra/postgres/migrations:/migrations:ro
+    command: ["sh", "/migrations/migrate.sh", "up"]
+    networks:
+      - pp171_internal
+    restart: "no"
+    security_opt:
+      - no-new-privileges:true
+
+  certification:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      args:
+        APP_VERSION: ${PP171_VERSION:?PP171_VERSION is required}
+        GIT_SHA: ${PP171_GIT_SHA:?PP171_GIT_SHA is required}
+        BUILD_TIME: pp171-static-design
+    environment:
+      DATABASE_URL: postgresql://pp171_certification:${PP171_DATABASE_PASSWORD:?PP171_DATABASE_PASSWORD is required}@postgres:5432/pp171_certification
+      NODE_ENV: test
+    volumes:
+      - ./scripts/validate-lot57pf-pp171.mjs:/app/scripts/validate-lot57pf-pp171.mjs:ro
+    command: ["node", "scripts/validate-lot57pf-pp171.mjs", "certify"]
+    networks:
+      - pp171_internal
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+
+networks:
+  pp171_internal:
+    internal: true
+
+volumes:
+  pp171_postgres_data:

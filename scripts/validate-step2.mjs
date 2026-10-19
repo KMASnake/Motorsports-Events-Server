@@ -21,6 +21,8 @@ async function expectOk(path, options = {}) {
 
 const marker = `step2-${Date.now().toString(36)}`;
 const createdIds = [];
+let providerId = null;
+let originalProviderName = null;
 
 try {
   const championships = await expectOk('/api/v1/championships');
@@ -51,17 +53,11 @@ try {
   });
   expect(rejectedManualSync.response.status === 409, 'La synchronisation d’un événement manuel aurait dû être refusée.');
 
-  const originalProviderName = 'Valeur fournisseur initiale';
-  const provider = await expectOk('/api/v1/admin/provider-events', {
-    method: 'POST',
-    body: JSON.stringify({
-      ...common,
-      name: originalProviderName,
-      provider_key: 'step2-fixture',
-      external_id: marker
-    })
-  });
-  createdIds.push(provider.id);
+  const providerEvents = await expectOk('/api/v1/admin/events');
+  const provider = providerEvents.find(row => row.origin === 'provider' && row.normalized_uuid && row.correction_count === 0);
+  expect(provider, 'Aucun événement fournisseur canonique sans correction disponible dans le dataset d’acceptation.');
+  providerId = provider.id;
+  originalProviderName = provider.name;
 
   await expectOk(`/api/v1/admin/events/${provider.id}`, {
     method: 'PATCH', body: JSON.stringify({ name: 'Première valeur locale' })
@@ -122,6 +118,7 @@ try {
   console.log('Résolutions locale/fournisseur : OK');
   console.log('API publique effective et nettoyée : OK');
 } finally {
+  if (providerId && originalProviderName) await call(`/api/v1/admin/events/${providerId}/provider-sync`, { method: 'POST', body: JSON.stringify({ name: originalProviderName }) }).catch(() => undefined);
   for (const id of createdIds.reverse()) {
     await call(`/api/v1/admin/events/${id}`, { method: 'DELETE' }).catch(() => undefined);
   }
