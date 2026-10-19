@@ -2,6 +2,35 @@
 
 > Les entrées sont des décisions datées. Lorsqu'un gate évolue, la décision la plus récente et les ADR acceptés prévalent sur les mentions historiques d'un état antérieur.
 
+## 2026-10-18 — Certification officielle ADM-02 avec réserves
+
+Le mainteneur décide explicitement de certifier le rejet motivé confirmé des
+candidats Meeting/Event éligibles depuis Doublons, au commit publié
+`6c37aa09436356eb6c85c310114dce5f4c2a5fd2` (tree `c424d391e4ee1d443c49f0a857dc18c920c8fa44`).
+Cette décision porte uniquement sur ADM-02, pas sur les 18 commits publiés.
+L’état canonique, les preuves et restrictions sont consignés dans
+[`PROGRESS.json`](../handoff/PROGRESS.json), objet `adm_02_certification`.
+La décision n’est pas déduite des seules CI ni de la publication GitHub.
+
+Sont retenus : éligibilité, motif obligatoire, confirmation explicite de
+l’irréversibilité via l’API actuelle, backend reject existant, idempotence,
+conflit 409 avec relecture et nouvelle confirmation, authentification/CSRF,
+persistance/audit, non-publication observée et non-régression ADM-01.
+Les workflows Node 39156810440 et Legacy Python 39156810395 sont terminés
+SUCCESS sur ce SHA exact ; ils ne remplacent pas les preuves fonctionnelles.
+
+Réserves expressément conservées : données intégrées synthétiques ; tables
+canoniques partiellement vides au baseline ; couverture HTTP 500 intégrée
+incomplète ; réserves ADM-01 non levées ; publication sans validation de
+déploiement ; CI sans couverture universelle des scénarios. Restent aussi
+les limites d’idempotence en mémoire, des révisions JS sûres et de visibilité
+réseau/intégrations documentées. Aucun échec historique requalifié.
+
+Aucun backend supplémentaire, link/create, matching guidé, déploiement ou
+A3-02 inclus. Toutes les décisions ADM-01/A1/A2/A3 sont préservées ;
+R1_P1_01 reste OPEN. Cette opération est documentaire sans commit ni push.
+Rapport : `/home/kmasnake/projects/audits/adm02-official-certification/ADM-02-OFFICIAL-CERTIFICATE.md`.
+
 ## 2026-10-17 — Acceptation officielle mainteneur d’ADM-01 avec réserves
 
 Le mainteneur accepte officiellement et explicitement le verdict indépendant

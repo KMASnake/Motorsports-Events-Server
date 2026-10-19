@@ -5,7 +5,7 @@
     "lot": "5",
     "name": "Providers and API synchronization core",
     "status": "lot-5.7-p-f3-proven-f4-complete-f5-7d1-maintainer-validated-gate-f-incomplete",
-    "updated_at": "2026-10-17",
+    "updated_at": "2026-10-18",
     "r1_a2_4_certification": {
       "scope": "R1-A2.4 only",
       "status": "CERTIFIED — PASS WITH EXPLICIT RESERVATIONS",
@@ -274,6 +274,136 @@
         "COMMIT_CREATED": "NO",
         "PUSH_EXECUTED": "NO"
       }
+    },
+    "adm_02_certification": {
+      "status": "PASS_WITH_RESERVATIONS",
+      "scope": "CONFIRMED_REASONED_REJECTION_OF_ELIGIBLE_MEETING_EVENT_CANDIDATES",
+      "admin_integration": "EXISTING_DUPLICATES_ROUTE",
+      "maintainer_decision": "ACCEPTED",
+      "maintainer_acceptance_date": "2026-10-18",
+      "acceptance_provenance": "Explicit current maintainer mandate authorizing official ADM-02 certification after evidence and exact-SHA GitHub CI verification; not inferred from publication or CI alone.",
+      "certified_branch": "codex/lot-5-providers-sync",
+      "certified_head": "6c37aa09436356eb6c85c310114dce5f4c2a5fd2",
+      "certified_tree": "c424d391e4ee1d443c49f0a857dc18c920c8fa44",
+      "reference_scope": "ADM-02 functional scope only at this immutable published SHA; not blanket certification of the 18 published commits. Subsequent documentary worktree excluded.",
+      "validation": {
+        "implementation": "PASS",
+        "integration": "PASS",
+        "evidence_review": "PASS",
+        "local_commit": "PASS",
+        "github_push": "PASS",
+        "node_ci": "PASS",
+        "legacy_python_ci": "PASS",
+        "synthetic_web_passed": 158,
+        "synthetic_targeted_included_in_web": 39,
+        "synthetic_browser_passed": 27,
+        "synthetic_api_passed": 21,
+        "integrated_api_postgres_groups_passed": 12,
+        "integrated_browser_and_check_groups_passed": 9,
+        "counting_note": "Historical executed campaigns reviewed and linked by hashes; no application test rerun by certification. Nine integrated browser/check groups = eight flows plus final DB check; counts overlap and are not additive."
+      },
+      "github_actions": [
+        {
+          "id": 39156810440,
+          "url": "https://github.com/KMASnake/Motorsports-Events-Server/actions/runs/39156810440",
+          "head_sha": "6c37aa09436356eb6c85c310114dce5f4c2a5fd2",
+          "conclusion": "success"
+        },
+        {
+          "id": 39156810395,
+          "url": "https://github.com/KMASnake/Motorsports-Events-Server/actions/runs/39156810395",
+          "head_sha": "6c37aa09436356eb6c85c310114dce5f4c2a5fd2",
+          "conclusion": "success"
+        }
+      ],
+      "audited_files_sha256": {
+        "apps/web/src/features/meeting-event-candidates/CandidatesPage.tsx": "ca92df4cc9314b2b6ce5040a12be59c83a759e53e05acd6f20d00a314ff77452",
+        "apps/web/src/features/meeting-event-candidates/candidates.css": "cc4c41752212b71f1b9de0709a7241b183d75b80d363a118abab53519a7a578c",
+        "apps/web/src/features/meeting-event-candidates/candidatesApi.ts": "cf2b78c0c5c78e5a61b52f7b22323b4027e821e0736e2b24f3a347c07259a548",
+        "apps/web/src/features/meeting-event-candidates/CandidateRejection.tsx": "f58e833f96c70d5a10077ac794503fec9309ab736c08cb0817ddaafb253a173d",
+        "apps/web/src/features/meeting-event-candidates/rejection.test.ts": "90f426ad8d2dbafce81558ba4e86024d833e34fdb930d1f1ea7f3e736fce60c5",
+        "apps/web/src/features/meeting-event-candidates/rejection.ts": "8b695ab96af8bad1d9abaec63c5021c6a372b65c19d6b5a8cc2593f71ccc5f9b",
+        "apps/web/tests/adm02/playwright.config.ts": "feb5dfdc6cf833a455135bbf70f4e47574f3bb0a3a32782ae1111ce9108c141d",
+        "apps/web/tests/adm02/rejection.pw.ts": "505f439cd51c560d733ab1028d55698503428551a628557a44f10f8eb72c9315"
+      },
+      "accepted_reservations": [
+        {
+          "id": "ADM02-R01",
+          "status": "OPEN",
+          "reservation": "La validation intégrée utilise uniquement des données synthétiques dans une API et une base PostgreSQL jetables."
+        },
+        {
+          "id": "ADM02-R02",
+          "status": "OPEN",
+          "reservation": "Plusieurs tables canoniques Meeting/Event étaient vides avant le test de non-publication : absence de création/publication démontrée dans les scénarios exécutés, pas conservation exhaustive de canoniques préexistants peuplés."
+        },
+        {
+          "id": "ADM02-R03",
+          "status": "OPEN",
+          "reservation": "Tous les scénarios HTTP 500 ne sont pas exercés en intégration ; couverture synthétique distincte, sans preuve intégrée universelle des erreurs serveur."
+        },
+        {
+          "id": "ADM02-R04",
+          "status": "OPEN",
+          "reservation": "Les réserves historiques ADM-01 R-GET-01, R-PAGE-01 et ADM01-R03 ne sont pas automatiquement levées ; preuves intégrées nouvelles limitées à leurs scénarios."
+        },
+        {
+          "id": "ADM02-R05",
+          "status": "OPEN",
+          "reservation": "La publication GitHub ne valide ni n’autorise un déploiement ; aucune aptitude production déduite."
+        },
+        {
+          "id": "ADM02-R06",
+          "status": "OPEN",
+          "reservation": "Les deux CI réussies au SHA exact ne remplacent pas les validations spécifiques de tous les scénarios fonctionnels ADM-02."
+        },
+        {
+          "id": "ADM02-R07",
+          "status": "OPEN",
+          "reservation": "Idempotence frontend en mémoire du document navigateur : pas de persistance après rechargement complet/fermeture ni coordination multi-onglets ; résultat incertain après perte de réponse jusqu’à confirmation/rejeu."
+        },
+        {
+          "id": "ADM02-R08",
+          "status": "OPEN",
+          "reservation": "Révisions hors entier JavaScript sûr refusées pour le rejet, sans conversion permissive."
+        },
+        {
+          "id": "ADM02-R09",
+          "status": "OPEN",
+          "reservation": "Quatre refus réseau initiaux sans destination ; reproduction de deux IPC locaux TSX, sans attribution rétrospective certaine. Visibilité des Apps externes limitée lors du prépush, risque accepté séparément pour publication, sans autorisation de déploiement."
+        }
+      ],
+      "evidence_directories": [
+        "/home/kmasnake/projects/audits/adm02-discovery",
+        "/home/kmasnake/projects/audits/adm02-implementation",
+        "/home/kmasnake/projects/audits/adm02-integration-validation",
+        "/home/kmasnake/projects/audits/adm02-consolidation-preparation",
+        "/home/kmasnake/projects/audits/adm02-local-commit",
+        "/home/kmasnake/projects/audits/adm02-github-push-retry"
+      ],
+      "certificate_report": "/home/kmasnake/projects/audits/adm02-official-certification/ADM-02-OFFICIAL-CERTIFICATE.md",
+      "exclusions": [
+        "additional backend development",
+        "link",
+        "create",
+        "guided matching",
+        "deployment",
+        "A3-02",
+        "blanket certification of the 18-commit chain"
+      ],
+      "restrictions": {
+        "deployment_authorized": false,
+        "production_deployed": false,
+        "A3_02_AUTHORIZED": false,
+        "provider_execution_authorized": false,
+        "database_write_authorized": false,
+        "worker_start_authorized": false,
+        "scheduler_start_authorized": false,
+        "commit_authorized": false,
+        "push_authorized": false,
+        "R1_P1_01": "OPEN"
+      },
+      "historical_scope_note": "ADM-01 and all other certification objects remain unchanged historical acceptance snapshots; this newer ADM-02 decision supersedes only their historical absence of ADM-02 authorization, without closing their reservations."
     },
     "implementation_percent": 100,
     "architecture_percent": 100,
@@ -952,6 +1082,6 @@
   },
   "next_action": {
     "owner": "Maintainer",
-    "task": "Examiner le diff complet des deux documents de gouvernance enregistrant l’acceptation officielle mainteneur ADM-01 PASS_WITH_RESERVATIONS pour READ_ONLY_MEETING_EVENT_CANDIDATE_LIST_DETAIL dans la rubrique Doublons existante. Les neuf fichiers web audités restent inchangés, non consolidés dans HEAD ; leurs empreintes complètent la base ead7141a9dff5a79ac4bd029873e104f16f3e2e3. Maintenir ouvertes et acceptées R-GET-01 (provenance partielle), R-PAGE-01 (offset sans total/snapshot) et ADM01-R03 (navigateur synthétique, API/DB réelle non validée). Après revue, demander une autorisation explicite distincte avant toute consolidation Git locale : aucun staging, commit ni push autorisé dans cette étape. A3-01 PASS_WITH_RESERVATIONS, LCA-01 OPEN_LOW et R1_P1_01 OPEN sont préservés ; aucune modification des décisions A1/A2 ou réserves R1-A2.4. ADM-02 et A3-02 ne sont pas autorisés ; aucun runtime A3, provider réel, worker/scheduler, préproduction, production ou déploiement. Arrêter après remise des preuves et attendre la décision du mainteneur."
+    "task": "Examiner le diff documentaire de certification officielle ADM-02 PASS_WITH_RESERVATIONS au SHA publié 6c37aa09436356eb6c85c310114dce5f4c2a5fd2. Les deux CI exact-SHA sont SUCCESS ; les réserves ADM-02 et historiques ADM-01/A1/A2/A3 restent préservées. Cette certification concerne uniquement le rejet motivé confirmé Meeting/Event, pas les 18 commits publiés dans leur ensemble. Aucun commit, push, merge, déploiement, provider, accès DB ou A3-02 autorisé ; attendre une nouvelle décision du mainteneur après remise des livrables."
   }
 }
